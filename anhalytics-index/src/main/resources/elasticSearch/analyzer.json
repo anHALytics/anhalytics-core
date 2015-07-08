@@ -1,0 +1,11 @@
+{
+  "analysis" : { 
+       "analyzer" : { 
+          "case_insensitive" : { 
+              "type" : "custom", 
+		      "tokenizer" : "keyword",
+		      "filter" : "lowercase"
+          }
+	   } 
+  }
+}

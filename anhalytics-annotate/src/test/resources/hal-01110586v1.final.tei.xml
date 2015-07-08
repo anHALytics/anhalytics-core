@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML">
+	<teiHeader xml:lang="en">
+		<titleStmt>
+			<title xml:id="_FUznWJZ" xml:lang="en">A RE-AIM evaluation of evidence-based multi-level interventions to improve obesity-related behaviours in adults: a systematic review (the SPOTLIGHT project)</title>
+			<author role="aut">
+				<persName>
+					<forename type="first">Sofie</forename>
+					<surname>Compernolle</surname>
+				</persName>
+				<email/>
+				<idno type="halauthor">1122092</idno>
+				<affiliation>
+					<org ref="#struct-250799" type="laboratory">
+						<orgName>Department of Movement and Sport Sciences</orgName>
+						<desc>
+							<address>
+								<addrLine>Faculty of Medicine and Health Sciences, Ghent</addrLine>
+								<country key="BE"/>
+							</address>
+						</desc>
+						<listRelation>
+							<relation active="#struct-302729" type="direct"/>
+						</listRelation>
+					</org>
+				</affiliation>
+			</author>
+			<author role="aut">
+				<persName>
+					<forename type="first">Katrien</forename>
+					<surname>De Cocker</surname>
+				</persName>
+				<email/>
+				<idno type="halauthor">1122093</idno>
+				<affiliation>
+					<org ref="#struct-160736" type="laboratory">
+						<orgName>Research Foundation - Flanders; Institute of Development Policy and Management</orgName>
+						<desc>
+							<address>
+								<country key="BE"/>
+							</address>
+						</desc>
+						<listRelation>
+							<relation active="#struct-340571" type="direct"/>
+						</listRelation>
+					</org>
+				</affiliation>
+				<affiliation>
+					<org ref="#struct-250799" type="laboratory">
+						<orgName>Department of Movement and Sport Sciences</orgName>
+						<desc>
+							<address>
+								<addrLine>Faculty of Medicine and Health Sciences, Ghent</addrLine>
+								<country key="BE"/>
+							</address>
+						</desc>
+						<listRelation>
+							<relation active="#struct-302729" type="direct"/>
+						</listRelation>
+					</org>
+				</affiliation>
+			</author>
+			<author role="aut">
+				<persName>
+					<forename type="first">Jeroen</forename>
+					<surname>Lakerveld</surname>
+				</persName>
+				<email/>
+				<idno type="halauthor">1122094</idno>
+				<affiliation>
+					<org ref="#struct-250797" type="laboratory">
+						<orgName>Department of General Practice and Elderly Care Medicine</orgName>
+						<desc>
+							<address>
+								<addrLine>Amsterdam</addrLine>
+								<country key="NL"/>
+							</address>
+						</desc>
+						<listRelation>
+							<relation active="#struct-305740" type="direct"/>
+							<relation active="#struct-359946" type="direct"/>
+						</listRelation>
+					</org>
+				</affiliation>
+			</author>
+			<author role="aut">
+				<persName>
+					<forename type="first">Joreintje D</forename>
+					<surname>Mackenbach</surname>
+				</persName>
+				<email/>
+				<idno type="halauthor">1122095</idno>
+				<affiliation>
+					<org ref="#struct-250797" type="laboratory">
+						<orgName>Department of General Practice and Elderly Care Medicine</orgName>
+						<desc>
+							<address>
+								<addrLine>Amsterdam</addrLine>
+								<country key="NL"/>
+							</address>
+						</desc>
+						<listRelation>
+							<relation active="#struct-305740" type="direct"/>
+							<relation active="#struct-359946" type="direct"/>
+						</listRelation>
+					</org>
+				</affiliation>
+			</author>
+			<author role="aut">
+				<persName>
+					<forename type="first">Giel</forename>
+					<surname>Nijpels</surname>
+				</persName>
+				<email/>
+				<idno type="halauthor">489202</idno>
+				<affiliation>
+					<org ref="#struct-250797" type="laboratory">
+						<orgName>Department of General Practice and Elderly Care Medicine</orgName>
+						<desc>
+							<address>
+								<addrLine>Amsterdam</addrLine>
+								<country key="NL"/>
+							</address>
+						</desc>
+						<listRelation>
+							<relation active="#struct-305740" type="direct"/>
+							<relation active="#struct-359946" type="direct"/>
+						</listRelation>
+					</org>
+				</affiliation>
+			</author>
+			<author role="crp">
+				<persName>
+					<forename type="first">Jean-Michel</forename>
+					<surname>Oppert</surname>
+				</persName>
+				<email>jean-michel.oppert@psl.aphp.fr</email>
+				<idno type="halauthor">636488</idno>
+				<affiliation>
+					<org ref="#struct-235755" type="laboratory">
+						<orgName>Unité de Recherche en Epidémiologie Nutritionnelle</orgName>
+						<orgName type="acronym">UREN</orgName>
+						<desc>
+							<address>
+								<addrLine>UFR Santé, Médecine et Biologie Humaine - 74 rue Marcel Cachin 93017 Bobigny Cedex</addrLine>
+								<country key="FR"/>
+							</address>
+							<ref type="url">http://www.univ-paris13.fr/uren/</ref>
+						</desc>
+						<listRelation>
+							<relation active="#struct-300001" name="UR1125" type="direct"/>
+							<relation active="#struct-300002" name="U557" type="direct"/>
+							<relation active="#struct-300351" type="direct"/>
+							<relation active="#struct-303171" type="direct"/>
+							<relation active="#struct-303232" type="direct"/>
+						</listRelation>
+					</org>
+				</affiliation>
+				<affiliation>
+					<org ref="#struct-247438" type="laboratory">
+						<orgName>Unité de Recherche sur les Maladies Cardiovasculaires, du Métabolisme et de la Nutrition</orgName>
+						<orgName type="acronym">ICAN</orgName>
+						<desc>
+							<address>
+								<addrLine>Faculté de Médecine - 91 boulevard de l'Hôpital 75634 Paris Cedex 13</addrLine>
+								<country key="FR"/>
+							</address>
+						</desc>
+						<listRelation>
+							<relation active="#struct-93591" type="direct"/>
+							<relation active="#struct-300002" name="U1166" type="direct"/>
+							<relation active="#struct-300068" type="direct"/>
+							<relation active="#struct-300887" type="direct"/>
+						</listRelation>
+					</org>
+				</affiliation>
+			</author>
+			<author role="aut">
+				<persName>
+					<forename type="first">Harry</forename>
+					<surname>Rutter</surname>
+				</persName>
+				<email/>
+				<idno type="halauthor">1122096</idno>
+				<affiliation>
+					<org ref="#struct-250798" type="laboratory">
+						<orgName>European Centre on Health of Societies in Transition</orgName>
+						<desc>
+							<address>
+								<addrLine>London</addrLine>
+								<country key="GB"/>
+							</address>
+						</desc>
+						<listRelation>
+							<relation active="#struct-310718" type="direct"/>
+						</listRelation>
+					</org>
+				</affiliation>
+			</author>
+			<author role="aut">
+				<persName>
+					<forename type="first">Pedro J</forename>
+					<surname>Teixeira</surname>
+				</persName>
+				<email/>
+				<idno type="halauthor">1122097</idno>
+				<affiliation>
+					<org ref="#struct-411199" type="laboratory">
+						<orgName>Interdisciplinary center for the study of human performance</orgName>
+						<desc>
+							<address>
+								<country key="PT"/>
+							</address>
+						</desc>
+						<listRelation>
+							<relation active="#struct-300565" type="direct"/>
+						</listRelation>
+					</org>
+				</affiliation>
+			</author>
+			<author role="aut">
+				<persName>
+					<forename type="first">Greet</forename>
+					<surname>Cardon</surname>
+				</persName>
+				<email/>
+				<idno type="halauthor">114021</idno>
+				<affiliation>
+					<org ref="#struct-250799" type="laboratory">
+						<orgName>Department of Movement and Sport Sciences</orgName>
+						<desc>
+							<address>
+								<addrLine>Faculty of Medicine and Health Sciences, Ghent</addrLine>
+								<country key="BE"/>
+							</address>
+						</desc>
+						<listRelation>
+							<relation active="#struct-302729" type="direct"/>
+						</listRelation>
+					</org>
+				</affiliation>
+			</author>
+			<author role="aut">
+				<persName>
+					<forename type="first">Ilse</forename>
+					<surname>De Bourdeaudhuij</surname>
+				</persName>
+				<email/>
+				<idno type="halauthor">525396</idno>
+				<affiliation>
+					<org ref="#struct-250799" type="laboratory">
+						<orgName>Department of Movement and Sport Sciences</orgName>
+						<desc>
+							<address>
+								<addrLine>Faculty of Medicine and Health Sciences, Ghent</addrLine>
+								<country key="BE"/>
+							</address>
+						</desc>
+						<listRelation>
+							<relation active="#struct-302729" type="direct"/>
+						</listRelation>
+					</org>
+				</affiliation>
+			</author>
+			<editor role="depositor">
+				<persName>
+					<forename>Administrateur</forename>
+					<surname>Hal-Upmc</surname>
+				</persName>
+				<email>halupmc@upmc.fr</email>
+			</editor>
+		</titleStmt>
+		<editionStmt>
+			<edition n="v1" type="current">
+				<date type="whenSubmitted">2015-01-28 15:00:27</date>
+				<date type="whenModified">2015-01-28 15:44:33</date>
+				<date type="whenReleased">2015-01-28 15:44:33</date>
+				<date type="whenProduced">2014-12-06</date>
+				<ref target="http://hal.upmc.fr/hal-01110586/document" type="file"/>
+			</edition>
+			<respStmt>
+				<resp>contributor</resp>
+				<name key="163328">
+					<persName>
+						<forename>Administrateur</forename>
+						<surname>Hal-Upmc</surname>
+					</persName>
+					<email>halupmc@upmc.fr</email>
+				</name>
+			</respStmt>
+		</editionStmt>
+		<publicationStmt>
+			<distributor>CCSD</distributor>
+			<idno type="halId">hal-01110586</idno>
+			<idno type="halUri">http://hal.upmc.fr/hal-01110586</idno>
+			<idno type="halBibtex">compernolle:hal-01110586</idno>
+			<idno type="halRefHtml">&lt;i&gt;International Journal of Behavioral Nutrition and Physical Activity&lt;/i&gt;, BioMed Central, 2014, 11 (1), pp.147. &lt;a target="_blank" href="http://dx.doi.org/10.1186/s12966-014-0147-3"&gt;&amp;lt;10.1186/s12966-014-0147-3&amp;gt;&lt;/a&gt;</idno>
+			<idno type="halRef">International Journal of Behavioral Nutrition and Physical Activity, BioMed Central, 2014, 11 (1), pp.147. &amp;lt;10.1186/s12966-014-0147-3&amp;gt;</idno>
+		</publicationStmt>
+		<seriesStmt>
+			<idno n="UPMC" type="stamp">Université Pierre et Marie Curie</idno>
+		</seriesStmt>
+		<notesStmt>
+			<note n="2" type="audience">International</note>
+			<note n="0" type="popular">No</note>
+			<note n="1" type="peer">Yes</note>
+		</notesStmt>
+		<sourceDesc>
+			<biblStruct>
+				<analytic>
+					<title xml:id="_aWpHxtp" xml:lang="en">A RE-AIM evaluation of evidence-based multi-level interventions to improve obesity-related behaviours in adults: a systematic review (the SPOTLIGHT project)</title>
+					<author role="aut">
+						<persName>
+							<forename type="first">Sofie</forename>
+							<surname>Compernolle</surname>
+						</persName>
+						<idno type="halAuthorId">1122092</idno>
+						<affiliation>
+							<org ref="#struct-250799" type="laboratory">
+								<orgName>Department of Movement and Sport Sciences</orgName>
+								<desc>
+									<address>
+										<addrLine>Faculty of Medicine and Health Sciences, Ghent</addrLine>
+										<country key="BE"/>
+									</address>
+								</desc>
+								<listRelation>
+									<relation active="#struct-302729" type="direct"/>
+								</listRelation>
+							</org>
+						</affiliation>
+					</author>
+					<author role="aut">
+						<persName>
+							<forename type="first">Katrien</forename>
+							<surname>De Cocker</surname>
+						</persName>
+						<idno type="halAuthorId">1122093</idno>
+						<affiliation>
+							<org ref="#struct-160736" type="laboratory">
+								<orgName>Research Foundation - Flanders; Institute of Development Policy and Management</orgName>
+								<desc>
+									<address>
+										<country key="BE"/>
+									</address>
+								</desc>
+								<listRelation>
+									<relation active="#struct-340571" type="direct"/>
+								</listRelation>
+							</org>
+						</affiliation>
+						<affiliation>
+							<org ref="#struct-250799" type="laboratory">
+								<orgName>Department of Movement and Sport Sciences</orgName>
+								<desc>
+									<address>
+										<addrLine>Faculty of Medicine and Health Sciences, Ghent</addrLine>
+										<country key="BE"/>
+									</address>
+								</desc>
+								<listRelation>
+									<relation active="#struct-302729" type="direct"/>
+								</listRelation>
+							</org>
+						</affiliation>
+					</author>
+					<author role="aut">
+						<persName>
+							<forename type="first">Jeroen</forename>
+							<surname>Lakerveld</surname>
+						</persName>
+						<idno type="halAuthorId">1122094</idno>
+						<affiliation>
+							<org ref="#struct-250797" type="laboratory">
+								<orgName>Department of General Practice and Elderly Care Medicine</orgName>
+								<desc>
+									<address>
+										<addrLine>Amsterdam</addrLine>
+										<country key="NL"/>
+									</address>
+								</desc>
+								<listRelation>
+									<relation active="#struct-305740" type="direct"/>
+									<relation active="#struct-359946" type="direct"/>
+								</listRelation>
+							</org>
+						</affiliation>
+					</author>
+					<author role="aut">
+						<persName>
+							<forename type="first">Joreintje D</forename>
+							<surname>Mackenbach</surname>
+						</persName>
+						<idno type="halAuthorId">1122095</idno>
+						<affiliation>
+							<org ref="#struct-250797" type="laboratory">
+								<orgName>Department of General Practice and Elderly Care Medicine</orgName>
+								<desc>
+									<address>
+										<addrLine>Amsterdam</addrLine>
+										<country key="NL"/>
+									</address>
+								</desc>
+								<listRelation>
+									<relation active="#struct-305740" type="direct"/>
+									<relation active="#struct-359946" type="direct"/>
+								</listRelation>
+							</org>
+						</affiliation>
+					</author>
+					<author role="aut">
+						<persName>
+							<forename type="first">Giel</forename>
+							<surname>Nijpels</surname>
+						</persName>
+						<idno type="halAuthorId">489202</idno>
+						<affiliation>
+							<org ref="#struct-250797" type="laboratory">
+								<orgName>Department of General Practice and Elderly Care Medicine</orgName>
+								<desc>
+									<address>
+										<addrLine>Amsterdam</addrLine>
+										<country key="NL"/>
+									</address>
+								</desc>
+								<listRelation>
+									<relation active="#struct-305740" type="direct"/>
+									<relation active="#struct-359946" type="direct"/>
+								</listRelation>
+							</org>
+						</affiliation>
+					</author>
+					<author role="crp">
+						<persName>
+							<forename type="first">Jean-Michel</forename>
+							<surname>Oppert</surname>
+						</persName>
+						<email>jean-michel.oppert@psl.aphp.fr</email>
+						<idno type="halAuthorId">636488</idno>
+						<affiliation>
+							<org ref="#struct-235755" type="laboratory">
+								<orgName>Unité de Recherche en Epidémiologie Nutritionnelle</orgName>
+								<orgName type="acronym">UREN</orgName>
+								<desc>
+									<address>
+										<addrLine>UFR Santé, Médecine et Biologie Humaine - 74 rue Marcel Cachin 93017 Bobigny Cedex</addrLine>
+										<country key="FR"/>
+									</address>
+									<ref type="url">http://www.univ-paris13.fr/uren/</ref>
+								</desc>
+								<listRelation>
+									<relation active="#struct-300001" name="UR1125" type="direct"/>
+									<relation active="#struct-300002" name="U557" type="direct"/>
+									<relation active="#struct-300351" type="direct"/>
+									<relation active="#struct-303171" type="direct"/>
+									<relation active="#struct-303232" type="direct"/>
+								</listRelation>
+							</org>
+						</affiliation>
+						<affiliation>
+							<org ref="#struct-247438" type="laboratory">
+								<orgName>Unité de Recherche sur les Maladies Cardiovasculaires, du Métabolisme et de la Nutrition</orgName>
+								<orgName type="acronym">ICAN</orgName>
+								<desc>
+									<address>
+										<addrLine>Faculté de Médecine - 91 boulevard de l'Hôpital 75634 Paris Cedex 13</addrLine>
+										<country key="FR"/>
+									</address>
+								</desc>
+								<listRelation>
+									<relation active="#struct-93591" type="direct"/>
+									<relation active="#struct-300002" name="U1166" type="direct"/>
+									<relation active="#struct-300068" type="direct"/>
+									<relation active="#struct-300887" type="direct"/>
+								</listRelation>
+							</org>
+						</affiliation>
+					</author>
+					<author role="aut">
+						<persName>
+							<forename type="first">Harry</forename>
+							<surname>Rutter</surname>
+						</persName>
+						<idno type="halAuthorId">1122096</idno>
+						<affiliation>
+							<org ref="#struct-250798" type="laboratory">
+								<orgName>European Centre on Health of Societies in Transition</orgName>
+								<desc>
+									<address>
+										<addrLine>London</addrLine>
+										<country key="GB"/>
+									</address>
+								</desc>
+								<listRelation>
+									<relation active="#struct-310718" type="direct"/>
+								</listRelation>
+							</org>
+						</affiliation>
+					</author>
+					<author role="aut">
+						<persName>
+							<forename type="first">Pedro J</forename>
+							<surname>Teixeira</surname>
+						</persName>
+						<idno type="halAuthorId">1122097</idno>
+						<affiliation>
+							<org ref="#struct-411199" type="laboratory">
+								<orgName>Interdisciplinary center for the study of human performance</orgName>
+								<desc>
+									<address>
+										<country key="PT"/>
+									</address>
+								</desc>
+								<listRelation>
+									<relation active="#struct-300565" type="direct"/>
+								</listRelation>
+							</org>
+						</affiliation>
+					</author>
+					<author role="aut">
+						<persName>
+							<forename type="first">Greet</forename>
+							<surname>Cardon</surname>
+						</persName>
+						<idno type="halAuthorId">114021</idno>
+						<affiliation>
+							<org ref="#struct-250799" type="laboratory">
+								<orgName>Department of Movement and Sport Sciences</orgName>
+								<desc>
+									<address>
+										<addrLine>Faculty of Medicine and Health Sciences, Ghent</addrLine>
+										<country key="BE"/>
+									</address>
+								</desc>
+								<listRelation>
+									<relation active="#struct-302729" type="direct"/>
+								</listRelation>
+							</org>
+						</affiliation>
+					</author>
+					<author role="aut">
+						<persName>
+							<forename type="first">Ilse</forename>
+							<surname>De Bourdeaudhuij</surname>
+						</persName>
+						<idno type="halAuthorId">525396</idno>
+						<affiliation>
+							<org ref="#struct-250799" type="laboratory">
+								<orgName>Department of Movement and Sport Sciences</orgName>
+								<desc>
+									<address>
+										<addrLine>Faculty of Medicine and Health Sciences, Ghent</addrLine>
+										<country key="BE"/>
+									</address>
+								</desc>
+								<listRelation>
+									<relation active="#struct-302729" type="direct"/>
+								</listRelation>
+							</org>
+						</affiliation>
+					</author>
+				</analytic>
+				<monogr>
+					<idno type="halJournalId">1137</idno>
+					<idno type="issn">1479-5868</idno>
+					<title level="j" xml:id="_CSF3WQp">International Journal of Behavioral Nutrition and Physical Activity</title>
+					<imprint>
+						<publisher>BioMed Central</publisher>
+						<biblScope unit="volume">11</biblScope>
+						<biblScope unit="issue">1</biblScope>
+						<biblScope unit="pp">147</biblScope>
+						<date type="datePub">2014-12-06</date>
+					</imprint>
+				</monogr>
+				<idno type="doi">10.1186/s12966-014-0147-3</idno>
+				<idno type="pubmed">25480391</idno>
+			</biblStruct>
+		</sourceDesc>
+		<profileDesc>
+			<langUsage>
+				<language ident="en">English</language>
+			</langUsage>
+			<textClass>
+				<keywords scheme="author">
+					<term xml:id="_a7QbE9x" xml:lang="en">Review</term>
+					<term xml:id="_SEMMFvS" xml:lang="en">RE-AIM</term>
+					<term xml:id="_gAE2xeb" xml:lang="en">Overweight</term>
+					<term xml:id="_be9HAjB" xml:lang="en">Obesity</term>
+					<term xml:id="_vZF3Ucb" xml:lang="en">Nutrition and physical activity interventions</term>
+				</keywords>
+				<classCode n="sdv.aen" scheme="halDomain" xml:id="_AtDFBXV">Life Sciences/Food and Nutrition</classCode>
+				<classCode n="ART" scheme="halTypology" xml:id="_2nn3Qty">Journal articles</classCode>
+			</textClass>
+			<abstract xml:id="_hy5VFKu" xml:lang="en">Background
+
+This systematic literature review describes the potential public health impact of evidence-based multi-level interventions to improve obesity-related behaviours in adults, using the Reach, Efficacy, Adoption, Implementation and Maintenance (RE-AIM) framework.
+Methods
+
+Electronic databases (PubMed, Embase, and The Cochrane Library) were searched to identify intervention studies published between January 2000 and October 2013. The following inclusion criteria were used: (1) the study included at least one outcome measure assessing obesity-related behaviours (i.e. diet, physical activity or sedentary behaviour), (2) the study collected data over at least one year and (3) the study’s intervention targeted adults, was conducted in a specified geographical area or worksite, and was multi-level (i.e. targeting both individual and environmental level). Evidence of RE-AIM of the selected interventions was assessed. Potential public health impact of an intervention was evaluated if information was provided on at least four of the five RE-AIM dimensions.
+Results
+
+Thirty-five multi-level interventions met the inclusion criteria. RE-AIM evaluation revealed that the included interventions generally had the potential to: reach a large number of people (on average 58% of the target population was aware of the intervention); achieve the assumed goals (89% found positive outcomes); be broadly adopted (the proportion of intervention deliverers varied from 9% to 92%) and be sustained (sixteen interventions were maintained). The highest potential public health impact was found in multi-level interventions that: 1) focused on all levels at the beginning of the planning process, 2) guided the implementation process using diffusion theory, and 3) used a website to disseminate the intervention.
+Conclusions
+
+Although most studies underreported results within the RE-AIM dimensions, the reported Reach, Effectiveness, Adoption, Implementation and Maintenance were positively evaluated. However, more information on external validity and sustainability is needed in order to take informed decisions on the choice of interventions that should be implemented in real-world settings to accomplish long-term changes in obesity-related behaviours.</abstract>
+		</profileDesc>
+	</teiHeader>
+	<text xml:lang="en">
+		<front>
+			<div type="abstract">
+				<head id="_VF7sZhV">Abstract</head>
+				<p id="_HkTNuuB">To improve a previously constructed broadly neutralizing hepatitis B virus (HBV)-specific preS1 humanized antibody (HzKR127), we further humanized it through specificity-determining residue (SDR) grafting. Moreover, we improved affinity by mutating two residues in heavy-chain complementarity-determining regions (CDR), on the basis of the crystal structure of the antigen–antibody complex. HzKR127-3.2 exhibited 2.5-fold higher affinity and enhanced virus-neutralizing activity compared to the original KR127 antibody and showed less immunogenic potential than HzKR127. Enhanced virus-neutralizing activity was achieved by the increased association rate, providing insights into engineering potent antibody therapeutics for HBV immunoprophylaxis. HzKR127-3.2 may be a good candidate for HBV immunoprophylaxis.</p>
+			</div>
+		</front>
+		<body>
+			<figure id="_P4Fyf6F">
+				<trash>FR1 HCDR1 FR2 HCDR2 1 10 20 30 40 52a 60 KR127 QVQLQQSGPELVKPGASVKISCKASGYAFS SSWMN WVKQRPGQGLEWIG RIYPGDGDTNYNGKFKG DP7</trash>
+			</figure>
+			<p xml:id="_wd64Dwv">--------A-VK-------V-------T-T -YY-H --R-A-------M- I-N-SG-S-S-AQ--Q- HzKR127 --------A-V--------V---------- ----- --R-A--------- -----------AQ--Q- HzKR127-3</p>
+			<p xml:id="_nHqwGGh">--------A-VK-------V-------T-T ----- --R-A-------M-</p>
+			<figure id="_8QfWmzX">
+				<trash>HzKR127-3.1</trash>
+			</figure>
+			<p xml:id="_67Q9n9W">--------A-VK-------V-------T-T ----- --R-A-------M-</p>
+			<figure id="_JmymVF9">
+				<trash>HzKR127-3.2</trash>
+			</figure>
+			<p xml:id="_SvBnHzs">--------A-VK-------V-------T-T ----- --R-A-------M-</p>
+			<figure id="_jUgHnzD">
+				<trash>FR3 HCDR3 FR4 70 82abc 90 102 110 KR127 KATLTADKSSSTAYMQLSSLTSVDSAVYFCAR EYDEAY WGQGTLVTVSA DP7</trash>
+			</figure>
+			<p xml:id="_GqVfw3Y">RV-M-R-T-T--V--E----R-E-T---Y--- - ----------S HzKR127I ---------T-----E----R-E-T------- ------ ----------S</p>
+			<head xml:id="_9xtDk3g">HzKR127-3</head>
+			<p xml:id="_yggYY94">RV-M-----T--V--E----R-E-T---Y--- ------ ----------S</p>
+			<figure id="_RvcBACH">
+				<head xml:id="_A2ENpYJ">HzKR127-3.1</head>
+			</figure>
+			<p xml:id="_Bb8qp7Y">RV-M-----T--V--E----R-E-T---Y--- --A--- ----------S</p>
+			<figure id="_reC5dBX">
+				<trash>HzKR127-3.2</trash>
+			</figure>
+			<p xml:id="_NNdwcDd">RV-M-----T--V--E----R-E-T---Y--- --A--- ----------S</p>
+			<figure id="_vaVgz5z">
+				<trash>FR1 LCDR1 FR2 LCDR2 10 20 27abcd 30 40 50 KR127 DILMTQTPLILSVTIGQPASISC KSSQSLLYSNGKTYLN WLLQRPGQSPKRLIY LVSKLDS DPK12</trash>
+			</figure>
+			<p xml:id="_GAj7YDU">--V------S----P-------- -------H-D-----Y</p>
+			<formula>-V-NRF- HzKR127</formula>
+			<p xml:id="_cQEmbMx">---------S----P-------- ----------------</p>
+			<formula>------- HzKR127-3</formula>
+			<p xml:id="_JS8BG3s">--V------S----P-------- ----------------</p>
+			<figure id="_9xdGzBF">
+				<trash>---NR-- FR3 LCDR3 FR4 60 70 80 90 100 KR127 GVPDRFTGSGSGTDFTLKIIRVEAEDLGVYYC VQGTHFPQT FGGGTKLEIKR DPK12</trash>
+			</figure>
+			<p xml:id="_vRMgaYq">------S------------S------V----- M-SIQL-L-</p>
+			<head xml:id="_ZUjna5S">HzKR127</head>
+			<p xml:id="_CKvGUM4">------S------------S------V----- ---------</p>
+			<head xml:id="_2nb8brQ">HzKR127-3</head>
+			<p xml:id="_vTSUfpS">------S------------S------V----- ---------</p>
+			<figure id="_Bgufjh2">
+				<trash>A B A D H1 loop preS1 Lys73H H3 loop H2 loop Gly54H H2 loop Asn58H H3 loop preS1 B L2 loop Leu36L Glu98H H3 loop C Leu54L Lys53L L2 loop H3 loop preS1 Pro53H Ile51H Ala71H Trp103H B Arg46L Asp97H Tyr96H Gln96L Glu98H Asn35H Glu95H Arg94H Tyr102H A Arg46L Asp97H Tyr96H Gln96L Asn35H Glu95H Arg94H Tyr102H Glu98H (kDa) 35 25 KR127 hzKR127-3.1 GST-preS1 hzKR127-3.2 A ACHN 293T 293T-S1-L1 SCK-L1 B16F1 CHO B A Ayw subtype Adr subtype B C</trash>
+			</figure>
+			<p xml:id="_ppePuew">Table 1. Affinity determination of murine and humanized antibodies using Octet Red Antibody name K D (M) K on (1/Ms) K off (1/s)</p>
+			<figure id="_MndGw3d">
+				<trash>KR127 1.23 x 10 -9 4.68 x 10 4 5.74 x 10 -5 HzKR127-3 3.97 x 10 -9 4.23 x 10 4 1.68 x 10 -4 HzKR127-3.1 8.13 x 10 -10 5.08 x 10 4 4.13 x 10 -5 HzKR127-3.2 4.93 x 10 -10 1.08 x 10 5 5.32 x 10 -5</trash>
+			</figure>
+			<p xml:id="_MP6FD3n">Table 2. Assessment of potential immunogenicity of humanized antibodies by T-cell epitope analysis. Prediction of HLA-DR binding sites by ProPred analysis (www.imtech.res.in/raghave/proped/index.html)񮽙</p>
+			<figure id="_6C84yqf">
+				<table>Antibody HzKR127 HzKR127-3.2 HzKR127 HzKR127-3.2 HzKR127 HzKR127-3.2 Location HCDR2/FR3 FR2 in VL FR2/LCDR2</table>
+			</figure>
+			<head xml:id="_7qmmJKX">Peptide sequence YNGKFKGKA YAQKFQGRV WLLQKPGQS WLLQKPGQP IYLVSKLDS IYLVSNRDS MHC Class II molecules that Bind to peptide DRB1_0801 DRB1_0802 DRB1_0804 DRB1_0806 DRB1_0813 DRB1_0817 DRB1_1307 DRB1_0305 DRB1_0309 DRB1_0401 DRB1_0426 DRB1_0802 DRB1_1101 DRB1_1114 DRB1_1120 DRB1_1128 DRB1_1302 DRB1_1305 DRB1_1307 DRB1_1323 DRB5_0101 DRB5_0105 DRB1_0301 DRB1_0305 DRB1_0306 DRB1_0307 DRB1_0308 DRB1_0309 DRB1_0311 DRB1_0801 DRB1_0802 DRB1_0804 DRB1_0806 DRB1_0813 DRB1_0817 DRB1_1101 DRB1_1102 DRB1_1104 DRB1_1106 DRB1_1107 DRB1_1114 DRB1_1120 DRB1_1121 DRB1_1128 DRB1_1301 DRB1_1302 DRB1_1304 DRB1_1305 DRB1_1307 DRB1_1311 DRB1_1321 DRB1_1322 DRB1_1323 DRB1_1327 DRB1_1328</head>
+			<p xml:id="_c7MpTWp">DRB1_0402 DRB1_0404 DRB1_0405 DRB1_0408 DRB1_0410 DRB1_0423 DRB1_1102 DRB1_1121 DRB1_1322 DRB5_0101</p>
+			<p xml:id="_UBJD9DN">Total number 7 0 15 0 33 10</p>
+		</body>
+	</text>
+</TEI>

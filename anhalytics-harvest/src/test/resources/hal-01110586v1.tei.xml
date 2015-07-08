@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:hal="http://hal.archives-ouvertes.fr/">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>
+HAL TEI export of hal-01110586</title>
+      </titleStmt>
+      <publicationStmt>
+        <distributor>
+CCSD</distributor>
+        <availability status="restricted">
+          <licence target="http://creativecommons.org/licenses/by/4.0/">
+Distributed under a Creative Commons Attribution 4.0 International License</licence>
+        </availability>
+        <date when="2015-01-28T15:47:27+01:00"/>
+      </publicationStmt>
+      <sourceDesc>
+        <p part="N">
+HAL API platform</p>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <listBibl>
+        <biblFull>
+          <titleStmt>
+            <title xml:lang="en">
+A RE-AIM evaluation of evidence-based multi-level interventions to improve obesity-related behaviours in adults: a systematic review (the SPOTLIGHT project)</title>
+            <author role="aut">
+              <persName>
+                <forename type="first">
+Sofie</forename>
+                <surname>
+Compernolle</surname>
+              </persName>
+              <email/>
+              <idno type="halauthor">
+1122092</idno>
+              <affiliation ref="#struct-250799"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">
+Katrien</forename>
+                <surname>
+De Cocker</surname>
+              </persName>
+              <email/>
+              <idno type="halauthor">
+1122093</idno>
+              <affiliation ref="#struct-160736"/>
+              <affiliation ref="#struct-250799"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">
+Jeroen</forename>
+                <surname>
+Lakerveld</surname>
+              </persName>
+              <email/>
+              <idno type="halauthor">
+1122094</idno>
+              <affiliation ref="#struct-250797"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">
+Joreintje D</forename>
+                <surname>
+Mackenbach</surname>
+              </persName>
+              <email/>
+              <idno type="halauthor">
+1122095</idno>
+              <affiliation ref="#struct-250797"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">
+Giel</forename>
+                <surname>
+Nijpels</surname>
+              </persName>
+              <email/>
+              <idno type="halauthor">
+489202</idno>
+              <affiliation ref="#struct-250797"/>
+            </author>
+            <author role="crp">
+              <persName>
+                <forename type="first">
+Jean-Michel</forename>
+                <surname>
+Oppert</surname>
+              </persName>
+              <email>
+jean-michel.oppert@psl.aphp.fr</email>
+              <idno type="halauthor">
+636488</idno>
+              <affiliation ref="#struct-235755"/>
+              <affiliation ref="#struct-247438"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">
+Harry</forename>
+                <surname>
+Rutter</surname>
+              </persName>
+              <email/>
+              <idno type="halauthor">
+1122096</idno>
+              <affiliation ref="#struct-250798"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">
+Pedro J</forename>
+                <surname>
+Teixeira</surname>
+              </persName>
+              <email/>
+              <idno type="halauthor">
+1122097</idno>
+              <affiliation ref="#struct-411199"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">
+Greet</forename>
+                <surname>
+Cardon</surname>
+              </persName>
+              <email/>
+              <idno type="halauthor">
+114021</idno>
+              <affiliation ref="#struct-250799"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">
+Ilse</forename>
+                <surname>
+De Bourdeaudhuij</surname>
+              </persName>
+              <email/>
+              <idno type="halauthor">
+525396</idno>
+              <affiliation ref="#struct-250799"/>
+            </author>
+            <editor role="depositor">
+              <persName>
+                <forename>
+Administrateur</forename>
+                <surname>
+Hal-Upmc</surname>
+              </persName>
+              <email>
+halupmc@upmc.fr</email>
+            </editor>
+          </titleStmt>
+          <editionStmt>
+            <edition n="v1" type="current">
+              <date type="whenSubmitted">
+2015-01-28 15:00:27</date>
+              <date type="whenModified">
+2015-01-28 15:44:33</date>
+              <date type="whenReleased">
+2015-01-28 15:44:33</date>
+              <date type="whenProduced">
+2014-12-06</date>
+              <ref target="http://hal.upmc.fr/hal-01110586/document" type="file"/>
+            </edition>
+            <respStmt>
+              <resp>
+contributor</resp>
+              <name key="163328">
+                <persName>
+                  <forename>
+Administrateur</forename>
+                  <surname>
+Hal-Upmc</surname>
+                </persName>
+                <email>
+halupmc@upmc.fr</email>
+              </name>
+            </respStmt>
+          </editionStmt>
+          <publicationStmt>
+            <distributor>
+CCSD</distributor>
+            <idno type="halId">
+hal-01110586</idno>
+            <idno type="halUri">
+http://hal.upmc.fr/hal-01110586</idno>
+            <idno type="halBibtex">
+compernolle:hal-01110586</idno>
+            <idno type="halRefHtml">
+&lt;i&gt;International Journal of Behavioral Nutrition and Physical Activity&lt;/i&gt;, BioMed Central, 2014, 11 (1), pp.147. &lt;a target="_blank" href="http://dx.doi.org/10.1186/s12966-014-0147-3"&gt;&amp;lt;10.1186/s12966-014-0147-3&amp;gt;&lt;/a&gt;</idno>
+            <idno type="halRef">
+International Journal of Behavioral Nutrition and Physical Activity, BioMed Central, 2014, 11 (1), pp.147. &amp;lt;10.1186/s12966-014-0147-3&amp;gt;</idno>
+          </publicationStmt>
+          <seriesStmt>
+            <idno n="UPMC" type="stamp">
+Université Pierre et Marie Curie</idno>
+          </seriesStmt>
+          <notesStmt>
+            <note n="2" type="audience">
+International</note>
+            <note n="0" type="popular">
+No</note>
+            <note n="1" type="peer">
+Yes</note>
+          </notesStmt>
+          <sourceDesc>
+            <biblStruct>
+              <analytic>
+                <title xml:lang="en">
+A RE-AIM evaluation of evidence-based multi-level interventions to improve obesity-related behaviours in adults: a systematic review (the SPOTLIGHT project)</title>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">
+Sofie</forename>
+                    <surname>
+Compernolle</surname>
+                  </persName>
+                  <idno type="halAuthorId">
+1122092</idno>
+                  <affiliation ref="#struct-250799"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">
+Katrien</forename>
+                    <surname>
+De Cocker</surname>
+                  </persName>
+                  <idno type="halAuthorId">
+1122093</idno>
+                  <affiliation ref="#struct-160736"/>
+                  <affiliation ref="#struct-250799"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">
+Jeroen</forename>
+                    <surname>
+Lakerveld</surname>
+                  </persName>
+                  <idno type="halAuthorId">
+1122094</idno>
+                  <affiliation ref="#struct-250797"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">
+Joreintje D</forename>
+                    <surname>
+Mackenbach</surname>
+                  </persName>
+                  <idno type="halAuthorId">
+1122095</idno>
+                  <affiliation ref="#struct-250797"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">
+Giel</forename>
+                    <surname>
+Nijpels</surname>
+                  </persName>
+                  <idno type="halAuthorId">
+489202</idno>
+                  <affiliation ref="#struct-250797"/>
+                </author>
+                <author role="crp">
+                  <persName>
+                    <forename type="first">
+Jean-Michel</forename>
+                    <surname>
+Oppert</surname>
+                  </persName>
+                  <email>
+jean-michel.oppert@psl.aphp.fr</email>
+                  <idno type="halAuthorId">
+636488</idno>
+                  <affiliation ref="#struct-235755"/>
+                  <affiliation ref="#struct-247438"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">
+Harry</forename>
+                    <surname>
+Rutter</surname>
+                  </persName>
+                  <idno type="halAuthorId">
+1122096</idno>
+                  <affiliation ref="#struct-250798"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">
+Pedro J</forename>
+                    <surname>
+Teixeira</surname>
+                  </persName>
+                  <idno type="halAuthorId">
+1122097</idno>
+                  <affiliation ref="#struct-411199"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">
+Greet</forename>
+                    <surname>
+Cardon</surname>
+                  </persName>
+                  <idno type="halAuthorId">
+114021</idno>
+                  <affiliation ref="#struct-250799"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">
+Ilse</forename>
+                    <surname>
+De Bourdeaudhuij</surname>
+                  </persName>
+                  <idno type="halAuthorId">
+525396</idno>
+                  <affiliation ref="#struct-250799"/>
+                </author>
+              </analytic>
+              <monogr>
+                <idno type="halJournalId">
+1137</idno>
+                <idno type="issn">
+1479-5868</idno>
+                <title level="j">
+International Journal of Behavioral Nutrition and Physical Activity</title>
+                <imprint>
+                  <publisher>
+BioMed Central</publisher>
+                  <biblScope unit="volume">
+11</biblScope>
+                  <biblScope unit="issue">
+1</biblScope>
+                  <biblScope unit="pp">
+147</biblScope>
+                  <date type="datePub">
+2014-12-06</date>
+                </imprint>
+              </monogr>
+              <idno type="doi">
+10.1186/s12966-014-0147-3</idno>
+              <idno type="pubmed">
+25480391</idno>
+            </biblStruct>
+          </sourceDesc>
+          <profileDesc>
+            <langUsage>
+              <language ident="en">
+English</language>
+            </langUsage>
+            <textClass>
+              <keywords scheme="author">
+                <term xml:lang="en">
+Review</term>
+                <term xml:lang="en">
+RE-AIM</term>
+                <term xml:lang="en">
+Overweight</term>
+                <term xml:lang="en">
+Obesity</term>
+                <term xml:lang="en">
+Nutrition and physical activity interventions</term>
+              </keywords>
+              <classCode n="sdv.aen" scheme="halDomain">
+Life Sciences/Food and Nutrition</classCode>
+              <classCode n="ART" scheme="halTypology">
+Journal articles</classCode>
+            </textClass>
+            <abstract xml:lang="en">
+Background
+
+This systematic literature review describes the potential public health impact of evidence-based multi-level interventions to improve obesity-related behaviours in adults, using the Reach, Efficacy, Adoption, Implementation and Maintenance (RE-AIM) framework.
+Methods
+
+Electronic databases (PubMed, Embase, and The Cochrane Library) were searched to identify intervention studies published between January 2000 and October 2013. The following inclusion criteria were used: (1) the study included at least one outcome measure assessing obesity-related behaviours (i.e. diet, physical activity or sedentary behaviour), (2) the study collected data over at least one year and (3) the study’s intervention targeted adults, was conducted in a specified geographical area or worksite, and was multi-level (i.e. targeting both individual and environmental level). Evidence of RE-AIM of the selected interventions was assessed. Potential public health impact of an intervention was evaluated if information was provided on at least four of the five RE-AIM dimensions.
+Results
+
+Thirty-five multi-level interventions met the inclusion criteria. RE-AIM evaluation revealed that the included interventions generally had the potential to: reach a large number of people (on average 58% of the target population was aware of the intervention); achieve the assumed goals (89% found positive outcomes); be broadly adopted (the proportion of intervention deliverers varied from 9% to 92%) and be sustained (sixteen interventions were maintained). The highest potential public health impact was found in multi-level interventions that: 1) focused on all levels at the beginning of the planning process, 2) guided the implementation process using diffusion theory, and 3) used a website to disseminate the intervention.
+Conclusions
+
+Although most studies underreported results within the RE-AIM dimensions, the reported Reach, Effectiveness, Adoption, Implementation and Maintenance were positively evaluated. However, more information on external validity and sustainability is needed in order to take informed decisions on the choice of interventions that should be implemented in real-world settings to accomplish long-term changes in obesity-related behaviours.</abstract>
+          </profileDesc>
+        </biblFull>
+      </listBibl>
+    </body>
+    <back>
+      <listOrg type="structures">
+        <org type="laboratory" xml:id="struct-250799">
+          <orgName>
+Department of Movement and Sport Sciences</orgName>
+          <desc>
+            <address>
+              <addrLine>
+Faculty of Medicine and Health Sciences, Ghent</addrLine>
+              <country key="BE"/>
+            </address>
+          </desc>
+          <listRelation>
+            <relation active="#struct-302729" type="direct"/>
+          </listRelation>
+        </org>
+        <org type="laboratory" xml:id="struct-160736">
+          <orgName>
+Research Foundation - Flanders; Institute of Development Policy and Management</orgName>
+          <desc>
+            <address>
+              <country key="BE"/>
+            </address>
+          </desc>
+          <listRelation>
+            <relation active="#struct-340571" type="direct"/>
+          </listRelation>
+        </org>
+        <org type="laboratory" xml:id="struct-250797">
+          <orgName>
+Department of General Practice and Elderly Care Medicine</orgName>
+          <desc>
+            <address>
+              <addrLine>
+Amsterdam</addrLine>
+              <country key="NL"/>
+            </address>
+          </desc>
+          <listRelation>
+            <relation active="#struct-305740" type="direct"/>
+            <relation active="#struct-359946" type="direct"/>
+          </listRelation>
+        </org>
+        <org type="laboratory" xml:id="struct-235755">
+          <orgName>
+Unité de Recherche en Epidémiologie Nutritionnelle</orgName>
+          <orgName type="acronym">
+UREN</orgName>
+          <desc>
+            <address>
+              <addrLine>
+UFR Santé, Médecine et Biologie Humaine - 74 rue Marcel Cachin 93017 Bobigny Cedex</addrLine>
+              <country key="FR"/>
+            </address>
+            <ref type="url">
+http://www.univ-paris13.fr/uren/</ref>
+          </desc>
+          <listRelation>
+            <relation active="#struct-300001" name="UR1125" type="direct"/>
+            <relation active="#struct-300002" name="U557" type="direct"/>
+            <relation active="#struct-300351" type="direct"/>
+            <relation active="#struct-303171" type="direct"/>
+            <relation active="#struct-303232" type="direct"/>
+          </listRelation>
+        </org>
+        <org type="laboratory" xml:id="struct-247438">
+          <orgName>
+Unité de Recherche sur les Maladies Cardiovasculaires, du Métabolisme et de la Nutrition</orgName>
+          <orgName type="acronym">
+ICAN</orgName>
+          <desc>
+            <address>
+              <addrLine>
+Faculté de Médecine - 91 boulevard de l'Hôpital 75634 Paris Cedex 13</addrLine>
+              <country key="FR"/>
+            </address>
+          </desc>
+          <listRelation>
+            <relation active="#struct-93591" type="direct"/>
+            <relation active="#struct-300002" name="U1166" type="direct"/>
+            <relation active="#struct-300068" type="direct"/>
+            <relation active="#struct-300887" type="direct"/>
+          </listRelation>
+        </org>
+        <org type="laboratory" xml:id="struct-250798">
+          <orgName>
+European Centre on Health of Societies in Transition</orgName>
+          <desc>
+            <address>
+              <addrLine>
+London</addrLine>
+              <country key="GB"/>
+            </address>
+          </desc>
+          <listRelation>
+            <relation active="#struct-310718" type="direct"/>
+          </listRelation>
+        </org>
+        <org type="laboratory" xml:id="struct-411199">
+          <orgName>
+Interdisciplinary center for the study of human performance</orgName>
+          <desc>
+            <address>
+              <country key="PT"/>
+            </address>
+          </desc>
+          <listRelation>
+            <relation active="#struct-300565" type="direct"/>
+          </listRelation>
+        </org>
+        <org type="institution" xml:id="struct-302729">
+          <orgName>
+Ghent University (BELGIUM)</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-340571">
+          <orgName>
+Research Foundation - Flanders; Institute of Development Policy and Management</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-305740">
+          <orgName>
+VU UNIVERSITY MEDICAL CENTER</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-359946">
+          <orgName>
+The EMGO Institute for Health and Care Research</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-300001">
+          <orgName>
+Institut national de la recherche agronomique (INRA)</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-300002">
+          <orgName>
+INSERM</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-300351">
+          <orgName>
+Conservatoire National des Arts et Métiers [CNAM]</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-303171">
+          <orgName>
+Université Sorbonne Paris Cité (USPC)</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-303232">
+          <orgName>
+Université Paris XIII - Paris Nord</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-93591">
+          <orgName>
+Université Pierre et Marie Curie - Paris 6</orgName>
+          <orgName type="acronym">
+UPMC</orgName>
+          <desc>
+            <address>
+              <addrLine>
+4 place Jussieu - 75005 Paris</addrLine>
+              <country key="FR"/>
+            </address>
+            <ref type="url">
+http://www.upmc.fr/</ref>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-300068">
+          <orgName>
+Assistance publique - Hôpitaux de Paris (AP-HP)</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-300887">
+          <orgName>
+Hôpital Pitié-Salpêtrière</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-310718">
+          <orgName>
+London School of Hygiene and Tropical Medicine</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org type="institution" xml:id="struct-300565">
+          <orgName>
+Universidade de Lisboa</orgName>
+          <orgName type="acronym">
+ULISBOA</orgName>
+          <desc>
+            <address>
+              <addrLine>
+Alameda da Universidade
+1649-004 Lisboa</addrLine>
+              <country key="PT"/>
+            </address>
+            <ref type="url">
+http://www.ulisboa.pt/</ref>
+          </desc>
+        </org>
+      </listOrg>
+    </back>
+  </text>
+</TEI>
