@@ -191,6 +191,8 @@ For indexing the produced annotations in ElasticSearch, in the main directory of
 
 A war file is produced under the directory ``anhalytics-frontend/target``, you can use Tomcat for instance to deploy it (make sur the ES and Nerd options are set). The front-end javascript web application will call ElasticSearch and MongoDB services as set in the main project. 
 
+Some elements of the search frontend have been inspired by [FacetView 1](https://github.com/okfn/facetview) from Open Knowledge Foundation and Cottage Labs, thanks to them!
+
 #### 5. Test
 
 In progress...
