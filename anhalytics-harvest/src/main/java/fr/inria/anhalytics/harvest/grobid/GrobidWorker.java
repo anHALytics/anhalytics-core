@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.harvest.grobid;
 
 import fr.inria.anhalytics.commons.managers.MongoManager;
+import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,10 +58,15 @@ abstract class GrobidWorker implements Runnable {
             (new File(zipPath)).delete();
             logger.debug("\t\t "+filename+" for "+date+" processed.");
         } catch (RuntimeException e) {
+            if(e.getMessage().contains("timed out")){
+                 mm.save(Utilities.getHalIDFromFilename(filename), "processGrobid", "timed out", date);
+            } else if(e.getMessage().contains("failed")){
+                 mm.save(Utilities.getHalIDFromFilename(filename), "processGrobid", "failed", date);
+            }
             e.printStackTrace();
         }
     }
-    
+
     protected void storeToGridfs(String zipDirectoryPath) {};
 
     @Override

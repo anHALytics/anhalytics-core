@@ -29,7 +29,7 @@ public class MongoManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoManager.class);
 
-    public static final String HARVEST_DIAGNOSTIC = "harvest_diagnostic";
+    public static final String HARVEST_DIAGNOSTIC = "diagnostic";
     public static final String ADDITIONAL_TEIS = "additional_teis";
     public static final String BINARIES = "binaries";
     public static final String PUB_ANNEXES = "pub_annexes";

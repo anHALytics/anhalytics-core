@@ -24,7 +24,7 @@ import org.apache.commons.io.IOUtils;
  * @author Patrice Lopez
  */
 public class GrobidService {
-    
+
     private String grobid_host = null;
     private String grobid_port = null;
     private String filename = null;
@@ -33,7 +33,7 @@ public class GrobidService {
     private boolean generateIDs = false;
     private MongoManager mm;
     private String date;
-    
+
     public GrobidService(String grobidHost, String grobidPort,
             int start, int end, boolean generateIDs, String date) {
         this.grobid_host = grobidHost;
@@ -42,7 +42,7 @@ public class GrobidService {
         this.end = end;
         this.generateIDs = generateIDs;
         this.date = date;
-        
+
     }
 
     /**
@@ -68,7 +68,7 @@ public class GrobidService {
             FileBody fileBody = new FileBody(new File(filepath));
             MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.STRICT);
             multipartEntity.addPart("input", fileBody);
-            
+
             if (start != -1) {
                 StringBody contentString = new StringBody("" + start);
                 multipartEntity.addPart("start", contentString);
@@ -81,7 +81,7 @@ public class GrobidService {
                 StringBody contentString = new StringBody("1");
                 multipartEntity.addPart("generateIDs", contentString);
             }*/
-            
+
             conn.setRequestProperty("Content-Type", multipartEntity.getContentType().getValue());
             OutputStream out = conn.getOutputStream();
             try {
@@ -89,7 +89,7 @@ public class GrobidService {
             } finally {
                 out.close();
             }
-            
+
             if (conn.getResponseCode() == HttpURLConnection.HTTP_UNAVAILABLE) {
                 throw new HttpRetryException("Failed : HTTP error code : "
                         + conn.getResponseCode(), conn.getResponseCode());
@@ -98,9 +98,9 @@ public class GrobidService {
             //int status = connection.getResponseCode();
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode());
+                        + conn.getResponseCode()+ " " + IOUtils.toString(conn.getErrorStream(), "UTF-8"));
             }
-            
+
             InputStream in = conn.getInputStream();
             zipDirectoryPath = Utilities.getTmpPath() + "/" + KeyGen.getKey();
             zipFolder = new File(zipDirectoryPath);
@@ -111,11 +111,11 @@ public class GrobidService {
             IOUtils.copy(in, zipStream);
             zipStream.close();
             in.close();
-            
+
             Utilities.unzipIt(zipDirectoryPath + "/" + "out.zip", zipDirectoryPath);
-            
+
             conn.disconnect();
-            
+
         } catch (ConnectException e) {
             e.printStackTrace();
             try {
@@ -137,7 +137,7 @@ public class GrobidService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return zipDirectoryPath;        
+        return zipDirectoryPath;
     }
-    
+
 }
