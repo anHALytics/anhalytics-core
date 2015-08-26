@@ -1,3 +1,6 @@
+.DS_Store
+
+
 *.log*
 anhalytics-harvest/target
 anhalytics-harvest/target/*

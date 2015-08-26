@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.commons.utilities;
 
 import fr.inria.anhalytics.commons.exceptions.BinaryNotAvailableException;
+import fr.inria.anhalytics.commons.exceptions.DirectoryNotFoundException;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
@@ -165,13 +166,6 @@ public class Utilities {
         return sb.toString();
     }
 
-    public static Document removeElement(Document doc, String elementTagName) {
-        Element element = (Element) doc.getElementsByTagName(elementTagName).item(0);
-        element.getParentNode().removeChild(element);
-        doc.normalize();
-        return doc;
-    }
-
     public static Node findNode(String id, NodeList orgs) {
         Node org = null;
         for (int i = 0; i < orgs.getLength(); i++) {
@@ -252,6 +246,7 @@ public class Utilities {
         // deletes file when the virtual machine terminate
         f.deleteOnExit();
         String filePath = f.getAbsolutePath();
+        if(inBinary == null) System.out.println("null");
         getBinaryURLContent(f, inBinary);
         return filePath;
     }
@@ -277,7 +272,8 @@ public class Utilities {
             while ((bytesRead = in.read(buf)) != -1) {
                 writer.write(buf, 0, bytesRead);
             }
-        } finally {
+        } //exception null inputstream
+        finally {
             in.close();
         }
     }
@@ -421,4 +417,12 @@ public class Utilities {
         return formatedXml;
     }
 
+    
+    public static void checkPath(String path) {
+        File f = new File(path);
+        // exception if prop file does not exist
+        if (!f.exists() || !f.isDirectory()) {
+            throw new DirectoryNotFoundException("The file '" + path + "' does not exist.");
+        }
+    }
 }

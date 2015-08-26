@@ -10,8 +10,8 @@ import java.io.InputStream;
  */
 public class GrobidAnnexWorker extends GrobidWorker {
 
-    public GrobidAnnexWorker(InputStream content, MongoManager mongoManager, String grobidHost, String grobidPort, String date) {
-        super(content, mongoManager, grobidHost, grobidPort, date);
+    public GrobidAnnexWorker(InputStream content, MongoManager mongoManager, String date) {
+        super(content, mongoManager, date);
     }
 
     protected void storeToGridfs(String zipDirectoryPath) {
