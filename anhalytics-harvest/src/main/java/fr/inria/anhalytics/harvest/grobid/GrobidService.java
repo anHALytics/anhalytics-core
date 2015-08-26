@@ -3,7 +3,6 @@ package fr.inria.anhalytics.harvest.grobid;
 import fr.inria.anhalytics.commons.managers.MongoManager;
 import fr.inria.anhalytics.commons.utilities.KeyGen;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.*;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,17 +24,25 @@ import org.apache.commons.io.IOUtils;
  * @author Patrice Lopez
  */
 public class GrobidService {
+
+    private String grobid_host = null;
+    private String grobid_port = null;
+    private String filename = null;
     private int start = -1;
     private int end = -1;
     private boolean generateIDs = false;
+    private MongoManager mm;
     private String date;
-    
-    public GrobidService(int start, int end, boolean generateIDs, String date) {
+
+    public GrobidService(String grobidHost, String grobidPort,
+            int start, int end, boolean generateIDs, String date) {
+        this.grobid_host = grobidHost;
+        this.grobid_port = grobidPort;
         this.start = start;
         this.end = end;
         this.generateIDs = generateIDs;
         this.date = date;
-        
+
     }
 
     /**
@@ -52,15 +59,16 @@ public class GrobidService {
         String tei = null;
         File zipFolder = null;
         try {
-            URL url = new URL("http://" + HarvestProperties.getGrobidHost() + ":" + HarvestProperties.getGrobidPort() + "/processFulltextAssetDocument");
+            URL url = new URL("http://" + grobid_host + ":" + grobid_port + "/processFulltextAssetDocument");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
+
             String filepath = Utilities.storeTmpFile(inBinary);
             FileBody fileBody = new FileBody(new File(filepath));
             MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.STRICT);
             multipartEntity.addPart("input", fileBody);
-            
+
             if (start != -1) {
                 StringBody contentString = new StringBody("" + start);
                 multipartEntity.addPart("start", contentString);
@@ -73,7 +81,7 @@ public class GrobidService {
                 StringBody contentString = new StringBody("1");
                 multipartEntity.addPart("generateIDs", contentString);
             }*/
-            
+
             conn.setRequestProperty("Content-Type", multipartEntity.getContentType().getValue());
             OutputStream out = conn.getOutputStream();
             try {
@@ -81,7 +89,7 @@ public class GrobidService {
             } finally {
                 out.close();
             }
-            
+
             if (conn.getResponseCode() == HttpURLConnection.HTTP_UNAVAILABLE) {
                 throw new HttpRetryException("Failed : HTTP error code : "
                         + conn.getResponseCode(), conn.getResponseCode());
@@ -90,11 +98,11 @@ public class GrobidService {
             //int status = connection.getResponseCode();
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode()+ " " +IOUtils.toString(conn.getErrorStream(), "UTF-8"));
+                        + conn.getResponseCode()+ " " + IOUtils.toString(conn.getErrorStream(), "UTF-8"));
             }
-            
+
             InputStream in = conn.getInputStream();
-            zipDirectoryPath = HarvestProperties.getTmpPath() + "/" + KeyGen.getKey();
+            zipDirectoryPath = Utilities.getTmpPath() + "/" + KeyGen.getKey();
             zipFolder = new File(zipDirectoryPath);
             if (!zipFolder.exists()) {
                 zipFolder.mkdir();
@@ -103,12 +111,11 @@ public class GrobidService {
             IOUtils.copy(in, zipStream);
             zipStream.close();
             in.close();
-            
+
             Utilities.unzipIt(zipDirectoryPath + "/" + "out.zip", zipDirectoryPath);
-            
+
             conn.disconnect();
-            
-            
+
         } catch (ConnectException e) {
             e.printStackTrace();
             try {
@@ -130,7 +137,7 @@ public class GrobidService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return zipDirectoryPath;        
+        return zipDirectoryPath;
     }
-    
+
 }

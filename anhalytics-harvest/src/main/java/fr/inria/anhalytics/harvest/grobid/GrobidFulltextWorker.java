@@ -13,8 +13,8 @@ import org.apache.commons.io.FileUtils;
  */
 public class GrobidFulltextWorker extends GrobidWorker {
 
-    public GrobidFulltextWorker(InputStream content, MongoManager mongoManager,String date) {
-        super(content, mongoManager, date);
+    public GrobidFulltextWorker(InputStream content, MongoManager mongoManager, String grobidHost, String grobidPort, String date) {
+        super(content, mongoManager, grobidHost, grobidPort, date);
     }
     
     @Override

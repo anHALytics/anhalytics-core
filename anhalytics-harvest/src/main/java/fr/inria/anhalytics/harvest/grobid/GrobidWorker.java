@@ -2,7 +2,6 @@ package fr.inria.anhalytics.harvest.grobid;
 
 import fr.inria.anhalytics.commons.managers.MongoManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,12 +20,16 @@ abstract class GrobidWorker implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(GrobidWorker.class);
     private InputStream content;
     protected MongoManager mm;
+    private String grobid_host;
+    private String grobid_port;
     protected String date;
     protected String filename;
 
-    public GrobidWorker(InputStream content, MongoManager mongoManager, String date) {
+    public GrobidWorker(InputStream content, MongoManager mongoManager, String grobidHost, String grobidPort, String date) {
         this.content = content;
         this.mm = mongoManager;
+        this.grobid_host = grobidHost;
+        this.grobid_port = grobidPort;
         this.date = date;
         this.filename = mm.getCurrentFilename();
     }
@@ -49,22 +52,21 @@ abstract class GrobidWorker implements Runnable {
     private void processCommand() throws IOException, ParseException {
         try {
             System.out.println(filename);
-            GrobidService grobidService = new GrobidService(2, -1, true, date);
-            String result = grobidService.runFullTextGrobid(content);            
-            storeToGridfs(result);
-            (new File(result)).delete();
+            GrobidService grobidService = new GrobidService(grobid_host, grobid_port, 2, -1, true, date);
+            String zipPath = grobidService.runFullTextGrobid(content);
+            storeToGridfs(zipPath);
+            (new File(zipPath)).delete();
             logger.debug("\t\t "+filename+" for "+date+" processed.");
         } catch (RuntimeException e) {
-            System.out.println(filename + " ff ");
             if(e.getMessage().contains("timed out")){
-                mm.save(Utilities.getHalIDFromFilename(filename), "processGrobid", "timed out", date);
+                 mm.save(Utilities.getHalIDFromFilename(filename), "processGrobid", "timed out", date);
             } else if(e.getMessage().contains("failed")){
-                mm.save(Utilities.getHalIDFromFilename(filename), "processGrobid", "failed", date);
+                 mm.save(Utilities.getHalIDFromFilename(filename), "processGrobid", "failed", date);
             }
             e.printStackTrace();
         }
     }
-    
+
     protected void storeToGridfs(String zipDirectoryPath) {};
 
     @Override

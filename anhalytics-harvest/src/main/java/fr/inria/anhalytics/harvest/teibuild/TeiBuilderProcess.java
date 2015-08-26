@@ -27,18 +27,16 @@ public class TeiBuilderProcess {
         InputStream grobid_tei = null;
         InputStream additional_tei = null;
         String result;
-        mm.setGridFS(MongoManager.GROBID_TEIS);
         for (String date : Utilities.getDates()) {
-            if (mm.initTeiFiles(date)) {
+            if (mm.init(MongoManager.GROBID_TEIS, date)) {
                 logger.debug("Merging documents.. for: " + date);
                 while (mm.hasMoreDocuments()) {
-                    String tei_doc = mm.nextDocument();
                     String filename = mm.getCurrentFilename();
                     logger.debug("\t\t Merging documents.. for: " + filename);
+                    String tei_doc = mm.nextDocument();
                     tei_doc = Utilities.trimEncodedCharaters(tei_doc);
                     grobid_tei = new ByteArrayInputStream(tei_doc.getBytes());
                     additional_tei = mm.streamFile(filename, MongoManager.ADDITIONAL_TEIS);
-                    
                     try {
                         result = TeiBuilder.generateTeiCorpus(additional_tei, grobid_tei, true);
                         InputStream tei = new ByteArrayInputStream(result.getBytes());

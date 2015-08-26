@@ -4,7 +4,6 @@ import fr.inria.anhalytics.commons.data.PubFile;
 import fr.inria.anhalytics.commons.data.TEI;
 import fr.inria.anhalytics.commons.managers.MongoManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.*;
 import java.text.ParseException;
 import java.util.*;
@@ -23,9 +22,9 @@ public class OAIHarvester extends Harvester {
 
     private String oai_url = null;
 
-    public OAIHarvester(MongoManager mm) {
+    public OAIHarvester(MongoManager mm, String oai_url) {
         super(mm);
-        this.oai_url = HarvestProperties.getOaiUrl();
+        this.oai_url = oai_url;
         oaiDom = new OAIPMHDom();
 
         fields = new ArrayList<String>();

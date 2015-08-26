@@ -32,10 +32,44 @@ public class IndexingPreprocess {
     static final public List<String> annotated
             = Arrays.asList("$title", "$abstract", "term");
 
+    public String collection = null;
+    public String model_version = null;
+    public String elasticsearch_host = null;
+    public String elasticsearch_port = null;
+    public String eclaTreeIndex = null;
+
     private MongoManager mm = null;
 
     public IndexingPreprocess(MongoManager mm) {
+        // read the relevant properties
+        this.loadProperties();
         this.mm = mm;
+    }
+
+    private void loadProperties() {
+        try {
+            /*Properties prop = new Properties();
+             File file = new File("es-plugin.properties");
+             if (file.exists()) 
+             prop.load(new FileInputStream("es-plugin.properties"));
+             else
+             prop.load(new FileInputStream("src/main/resources/es-plugin.properties"));
+			
+             collection = prop.getProperty("river.collection");
+             model_version = prop.getProperty("river.document_model_version");
+             elasticsearch_host = prop.getProperty("river.elasticsearch_host");
+             elasticsearch_port = prop.getProperty("river.elasticsearch_port");
+             eclaTreeIndex = prop.getProperty("river.eclaTreeIndex");*/
+
+            /*collection = "patent";
+             model_version = "1.3";
+             elasticsearch_host = "localhost";
+             elasticsearch_port = "9200";
+             eclaTreeIndex = "eclatree";*/
+        } catch (Exception e) {
+            System.err.println("Failed to load properties: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public String process(String jsonStr) throws Exception {
@@ -45,6 +79,7 @@ public class IndexingPreprocess {
     public String process(String jsonStr, String filename) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonRoot = mapper.readTree(jsonStr);
+
         // root node is the TEI node, we add as a child the "light" annotations in a 
         // standoff element
         if (filename != null) {
@@ -471,7 +506,7 @@ public class IndexingPreprocess {
      * For a given ECLA class, give the full root path, from the root down to
      * the current class
      */
-    /*public List<String> giveECLARootPath(String eclaClass) {
+    public List<String> giveECLARootPath(String eclaClass) {
         // This is done via the ECLA tree index in ElasticSearch
         String query = queryECLA.replace("%CLASS%", eclaClass);
         List<String> result = new ArrayList<String>();
@@ -479,7 +514,7 @@ public class IndexingPreprocess {
         InputStream is = null;
         try {
             // we send a post request to elasticsearch to get the root path
-            URL url = new URL("http://" + IndexProperties + ":" + elasticsearch_port + "/" + eclaTreeIndex + "/_search");
+            URL url = new URL("http://" + elasticsearch_host + ":" + elasticsearch_port + "/" + eclaTreeIndex + "/_search");
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -534,14 +569,14 @@ public class IndexingPreprocess {
         }
         return result;
     }
-*/
+
     /**
      * This method provides a basic handling of the ECLA classes expressed in a
      * compact way with a "+" symbol. This might over-generate the possible ECLA
      * classes, so a filter based on the possible valid ECLA classes is
      * necessary.
      */
-   /* public List<String> normalizeECLAClass(String classs) {
+    public List<String> normalizeECLAClass(String classs) {
         List<String> eclas = new ArrayList<String>();
         if (classs.indexOf('+') != -1) {
             StringTokenizer st = new StringTokenizer(classs, "+");
@@ -575,7 +610,7 @@ public class IndexingPreprocess {
         }
         return eclas;
     }
-*/
+
     private JsonNode getStandoff(ObjectMapper mapper, String filename) throws Exception {
         JsonNode standoffNode = null;
         //System.out.println("filename: " + filename);
