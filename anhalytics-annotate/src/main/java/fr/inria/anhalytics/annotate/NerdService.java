@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.annotate;
 
+import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
@@ -21,16 +22,12 @@ public class NerdService {
 
     private static final Logger logger = LoggerFactory.getLogger(NerdService.class);
 
-    private String nerd_host = null;
-    private String nerd_port = null;
     private String input = null;
 
-    static private String RESOURCEPATH = "processNERDQueryScience";
+    static private String REQUEST = "processNERDQueryScience";
 
-    public NerdService(String input, String nerdHost, String nerdPort) {
+    public NerdService(String input) {
         this.input = input;
-        this.nerd_host = nerdHost;
-        this.nerd_port = nerdPort;
     }
 
     /**
@@ -41,7 +38,7 @@ public class NerdService {
     public String runNerd() {
         StringBuffer output = new StringBuffer();
         try {
-            URL url = new URL("http://" + nerd_host + ":" + nerd_port + "/" + RESOURCEPATH);
+            URL url = new URL("http://" + AnnotateProperties.getNerd_host() + ":" + AnnotateProperties.getNerd_port() + "/" + REQUEST);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
@@ -68,6 +65,7 @@ public class NerdService {
             }
             os.close();
             conn.disconnect();
+            
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {

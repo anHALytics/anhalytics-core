@@ -44,14 +44,13 @@ abstract class Harvester {
         for (TEI tei : teis) {
             try {
                 String teiFilename = tei.getId() + ".tei.xml";
-                logger.debug("\t\t Extracting tei.... for " + tei.getId());
-                String teiString = tei.getTei();
-                if (teiString.length() > 0) {
-                    logger.debug("\t\t\t\t Storing tei : " + tei.getId());
-                    mm.addDocument(new ByteArrayInputStream(teiString.getBytes()), teiFilename, MongoManager.ADDITIONAL_TEIS, date);
-
-                    String filename = tei.getId() + ".pdf";
-                    if (!mm.isCollected(filename)) {
+                //if (HarvestProperties.isReset() || !mm.isCollected(teiFilename)) {
+                    logger.debug("\t\t Extracting tei.... for " + tei.getId());
+                    String teiString = tei.getTei();
+                    if (teiString.length() > 0) {
+                        logger.debug("\t\t\t\t Storing tei : " + tei.getId());
+                        mm.addDocument(new ByteArrayInputStream(teiString.getBytes()), teiFilename, MongoManager.ADDITIONAL_TEIS, date);
+                        String filename = tei.getId() + ".pdf";
                         //binary processing.
                         if (tei.getFile() != null) {
                             System.out.println(filename);
@@ -60,7 +59,7 @@ abstract class Harvester {
                             mm.save(tei.getId(), "harvestProcess", "no file url", null);
                             logger.debug("\t\t\t PDF not found !");
                         }
-                    }
+                   // }
                     //annexes
                     for (PubFile file : tei.getAnnexes()) {
                         downloadFile(file, tei.getId(), date);

@@ -57,7 +57,7 @@
                 <executions>
                     <execution>
                         <configuration>
-                            <mainClass>fr.inria.anhalytics.index.Indexer</mainClass>
+                            <mainClass>fr.inria.anhalytics.index.main.Main</mainClass>
                             <!-- Optional -->
                             <onejarVersion>0.97</onejarVersion>
                             <!-- Optional, default is false -->

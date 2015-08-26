@@ -1,10 +1,12 @@
 package fr.inria.anhalytics.annotate;
 
+import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.managers.MongoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.logging.Level;
 import javax.xml.parsers.DocumentBuilder;
@@ -25,21 +27,15 @@ public class AnnotatorWorker implements Runnable {
     private String filename = null;
     private String tei = null;
     private String halID = null;
-    private String nerd_host = null;
-    private String nerd_port = null;
 
     public AnnotatorWorker(MongoManager mongoManager,
             String filename,
             String halID,
-            String tei,
-            String nerd_host,
-            String nerd_port) {
+            String tei) {
         this.mm = mongoManager;
         this.filename = filename;
         this.halID = halID;
         this.tei = tei;
-        this.nerd_host = nerd_host;
-        this.nerd_port = nerd_port;
     }
 
     @Override
@@ -87,7 +83,7 @@ public class AnnotatorWorker implements Runnable {
                 }
             }
             // get all the elements having an attribute id and annotate their text content
-            String jsonAnnotations = annotateDocument(docTei, filename, halID, nerd_host, nerd_port);
+            String jsonAnnotations = annotateDocument(docTei, filename, halID);
             mm.insertAnnotation(jsonAnnotations);
         } catch (RuntimeException e) {
             e.printStackTrace();
@@ -96,26 +92,18 @@ public class AnnotatorWorker implements Runnable {
         }
         logger.debug("\t\t " + filename + " annotated.");
     }
-
-    public String annotateDocument(Document doc,
-            String filename,
-            String halID) {
-        return annotateDocument(doc, filename, halID, nerd_host, nerd_port);
-    }
-
+    
     /**
      * Annotation of a complete document
      */
     public static String annotateDocument(Document doc,
             String filename,
-            String halID,
-            String nerd_host,
-            String nerd_port) {
+            String halID) {
         StringBuffer json = new StringBuffer();
         json.append("{ \"filename\" : \"" + filename
                 + "\", \"halID\" : \"" + halID
                 + "\", \"nerd\" : [");
-        annotateNode(doc.getDocumentElement(), true, json, nerd_host, nerd_port);
+        annotateNode(doc.getDocumentElement(), true, json);
         json.append("] }");
         return json.toString();
     }
@@ -125,9 +113,7 @@ public class AnnotatorWorker implements Runnable {
      */
     public static boolean annotateNode(Node node,
             boolean first,
-            StringBuffer json,
-            String nerd_host,
-            String nerd_port) {
+            StringBuffer json) {
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             Element e = (Element) (node);
             String id = e.getAttribute("xml:id");
@@ -137,7 +123,7 @@ public class AnnotatorWorker implements Runnable {
                 String text = e.getTextContent();
                 String jsonText = null;
                 try {
-                    NerdService nerdService = new NerdService(text, nerd_host, nerd_port);
+                    NerdService nerdService = new NerdService(text);
                     jsonText = nerdService.runNerd();
                 } catch (Exception ex) {
                     logger.debug("Text could not be annotated by NERD: " + text);
@@ -157,7 +143,7 @@ public class AnnotatorWorker implements Runnable {
         NodeList nodeList = node.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node currentNode = nodeList.item(i);
-            first = annotateNode(currentNode, first, json, nerd_host, nerd_port);
+            first = annotateNode(currentNode, first, json);
         }
         return first;
     }
