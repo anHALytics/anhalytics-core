@@ -5,6 +5,7 @@ import com.mongodb.gridfs.GridFSInputFile;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
+import fr.inria.anhalytics.commons.exceptions.FileNotFoundException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.File;
 import java.io.FileInputStream;
@@ -452,17 +453,21 @@ public class MongoManager {
         }
     }
 
-    /*
-     Returns the asset files using the halID+filename indexes.
+    /**
+     * Returns the asset files using the halID+filename indexes.
      */
-    public InputStream getFile(String halId, String filename, String collection) {
+    public InputStream getFile(String halId, String filename, String collection) throws FileNotFoundException {
         InputStream file = null;
-        GridFS gfs = new GridFS(db, collection);
-        BasicDBObject whereQuery = new BasicDBObject();
-        whereQuery.put("halId", halId);
-        whereQuery.put("filename", filename);
-        GridFSDBFile cursor = gfs.findOne(whereQuery);
-        file = cursor.getInputStream();
+        try{
+            GridFS gfs = new GridFS(db, collection);
+            BasicDBObject whereQuery = new BasicDBObject();
+            whereQuery.put("halId", halId);
+            whereQuery.put("filename", filename);
+            GridFSDBFile cursor = gfs.findOne(whereQuery);
+            file = cursor.getInputStream();
+        }catch(Exception exp){
+            throw new FileNotFoundException("Not found asset.");
+        }
         return file;
     }
 

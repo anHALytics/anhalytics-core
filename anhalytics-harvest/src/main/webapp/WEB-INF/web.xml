@@ -4,17 +4,17 @@
 <web-app>
     <display-name>fr.inria.hal.service</display-name>
  <servlet>
-    <servlet-name>Jersey REST Service</servlet-name>
+    <servlet-name>asset-service</servlet-name>
     <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
      <!-- Register resources and providers under com.vogella.jersey.first package. -->
     <init-param>
         <param-name>jersey.config.server.provider.packages</param-name>
-        <param-value>fr.inria.hal.service</param-value>
+        <param-value>fr.inria.anhalytics.harvest.service</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
-    <servlet-name>Jersey REST Service</servlet-name>
-    <url-pattern>/assets/*</url-pattern>
+    <servlet-name>asset-service</servlet-name>
+    <url-pattern>asset</url-pattern>
   </servlet-mapping>
 </web-app> 
