@@ -21,3 +21,4 @@ anhalytics-frontend/search/lib/mathjax
 anhalytics-frontend/search/lib/mathjax/*
 config/local/*
 /anhalytics-frontend/target/
+*.bak
