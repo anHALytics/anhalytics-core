@@ -164,7 +164,7 @@ The following command displays the help:
 
 ###### Annotation of the HAL collection
 
-The annotation on the HAL collection cab be launch with the command in the main directory of the sub-project ``anhalytics-annotate/``:
+The annotation on the HAL collection can be launch with the command in the main directory of the sub-project ``anhalytics-annotate/``:
 
 >java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -multiThread
 

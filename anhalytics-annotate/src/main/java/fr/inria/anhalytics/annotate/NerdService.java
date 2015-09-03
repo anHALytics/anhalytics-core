@@ -24,7 +24,7 @@ public class NerdService {
 
     private String input = null;
 
-    static private String REQUEST = "processNERDQueryScience";
+    static private String REQUEST = "processERDQuery";
 
     public NerdService(String input) {
         this.input = input;
@@ -47,6 +47,12 @@ public class NerdService {
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode node = mapper.createObjectNode();
             node.put("text", input);
+			ObjectNode dataTable = mapper.createObjectNode();
+			dataTable.putArray("fr");
+			dataTable.putArray("de");
+			dataTable.putArray("en");
+			node.put("resultLanguages", dataTable);
+			
             byte[] postDataBytes = node.toString().getBytes("UTF-8");
 
             OutputStream os = conn.getOutputStream();
