@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
@@ -39,7 +40,11 @@ public class GrobidProcess {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setDoOutput(true);
         conn.setRequestMethod("GET");
-        int responseCode = conn.getResponseCode();
+        int responseCode = 0;
+        try {
+            responseCode = conn.getResponseCode();
+        } catch (UnknownHostException e) {
+        }
         if (responseCode != 200) {
             throw new UnreachableGrobidServiceException("Grobid service is not alive.");
         }

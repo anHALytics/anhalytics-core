@@ -34,8 +34,6 @@ public class Indexer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Indexer.class);
 
-    private Client client = null;
-
     private final MongoManager mm;
 
     // only annotations under these paths will be indexed for the moment

@@ -52,7 +52,7 @@ public class OAIHarvester extends Harvester {
             logger.debug("\t Extracting teis.... for " + date);
             List<TEI> teis = oaiDom.getTeis(in);
 
-            processTeis(teis, date);
+            processTeis(teis, date, true);
 
             // token if any:
             tokenn = oaiDom.getToken();

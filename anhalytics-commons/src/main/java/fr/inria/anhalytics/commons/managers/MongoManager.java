@@ -61,20 +61,21 @@ public class MongoManager {
 
     public MongoManager(boolean test) {
         try {
-            Properties prop = new Properties();
-            File file = new File(System.getProperty("user.dir"));
-            prop.load(new FileInputStream(file.getParent() + "/anhalytics-commons/" + "commons.properties"));
-            mongodbServer = prop.getProperty("commons.mongodb_host");
-            mongodbPort = Integer.parseInt(prop.getProperty("commons.mongodb_port"));
-            String mongodbDb = prop.getProperty("commons.mongodb_db") + (test ? "_test" : "");
-            String mongodbUser = prop.getProperty("commons.mongodb_user");
-            String mongodbPass = prop.getProperty("commons.mongodb_pass");
-            mongo = new MongoClient(mongodbServer, mongodbPort);
-            if(!mongo.getDatabaseNames().contains(mongodbDb))
-                LOGGER.debug("MongoDB database "+mongodbDb+" does not exist and will be created");
-            db = mongo.getDB(mongodbDb);
-            boolean auth = db.authenticate(mongodbUser, mongodbPass.toCharArray());
-
+            if(!test) {
+                Properties prop = new Properties();
+                File file = new File(System.getProperty("user.dir"));
+                prop.load(new FileInputStream(file.getParent() + "/anhalytics-commons/" + "commons.properties"));
+                mongodbServer = prop.getProperty("commons.mongodb_host");
+                mongodbPort = Integer.parseInt(prop.getProperty("commons.mongodb_port"));
+                String mongodbDb = prop.getProperty("commons.mongodb_db");
+                String mongodbUser = prop.getProperty("commons.mongodb_user");
+                String mongodbPass = prop.getProperty("commons.mongodb_pass");
+                mongo = new MongoClient(mongodbServer, mongodbPort);
+                if(!mongo.getDatabaseNames().contains(mongodbDb))
+                    LOGGER.debug("MongoDB database "+mongodbDb+" does not exist and will be created");
+                db = mongo.getDB(mongodbDb);
+                boolean auth = db.authenticate(mongodbUser, mongodbPass.toCharArray());
+            }
             //initAnnotations();
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,6 +84,10 @@ public class MongoManager {
 
     public void close() {
         mongo.close();
+    }
+    
+    public void setDB(DB currentDB){
+        this.db = currentDB;
     }
     
     public boolean initTeiFiles(String date) {

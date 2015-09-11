@@ -40,11 +40,10 @@ abstract class Harvester {
     /**
      * Stores the given teis and downloads attachements(main file(s), annexes ..) . 
      */
-    protected void processTeis(List<TEI> teis, String date) {
+    protected void processTeis(List<TEI> teis, String date, boolean withAnnexes) {
         for (TEI tei : teis) {
             try {
                 String teiFilename = tei.getId() + ".tei.xml";
-                //if (HarvestProperties.isReset() || !mm.isCollected(teiFilename)) {
                     logger.debug("\t\t Extracting tei.... for " + tei.getId());
                     String teiString = tei.getTei();
                     if (teiString.length() > 0) {
@@ -59,12 +58,8 @@ abstract class Harvester {
                             mm.save(tei.getId(), "harvestProcess", "no file url", null);
                             logger.debug("\t\t\t PDF not found !");
                         }
-                   // }
-                    //annexes
-                    for (PubFile file : tei.getAnnexes()) {
-                        downloadFile(file, tei.getId(), date);
-                        // diagnose annexes (not found)?
-                    }
+                        if(withAnnexes)
+                            downloadAnnexes(tei.getAnnexes(), tei.getId(), date);
                 } else {
                     logger.debug("\t\t\t Tei not found !!!");
                 }
@@ -76,7 +71,18 @@ abstract class Harvester {
             }
         }
     }
-
+        
+    /**
+     * Downloads publication annexes and stores them.
+     */
+    protected void downloadAnnexes(List<PubFile> annexes, String id, String date) throws ParseException, IOException {
+        //annexes
+         for (PubFile file : annexes) {
+             downloadFile(file, id, date);
+             // diagnose annexes (not found)?
+         }
+    }
+    
     /**
      * Downloads the given file and classify it either as main file or as an
      * annex.
