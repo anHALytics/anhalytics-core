@@ -3,11 +3,13 @@ package fr.inria.anhalytics.harvest;
 import fr.inria.anhalytics.commons.data.PubFile;
 import fr.inria.anhalytics.commons.data.TEI;
 import fr.inria.anhalytics.commons.exceptions.BinaryNotAvailableException;
-import fr.inria.anhalytics.commons.managers.MongoManager;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -23,11 +25,11 @@ import org.xml.sax.SAXException;
 abstract class Harvester {
     protected static final Logger logger = LoggerFactory.getLogger(Harvester.class);
     
-    public Harvester(MongoManager mm) {
-        this.mm = mm;
+    public Harvester() throws UnknownHostException {
+        this.mm = MongoFileManager.getInstance(false);
     }
     
-    protected MongoManager mm;
+    protected MongoFileManager mm;
     /**
      * Harvests the documents submitted on the given date.
      */
@@ -48,7 +50,7 @@ abstract class Harvester {
                     String teiString = tei.getTei();
                     if (teiString.length() > 0) {
                         logger.debug("\t\t\t\t Storing tei : " + tei.getId());
-                        mm.addDocument(new ByteArrayInputStream(teiString.getBytes()), teiFilename, MongoManager.ADDITIONAL_TEIS, date);
+                        mm.addDocument(new ByteArrayInputStream(teiString.getBytes()), teiFilename, MongoCollectionsInterface.ADDITIONAL_TEIS, date);
                         String filename = tei.getId() + ".pdf";
                         //binary processing.
                         if (tei.getFile() != null) {
@@ -98,12 +100,12 @@ abstract class Harvester {
                 mm.save(id, "no stream/"+file.getType(), file.getUrl(), date);
             } else {
                 if ((file.getType()).equals("file")) {
-                    mm.addDocument(inBinary, id + ".pdf", MongoManager.BINARIES, date);
+                    mm.addDocument(inBinary, id + ".pdf", MongoCollectionsInterface.BINARIES, date);
                 } else {
                     int n = file.getUrl().lastIndexOf("/");
                     String filename = file.getUrl().substring(n + 1);
                     System.out.println(filename);
-                    mm.addAnnexDocument(inBinary, file.getType(), id, filename, MongoManager.PUB_ANNEXES, date);
+                    mm.addAnnexDocument(inBinary, file.getType(), id, filename, MongoCollectionsInterface.PUB_ANNEXES, date);
                 }
                 inBinary.close();
             }

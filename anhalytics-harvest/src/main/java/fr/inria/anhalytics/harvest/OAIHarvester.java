@@ -2,11 +2,10 @@ package fr.inria.anhalytics.harvest;
 
 import fr.inria.anhalytics.commons.data.PubFile;
 import fr.inria.anhalytics.commons.data.TEI;
-import fr.inria.anhalytics.commons.managers.MongoManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.*;
-import java.text.ParseException;
+import java.net.UnknownHostException;
 import java.util.*;
 import javax.xml.parsers.*;
 
@@ -23,8 +22,8 @@ public class OAIHarvester extends Harvester {
 
     private String oai_url = null;
 
-    public OAIHarvester(MongoManager mm) {
-        super(mm);
+    public OAIHarvester() throws UnknownHostException {
+        super();
         this.oai_url = HarvestProperties.getOaiUrl();
         oaiDom = new OAIPMHDom();
 

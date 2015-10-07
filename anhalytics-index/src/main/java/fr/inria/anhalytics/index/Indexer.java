@@ -1,9 +1,8 @@
 package fr.inria.anhalytics.index;
 
 
-
-import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.commons.managers.MongoManager;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import java.io.*;
 import java.util.*;
 
@@ -34,7 +33,7 @@ public class Indexer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Indexer.class);
 
-    private final MongoManager mm;
+    private final MongoFileManager mm;
 
     // only annotations under these paths will be indexed for the moment
     static final public List<String> toBeIndexed
@@ -42,8 +41,8 @@ public class Indexer {
                     "$teiCorpus.$teiHeader.$profileDesc.xml:id",
                     "$teiCorpus.$teiHeader.$profileDesc.$textClass.$keywords.$type_author.xml:id");
 
-    public Indexer(MongoManager mm) {
-        this.mm = mm;
+    public Indexer() throws UnknownHostException {
+        this.mm = MongoFileManager.getInstance(false);
     }
 
     /**
@@ -195,7 +194,7 @@ public class Indexer {
         IndexingPreprocess indexingPreprocess = new IndexingPreprocess(mm);
 
         int nb = 0;
-        mm.setGridFS(MongoManager.FINAL_TEIS);
+        mm.setGridFS(MongoCollectionsInterface.FINAL_TEIS);
         if (mm.initTeiFiles(null)) {
             int i = 0;
             BulkRequestBuilder bulkRequest = client.prepareBulk();

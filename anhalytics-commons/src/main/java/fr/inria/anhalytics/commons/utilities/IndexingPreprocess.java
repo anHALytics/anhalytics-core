@@ -1,17 +1,13 @@
 package fr.inria.anhalytics.commons.utilities;
 
-import fr.inria.anhalytics.commons.managers.MongoManager;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import org.codehaus.jackson.*;
 import org.codehaus.jackson.node.*;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
 import java.util.Arrays;
-import java.net.*;
-import java.io.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
 
@@ -32,9 +28,9 @@ public class IndexingPreprocess {
     static final public List<String> annotated
             = Arrays.asList("$title", "$abstract", "term");
 
-    private MongoManager mm = null;
+    private MongoFileManager mm = null;
 
-    public IndexingPreprocess(MongoManager mm) {
+    public IndexingPreprocess(MongoFileManager mm) {
         this.mm = mm;
     }
 

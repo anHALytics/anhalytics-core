@@ -1,6 +1,5 @@
 package fr.inria.anhalytics.index.main;
 
-import fr.inria.anhalytics.commons.managers.MongoManager;
 import fr.inria.anhalytics.index.Indexer;
 import fr.inria.anhalytics.index.properties.IndexProperties;
 import java.io.IOException;
@@ -24,8 +23,6 @@ public class Main {
             add("annotation");
         }
     };
-
-    private final MongoManager mm = new MongoManager(false);
 
     public static void main(String[] args) throws IOException, ParserConfigurationException {
         
@@ -65,7 +62,7 @@ public class Main {
 
     private void processCommand() throws IOException, ParserConfigurationException {
         String process = IndexProperties.getProcessName();
-        Indexer esm = new Indexer(mm);
+        Indexer esm = new Indexer();
         try {
             if (process.equals("tei")) {
                 esm.setUpElasticSearch(process);

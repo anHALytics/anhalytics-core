@@ -1,7 +1,7 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
-import fr.inria.anhalytics.commons.managers.MongoManager;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,12 +23,12 @@ import org.xml.sax.InputSource;
 public class AnnotatorWorker implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotatorWorker.class);
-    private MongoManager mm = null;
+    private MongoFileManager mm = null;
     private String filename = null;
     private String tei = null;
     private String halID = null;
 
-    public AnnotatorWorker(MongoManager mongoManager,
+    public AnnotatorWorker(MongoFileManager mongoManager,
             String filename,
             String halID,
             String tei) {

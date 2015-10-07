@@ -1,14 +1,12 @@
 package fr.inria.anhalytics.harvest.grobid;
 
-import fr.inria.anhalytics.commons.managers.MongoManager;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.logging.Level;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,11 +18,11 @@ abstract class GrobidWorker implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(GrobidWorker.class);
     private InputStream content;
-    protected MongoManager mm;
+    protected MongoFileManager mm;
     protected String date;
     protected String filename;
 
-    public GrobidWorker(InputStream content, MongoManager mongoManager, String date) {
+    public GrobidWorker(InputStream content, MongoFileManager mongoManager, String date) {
         this.content = content;
         this.mm = mongoManager;
         this.date = date;

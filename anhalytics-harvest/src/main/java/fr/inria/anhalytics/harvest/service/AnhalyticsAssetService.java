@@ -2,9 +2,11 @@ package fr.inria.anhalytics.harvest.service;
 
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
-import fr.inria.anhalytics.commons.managers.MongoManager;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.util.Properties;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -22,11 +24,12 @@ import org.apache.commons.io.IOUtils;
 @Path("/")
 public class AnhalyticsAssetService {
 
-    private MongoManager mm = new MongoManager(false);
+    private MongoFileManager mm;
 
     private static String KEY = null ; // :) 
     
-    public AnhalyticsAssetService() {
+    public AnhalyticsAssetService() throws UnknownHostException {
+        this.mm = MongoFileManager.getInstance(false);
         Properties props = new Properties();
         try {
             props.load(new FileInputStream("harvest.properties"));
@@ -42,7 +45,7 @@ public class AnhalyticsAssetService {
         Response response = null;
         if(key.equals(KEY)){
             try {
-                InputStream is = mm.getFile(id, filename, MongoManager.GROBID_ASSETS);
+                InputStream is = mm.getFile(id, filename, MongoCollectionsInterface.GROBID_ASSETS);
                 if (is == null) {
                     response = Response.status(Status.NOT_FOUND).build();
                 } else {

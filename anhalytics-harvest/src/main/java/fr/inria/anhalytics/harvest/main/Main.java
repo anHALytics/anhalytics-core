@@ -1,20 +1,17 @@
 package fr.inria.anhalytics.harvest.main;
 
-import fr.inria.anhalytics.commons.managers.MongoManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.OAIHarvester;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import fr.inria.anhalytics.harvest.teibuild.TeiBuilderProcess;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Properties;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
@@ -31,8 +28,6 @@ public class Main {
             add("buildTei");
         }
     };
-    private final MongoManager mm = new MongoManager(false);
-    //private static int nullBinaries = 0;
 
     public static void main(String[] args) throws IOException, ParserConfigurationException {
         try {
@@ -53,9 +48,9 @@ public class Main {
 
     private void processCommand() throws IOException, ParserConfigurationException {
         String process = HarvestProperties.getProcessName();
-        GrobidProcess gp = new GrobidProcess(mm);
-        TeiBuilderProcess tb = new TeiBuilderProcess(mm);
-        OAIHarvester oai = new OAIHarvester(mm);//tb renamed (Process suffix)
+        GrobidProcess gp = new GrobidProcess();
+        TeiBuilderProcess tb = new TeiBuilderProcess();
+        OAIHarvester oai = new OAIHarvester();//tb renamed (Process suffix)
         if (process.equals("harvestAll")) {
             oai.fetchAllDocuments();
             gp.processFulltext();

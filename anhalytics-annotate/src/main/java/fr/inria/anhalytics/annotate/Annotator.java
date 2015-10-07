@@ -1,12 +1,12 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
-import fr.inria.anhalytics.commons.managers.MongoManager;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.*;
-import java.util.*;
+import java.net.UnknownHostException;
 import java.util.concurrent.*;
 
 /**
@@ -19,16 +19,16 @@ public class Annotator {
 
     private static final Logger logger = LoggerFactory.getLogger(Annotator.class);
 
-    private final MongoManager mm;
+    private final MongoFileManager mm;
 
-    public Annotator(MongoManager mm) {
-        this.mm = mm;        
+    public Annotator() throws UnknownHostException {
+        this.mm = MongoFileManager.getInstance(false);        
     }
 
     public int annotateCollection() {
         int nb = 0;
         try {
-            mm.setGridFS(MongoManager.FINAL_TEIS);
+            mm.setGridFS(MongoCollectionsInterface.FINAL_TEIS);
             for (String date : Utilities.getDates()) {
                 if (mm.initTeiFiles(date)) {
                     //logger.debug("processing teis for :" + date);
@@ -73,7 +73,7 @@ public class Annotator {
         ThreadPoolExecutor executor = getThreadsExecutor();
         int nb = 0;
         try {
-            mm.setGridFS(MongoManager.FINAL_TEIS);
+            mm.setGridFS(MongoCollectionsInterface.FINAL_TEIS);
             for (String date : Utilities.getDates()) {
                 if (mm.initTeiFiles(date)) {
                     //logger.debug("processing teis for :" + date);

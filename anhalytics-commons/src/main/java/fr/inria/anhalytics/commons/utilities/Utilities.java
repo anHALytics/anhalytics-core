@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
@@ -246,7 +247,9 @@ public class Utilities {
         // deletes file when the virtual machine terminate
         f.deleteOnExit();
         String filePath = f.getAbsolutePath();
-        if(inBinary == null) System.out.println("null");
+        if (inBinary == null) {
+            System.out.println("null");
+        }
         getBinaryURLContent(f, inBinary);
         return filePath;
     }
@@ -417,12 +420,32 @@ public class Utilities {
         return formatedXml;
     }
 
-    
     public static void checkPath(String path) {
         File f = new File(path);
         // exception if prop file does not exist
         if (!f.exists() || !f.isDirectory()) {
             throw new DirectoryNotFoundException("The file '" + path + "' does not exist.");
         }
+    }
+
+    /*
+     * To convert the InputStream to String we use the BufferedReader.readLine()
+     * method. We iterate until the BufferedReader return null which means
+     * there's no more data to read. Each line will appended to a StringBuilder
+     * and returned as String.
+     */
+    static public String convertStreamToString(InputStream is) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+        } finally {
+            is.close();
+        }
+        return sb.toString();
     }
 }

@@ -1,7 +1,8 @@
 package fr.inria.anhalytics.harvest.grobid;
 
 import fr.inria.anhalytics.commons.exceptions.UnreachableGrobidServiceException;
-import fr.inria.anhalytics.commons.managers.MongoManager;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.IOException;
@@ -23,10 +24,10 @@ public class GrobidProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(GrobidProcess.class);
 
-    private MongoManager mm;
+    private MongoFileManager mm;
 
-    public GrobidProcess(MongoManager mm) {
-        this.mm = mm;
+    public GrobidProcess() throws UnknownHostException {
+        this.mm = MongoFileManager.getInstance(false);
     }
 
     /**
@@ -58,7 +59,7 @@ public class GrobidProcess {
     public void processFulltext() throws IOException {
         if (isAllOk()) {
             ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
-            mm.setGridFS(MongoManager.BINARIES);
+            mm.setGridFS(MongoCollectionsInterface.BINARIES);
             for (String date : Utilities.getDates()) {
                 if (mm.initBinaries(date)) {
                     while (mm.hasMoreDocuments()) {

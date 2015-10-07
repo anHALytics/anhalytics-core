@@ -2,7 +2,6 @@ package fr.inria.anhalytics.annotate.main;
 
 import fr.inria.anhalytics.annotate.Annotator;
 import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
-import fr.inria.anhalytics.commons.managers.MongoManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +16,6 @@ import org.slf4j.LoggerFactory;
 public class Main {
     
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
-    
-    private final MongoManager mm = new MongoManager(false);
     
     public static void main(String[] args) throws IOException, ParserConfigurationException {
         try {
@@ -38,7 +35,7 @@ public class Main {
     
     private void processCommand() throws IOException, ParserConfigurationException {
         int nbAnnots;
-        Annotator annotator = new Annotator(mm);
+        Annotator annotator = new Annotator();
         // loading based on DocDB XML, with TEI conversion
         try {
             

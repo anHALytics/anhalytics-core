@@ -1,6 +1,6 @@
 package fr.inria.anhalytics.harvest.grobid;
 
-import fr.inria.anhalytics.commons.managers.MongoManager;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import java.io.File;
 import java.io.InputStream;
 
@@ -10,7 +10,7 @@ import java.io.InputStream;
  */
 public class GrobidAnnexWorker extends GrobidWorker {
 
-    public GrobidAnnexWorker(InputStream content, MongoManager mongoManager, String date) {
+    public GrobidAnnexWorker(InputStream content, MongoFileManager mongoManager, String date) {
         super(content, mongoManager, date);
     }
 
