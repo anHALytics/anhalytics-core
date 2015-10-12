@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -48,11 +49,10 @@ public class NerdService {
             ObjectNode node = mapper.createObjectNode();
             node.put("text", input);
 			ObjectNode dataTable = mapper.createObjectNode();
-			dataTable.putArray("fr");
-			dataTable.putArray("de");
-			dataTable.putArray("en");
-			node.put("resultLanguages", dataTable);
-			
+			dataTable.put("lang","fr");
+			dataTable.put("lang","de");
+			dataTable.put("lang","en");
+			node.put("language", dataTable);
             byte[] postDataBytes = node.toString().getBytes("UTF-8");
 
             OutputStream os = conn.getOutputStream();
