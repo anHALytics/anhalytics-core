@@ -77,7 +77,7 @@ var thefacetview_nl = ' \
            ';
 
 var field_complex;
-if (options['collection'] == 'npl') {
+if (defaults['collection'] == 'npl') {
     field_complex = ' \
 			<div style="display:inline-block; margin-left:-2px;" class="btn-group"> \
 			    <a style="-moz-border-radius:0px 3px 3px 0px; \

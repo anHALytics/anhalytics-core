@@ -579,8 +579,7 @@
 			';
             $('#facetview_filters').html("").append(temp_intro);
             $('#new_facet').bind('click', add_facet);
-        }
-        else {
+        
             var temp_intro = '<form class="well" id="scope_area"><label class="checkbox">' +
                     '<input type="checkbox" name="scientific" checked>Technical content</label>';
             temp_intro += '<label class="checkbox">' +
