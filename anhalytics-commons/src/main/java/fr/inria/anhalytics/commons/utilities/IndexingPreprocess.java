@@ -596,11 +596,13 @@ public class IndexingPreprocess {
                         JsonNode piece = (JsonNode) iter.next();
 
                         JsonNode nerd_scoreN = piece.findValue("nerd_score");
+                        JsonNode preferredTermN = piece.findValue("preferredTerm");
                         JsonNode wikipediaExternalRefN = piece.findValue("wikipediaExternalRef");
                         JsonNode freeBaseExternalRefN = piece.findValue("freeBaseExternalRef");
 
                         String nerd_score = nerd_scoreN.getTextValue();
                         String wikipediaExternalRef = wikipediaExternalRefN.getTextValue();
+                        String preferredTerm = preferredTermN.getTextValue();
                         String freeBaseExternalRef = null;
                         if ((freeBaseExternalRefN != null) && (!freeBaseExternalRefN.isMissingNode())) {
                             freeBaseExternalRef = freeBaseExternalRefN.getTextValue();
@@ -615,6 +617,10 @@ public class IndexingPreprocess {
                         JsonNode wikiNode = mapper.createObjectNode();
                         ((ObjectNode) wikiNode).put("wikipediaExternalRef", wikipediaExternalRef);
                         ((ArrayNode) newNode).add(wikiNode);
+                        
+                        JsonNode preferredTermNode = mapper.createObjectNode();
+                        ((ObjectNode) preferredTermNode).put("preferredTerm", preferredTerm);
+                        ((ArrayNode) newNode).add(preferredTermNode);
 
                         if (freeBaseExternalRef != null) {
                             JsonNode freeBaseNode = mapper.createObjectNode();

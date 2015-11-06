@@ -23,8 +23,8 @@ var textFieldsNPLReturned = ['$teiCorpus.$teiHeader.$titleStmt.$title.$title-fir
     '$teiCorpus.$teiHeader.$titleStmt.xml:id',
     '$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$monogr.$imprint.$date',
     '$teiCorpus.$teiHeader.$editionStmt.$edition.$date',
-    '$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$analytic.$author.$persName.$surname',
-    '$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$analytic.$author.$persName.$forename',
+    '$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$author.$persName.$surname',
+    '$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$author.$persName.$forename',
     '$teiCorpus.$teiHeader.$sourceDesc.target',
 //			'$teiCorpus.$teiHeader.$profileDesc.$textClass.$classCode.$scheme_halTypology',
     '_id'
@@ -225,7 +225,7 @@ var elasticsearchquery = function () {
                 else if ($('#label1_facetview_searchbar' + rank).text() == "authors\' country") {
                     // this one is for NPL only
                     var obj = {'query_string': {'default_operator': 'AND'}};
-                    var theField = "$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$biblStruct.$analytic.$author.$affiliation.$address.key";
+                    var theField = "$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$biblStruct.$author.$affiliation.$address.key";
                     obj['query_string']['query'] =
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);
@@ -233,7 +233,7 @@ var elasticsearchquery = function () {
                 else if ($('#label1_facetview_searchbar' + rank).text() == "author") {
                     // this one is for NPL only
                     var obj = {'query_string': {'default_operator': 'AND'}};
-                    var theField = "$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$biblStruct.$analytic.$author.$persName.$surname";
+                    var theField = "$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$biblStruct..$author.$persName.$surname";
                     obj['query_string']['query'] =
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);
@@ -241,7 +241,7 @@ var elasticsearchquery = function () {
                 else if ($('#label1_facetview_searchbar' + rank).text() == "affiliation") {
                     // this one is for NPL only
                     var obj = {'query_string': {'default_operator': 'AND'}};
-                    var theField = "$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$biblStruct.$analytic.$author.$affiliation.$orgName";
+                    var theField = "$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$biblStruct.$author.$affiliation.$orgName";
                     obj['query_string']['query'] =
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);

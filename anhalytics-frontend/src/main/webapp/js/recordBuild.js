@@ -99,7 +99,7 @@ var buildrecord = function (index, node) {
             titles = jsonObject['$teiCorpus.$teiHeader.$fileDesc.$titleStmt.$title.$lang_en'];
         }
         else {
-            titles = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$analytic.$title.$lang_en'];
+            titles = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$title.$lang_en'];
         }
         if (typeof titles == 'string') {
             title = titles;
@@ -119,7 +119,7 @@ var buildrecord = function (index, node) {
             titles = jsonObject['$teiCorpus.$teiHeader.$fileDesc.$titleStmt.$title.$lang_fr'];
         }
         else {
-            titles = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$analytic.$title.$lang_fr'];
+            titles = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$title.$lang_fr'];
         }
         if (typeof titles == 'string') {
             title = titles;
@@ -139,7 +139,7 @@ var buildrecord = function (index, node) {
             titles = jsonObject['$teiCorpus.$teiHeader.$fileDesc.$titleStmt.$title.$lang_de'];
         }
         else {
-            titles = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$analytic.$title.$lang_de'];
+            titles = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$title.$lang_de'];
         }
         if (typeof titles == 'string') {
             title = titles;
@@ -178,10 +178,10 @@ var buildrecord = function (index, node) {
         var authorsLast = null;
         var authorsFirst = null;
 
-        authorsLast = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$analytic.$author.$persName.$surname'];
+        authorsLast = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$author.$persName.$surname'];
         var tempStr = "" + authorsLast;
         authorsLast = tempStr.split(",");
-        authorsFirst = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$analytic.$author.$persName.$forename'];
+        authorsFirst = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$author.$persName.$forename'];
         tempStr = "" + authorsFirst;
         authorsFirst = tempStr.split(",");
 

@@ -153,7 +153,7 @@ var displayAbstract = function (data, index) {
 
         // authors and affiliation
         var names =
-                jsonObject.fields['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$analytic.$author.$persName.$fullName'];
+                jsonObject.fields['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$author.$persName.$fullName'];
 
         if (names) {
             for (var aut in names) {

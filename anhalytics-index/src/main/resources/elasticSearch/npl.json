@@ -1404,6 +1404,9 @@
                             "nerd_score": {
                                 "type": "string"
                             },
+                            "preferredTerm": {
+                                "type": "string"
+                            },
                             "wikipediaExternalRef": {
                                 "type": "string"
                             }
