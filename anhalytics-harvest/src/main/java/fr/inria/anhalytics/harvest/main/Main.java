@@ -2,6 +2,8 @@ package fr.inria.anhalytics.harvest.main;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.OAIHarvester;
+import fr.inria.anhalytics.harvest.auxiliaries.ArXivHarvester;
+import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import fr.inria.anhalytics.harvest.teibuild.TeiBuilderProcess;
@@ -26,6 +28,7 @@ public class Main {
             add("harvestDaily");
             add("processGrobid");
             add("buildTei");
+            add("datamine");// feeds knowledge base 
         }
     };
 
@@ -69,6 +72,7 @@ public class Main {
             gp.processFulltext();
             return;
         } else if (process.equals("buildTei")) {
+            //warn about xml_id modifications
             tb.build();
             return;
         }

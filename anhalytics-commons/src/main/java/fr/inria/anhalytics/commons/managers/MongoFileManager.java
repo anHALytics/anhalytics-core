@@ -46,6 +46,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     private String currentFilename = null;
     private String currentHalID = null;
+    private String currentHalURI = null;
 
     // for annotations
     private DBCursor cursor = null;
@@ -187,6 +188,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public String getCurrentFilename() {
         return currentFilename;
     }
+    
+    public String getCurrentHalURI() {
+        return currentHalURI;
+    }
 
     public String nextDocument() {
         String tei = null;
@@ -194,6 +199,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             if (indexFile < files.size()) {
                 GridFSDBFile teifile = files.get(indexFile);
                 currentFilename = teifile.getFilename();
+                currentHalURI = Utilities.getHalURIFromFilename(currentFilename);
                 currentHalID = (String)teifile.get("halId");
                 InputStream input = teifile.getInputStream();
                 tei = IOUtils.toString(input, "UTF-8");

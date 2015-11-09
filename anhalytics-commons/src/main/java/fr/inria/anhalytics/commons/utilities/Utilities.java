@@ -301,6 +301,21 @@ public class Utilities {
         }
         return halID;
     }
+    
+    public static String getVersionFromURI(String uri) {
+        int ind = uri.lastIndexOf("v");
+        String version="";
+        if (ind > -1) {
+            version = uri.substring(ind, uri.length());
+        }
+        return version;
+    }
+    
+    public static String getHalURIFromFilename(String filename) {
+        int ind = filename.indexOf(".");
+        String halURI = filename.substring(0, ind);
+        return halURI;
+    }
 
     /**
      * @return the dates

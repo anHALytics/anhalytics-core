@@ -3,6 +3,7 @@ package fr.inria.anhalytics.harvest.teibuild;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.datamine.HALMiner;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +11,7 @@ import java.net.UnknownHostException;
 import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 /**
  *
@@ -29,6 +31,7 @@ public class TeiBuilderProcess {
         InputStream grobid_tei = null;
         InputStream additional_tei = null;
         String result;
+        Document doc_result;
         mm.setGridFS(MongoCollectionsInterface.GROBID_TEIS);
         for (String date : Utilities.getDates()) {
             if (mm.initTeiFiles(date)) {
@@ -36,13 +39,17 @@ public class TeiBuilderProcess {
                 while (mm.hasMoreDocuments()) {
                     String tei_doc = mm.nextDocument();
                     String filename = mm.getCurrentFilename();
+                    String hal_uri = mm.getCurrentHalURI();
                     logger.debug("\t\t Merging documents.. for: " + filename);
                     tei_doc = Utilities.trimEncodedCharaters(tei_doc);
                     grobid_tei = new ByteArrayInputStream(tei_doc.getBytes());
                     additional_tei = mm.streamFile(filename, MongoCollectionsInterface.ADDITIONAL_TEIS);
                     
                     try {
-                        result = TeiBuilder.generateTeiCorpus(additional_tei, grobid_tei, true);
+                        doc_result = TeiBuilder.generateTeiCorpus(additional_tei, grobid_tei);
+                        //Extract teis Header metadata
+                        doc_result = HALMiner.mine(doc_result, hal_uri);
+                        result = Utilities.toString(doc_result);
                         InputStream tei = new ByteArrayInputStream(result.getBytes());
                         mm.addDocument(tei, filename, MongoCollectionsInterface.FINAL_TEIS, date);
                     } catch (Exception e) {
