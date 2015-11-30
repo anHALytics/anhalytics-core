@@ -287,8 +287,11 @@ public class Utilities {
     }
 
     public static Date parseStringDate(String dateString) throws ParseException {
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-        Date date = format.parse(dateString);
+        Date date = null;
+        if (dateString != null) {
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+            date = format.parse(dateString);
+        }
         return date;
     }
 
@@ -301,16 +304,16 @@ public class Utilities {
         }
         return halID;
     }
-    
+
     public static String getVersionFromURI(String uri) {
         int ind = uri.lastIndexOf("v");
-        String version="";
+        String version = "";
         if (ind > -1) {
             version = uri.substring(ind, uri.length());
         }
         return version;
     }
-    
+
     public static String getHalURIFromFilename(String filename) {
         int ind = filename.indexOf(".");
         String halURI = filename.substring(0, ind);

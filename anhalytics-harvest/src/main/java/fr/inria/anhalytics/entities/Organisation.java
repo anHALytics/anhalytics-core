@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author azhar
@@ -9,14 +12,14 @@ public class Organisation {
     private String type = "";
     private String url = "";
     private String structure = "";
-    private String name= "";
+    private List<String> names = null;
     public Organisation(){}
-    public Organisation(Long organisationId, String type, String url, String structure, String name){
+    public Organisation(Long organisationId, String type, String url, String structure, List<String> names){
         this.organisationId = organisationId;
         this.type = type;
         this.url = url;
         this.structure = structure;
-        this.name = name;
+        this.names = names;
     }
 
     /**
@@ -78,14 +81,18 @@ public class Organisation {
     /**
      * @return the name
      */
-    public String getName() {
-        return name;
+    public List<String> getNames() {
+        if(this.names == null)
+            this.names = new ArrayList<String>();
+        return names;
     }
 
     /**
      * @param name the name to set
      */
-    public void setName(String name) {
-        this.name = name;
+    public void addName(String name) {
+        if(this.names == null)
+            this.names = new ArrayList<String>();
+        this.names.add(name);
     }
 }

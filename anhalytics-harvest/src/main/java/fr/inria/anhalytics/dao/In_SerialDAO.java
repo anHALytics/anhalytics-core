@@ -22,13 +22,13 @@ public class In_SerialDAO extends DAO<In_Serial> {
     private static final String SQL_INSERT
             = "INSERT INTO IN_SERIAL (monographID, collectionID, journalID, volume, number) VALUES (?, ?, ?, ?, ?)";
 
-    private static final String SQL_INSERT1
+    private static final String SQL_INSERT_COLLECTION
             = "INSERT INTO COLLECTION (title) VALUES (?)";
 
-    private static final String SQL_INSERT2
+    private static final String SQL_INSERT_JOURNAL
             = "INSERT INTO JOURNAL (title) VALUES (?)";
     
-    private static final String SQL_INSERT3
+    private static final String SQL_INSERT_SERIAL_IDENTIFIER
             = "INSERT INTO SERIAL_IDENTIFIER (id, type, journalID, collectionID) VALUES (?, ?, ?, ?)";
 
     
@@ -47,7 +47,7 @@ public class In_SerialDAO extends DAO<In_Serial> {
         PreparedStatement statement1;
         PreparedStatement statement2;
         try {
-            statement = connect.prepareStatement(SQL_INSERT2, Statement.RETURN_GENERATED_KEYS);
+            statement = connect.prepareStatement(SQL_INSERT_JOURNAL, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, obj.getJ().getTitle());
             
             int code = statement.executeUpdate();
@@ -60,7 +60,7 @@ public class In_SerialDAO extends DAO<In_Serial> {
             result = true;
             
             
-            statement1 = connect.prepareStatement(SQL_INSERT1, Statement.RETURN_GENERATED_KEYS);
+            statement1 = connect.prepareStatement(SQL_INSERT_COLLECTION, Statement.RETURN_GENERATED_KEYS);
             statement1.setString(1, obj.getC().getTitle());
             
             int code1 = statement1.executeUpdate();
@@ -96,7 +96,7 @@ public class In_SerialDAO extends DAO<In_Serial> {
 
         PreparedStatement statement;
         try {
-            statement = connect.prepareStatement(SQL_INSERT3, Statement.RETURN_GENERATED_KEYS);
+            statement = connect.prepareStatement(SQL_INSERT_SERIAL_IDENTIFIER, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, obj1.getId());
             statement.setString(2, obj1.getType());
             statement.setLong(3, obj.getJ().getJournalID());

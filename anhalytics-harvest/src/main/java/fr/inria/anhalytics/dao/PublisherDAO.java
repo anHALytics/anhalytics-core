@@ -32,7 +32,6 @@ public class PublisherDAO extends DAO<Publisher> {
         try {
             statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, obj.getName());
-            System.out.println("fick");
             int code = statement.executeUpdate();
             ResultSet rs = statement.getGeneratedKeys();
 

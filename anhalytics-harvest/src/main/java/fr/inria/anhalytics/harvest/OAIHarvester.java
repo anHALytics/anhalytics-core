@@ -58,6 +58,7 @@ public class OAIHarvester extends Harvester {
             if (tokenn == null) {
                 stop = true;
             }
+            in.close();
         }
         processEmbargoFiles(date);
     }

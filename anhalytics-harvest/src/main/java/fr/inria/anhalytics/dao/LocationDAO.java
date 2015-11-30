@@ -96,4 +96,19 @@ public class LocationDAO extends DAO<Location> {
         return location;
     }
 
+    public Long findAddressIdByOrganisationId(String orgId) {
+        Long addressId = null;
+
+        try {
+            ResultSet result = this.connect.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT addressID FROM LOCATION WHERE organisationID = " + orgId);
+            if (result.first()) {
+                addressId = result.getLong("addressID");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return addressId;
+    }
 }

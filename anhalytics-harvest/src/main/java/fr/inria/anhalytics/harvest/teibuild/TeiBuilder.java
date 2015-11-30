@@ -17,7 +17,7 @@ import org.w3c.dom.Attr;
 
 public class TeiBuilder {
 
-    public static Document generateTeiCorpus(InputStream additionalTei, InputStream grobidTei) throws ParserConfigurationException, IOException, XPathExpressionException {
+    public static Document generateTeiCorpus(InputStream additionalTei, InputStream grobidTei) throws ParserConfigurationException, IOException {
         Document resultTei = null;
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
@@ -29,20 +29,23 @@ public class TeiBuilder {
             docAdditionalTei = docBuilder.parse(additionalTei);
         } catch (SAXException e) {
             e.printStackTrace();
+
         }
-//System.out.println(Utilities.toString(docAdditionalTei));
+        
         NodeList teiHeader = halTeiExtractor.getTeiHeader(docAdditionalTei);
         
         Document doc = null;
         try {
+            
             doc = docBuilder.parse(grobidTei);
             //System.out.println(Utilities.toString(doc));
             //Extract grobid tei metadata
             updateGrobidTEI(doc);
-            
+
             resultTei = createTEICorpus(doc, teiHeader);
-        } catch (SAXException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            resultTei = createTEICorpus(doc, teiHeader);
         }
         return resultTei;
     }
@@ -58,7 +61,7 @@ public class TeiBuilder {
         }
     }
 
-    private static Document createTEICorpus(Document doc, NodeList biblFull) {        
+    private static Document createTEICorpus(Document doc, NodeList biblFull) {
         Element teiHeader = doc.createElement("teiHeader");
         Element tei = (Element) doc.getDocumentElement();
         Attr attr = tei.getAttributeNode("xmlns");
@@ -68,9 +71,9 @@ public class TeiBuilder {
         addAdditionalTeiHeader(biblFull, teiHeader, doc);
         teiCorpus.appendChild(teiHeader);
         teiCorpus.appendChild(tei);
-        
+
         teiCorpus.setAttributeNode(attr);
-        
+
         doc.appendChild(teiCorpus);
         // add random xml:id on textual elements
         Utilities.generateIDs(doc);
@@ -83,7 +86,7 @@ public class TeiBuilder {
     private static void updateGrobidTEI(Document doc) {
         NodeList nl = doc.getElementsByTagName("teiHeader");
         Node n = nl.item(0);
-        
+
         while (n.hasChildNodes()) {
             n.removeChild(n.getFirstChild());
         }

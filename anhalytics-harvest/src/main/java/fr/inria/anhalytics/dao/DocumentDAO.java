@@ -34,7 +34,6 @@ public class DocumentDAO extends DAO<Document> {
             statement.setString(1, obj.getVersion());
             statement.setString(2, obj.getUri());
             statement.setString(3, obj.getTei_metadata());
-            System.out.println("fick");
             int code = statement.executeUpdate();
             ResultSet rs = statement.getGeneratedKeys();
 

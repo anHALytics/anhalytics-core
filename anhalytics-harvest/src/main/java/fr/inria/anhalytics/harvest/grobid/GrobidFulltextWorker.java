@@ -35,7 +35,7 @@ public class GrobidFulltextWorker extends GrobidWorker {
                             tei = Utilities.readFile(currFile.getAbsolutePath());
                             tei = Utilities.trimEncodedCharaters(tei);
                             System.out.println(filename);
-                            mm.addDocument(new ByteArrayInputStream(tei.getBytes()), filename.substring(0, filename.indexOf("."))+".tei.xml", MongoCollectionsInterface.GROBID_TEIS, date);
+                            mm.addDocument(new ByteArrayInputStream(tei.getBytes()), "", filename.substring(0, filename.indexOf("."))+".tei.xml", MongoCollectionsInterface.GROBID_TEIS, date);
                         }
                     }
                 }

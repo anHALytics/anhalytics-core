@@ -16,61 +16,63 @@ import org.w3c.dom.NodeList;
  * @author achraf
  */
 public class halTeiExtractor {
-    
+
     private static XPath xPath = XPathFactory.newInstance().newXPath();
-    
+
     /**
-     * Reorganizes some nodes especially authors/editors that are 'missplaced' and returns the biblFull to avoid redundancy. 
+     * Reorganizes some nodes especially authors/editors that are 'missplaced'
+     * and returns the biblFull to avoid redundancy.
+     *
      * @param docAdditionalTei
-     * @return 
+     * @return
      */
     // TO BE RENAMED.
-    public static NodeList getTeiHeader(Document docAdditionalTei) throws XPathExpressionException {
+    public static NodeList getTeiHeader(Document docAdditionalTei) {
         /////////////// Hal specific : To be done as a harvesting post process before storing tei ////////////////////
         // remove ugly end-of-line in starting and ending text as it is
         // a problem for stand-off annotations
         //read an xml node using xpath
-        NodeList editors = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/editor").evaluate(docAdditionalTei, XPathConstants.NODESET);
-        NodeList authors = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/author").evaluate(docAdditionalTei, XPathConstants.NODESET);
-        NodeList orgs = (NodeList) xPath.compile("/TEI/text/back/listOrg/org").evaluate(docAdditionalTei, XPathConstants.NODESET);
-       
-        removeConsolidatedData(docAdditionalTei, authors);
-        updateAffiliations(authors, orgs, docAdditionalTei);        
-        removeConsolidatedData(docAdditionalTei, editors);
-        updateAffiliations(editors, orgs, docAdditionalTei);
-        docAdditionalTei = removeUnneededParts(docAdditionalTei); 
-        Utilities.trimEOL(docAdditionalTei.getDocumentElement(), docAdditionalTei);
-        return (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull").evaluate(docAdditionalTei, XPathConstants.NODESET);
+        NodeList teiHeader = null;
+        try {
+            NodeList editors = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/editor").evaluate(docAdditionalTei, XPathConstants.NODESET);
+            NodeList authors = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/author").evaluate(docAdditionalTei, XPathConstants.NODESET);
+            NodeList orgs = (NodeList) xPath.compile("/TEI/text/back/listOrg/org").evaluate(docAdditionalTei, XPathConstants.NODESET);
+
+            removeConsolidatedData(docAdditionalTei, authors);
+            updateAffiliations(authors, orgs, docAdditionalTei);
+            removeConsolidatedData(docAdditionalTei, editors);
+            updateAffiliations(editors, orgs, docAdditionalTei);
+            docAdditionalTei = removeUnneededParts(docAdditionalTei);
+            Utilities.trimEOL(docAdditionalTei.getDocumentElement(), docAdditionalTei);
+            teiHeader = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull").evaluate(docAdditionalTei, XPathConstants.NODESET);
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+
+        }
+        return teiHeader;
     }
-    
+
     /**
      * WIP...
+     *
      * @param docAdditionalTei
-     * @param entities 
+     * @param entities
      */
-    private static void removeConsolidatedData(Document docAdditionalTei, NodeList entities) throws XPathExpressionException{
+    // TO BE RENAMED
+    private static void removeConsolidatedData(Document docAdditionalTei, NodeList entities) throws XPathExpressionException {
         Node person = null;
         for (int i = entities.getLength() - 1; i >= 0; i--) {
             person = entities.item(i);
-            /*
-            theNodes = person.getChildNodes();
-            for (int y = 0; y < theNodes.getLength(); y++) {
-                Node node = theNodes.item(y);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    if(!node.getNodeName().equals("idno"))
-                        person.removeChild(node);
-                }
-            }
-                    */
+
             person.getParentNode().removeChild(person);
 
             NodeList biblStruct = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct").evaluate(docAdditionalTei, XPathConstants.NODESET);
             biblStruct.item(0).insertBefore(person, biblStruct.item(0).getFirstChild());
         }
-    
+
     }
-    
-    private static Document removeUnneededParts(Document docAdditionalTei) throws XPathExpressionException{
+
+    private static Document removeUnneededParts(Document docAdditionalTei) throws XPathExpressionException {
         Node analytic = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/analytic").evaluate(docAdditionalTei, XPathConstants.NODE);
         analytic.getParentNode().removeChild(analytic);
         Node editionStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/editionStmt").evaluate(docAdditionalTei, XPathConstants.NODE);

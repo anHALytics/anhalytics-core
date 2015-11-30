@@ -3,6 +3,7 @@ package fr.inria.anhalytics.dao;
 import fr.inria.anhalytics.entities.Author;
 import fr.inria.anhalytics.entities.Editor;
 import fr.inria.anhalytics.entities.Monograph;
+import fr.inria.anhalytics.entities.Organisation;
 import fr.inria.anhalytics.entities.Person;
 import fr.inria.anhalytics.entities.Person_Identifier;
 import java.sql.Connection;
@@ -11,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,10 +25,10 @@ public class PersonDAO extends DAO<Person> {
     private static final String SQL_INSERT
             = "INSERT INTO PERSON (title, photo, url) VALUES (?, ?, ?)";
 
-    private static final String SQL_INSERT1
+    private static final String SQL_INSERT_PERSON_NAME
             = "INSERT INTO PERSON_NAME (personID, fullname, forename ,middlename , surname, title) VALUES (?, ?, ?, ?, ?, ?)";
 
-    private static final String SQL_INSERT2
+    private static final String SQL_INSERT_PERSON_IDENTIFIER
             = "INSERT INTO PERSON_IDENTIFIER (personID, ID, type) VALUES (?, ?, ?)";
 
     private static final String SQL_INSERT_AUTHOR
@@ -34,6 +36,8 @@ public class PersonDAO extends DAO<Person> {
 
     private static final String SQL_INSERT_EDITOR
             = "INSERT INTO EDITOR (rank, personID, publicationID) VALUES (?, ?, ?)";
+
+    private static final String READ_QUERY_AUTHORS_BY_DOCID = "SELECT personID FROM AUTHOR WHERE docID = ?";
 
     public PersonDAO(Connection conn) {
         super(conn);
@@ -98,7 +102,7 @@ public class PersonDAO extends DAO<Person> {
                 obj.setPersonId(rs.getLong(1));
             }
 
-            statement1 = connect.prepareStatement(SQL_INSERT1);
+            statement1 = connect.prepareStatement(SQL_INSERT_PERSON_NAME);
             statement1.setLong(1, obj.getPersonId());
             statement1.setString(2, obj.getFullname());
             statement1.setString(3, obj.getForename());
@@ -109,7 +113,7 @@ public class PersonDAO extends DAO<Person> {
             int code1 = statement1.executeUpdate();
 
             for (Person_Identifier pi : obj.getPerson_identifiers()) {
-                statement2 = connect.prepareStatement(SQL_INSERT2);
+                statement2 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
                 statement2.setLong(1, obj.getPersonId());
                 statement2.setString(2, pi.getId());
                 statement2.setString(3, pi.getType());
@@ -140,23 +144,44 @@ public class PersonDAO extends DAO<Person> {
         try {
             ResultSet result = this.connect.createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM PERSON WHERE personID = " + id);
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT p.title, p.photo, p.url, pn.fullname, pn.forename, pn.middlename, pn.surname FROM PERSON p, PERSON_NAME pn WHERE p.personID = " + id + " AND pn.personID = " + id);
             if (result.first()) {
                 person = new Person(
                         id,
-                        result.getString("title"),
-                        result.getString("photo"),
-                        result.getString("fullname"),
-                        result.getString("forename"),
-                        result.getString("middlename"),
-                        result.getString("surname"),
-                        result.getString("url"),
+                        result.getString("p.title"),
+                        result.getString("p.photo"),
+                        result.getString("pn.fullname"),
+                        result.getString("pn.forename"),
+                        result.getString("pn.middlename"),
+                        result.getString("pn.surname"),
+                        result.getString("p.url"),
                         new ArrayList<Person_Identifier>());
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return person;
+    }
+
+    public List<Person> getAuthorsByDocId(Long docId) {
+        List<Person> persons = new ArrayList<Person>();
+
+        Person person = null;
+
+        try {
+            PreparedStatement ps = this.connect.prepareStatement(READ_QUERY_AUTHORS_BY_DOCID);
+            ps.setLong(1, docId);
+            // process the results
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                person = find(rs.getLong("personID"));
+                persons.add(person);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return persons;
     }
 
 }

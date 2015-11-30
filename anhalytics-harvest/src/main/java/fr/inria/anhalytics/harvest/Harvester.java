@@ -50,7 +50,7 @@ abstract class Harvester {
                     String teiString = tei.getTei();
                     if (teiString.length() > 0) {
                         logger.debug("\t\t\t\t Storing tei : " + tei.getId());
-                        mm.addDocument(new ByteArrayInputStream(teiString.getBytes()), teiFilename, MongoCollectionsInterface.ADDITIONAL_TEIS, date);
+                        mm.addDocument(new ByteArrayInputStream(teiString.getBytes()), "", teiFilename, MongoCollectionsInterface.ADDITIONAL_TEIS, date);
                         String filename = tei.getId() + ".pdf";
                         //binary processing.
                         if (tei.getFile() != null) {
@@ -100,7 +100,7 @@ abstract class Harvester {
                 mm.save(id, "no stream/"+file.getType(), file.getUrl(), date);
             } else {
                 if ((file.getType()).equals("file")) {
-                    mm.addDocument(inBinary, id + ".pdf", MongoCollectionsInterface.BINARIES, date);
+                    mm.addDocument(inBinary, "", id + ".pdf", MongoCollectionsInterface.BINARIES, date);
                 } else {
                     int n = file.getUrl().lastIndexOf("/");
                     String filename = file.getUrl().substring(n + 1);

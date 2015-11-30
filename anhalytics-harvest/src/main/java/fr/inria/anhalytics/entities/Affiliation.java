@@ -1,6 +1,8 @@
 package fr.inria.anhalytics.entities;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -8,15 +10,15 @@ import java.util.Date;
  */
 public class Affiliation {
     private Long affiliationId;
-    private Organisation organisation;
+    private List<Organisation> organisations;
     private Person person;
     private Date begin_date;
     private Date end_date;
     
     public Affiliation(){}
-    public Affiliation(Long affiliationId ,Organisation organisation ,Person person ,Date begin_date ,Date end_date){ 
+    public Affiliation(Long affiliationId ,List<Organisation> organisations ,Person person ,Date begin_date ,Date end_date){ 
         this.affiliationId = affiliationId;
-        this.organisation = organisation;
+        this.organisations = organisations;
         this.person = person;
         this.begin_date = begin_date;
         this.end_date = end_date;
@@ -39,15 +41,24 @@ public class Affiliation {
     /**
      * @return the organisation
      */
-    public Organisation getOrganisation() {
-        return organisation;
+    public List<Organisation> getOrganisations() {
+        return organisations;
     }
 
     /**
      * @param organisation the organisation to set
      */
-    public void setOrganisation(Organisation organisation) {
-        this.organisation = organisation;
+    public void setOrganisation(List<Organisation> organisations) {
+        this.organisations = organisations;
+    }
+    
+    /**
+     * @param organisation the organisation to set
+     */
+    public void addOrganisation(Organisation organisation) {
+        if(this.organisations == null)
+            this.organisations = new ArrayList<Organisation>();
+        this.organisations.add(organisation);
     }
 
     /**

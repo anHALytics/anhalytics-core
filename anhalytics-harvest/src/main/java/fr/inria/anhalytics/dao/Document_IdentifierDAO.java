@@ -35,7 +35,6 @@ public class Document_IdentifierDAO extends DAO<Document_Identifier> {
             statement.setLong(1, obj.getDoc().getDocID());
             statement.setString(2, obj.getId());
             statement.setString(3, obj.getType());
-            System.out.println("fick");
             int code = statement.executeUpdate();
             ResultSet rs = statement.getGeneratedKeys();
 

@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +22,7 @@ public class Conference_EventDAO extends DAO<Conference_Event> {
     private static final String SQL_INSERT
             = "INSERT INTO CONFERENCE_EVENT (conferenceID, addressID, start_date, end_date, monographID) VALUES (?, ?, ?, ?, ?)";
 
-    private static final String SQL_INSERT1
+    private static final String SQL_INSERT_CONFERENCE
             = "INSERT INTO CONFERENCE (title) VALUES (?)";
 
     
@@ -40,7 +39,7 @@ public class Conference_EventDAO extends DAO<Conference_Event> {
         PreparedStatement statement;
         PreparedStatement statement1;
         try {
-            statement1 = connect.prepareStatement(SQL_INSERT1, Statement.RETURN_GENERATED_KEYS);
+            statement1 = connect.prepareStatement(SQL_INSERT_CONFERENCE, Statement.RETURN_GENERATED_KEYS);
             statement1.setString(1, obj.getConference().getTitle());
             int code1 = statement1.executeUpdate();
             ResultSet rs1 = statement1.getGeneratedKeys();

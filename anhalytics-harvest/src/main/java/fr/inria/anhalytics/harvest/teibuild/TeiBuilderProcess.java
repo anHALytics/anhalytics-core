@@ -44,17 +44,22 @@ public class TeiBuilderProcess {
                     tei_doc = Utilities.trimEncodedCharaters(tei_doc);
                     grobid_tei = new ByteArrayInputStream(tei_doc.getBytes());
                     additional_tei = mm.streamFile(filename, MongoCollectionsInterface.ADDITIONAL_TEIS);
-                    
+                    String docId = null;
+                    InputStream final_tei = null;
+                    doc_result = TeiBuilder.generateTeiCorpus(additional_tei, grobid_tei);
                     try {
-                        doc_result = TeiBuilder.generateTeiCorpus(additional_tei, grobid_tei);
                         //Extract teis Header metadata
                         doc_result = HALMiner.mine(doc_result, hal_uri);
-                        result = Utilities.toString(doc_result);
-                        InputStream tei = new ByteArrayInputStream(result.getBytes());
-                        mm.addDocument(tei, filename, MongoCollectionsInterface.FINAL_TEIS, date);
+                        docId = HALMiner.getDocId();
+                        
+                        //System.out.println(docId);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    result = Utilities.toString(doc_result);
+                        final_tei = new ByteArrayInputStream(result.getBytes());
+                    mm.addDocument(final_tei, filename, docId, MongoCollectionsInterface.FINAL_TEIS, date);
                     grobid_tei.close();
                     additional_tei.close();
                 }
