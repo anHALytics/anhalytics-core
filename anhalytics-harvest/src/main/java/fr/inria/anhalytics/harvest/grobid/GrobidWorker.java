@@ -33,10 +33,10 @@ abstract class GrobidWorker implements Runnable {
     public void run() {
         try {
             long startTime = System.nanoTime();
-            System.out.println(Thread.currentThread().getName() + " Start. Processing = " + filename);
+            logger.info(Thread.currentThread().getName() + " Start. Processing = " + filename);
             processCommand();
             long endTime = System.nanoTime();
-            System.out.println(Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
+            logger.info(Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
         } catch (IOException ex) {
             java.util.logging.Logger.getLogger(GrobidFulltextWorker.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParseException ex) {
@@ -46,14 +46,14 @@ abstract class GrobidWorker implements Runnable {
 
     private void processCommand() throws IOException, ParseException {
         try {
-            System.out.println(filename);
+            logger.info("\t\t Extracting teis for : " + filename);
             GrobidService grobidService = new GrobidService(2, -1, true, date);
             String result = grobidService.runFullTextGrobid(content);            
             storeToGridfs(result);
             (new File(result)).delete();
-            logger.debug("\t\t "+filename+" for "+date+" processed.");
+            logger.debug("\t\t "+filename+" processed.");
         } catch (RuntimeException e) {
-            System.out.println(filename + " ff ");
+            logger.error("\t\t error occurred while processing "+ filename );
             if(e.getMessage().contains("timed out")){
                 mm.save(Utilities.getHalIDFromFilename(filename), "processGrobid", "timed out", date);
             } else if(e.getMessage().contains("failed")){

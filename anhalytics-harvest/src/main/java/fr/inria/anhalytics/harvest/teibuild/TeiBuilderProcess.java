@@ -35,12 +35,12 @@ public class TeiBuilderProcess {
         mm.setGridFS(MongoCollectionsInterface.GROBID_TEIS);
         for (String date : Utilities.getDates()) {
             if (mm.initTeiFiles(date)) {
-                logger.debug("Merging documents.. for: " + date);
+                logger.info("Processing documents for: " + date);
                 while (mm.hasMoreDocuments()) {
                     String tei_doc = mm.nextDocument();
                     String filename = mm.getCurrentFilename();
                     String hal_uri = mm.getCurrentHalURI();
-                    logger.debug("\t\t Merging documents.. for: " + filename);
+                    logger.info("\t Building tei for: " + filename);
                     tei_doc = Utilities.trimEncodedCharaters(tei_doc);
                     grobid_tei = new ByteArrayInputStream(tei_doc.getBytes());
                     additional_tei = mm.streamFile(filename, MongoCollectionsInterface.ADDITIONAL_TEIS);
@@ -51,17 +51,16 @@ public class TeiBuilderProcess {
                         //Extract teis Header metadata
                         doc_result = HALMiner.mine(doc_result, hal_uri);
                         docId = HALMiner.getDocId();
-                        
-                        //System.out.println(docId);
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     result = Utilities.toString(doc_result);
-                        final_tei = new ByteArrayInputStream(result.getBytes());
+                    final_tei = new ByteArrayInputStream(result.getBytes());
                     mm.addDocument(final_tei, filename, docId, MongoCollectionsInterface.FINAL_TEIS, date);
                     grobid_tei.close();
                     additional_tei.close();
+                    final_tei.close();
                 }
             }
         }

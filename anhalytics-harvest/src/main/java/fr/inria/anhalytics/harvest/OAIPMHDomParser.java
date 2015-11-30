@@ -7,15 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -28,14 +27,16 @@ import org.xml.sax.SAXException;
  *
  * @author Achraf
  */
-public class OAIPMHDom implements OAIPMHMetadata {
+public class OAIPMHDomParser implements OAIPMHMetadata {
 
+    protected static final Logger logger = LoggerFactory.getLogger(OAIPMHDomParser.class);
+    
     private List<TEI> teis = new ArrayList<TEI>();
     private Document doc;
     private String token;
     private XPath xPath;
 
-    public OAIPMHDom() {
+    public OAIPMHDomParser() {
         xPath = XPathFactory.newInstance().newXPath();
     }
 
@@ -48,6 +49,8 @@ public class OAIPMHDom implements OAIPMHMetadata {
         //XPath xPath = XPathFactory.newInstance().newXPath();//play with it  
         //NodeList nodes = (NodeList)xPath.evaluate("/OAI-PMH/ListRecords/record/metadata", rootElement, XPathConstants.NODESET);
         setToken(rootElement);
+        logger.info("\t \t "+listRecords.getLength() + " records found. processing...");
+        
         if (listRecords.getLength() >= 1) {
             for (int i = listRecords.getLength() - 1; i >= 0; i--) {
                 if ((listRecords.item(i) instanceof Element)) {
@@ -63,6 +66,7 @@ public class OAIPMHDom implements OAIPMHMetadata {
 
                         String ref = getRef(record);
                         teis.add(new TEI(id, file, annexes, doi, type, tei, ref));
+                        logger.debug("\t \t \t tei of "+id+"extracted.");
                     }
                 }
             }
@@ -116,7 +120,7 @@ public class OAIPMHDom implements OAIPMHMetadata {
             DocumentBuilder db = dbf.newDocumentBuilder();
             return db.parse(in);
         } catch (SAXException e) {
-            System.out.println("Could not parse document because "
+            logger.error("Could not parse document because "
                     + e.getMessage());
         }
         return null;

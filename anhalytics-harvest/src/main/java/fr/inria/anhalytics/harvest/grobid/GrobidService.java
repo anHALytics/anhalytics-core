@@ -40,13 +40,11 @@ public class GrobidService {
     /**
      * Call the Grobid full text extraction service on server.
      *
-     * @param pdfPath path to the PDF file to be processed
-     * @param start first page of the PDF to be processed, default -1 first page
-     * @param last last page of the PDF to be processed, default -1 last page
+     * @param pdfBinary InputStream of the PDF file to be processed
      * @return the resulting TEI document as a String or null if the service
      * failed
      */
-    public String runFullTextGrobid(InputStream inBinary) {
+    public String runFullTextGrobid(InputStream pdfBinary) {
         String zipDirectoryPath = null;
         String tei = null;
         File zipFolder = null;
@@ -55,7 +53,7 @@ public class GrobidService {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
-            String filepath = Utilities.storeTmpFile(inBinary);
+            String filepath = Utilities.storeTmpFile(pdfBinary);
             FileBody fileBody = new FileBody(new File(filepath));
             MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.STRICT);
             multipartEntity.addPart("input", fileBody);
@@ -112,7 +110,7 @@ public class GrobidService {
             e.printStackTrace();
             try {
                 Thread.sleep(20000);
-                runFullTextGrobid(inBinary);
+                runFullTextGrobid(pdfBinary);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
@@ -120,7 +118,7 @@ public class GrobidService {
             e.printStackTrace();
             try {
                 Thread.sleep(20000);
-                runFullTextGrobid(inBinary);
+                runFullTextGrobid(pdfBinary);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }

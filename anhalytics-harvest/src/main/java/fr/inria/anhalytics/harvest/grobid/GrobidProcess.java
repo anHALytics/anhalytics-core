@@ -37,6 +37,7 @@ public class GrobidProcess {
      * @return
      */
     private boolean isAllOk() throws MalformedURLException, IOException {
+        logger.info("Cheking Grobid service...");
         URL url = new URL("http://" + HarvestProperties.getGrobidHost() + ":" + HarvestProperties.getGrobidPort() + "/isalive");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setDoOutput(true);
@@ -47,12 +48,13 @@ public class GrobidProcess {
         } catch (UnknownHostException e) {
         }
         if (responseCode != 200) {
+            logger.error("Grobid service is not alive.");
             throw new UnreachableGrobidServiceException("Grobid service is not alive.");
         }
         conn.disconnect();
 
         Utilities.checkPath(HarvestProperties.getTmpPath());
-        logger.debug("Grobid service is ok and ready to be used...");
+        logger.info("Grobid service is ok and can be used.");
         return true;
     }
 
@@ -61,6 +63,7 @@ public class GrobidProcess {
             ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
             mm.setGridFS(MongoCollectionsInterface.BINARIES);
             for (String date : Utilities.getDates()) {
+                logger.info("\t Grobid processing for :"+date);
                 if (mm.initBinaries(date)) {
                     while (mm.hasMoreDocuments()) {
                         InputStream content = mm.nextBinaryDocument();

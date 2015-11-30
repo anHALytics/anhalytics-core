@@ -398,7 +398,7 @@ public class Utilities {
                 in = request(request, true);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new BinaryNotAvailableException("No stream found.");
         }
         return in;
     }

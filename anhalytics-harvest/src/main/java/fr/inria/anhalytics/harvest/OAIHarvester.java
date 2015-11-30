@@ -15,23 +15,15 @@ import javax.xml.parsers.*;
 public class OAIHarvester extends Harvester {
 
     private static String OAI_FORMAT = "xml-tei";
-    private ArrayList<String> fields = null;
-    private ArrayList<String> affiliations = null;
 
-    private final OAIPMHDom oaiDom;
+    private final OAIPMHDomParser oaiDom;
 
     private String oai_url = null;
 
     public OAIHarvester() throws UnknownHostException {
         super();
         this.oai_url = HarvestProperties.getOaiUrl();
-        oaiDom = new OAIPMHDom();
-
-        fields = new ArrayList<String>();
-        affiliations = new ArrayList<String>();
-
-        affiliations.add("INRIA");
-
+        oaiDom = new OAIPMHDomParser();
     }
 
     @Override
@@ -44,11 +36,9 @@ public class OAIHarvester extends Harvester {
             if (tokenn != null) {
                 request = oai_url + "/?verb=ListRecords&resumptionToken=" + tokenn;
             }
-            System.out.println(request);
-            logger.debug("Sending: " + request);
+            logger.info("\t Sending: " + request);
 
             InputStream in = Utilities.request(request, true);
-            logger.debug("\t Extracting teis.... for " + date);
             List<TEI> teis = oaiDom.getTeis(in);
 
             processTeis(teis, date, true);
@@ -66,6 +56,7 @@ public class OAIHarvester extends Harvester {
     @Override
     public void fetchAllDocuments() throws ParserConfigurationException, IOException {
         for (String date : Utilities.getDates()) {
+            logger.info("Extracting publications teis for : " + date);
             fetchDocumentsByDate(date);
         }
     }
@@ -73,13 +64,18 @@ public class OAIHarvester extends Harvester {
     public void processEmbargoFiles(String date) {
         Map<String, String> files = mm.getEmbargoFiles(date);
         Iterator it = files.entrySet().iterator();
+        logger.info("\t [Embargo publications] Extracting publications teis for : " + date);
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
+            String url = (String) pair.getValue();
+            String id = (String) pair.getKey();
             try {
-                downloadFile(new PubFile((String) pair.getValue(), date, "file"), (String) pair.getKey(), date);
-                System.out.println("done");
+                logger.info("\t\t Processing tei for " + id);
+                downloadFile(new PubFile(url, date, "file"), id, date);
             } catch (Exception e) {
                 e.printStackTrace();
+                mm.save(id, "harvestProcess", "harvest error", date);
+                logger.error("\t\t  Error occured while processing tei for "+id);
             }
             it.remove(); // avoids a ConcurrentModificationException
         }

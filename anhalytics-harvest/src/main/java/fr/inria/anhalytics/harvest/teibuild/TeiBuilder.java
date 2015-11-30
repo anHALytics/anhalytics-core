@@ -38,7 +38,6 @@ public class TeiBuilder {
         try {
             
             doc = docBuilder.parse(grobidTei);
-            //System.out.println(Utilities.toString(doc));
             //Extract grobid tei metadata
             updateGrobidTEI(doc);
 
