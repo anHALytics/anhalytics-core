@@ -26,7 +26,7 @@ public class Main {
             add("harvestAll");
             add("harvestDaily");
             add("processGrobid");
-            add("buildTei");
+            add("generateTei");
             add("deduplicate");// feeds knowledge base 
             add("mineGrobidMetadata");// feeds knowledge base 
         }
@@ -75,7 +75,7 @@ public class Main {
         } else if (process.equals("mineGrobidMetadata")) {
             gm.mine();
             return;
-        } else if (process.equals("generateFinalTei")) {
+        } else if (process.equals("generateTei")) {
             //warn about xml_id modifications
             tb.build();
             return;

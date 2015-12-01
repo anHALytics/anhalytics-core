@@ -43,6 +43,7 @@ import javax.xml.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -92,8 +93,8 @@ public class HALMiner {
         processMonogr(monogr, pub);
         
         pd.create(pub);
-        processPersons(authors, "author", pub);
-        processPersons(editors, "editor", pub);
+        processPersons(authors, "author", pub, docTeiCorpus);
+        processPersons(editors, "editor", pub, docTeiCorpus);
         processIdentifiers(ids, doc);
         
         return docTeiCorpus;
@@ -264,7 +265,7 @@ public class HALMiner {
         isd.createSerial(is, serial_identifier);
     }
     
-    private static void processPersons(NodeList persons, String type, Publication pub) {
+    private static void processPersons(NodeList persons, String type, Publication pub, Document doc) {
         Node person = null;
         PersonDAO pd = new PersonDAO(AnhalyticsConnection.getInstance());
         Person prs = new Person();
@@ -362,6 +363,7 @@ public class HALMiner {
                         pi.setType(id_type);
                         pis.add(pi);
                     }
+                    person.removeChild(node);
                 }
             }
             prs.setPerson_identifiers(pis);
@@ -377,6 +379,10 @@ public class HALMiner {
                 Editor editor = new Editor(0, prs, pub);
                 pd.createEditor(editor);
             }
+            Element idno = doc.createElement("idno");
+            idno.setAttribute(type, "anhalyticsID");
+            idno.setTextContent(Long.toString(prs.getPersonId()));
+            person.appendChild(idno);
         }
         
     }
