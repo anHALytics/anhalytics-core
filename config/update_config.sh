@@ -1,5 +1,6 @@
 #!/bin/bash
 # script for replacing generic config files by local ones (local config files must be up-to-date!)
+mkdir -p generic
 
 # saving generic config files
 cp ../anhalytics-frontend/src/main/webapp/js/resource/config.js generic/

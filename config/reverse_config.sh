@@ -1,6 +1,8 @@
 #!/bin/bash
 # script for replacing local config files by generic ones before commit
 
+mkdir -p local
+
 # saving local config files
 cp ../anhalytics-frontend/src/main/webapp/js/resource/config.js local/
 cp ../anhalytics-annotate/annotate.properties local/
