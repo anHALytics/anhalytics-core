@@ -90,7 +90,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
             }
             files = gfs.find(bdbo);
-            if(files.size() > 0) LOGGER.debug(files.size()+ " found and will be processed.");
+            if(files.size() > 0) 
+                LOGGER.debug(files.size()+ " found and will be processed.");
+            else if(files.size() == 0)
+                LOGGER.debug("Nothing found.");
             indexFile = 0;
         } catch (ParseException e) {
             e.printStackTrace();
