@@ -6,6 +6,8 @@ import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.*;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.xml.parsers.*;
 
@@ -50,7 +52,6 @@ public class OAIHarvester extends Harvester {
             }
             in.close();
         }
-        processEmbargoFiles(date);
     }
 
     @Override
@@ -61,23 +62,33 @@ public class OAIHarvester extends Harvester {
         }
     }
 
-    public void processEmbargoFiles(String date) {
-        Map<String, String> files = mm.getEmbargoFiles(date);
-        Iterator it = files.entrySet().iterator();
-        logger.info("\t [Embargo publications] Extracting publications teis for : " + date);
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            String url = (String) pair.getValue();
-            String id = (String) pair.getKey();
-            try {
-                logger.info("\t\t Processing tei for " + id);
-                downloadFile(new PubFile(url, date, "file"), id, date);
-            } catch (Exception e) {
-                e.printStackTrace();
-                mm.save(id, "harvestProcess", "harvest error", date);
-                logger.error("\t\t  Error occured while processing tei for "+id);
+    public void fetchEmbargoPublications() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        String today_date = dateFormat.format(cal.getTime());
+        Utilities.updateDates(null, today_date);
+        for (String date : Utilities.getDates()) {
+            Map<String, String> files = mm.getEmbargoRecords(date);
+            Iterator it = files.entrySet().iterator();
+            logger.info("\t [Embargo publications] Extracting publications teis for : " + date);
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                String url = (String) pair.getValue();
+                String id = (String) pair.getKey();
+                try {
+                    logger.info("\t\t Processing tei for " + id);
+                    boolean donwloaded = downloadFile(new PubFile(url, date, "file"), id, date);
+                    if (donwloaded) {
+                        mm.removeEmbargoRecord(id);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    mm.save(id, "harvestProcess", "harvest error", date);
+                    logger.error("\t\t  Error occured while processing tei for " + id);
+                }
+                it.remove(); // avoids a ConcurrentModificationException
             }
-            it.remove(); // avoids a ConcurrentModificationException
         }
     }
 }

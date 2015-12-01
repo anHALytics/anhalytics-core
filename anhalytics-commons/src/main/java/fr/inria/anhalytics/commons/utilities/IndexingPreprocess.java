@@ -575,7 +575,7 @@ public class IndexingPreprocess {
     private JsonNode getStandoff(ObjectMapper mapper, String filename) throws Exception {
         JsonNode standoffNode = null;
         //System.out.println("filename: " + filename);
-        String annotation = mm.getAnnotation(filename);
+        String annotation = mm.getAnnotations(filename);
         //System.out.println(annotation);
         if ((annotation != null) && (annotation.trim().length() > 0)) {
             JsonNode jsonAnnotation = mapper.readTree(annotation);

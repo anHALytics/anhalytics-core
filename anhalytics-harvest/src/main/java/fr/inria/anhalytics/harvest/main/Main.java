@@ -25,6 +25,7 @@ public class Main {
         {
             add("harvestAll");
             add("harvestDaily");
+            add("fetchEmbargoPublications");
             add("processGrobid");
             add("generateTei");
             add("deduplicate");// feeds knowledge base 
@@ -67,6 +68,9 @@ public class Main {
             Utilities.updateDates(date, date);
             oai.fetchDocumentsByDate(date);
             gp.processFulltext();
+            return;
+        } else if (process.equals("fetchEmbargoPublications")) {
+            oai.fetchEmbargoPublications();
             return;
         } else if (process.equals("processGrobid")) {
             //clearTmpDirectory();           

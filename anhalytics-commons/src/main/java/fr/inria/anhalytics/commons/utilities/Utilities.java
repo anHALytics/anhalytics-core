@@ -396,6 +396,8 @@ public class Utilities {
                     Thread.currentThread().interrupt();
                 }
                 in = request(request, true);
+            } else {
+                throw new BinaryNotAvailableException("No stream found.");
             }
         } catch (IOException e) {
             throw new BinaryNotAvailableException("No stream found.");

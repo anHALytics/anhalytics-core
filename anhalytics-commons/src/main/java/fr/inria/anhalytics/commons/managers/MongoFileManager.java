@@ -23,19 +23,18 @@ import org.slf4j.LoggerFactory;
  * Class for retrieving TEI files to be indexed from MongoDB GridFS
  *
  */
-public class MongoFileManager extends MongoManager implements MongoCollectionsInterface{
+public class MongoFileManager extends MongoManager implements MongoCollectionsInterface {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoFileManager.class);
 
-    
     /**
-     * A static {@link MongoFileManager} object containing MongoFileManager instance
-     * that can be used from different locations..
+     * A static {@link MongoFileManager} object containing MongoFileManager
+     * instance that can be used from different locations..
      */
     private static MongoFileManager mongoManager = null;
-    
+
     private GridFS gfs = null;
-    
+
     // for files
     private List<GridFSDBFile> files = null;
     private int indexFile = 0;
@@ -48,15 +47,13 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     private DBCursor cursor = null;
     private DBCollection collection = null;
 
-
     public MongoFileManager(boolean isTest) {
         super(isTest);
         initDatabase(mongodbDb);
-        
+
     }
 
-    
-       /**
+    /**
      * Returns a static {@link MongoManager} object. If no one is set, then it
      * creates one. {@inheritDoc #MongoFilesManager()}
      *
@@ -80,7 +77,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         mongoManager = new MongoFileManager(isTest);
         return mongoManager;
     }
-    
+
     public boolean initTeiFiles(String date) {
         // open the GridFS
         try {
@@ -90,10 +87,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
             }
             files = gfs.find(bdbo);
-            if(files.size() > 0) 
-                LOGGER.debug(files.size()+ " found and will be processed.");
-            else if(files.size() == 0)
+            if (files.size() > 0) {
+                LOGGER.debug(files.size() + " found and will be processed.");
+            } else if (files.size() == 0) {
                 LOGGER.debug("Nothing found.");
+            }
             indexFile = 0;
         } catch (ParseException e) {
             e.printStackTrace();
@@ -116,7 +114,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
         return true;
     }
-        
+
     public boolean initAnnexes(String date) {
         // open the GridFS
         try {
@@ -132,7 +130,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
         return true;
     }
-    
+
     public boolean initAnnotations() throws MongoException {
         collection = getCollection(ANNOTATIONS);
         // index on filename and xml:id
@@ -142,7 +140,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         indexFile = 0;
         return true;
     }
-
 
     public boolean hasMoreDocuments() {
         if (indexFile < files.size()) {
@@ -181,7 +178,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 GridFSDBFile teifile = files.get(indexFile);
                 currentFilename = teifile.getFilename();
                 currentHalURI = Utilities.getHalURIFromFilename(currentFilename);
-                currentHalID = (String)teifile.get("halId");
+                currentHalID = (String) teifile.get("halId");
                 InputStream input = teifile.getInputStream();
                 tei = IOUtils.toString(input, "UTF-8");
                 indexFile++;
@@ -199,7 +196,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         if (indexFile < files.size()) {
             GridFSDBFile binaryfile = files.get(indexFile);
             currentFilename = binaryfile.getFilename();
-            currentHalID = (String)binaryfile.get("halId");
+            currentHalID = (String) binaryfile.get("halId");
             input = binaryfile.getInputStream();
             indexFile++;
         }
@@ -220,7 +217,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         c = db.getCollection("annotations");
         c.ensureIndex(new BasicDBObject("filename", 1));
         c.ensureIndex(new BasicDBObject("xml:id", 1));
-        
+
         DBObject dbObject = (DBObject) JSON.parse(json);
         WriteResult result = c.insert(dbObject);
         CommandResult res = result.getCachedLastError();
@@ -236,7 +233,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         c = db.getCollection("annotations");
         c.ensureIndex(new BasicDBObject("filename", 1));
         c.ensureIndex(new BasicDBObject("xml:id", 1));
-        
+
         String result = null;
         BasicDBObject query = new BasicDBObject("filename", filename);
         DBCursor curs = null;
@@ -263,7 +260,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return result;
     }
 
-    public Map<String, String> getEmbargoFiles(String date) {
+    public Map<String, String> getEmbargoRecords(String date) {
         Map<String, String> files = new HashMap<String, String>();
         if (db.collectionExists(HARVEST_DIAGNOSTIC)) {
             collection = db.getCollection(HARVEST_DIAGNOSTIC);
@@ -285,12 +282,12 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return files;
     }
 
-    public String getAnnotation(String filename) {
+    public String getAnnotations(String filename) {
         DBCollection c = null;
         c = db.getCollection("annotations");
         c.ensureIndex(new BasicDBObject("filename", 1));
         c.ensureIndex(new BasicDBObject("xml:id", 1));
-        
+
         String result = null;
         BasicDBObject query = new BasicDBObject("filename", filename);
         DBCursor curs = null;
@@ -309,22 +306,22 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
         return result;
     }
-    
+
     /**
      * Check if the given pdf has already been harvested.
      */
     /*public boolean isCollectedDate(String filename) {
-        GridFSDBFile f = (new GridFS(db, ADDITIONAL_TEIS)).findOne(filename);
-        boolean result = false;
-        if (f != null) {
-            result = true;
-        }
-        return result;
-    }*/
+     GridFSDBFile f = (new GridFS(db, ADDITIONAL_TEIS)).findOne(filename);
+     boolean result = false;
+     if (f != null) {
+     result = true;
+     }
+     return result;
+     }*/
     /**
      * Check if the given pdf has already been grobidified.
      */
-     public boolean isGrobidified() {
+    public boolean isGrobidified() {
         String filename = getCurrentFilename();
         GridFSDBFile f = (new GridFS(db, GROBID_TEIS)).findOne(filename);
         boolean result = false;
@@ -332,7 +329,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             result = true;
         }
         return result;
-     }
+    }
 
     /**
      * Check if the current document has already been annotated.
@@ -345,7 +342,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         boolean result = false;
         String filename = getCurrentFilename();
         BasicDBObject query = new BasicDBObject("filename", filename);
-        
+
         DBCursor cursor = null;
         try {
             cursor = c.find(query);
@@ -424,18 +421,17 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             e.printStackTrace();
         }
     }
-    
-    public String getFinalTeiDocId() throws FileNotFoundException{
+
+    public String getFinalTeiDocId() throws FileNotFoundException {
         String docId = null;
-        try{
+        try {
             GridFS gfs = new GridFS(db, FINAL_TEIS);
             BasicDBObject whereQuery = new BasicDBObject();
             whereQuery.put("halId", currentHalID);
             whereQuery.put("filename", currentFilename);
-            System.out.println(whereQuery.toString());
             GridFSDBFile cursor = gfs.findOne(whereQuery);
             docId = (String) cursor.get("docId");
-        }catch(Exception exp){
+        } catch (Exception exp) {
             throw new FileNotFoundException("Not found asset.");
         }
         return docId;
@@ -446,14 +442,14 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      */
     public InputStream getFile(String halId, String filename, String collection) throws FileNotFoundException {
         InputStream file = null;
-        try{
+        try {
             GridFS gfs = new GridFS(db, collection);
             BasicDBObject whereQuery = new BasicDBObject();
             whereQuery.put("halId", halId);
             whereQuery.put("filename", filename);
             GridFSDBFile cursor = gfs.findOne(whereQuery);
             file = cursor.getInputStream();
-        }catch(Exception exp){
+        } catch (Exception exp) {
             throw new FileNotFoundException("Not found asset.");
         }
         return file;
@@ -468,10 +464,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     public void save(String haldID, String process, String desc, String date) {
         DBCollection collection = db.getCollection(HARVEST_DIAGNOSTIC);
-        BasicDBObject whereQuery = new BasicDBObject();
-        whereQuery.put("halId", haldID);
-        whereQuery.put("process", process);
-        collection.remove(whereQuery);
+        collection.ensureIndex(new BasicDBObject("halId", 1));
+        collection.ensureIndex(new BasicDBObject("process", 1));
         BasicDBObject document = new BasicDBObject();
         document.put("haldID", haldID);
         document.put("process", process);
@@ -482,12 +476,19 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         document.put("date", date);
         collection.insert(document);
     }
-    
+
+    public void removeEmbargoRecord(String haldID) {
+        DBCollection collection = db.getCollection(HARVEST_DIAGNOSTIC);
+        BasicDBObject whereQuery = new BasicDBObject();
+        whereQuery.put("halId", haldID);
+        collection.remove(whereQuery);
+    }
+
     public void setGridFS(String collectioName) {
         collection = getCollection(collectioName);
         gfs = new GridFS(db, collectioName);
     }
-    
+
     public String getCurrentHalID() {
         return currentHalID;
     }
@@ -495,7 +496,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public String getCurrentFilename() {
         return currentFilename;
     }
-    
+
     public String getCurrentHalURI() {
         return currentHalURI;
     }

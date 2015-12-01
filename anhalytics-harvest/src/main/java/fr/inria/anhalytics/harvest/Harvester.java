@@ -95,7 +95,7 @@ abstract class Harvester {
      * Downloads the given file and classify it either as main file or as an
      * annex.
      */
-    protected void downloadFile(PubFile file, String id, String date) throws ParseException, IOException {
+    protected boolean downloadFile(PubFile file, String id, String date) throws ParseException, IOException {
         InputStream inBinary = null;
         Date embDate = Utilities.parseStringDate(file.getEmbargoDate());
         Date today = new Date();
@@ -114,11 +114,13 @@ abstract class Harvester {
                     logger.debug("\t\t\t\t Getting annex file "+filename+" for pub Id :"+ id);
                     mm.addAnnexDocument(inBinary, file.getType(), id, filename, MongoCollectionsInterface.PUB_ANNEXES, date);
                 }
-                inBinary.close();
             }
+            inBinary.close();
+            return true;
         } else {
             mm.save(id, "embargo", file.getUrl(), file.getEmbargoDate());
             logger.info("\t\t\t file under embargo !");
+            return false;
         }
     }
 }
