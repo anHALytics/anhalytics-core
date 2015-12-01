@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.harvest.main;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.datamine.GrobidMiner;
 import fr.inria.anhalytics.harvest.OAIHarvester;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
@@ -27,6 +28,7 @@ public class Main {
             add("processGrobid");
             add("buildTei");
             add("deduplicate");// feeds knowledge base 
+            add("mineGrobidMetadata");// feeds knowledge base 
         }
     };
 
@@ -52,6 +54,7 @@ public class Main {
         GrobidProcess gp = new GrobidProcess();
         TeiBuilderProcess tb = new TeiBuilderProcess();
         OAIHarvester oai = new OAIHarvester();//tb renamed (Process suffix)
+        GrobidMiner gm = new GrobidMiner();
         if (process.equals("harvestAll")) {
             oai.fetchAllDocuments();
             gp.processFulltext();
@@ -69,7 +72,10 @@ public class Main {
             //clearTmpDirectory();           
             gp.processFulltext();
             return;
-        } else if (process.equals("buildTei")) {
+        } else if (process.equals("mineGrobidMetadata")) {
+            gm.mine();
+            return;
+        } else if (process.equals("generateFinalTei")) {
             //warn about xml_id modifications
             tb.build();
             return;
