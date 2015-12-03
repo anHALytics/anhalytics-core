@@ -241,7 +241,7 @@ var elasticsearchquery = function () {
                 else if ($('#label1_facetview_searchbar' + rank).text() == "affiliation") {
                     // this one is for NPL only
                     var obj = {'query_string': {'default_operator': 'AND'}};
-                    var theField = "$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$biblStruct.$author.$affiliation.$orgName";
+                    var theField = "$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$author.$affiliation.$org.$orgName";
                     obj['query_string']['query'] =
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);
