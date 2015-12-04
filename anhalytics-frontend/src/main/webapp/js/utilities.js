@@ -53,7 +53,7 @@ var fixmatch = function (event) {
         $('#facetview_freetext').val($('#facetview_freetext').val().replace(/ /gi, ' OR '));
     }
     $('#facetview_freetext').focus().trigger('keyup');
-}
+};
 
 // this is the list of Lucene characters to escape when not used as lucene operators:  +-&amp;|!(){}[]^"~*?:\
 var lucene_specials =
@@ -199,7 +199,7 @@ var Base64 = {
         return string;
     }
 
-}
+};
 
 UTF8 = {
     encode: function (s) {
@@ -301,7 +301,7 @@ var accessJsonPath = function (jsonArray, path) {
     }
 
     return res;
-}
+};
 
 
 
@@ -309,7 +309,7 @@ var accessJsonPath = function (jsonArray, path) {
 
 var computeIdString = function (acceptType, date, host, path, queryParameters) {
     return appendStrings(acceptType, date, host, path, computeSortedQueryString(queryParameters));
-}
+};
 
 var computeSortedQueryString = function (queryParameters) {
     // parameters are stored in a json object
@@ -342,8 +342,7 @@ var computeSortedQueryString = function (queryParameters) {
         }
     }
     return parameterStrings;
-}
-
+};
 
 
 // compute the digest base on idString and the key via HmacSHA1 hash
@@ -354,7 +353,7 @@ var buildDigest = function (key, idString) {
     var encodedData = signature.toString(CryptoJS.enc.Base64);
 
     return encodedData;
-}
+};
 
 // append the strings together with '\n' as a delimiter
 var appendStrings = function (acceptType, date, host, path, queryParameters) {
@@ -364,7 +363,7 @@ var appendStrings = function (acceptType, date, host, path, queryParameters) {
     stringBuilder += path + "\n";
     stringBuilder += queryParameters + "\n";
     return stringBuilder;
-}
+};
 
 
 var parseDisamb = function (sdata) {
@@ -431,6 +430,6 @@ var parseDisamb = function (sdata) {
     });
 
     return resObj;
-}
+};
 
         

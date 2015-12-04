@@ -1,5 +1,5 @@
 /**
- *  Functions for the anHALytics ElasticSearch front end.
+ *  Functions for the anHALytics Search front end.
  *
  */
 
@@ -7,18 +7,13 @@
 (function ($) {
     $.fn.facetview = function (options) {
 
-        // a default value (pulled into options below)
-        var resdisplay = [
-        ]
-
         // and add in any overrides from the call
         // these options are also overridable by URL parameters
         // facetview options are declared as a function so they are available externally
         // (see bottom of this file)
-        var provided_options = $.extend(defaults, options)
-        var url_options = $.getUrlVars()
-        $.fn.facetview.options = $.extend(provided_options, url_options)
-        var options = $.fn.facetview.options
+        var url_options = $.getUrlVars();
+        $.fn.facetview.options = $.extend(options, url_options);
+        var options = $.fn.facetview.options;
 
         //var fillDefaultColor = '#FF8000';
         var fillDefaultColor = '#BC0E0E';
@@ -33,72 +28,69 @@
         var showfiltervals = function (event) {
             event.preventDefault();
             if ($(this).hasClass('facetview_open')) {
-                $(this).children('i').replaceWith('<i class="icon-plus"></i>')
+                $(this).children('i').replaceWith('<i class="icon-plus"></i>');
                 $(this).removeClass('facetview_open');
                 $('#facetview_' + $(this).attr('rel')).children('li').hide();
             }
             else {
-                $(this).children('i').replaceWith('<i class="icon-minus"></i>')
+                $(this).children('i').replaceWith('<i class="icon-minus"></i>');
                 $(this).addClass('facetview_open');
                 $('#facetview_' + $(this).attr('rel')).children('li').show();
             }
-        }
+        };
 
         // function to perform for sorting of filters
         var sortfilters = function (event) {
-            event.preventDefault()
-            var sortwhat = $(this).attr('href')
-            var which = 0
+            event.preventDefault();
+            var sortwhat = $(this).attr('href');
+            var which = 0;
             for (item in options.facets) {
                 if ('field' in options.facets[item]) {
-                    if (options.facets[item]['field'] == sortwhat) {
+                    if (options.facets[item]['field'] === sortwhat) {
                         which = item;
                     }
                 }
             }
             if ($(this).hasClass('facetview_count')) {
-                options.facets[which]['order'] = 'count'
+                options.facets[which]['order'] = 'count';
             }
             else if ($(this).hasClass('facetview_term')) {
-                options.facets[which]['order'] = 'term'
+                options.facets[which]['order'] = 'term';
             }
             else if ($(this).hasClass('facetview_rcount')) {
-                options.facets[which]['order'] = 'reverse_count'
+                options.facets[which]['order'] = 'reverse_count';
             }
             else if ($(this).hasClass('facetview_rterm')) {
-                options.facets[which]['order'] = 'reverse_term'
+                options.facets[which]['order'] = 'reverse_term';
             }
             dosearch();
             if (!$(this).parent().parent().siblings('.facetview_filtershow').hasClass('facetview_open')) {
                 $(this).parent().parent().siblings('.facetview_filtershow').trigger('click');
             }
-        }
+        };
 
         var editfilter = function (event) {
-            event.preventDefault()
-            var editwhat = $(this).attr('href');
+            event.preventDefault();
             var which = $(this).attr('rel');
             $('#facetview').append(getEditFilterModal(which));
             $('.facetview_removeedit').bind('click', removeedit);
             $('#facetview_dofacetedit').bind('click', dofacetedit);
-            $('#facetview_editmodal').modal('show')
-        }
+            $('#facetview_editmodal').modal('show');
+        };
               
         // trigger a search when a filter choice is clicked
         var clickfilterchoice = function (event) {
             event.preventDefault();
 //console.log(event);	
 //console.log($(this));			
-            if ($(this).html().trim().length == 0) {
-                //if ($(this).type == 'checkbox') {	
+            if ($(this).html().trim().length === 0) {
                 console.log('checkbox');
                 if (!$(this).is(':checked')) {
-                    //if (!$(this).checked) {	
                     console.log('checked');
                     $('.facetview_filterselected[href="' + $(this).attr("href") + '"]').each(function () {
                         $(this).remove();
                     });
-                    options.paging.from = 0
+                    options.paging.from = 0;
                     dosearch();
                 }
                 else {
@@ -114,7 +106,7 @@
                     $('#facetview_selectedfilters').append(newobj);
                     $('.facetview_filterselected').unbind('click', clearfilter);
                     $('.facetview_filterselected').bind('click', clearfilter);
-                    options.paging.from = 0
+                    options.paging.from = 0;
                     dosearch();
                 }
             }
@@ -131,24 +123,24 @@
                 $('#facetview_selectedfilters').append(newobj);
                 $('.facetview_filterselected').unbind('click', clearfilter);
                 $('.facetview_filterselected').bind('click', clearfilter);
-                options.paging.from = 0
+                options.paging.from = 0;
                 dosearch();
             }
-        }
+        };
 
         // clear a filter when clear button is pressed, and re-do the search
         var clearfilter = function (event) {
             event.preventDefault();
             $(this).remove();
-            options.paging.from = 0
+            options.paging.from = 0;
             dosearch();
         }
         
         // remove the edit modal from page altogether on close (rebuilt for each filter)
         var removeedit = function (event) {
-            event.preventDefault()
-            $('#facetview_editmodal').modal('hide')
-            $('#facetview_editmodal').remove()
+            event.preventDefault();
+            $('#facetview_editmodal').modal('hide');
+            $('#facetview_editmodal').remove();
         }
         // update parameters and re-run the facet
         var dofacetedit = function (event) {
@@ -167,11 +159,11 @@
             //if ( !$(this).parent().parent().siblings('.facetview_filtershow').hasClass('facetview_open') ) {
             //    $(this).parent().parent().siblings('.facetview_filtershow').trigger('click')
             //}
-        }
+        };
 
         // adjust how many results are shown
         var morefacetvals = function (event) {
-            event.preventDefault()
+            event.preventDefault();
             var morewhat = options.facets[ $(this).attr('rel') ]
             if ('size' in morewhat) {
                 var currentval = morewhat['size'];
@@ -179,16 +171,16 @@
                 var currentval = 6;
             }
             var newmore = prompt('Currently showing ' + currentval +
-                    '. How many would you like instead?')
+                    '. How many would you like instead?');
             if (newmore) {
                 options.facets[ $(this).attr('rel') ]['size'] = parseInt(newmore);
-                $(this).html('show up to (' + newmore + ')')
+                $(this).html('show up to (' + newmore + ')');
                 dosearch();
                 if (!$(this).parent().parent().siblings('.facetview_filtershow').hasClass('facetview_open')) {
                     $(this).parent().parent().siblings('.facetview_filtershow').trigger('click')
                 }
             }
-        }
+        };
 
         // insert a facet range once selected
         var dofacetrange = function (event) {
@@ -205,7 +197,7 @@
             $('.facetview_filterselected').bind('click', clearfilter);
             $('#facetview_rangemodal').modal('hide');
             $('#facetview_rangemodal').remove();
-            options.paging.from = 0
+            options.paging.from = 0;
             dosearch();
         }
         // remove the range modal from page altogether on close (rebuilt for each filter)
@@ -213,16 +205,16 @@
             event.preventDefault()
             $('#facetview_rangemodal').modal('hide')
             $('#facetview_rangemodal').remove()
-        }
+        };
         // build a facet range selector
         var facetrange = function (event) {
-            event.preventDefault()
-            $('#facetview').append(facetrangeModal)
+            event.preventDefault();
+            $('#facetview').append(facetrangeModal);
             $('#facetview_rangemodal').append('<div id="facetview_rangerel" style="display:none;">' +
-                    $(this).attr('rel') + '</div>')
-            $('#facetview_rangemodal').modal('show')
-            $('#facetview_dofacetrange').bind('click', dofacetrange)
-            $('.facetview_removerange').bind('click', removerange)
+                    $(this).attr('rel') + '</div>');
+            $('#facetview_rangemodal').modal('show');
+            $('#facetview_dofacetrange').bind('click', dofacetrange);
+            $('.facetview_removerange').bind('click', removerange);
             var values = [];
             //var valsobj = $( '#facetview_' + $(this).attr('href').replace(/\./gi,'_') );
             var valsobj = $('#facetview_' + $(this).attr('href'));
@@ -230,7 +222,7 @@
                 var theDate = new Date(parseInt($(this).attr('href')));
                 var years = theDate.getFullYear();
                 values.push(years);
-            })
+            });
             values = values.sort();
             $("#facetview_slider").slider({
                 range: true,
@@ -238,13 +230,13 @@
                 max: values.length - 1,
                 values: [0, values.length - 1],
                 slide: function (event, ui) {
-                    $('#facetview_rangechoices .facetview_lowrangeval').html(values[ ui.values[0] ])
-                    $('#facetview_rangechoices .facetview_highrangeval').html(values[ ui.values[1] ])
+                    $('#facetview_rangechoices .facetview_lowrangeval').html(values[ ui.values[0] ]);
+                    $('#facetview_rangechoices .facetview_highrangeval').html(values[ ui.values[1] ]);
                 }
-            })
+            });
             $('#facetview_rangechoices .facetview_lowrangeval').html(values[0]);
             $('#facetview_rangechoices .facetview_highrangeval').html(values[ values.length - 1]);
-        }
+        };
 
         var setScope = function () {
             if ($('input[name=\"scientific\"]').attr('checked') && (options.scope != 'scientific')) {
@@ -277,7 +269,7 @@
                 options.paging.from = 0;
                 dosearch();
             }
-        }
+        };
 
         var setDateRange = function () {
             var day_from = 1;
@@ -289,7 +281,7 @@
                 var theDate = new Date(parseInt($(this).attr('href')));
                 var years = theDate.getFullYear();
                 values.push(years);
-            })
+            });
             //values = values.sort();
             var year_from = values[0];
             if (year_from == 0) {
@@ -340,9 +332,9 @@
             $('#facetview_selectedfilters').append(newobj);
             $('.facetview_filterselected').unbind('click', clearfilter);
             $('.facetview_filterselected').bind('click', clearfilter);
-            options.paging.from = 0
+            options.paging.from = 0;
             dosearch();
-        }
+        };
 
         // set the available filter values based on results
         var putvalsinfilters = function (data) {
@@ -391,7 +383,7 @@
                 }
             }
             $('.facetview_filterchoice').bind('click', clickfilterchoice);
-        }
+        };
     
         var add_facet = function (event) {
             event.preventDefault();
@@ -399,7 +391,7 @@
             options.facets.push(truc);
             buildfilters();
             dosearch();
-        }
+        };
 
         var add_field = function (event) {
             event.preventDefault();
@@ -445,7 +437,7 @@
 
             // bind the new input field with the query callback
             $('#facetview_freetext' + nb_fields, obj).bindWithDelay('keyup', dosearch, options.freetext_submit_delay);
-        }
+        };
 
         var set_field = function (event) {
             event.preventDefault();
@@ -454,11 +446,11 @@
             $('#label' + labelID + '_facetview_searchbar' + theID).empty();
             $('#label' + labelID + '_facetview_searchbar' + theID).append($(this).text());
             dosearch();
-        }
+        };
 
         // show the add/remove filters options
         var addremovefacet = function (event) {
-            event.preventDefault()
+            event.preventDefault();
             if ($(this).hasClass('facetview_filterexists')) {
                 $(this).removeClass('facetview_filterexists');
                 delete options.facets[$(this).attr('href')];
@@ -468,11 +460,11 @@
             }
             buildfilters();
             dosearch();
-        }
+        };
         var showarf = function (event) {
             event.preventDefault()
             $('#facetview_addremovefilters').toggle()
-        }
+        };
         var addremovefacets = function () {
             $('#facetview_filters').append('<a id="facetview_showarf" href="">' +
                     'add or remove filters</a><div id="facetview_addremovefilters"></div>')
@@ -499,7 +491,7 @@
             $('#facetview_addremovefilters').hide();
             $('#facetview_showarf').bind('click', showarf);
             $('.facetview_filterchoose').bind('click', addremovefacet);
-        }
+        };
     
         // pass a list of filters to be displayed
         var buildfilters = function () {
@@ -606,7 +598,7 @@
             }
             $('#validate-date-range').bind('click', setDateRange);
             $('#date-input').hide();
-        }
+        };
 
         // ===============================================
         // filter visualisations
@@ -677,7 +669,7 @@
                         'facetview_visualisation' + '_' + $(this).attr('href') + "_chart", update);
             }
 
-        }
+        };
 
         var wheel = function (facetidx, facetkey, width, place, update) {
             var w = width,
@@ -1021,8 +1013,8 @@
                 return rgb.r * .299 + rgb.g * .587 + rgb.b * .114;
 
             }
-        }
-
+        };
+/*
         var donut = function (facetidx, facetkey, width, place) {
             var facetfield = options.facets[facetidx]['field'];
             var records = options.data['facets'][facetkey];
@@ -1117,14 +1109,14 @@
                     // And render it.
                     .render();
         }
-
+*/
 
         var donut2 = function (facetidx, facetkey, width, place, update) {
             var vis = d3.select("#facetview_visualisation_" + facetkey + " > .modal-body2");
 
             var facetfield = options.facets[facetidx]['field'];
             var records = options.data['facets'][facetkey];
-            if (records.length == 0) {
+            if (records.length === 0) {
                 $('#' + place).hide();
                 return;
             }
@@ -1133,7 +1125,7 @@
                 for (var item in records) {
                     siz++;
                 }
-                if (siz == 0) {
+                if (siz === 0) {
                     $('#' + place).hide();
                     return;
                 }
@@ -1184,7 +1176,6 @@
                     arc = d3.svg.arc(),
                     //fill = d3.scale.log(.1, 1).domain([0.1,0.9]).range(["#FF7700","#FCE6D4"]);
                     fill = d3.scale.log(.1, 1).domain([0.1, 0.9]).range([fillDefaultColor, fillDefaultColorLight]);
-            fillDefaultColor
 
             //fill = d3.scale.log(.1, 1).range(["#FF7700","#FCE6D4"]),
             donute = d3.layout.pie().sort(null);
@@ -1208,7 +1199,7 @@
                         return d.index;
                     })
                     .on("mousedown", function (d) {
-                        var index = this.getAttribute("index")
+                        var index = this.getAttribute("index");
                         var term = entries[index].term;
                         var source = entries[index].source;
                         if (source)
@@ -1223,18 +1214,6 @@
                     })
                     .attr("stroke", "#fff")
                     .attr("d", arc);
-
-            /*	vis.selectAll("g")
-             .append("svg:text")
-             .attr("transform", function(d) {                  
-             d.innerRadius = innerRadius;
-             d.outerRadius = outerRadius*1.30;
-             return "translate(" + arc.centroid(d) + ")";  
-             })
-             .attr('text-anchor', 'middle')
-             .text(function(d) { return d.term;} )
-             .style("textStyle", "black")
-             .style("font", "09pt sans-serif");*/
 
             // we need to re-create all the arcs for placing the text labels, so that the labels
             // are not covered by the arcs
@@ -1361,7 +1340,7 @@
                     };
                 };
             }
-        }
+        };
 
         var timeline = function (facetidx, width, place) {
             var facetkey = options.facets[facetidx]['display'];
@@ -1413,7 +1392,7 @@
                         if (year >= 100) {
                             year = year - 100;
                         }
-                        if (year == 0) {
+                        if (year === 0) {
                             year = '00';
                         }
                         else if (year < 10) {
@@ -1422,7 +1401,7 @@
                         return year;
                     })
                     .textStyle("#333333")
-                    .textMargin("2")
+                    .textMargin("2");
 
             // Add container panel for the chart
             vis.add(pv.Panel)
@@ -1464,13 +1443,13 @@
                     .root.canvas(place)
                     // And render it.
                     .render();
-        }
+        };
 
         var bubble = function (facetidx, width, place, update) {
             var facetkey = options.facets[facetidx]['display'];
             var facetfield = options.facets[facetidx]['field'];
             var facets = options.data['facets'][facetkey];
-            if (facets.length == 0) {
+            if (facets.length === 0) {
                 $('#' + place).hide();
                 return;
             }
@@ -1479,7 +1458,7 @@
                 for (var item in facets) {
                     siz++;
                 }
-                if (siz == 0) {
+                if (siz === 0) {
                     $('#' + place).hide();
                     return;
                 }
@@ -1498,7 +1477,7 @@
                     "className": fct,
                     "packageName": count++,
                     "value": facets[fct]
-                }
+                };
                 data["children"].push(arr);
                 numb++;
             }
@@ -1590,29 +1569,24 @@
                     'btn btn-info" rel="' + facetKey +
                     '" alt="remove" title="remove"' +
                     ' href="' + facetValue + '">' +
-                    facetValueDisplay + ' <i class="icon-remove"></i></a>'
-            $('#facetview_selectedfilters').append(newobj)
-            $('.facetview_filterselected').unbind('click', clearfilter)
-            $('.facetview_filterselected').bind('click', clearfilter)
+                    facetValueDisplay + ' <i class="icon-remove"></i></a>';
+            $('#facetview_selectedfilters').append(newobj);
+            $('.facetview_filterselected').unbind('click', clearfilter);
+            $('.facetview_filterselected').bind('click', clearfilter);
             options.paging.from = 0;
             dosearch();
             //$('#facetview_visualisation'+"_"+facetkey).remove();
-        }
+        };
 
 
         // ===============================================
         // disambiguation
         // ===============================================
 
-        var disambiguate = function () {
-            var queryText = $('#facetview_freetext').val();
-            doexpand(queryText);
-        }
-
         var disambiguateNERD = function () {
             var queryText = $('#facetview_freetext').val();
             doexpandNERD(queryText);
-        }
+        };
 
         // call the NERD service and propose senses to the user for his query
         var doexpandNERD = function (queryText) {
@@ -1631,17 +1605,14 @@
 //				data: JSON.stringify( { text : encodeURIComponent(queryText) } ),
                 success: showexpandNERD
             });
-        }
+        };
 
         var showexpandNERD = function (sdata) {
             if (!sdata) {
                 return;
             }
-            console.log(sdata);
 
             var jsonObject = parseDisambNERD(sdata);
-
-            console.log(jsonObject);
 
             $('#disambiguation_panel').empty();
 
@@ -1661,8 +1632,8 @@
             }
 
             $('#disambiguation_panel').show();
-        }
-
+        };
+/*
         // execute a query expansion
         var doexpand = function (queryText) {
             var header = authenticateIdilia(queryText);
@@ -1718,7 +1689,7 @@
                 });
             }
         }
-
+*/
 
         // ===============================================
         // building results
@@ -1731,16 +1702,16 @@
                 options.paging.from < 0 ? options.paging.from = 0 : "";
                 dosearch();
             }
-        }
+        };
 
         // increment result set
         var increment = function (event) {
-            event.preventDefault()
+            event.preventDefault();
             if ($(this).html() != '..') {
                 options.paging.from = parseInt($(this).attr('href'));
                 dosearch();
             }
-        }
+        };
 
         // write the metadata to the page
         var putmetadata = function (data) {
@@ -1783,20 +1754,12 @@
                 meta = meta.replace(/{{to}}/g, to);
                 meta = meta.replace(/{{total}}/g, addCommas("" + data.found));
                 $('#facetview_metadata').html("").append(meta);
-                $('#facetview_decrement').bind('click', decrement)
-                from < size ? $('#facetview_decrement').html('..') : ""
-                $('#facetview_increment').bind('click', increment)
-                data.found <= to ? $('#facetview_increment').html('..') : ""
+                $('#facetview_decrement').bind('click', decrement);
+                from < size ? $('#facetview_decrement').html('..') : "";
+                $('#facetview_increment').bind('click', increment);
+                data.found <= to ? $('#facetview_increment').html('..') : "";
             }
-        }
-
-
-        // view a full record when selected - not used!
-        var viewrecord = function (event) {
-            event.preventDefault();
-            var record = options.data['records'][$(this).attr('href')]
-            alert(JSON.stringify(record, "", "    "))
-        }
+        };
 
         // put the results on the page
         showresults = function (sdata) {
@@ -1920,7 +1883,7 @@
                     });
                 }
             });
-        }
+        };
         
         // execute a search
         var dosearch = function () {
@@ -1937,20 +1900,20 @@
                     success: showresults
                 });
             }
-        }
+        };
 
         // adjust how many results are shown
         var howmany = function (event) {
-            event.preventDefault()
+            event.preventDefault();
             var newhowmany = prompt('Currently displaying ' + options.paging.size +
-                    ' results per page. How many would you like instead?')
+                    ' results per page. How many would you like instead?');
             if (newhowmany) {
-                options.paging.size = parseInt(newhowmany)
-                options.paging.from = 0
-                $('#facetview_howmany').html('results per page (' + options.paging.size + ')')
+                options.paging.size = parseInt(newhowmany);
+                options.paging.from = 0;
+                $('#facetview_howmany').html('results per page (' + options.paging.size + ')');
                 dosearch();
             }
-        }
+        };
 
         // what to do when ready to go
         var whenready = function () {
@@ -2050,7 +2013,6 @@
                 $('#facetview_searchbar').css('width', thewidth / 2 + 70 + 'px'); // -50
                 $('#facetview_freetext').css('width', thewidth / 2 + 32 + 'px'); // -88
 
-                //$('#disambiguate').bind('click',disambiguate);
                 $('#disambiguate').bind('click', disambiguateNERD);
                 $('#disambiguation_panel').hide();
 
@@ -2077,7 +2039,7 @@
 
             // trigger the search once on load, to get all results
             dosearch();
-        }
+        };
 
         // ===============================================
         // now create the plugin on the page
@@ -2092,7 +2054,7 @@
                     url: options.config_file,
                     dataType: "jsonp",
                     success: function (data) {
-                        options = $.extend(options, data)
+                        options = $.extend(options, data);
                         whenready();
                     },
                     error: function () {
@@ -2100,15 +2062,15 @@
                             type: "get",
                             url: options.config_file,
                             success: function (data) {
-                                options = $.extend(options, $.parseJSON(data))
+                                options = $.extend(options, $.parseJSON(data));
                                 whenready();
                             },
                             error: function () {
                                 whenready();
                             }
-                        })
+                        });
                     }
-                })
+                });
             }
             else {
                 whenready();

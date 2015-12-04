@@ -399,7 +399,7 @@ var displayAbstract = function (data, index) {
 
         $('#innen_abstract[rel="' + docid + '"]').append(piece);
     }
-}
+};
 
 /** 
  * View the full entity information in the infobox 

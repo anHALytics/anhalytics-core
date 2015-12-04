@@ -142,7 +142,7 @@ var getEditFilterModal = function (which) {
     return editFilterModal;
 
 
-}
+};
 
 var facetrangeModal = '<div class="modal" id="facetview_rangemodal"> \
                 <div class="modal-header"> \

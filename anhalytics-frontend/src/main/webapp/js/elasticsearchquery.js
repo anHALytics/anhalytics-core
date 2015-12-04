@@ -34,8 +34,6 @@ var textFieldsNPLReturned = ['$teiCorpus.$teiHeader.$titleStmt.$title.$title-fir
 var elasticsearchquery = function () {
     var qs = {};
     var bool = false;
-    var should = false;
-    var must_not = false;
     //var nested = false;
     var filtered = false; // true if a filter at least applies to the query
     var queried_fields = []; // list of queried fields for highlights   
@@ -57,28 +55,28 @@ var elasticsearchquery = function () {
             if ($('#facetview_freetext' + rank).val() != "") {
                 // init bool clause
                 if (!bool) {
-                    if (modality == 'must')
+                    if (modality === 'must')
                         bool = {'must': []};
-                    else if (modality == 'should')
+                    else if (modality === 'should')
                         bool = {'should': []};
                     else
                         bool = {'must_not': []};
                 }
                 else {
-                    if (modality == 'must')
+                    if (modality === 'must')
                         bool['must'] = [];
-                    else if (modality == 'should')
+                    else if (modality === 'should')
                         bool['should'] = [];
                     else
                         bool['must_not'] = [];
                 }
 
-                if ($('#label1_facetview_searchbar' + rank).text() == "all text") {
+                if ($('#label1_facetview_searchbar' + rank).text() === "all text") {
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     obj['query_string']['query'] = $('#facetview_freetext' + rank).val();
                     queried_fields.push("_all");
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "all titles") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "all titles") {
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     var theField;
                     if (options['collection'] == 'npl') {
@@ -87,14 +85,14 @@ var elasticsearchquery = function () {
                     else {
                         theField = "$teiCorpus.$teiHeader.$fileDesc.$titleStmt.$title.";
                     }
-                    if (($('#label3_facetview_searchbar' + rank).text() == "all") ||
-                            ($('#label3_facetview_searchbar' + rank).text() == "lang")) {
+                    if (($('#label3_facetview_searchbar' + rank).text() === "all") ||
+                            ($('#label3_facetview_searchbar' + rank).text() === "lang")) {
                         theField += "\\*";
                     }
-                    else if ($('#label3_facetview_searchbar' + rank).text() == "de") {
+                    else if ($('#label3_facetview_searchbar' + rank).text() === "de") {
                         theField += "$lang_de";
                     }
-                    else if ($('#label3_facetview_searchbar' + rank).text() == "fr") {
+                    else if ($('#label3_facetview_searchbar' + rank).text() === "fr") {
                         theField += "$lang_fr";
                     }
                     else {
@@ -104,7 +102,7 @@ var elasticsearchquery = function () {
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "all abstracts") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "all abstracts") {
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     var theField;
                     if (options['collection'] == 'npl') {
@@ -113,14 +111,14 @@ var elasticsearchquery = function () {
                     else {
                         theField = "$teiCorpus.$teiHeader.$text.$front.$div.$p.";
                     }
-                    if (($('#label3_facetview_searchbar' + rank).text() == "all") ||
-                            ($('#label3_facetview_searchbar' + rank).text() == "lang")) {
+                    if (($('#label3_facetview_searchbar' + rank).text() === "all") ||
+                            ($('#label3_facetview_searchbar' + rank).text() === "lang")) {
                         theField += "\\*";
                     }
-                    else if ($('#label3_facetview_searchbar' + rank).text() == "de") {
+                    else if ($('#label3_facetview_searchbar' + rank).text() === "de") {
                         theField += "$lang_de";
                     }
-                    else if ($('#label3_facetview_searchbar' + rank).text() == "fr") {
+                    else if ($('#label3_facetview_searchbar' + rank).text() === "fr") {
                         theField += "$lang_fr";
                     }
                     else {
@@ -131,18 +129,18 @@ var elasticsearchquery = function () {
                     obj['query_string']['analyze_wildcard'] = false;
                     queried_fields.push(theField);
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "claims") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "claims") {
                     // this one is for patent only
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     var theField = "$teiCorpus.$teiHeader.$text.$body.$div.$div.";
-                    if (($('#label3_facetview_searchbar' + rank).text() == "all") ||
-                            ($('#label3_facetview_searchbar' + rank).text() == "lang")) {
+                    if (($('#label3_facetview_searchbar' + rank).text() === "all") ||
+                            ($('#label3_facetview_searchbar' + rank).text() === "lang")) {
                         theField += "\\*";
                     }
-                    else if ($('#label3_facetview_searchbar' + rank).text() == "de") {
+                    else if ($('#label3_facetview_searchbar' + rank).text() === "de") {
                         theField += "$lang_de";
                     }
-                    else if ($('#label3_facetview_searchbar' + rank).text() == "fr") {
+                    else if ($('#label3_facetview_searchbar' + rank).text() === "fr") {
                         theField += "$lang_fr";
                     }
                     else {
@@ -152,18 +150,18 @@ var elasticsearchquery = function () {
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "description") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "description") {
                     // this one is for patent only
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     var theField = "$teiCorpus.$teiHeader.$text.$body.$div.$p.";
-                    if (($('#label3_facetview_searchbar' + rank).text() == "all") ||
-                            ($('#label3_facetview_searchbar' + rank).text() == "lang")) {
+                    if (($('#label3_facetview_searchbar' + rank).text() === "all") ||
+                            ($('#label3_facetview_searchbar' + rank).text() === "lang")) {
                         theField += "\\*";
                     }
-                    else if ($('#label3_facetview_searchbar' + rank).text() == "de") {
+                    else if ($('#label3_facetview_searchbar' + rank).text() === "de") {
                         theField += "$lang_de";
                     }
-                    else if ($('#label3_facetview_searchbar' + rank).text() == "fr") {
+                    else if ($('#label3_facetview_searchbar' + rank).text() === "fr") {
                         theField += "$lang_fr";
                     }
                     else {
@@ -174,18 +172,18 @@ var elasticsearchquery = function () {
                     obj['query_string']['analyze_wildcard'] = false;
                     queried_fields.push(theField);
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "full text") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "full text") {
                     // this one is for NPL only
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     var theField = "$teiCorpus.$teiHeader.$text.$body.$div.$p.";
-                    if (($('#label3_facetview_searchbar' + rank).text() == "all") ||
-                            ($('#label3_facetview_searchbar' + rank).text() == "lang")) {
+                    if (($('#label3_facetview_searchbar' + rank).text() === "all") ||
+                            ($('#label3_facetview_searchbar' + rank).text() === "lang")) {
                         theField += "\\*";
                     }
-                    else if ($('#label3_facetview_searchbar' + rank).text() == "de") {
+                    else if ($('#label3_facetview_searchbar' + rank).text() === "de") {
                         theField += "$lang_de";
                     }
-                    else if ($('#label3_facetview_searchbar' + rank).text() == "fr") {
+                    else if ($('#label3_facetview_searchbar' + rank).text() === "fr") {
                         theField += "$lang_fr";
                     }
                     else {
@@ -196,7 +194,7 @@ var elasticsearchquery = function () {
                     obj['query_string']['analyze_wildcard'] = false;
                     queried_fields.push(theField);
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "IPC class") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "IPC class") {
                     // this one is for patent only
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     //var theField = "$teiCorpus.$teiCorpus.$teiHeader.$profileDesc.$textClass.$classCode.$term";
@@ -206,7 +204,7 @@ var elasticsearchquery = function () {
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "ECLA class") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "ECLA class") {
                     // this one is for patent only
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     var theField = "$teiCorpus.$teiHeader.$profileDesc.$textClass.$classCode.$scheme_patent-classification.$ecla.$path";
@@ -214,7 +212,7 @@ var elasticsearchquery = function () {
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "ap. country") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "ap. country") {
                     // this one is for patent only	 
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     var theField = "$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$list.$item.$list.$item.$country";
@@ -222,7 +220,7 @@ var elasticsearchquery = function () {
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "authors\' country") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "authors\' country") {
                     // this one is for NPL only
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     var theField = "$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$biblStruct.$author.$affiliation.$address.key";
@@ -230,7 +228,7 @@ var elasticsearchquery = function () {
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "author") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "author") {
                     // this one is for NPL only
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     var theField = "$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$biblStruct..$author.$persName.$surname";
@@ -238,7 +236,7 @@ var elasticsearchquery = function () {
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "affiliation") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "affiliation") {
                     // this one is for NPL only
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     var theField = "$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$author.$affiliation.$org.$orgName";
@@ -246,7 +244,7 @@ var elasticsearchquery = function () {
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "inventor") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "inventor") {
                     // this one is for NPL only
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     var theField = "$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$list.$item.$type_parties.$listPerson.$person.$type_docdba.$persName";
@@ -254,7 +252,7 @@ var elasticsearchquery = function () {
                             theField + ":" + $('#facetview_freetext' + rank).val();
                     queried_fields.push(theField);
                 }
-                else if ($('#label1_facetview_searchbar' + rank).text() == "applicant") {
+                else if ($('#label1_facetview_searchbar' + rank).text() === "applicant") {
                     // this one is for NPL only
                     var obj = {'query_string': {'default_operator': 'AND'}};
                     var theField = "$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$list.$item.$type_parties.$list.$item.$type_docdb.$name";
@@ -290,8 +288,8 @@ var elasticsearchquery = function () {
                     var rngs = {
                         'from': "" + from_,
                         'to': "" + to_
-                    }
-                    var obbj = {'range': {}}
+                    };
+                    var obbj = {'range': {}};
                     obbj['range'][ rel ] = rngs;
                     filtered['and'].push(obbj);
                 }
@@ -301,14 +299,14 @@ var elasticsearchquery = function () {
                     ($(this).attr('rel').indexOf("when") != -1)) {
                 // facet filter for date
                 var rel = $(this).attr('rel');
-                var obbj = {'range': {}}
+                var obbj = {'range': {}};
                 var from_ = $(this).attr('href');
                 //var to_ = parseInt(from_) + 365*24*60*60*1000 - 1;
                 var to_ = parseInt(from_) + 365 * 24 * 60 * 60 * 1000;
                 var rngs = {
                     'from': from_,
                     'to': to_
-                }
+                };
                 obbj['range'][ rel ] = rngs;
                 filtered['and'].push(obbj);
             }
@@ -369,7 +367,7 @@ var elasticsearchquery = function () {
                     var rngs = {
                         'from': "" + from_,
                         'to': "" + to_
-                    }
+                    };
                     var obj = {'range': {}};
                     obj['range'][ rel ] = rngs;
                     bool['must'].push(obj);
@@ -380,14 +378,14 @@ var elasticsearchquery = function () {
                     ($(this).attr('rel').indexOf("when") != -1)) {
                 //var rel = options.facets[ $(this).attr('rel') ]['field'];
                 var rel = $(this).attr('rel');
-                var obj = {'range': {}}
+                var obj = {'range': {}};
                 var from_ = $(this).attr('href');
                 //var to_ = parseInt(from_) + 365*24*60*60*1000 - 1;
                 var to_ = parseInt(from_) + 365 * 24 * 60 * 60 * 1000;
                 var rngs = {
                     'from': from_,
                     'to': to_
-                }
+                };
                 obj['range'][ rel ] = rngs;
                 bool['must'].push(obj);
             }
@@ -406,16 +404,16 @@ var elasticsearchquery = function () {
         }
         var theField = "";
         var analys = "";
-        if (($('#label_facetview_searchbar').text() == "all") ||
-                ($('#label_facetview_searchbar').text() == "lang")) {
+        if (($('#label_facetview_searchbar').text() === "all") ||
+                ($('#label_facetview_searchbar').text() === "lang")) {
             theField += "*";
             analys = "default";
         }
-        else if ($('#label_facetview_searchbar').text() == "de") {
+        else if ($('#label_facetview_searchbar').text() === "de") {
             theField += "$lang_de";
             analys = "german";
         }
-        else if ($('#label_facetview_searchbar').text() == "fr") {
+        else if ($('#label_facetview_searchbar').text() === "fr") {
             theField += "$lang_fr";
             analys = "french";
         }
@@ -454,7 +452,7 @@ var elasticsearchquery = function () {
                 }
 
                 for (var ii = 0; ii < textFields.length; ii++) {
-                    if (ii == 0) {
+                    if (ii === 0) {
                         textLangFields[ii] = textFields[ii] + theField;
                     }
                     else {
@@ -496,7 +494,7 @@ var elasticsearchquery = function () {
                 }
 
                 for (var ii = 0; ii < textFields.length; ii++) {
-                    if (ii == 0) {
+                    if (ii === 0) {
                         textLangFields[ii] = textFields[ii] + theField;
                     }
                     else {
@@ -534,7 +532,7 @@ var elasticsearchquery = function () {
                     var rngs = {
                         'from': "" + from_,
                         'to': "" + to_
-                    }
+                    };
                     var obj = {'range': {}};
                     obj['range'][ rel ] = rngs;
                     bool['must'].push(obj);
@@ -546,14 +544,14 @@ var elasticsearchquery = function () {
                     ($(this).attr('rel').indexOf("when") != -1)) {
                 /// facet filter for a date
                 var rel = $(this).attr('rel');
-                var obj = {'range': {}}
+                var obj = {'range': {}};
                 var from_ = $(this).attr('href');
                 //var to_ = parseInt(from_) + 365*24*60*60*1000 - 1;
                 var to_ = parseInt(from_) + 365 * 24 * 60 * 60 * 1000;
                 var rngs = {
                     'from': from_,
                     'to': to_
-                }
+                };
                 obj['range'][ rel ] = rngs;
                 bool['must'].push(obj);
                 filtered = true;
@@ -630,8 +628,8 @@ var elasticsearchquery = function () {
         }
     }
     // set any paging
-    options.paging.from != 0 ? qs['from'] = options.paging.from : ""
-    options.paging.size != 10 ? qs['size'] = options.paging.size : ""
+    options.paging.from != 0 ? qs['from'] = options.paging.from : "";
+    options.paging.size != 10 ? qs['size'] = options.paging.size : "";
 
     // set any facets
     qs['facets'] = {};
@@ -661,7 +659,7 @@ var elasticsearchquery = function () {
         }
     }
     // set snippets/highlight
-    if (queried_fields.length == 0) {
+    if (queried_fields.length === 0) {
         queried_fields.push("_all");
     }
     qs['highlight'] = {};
@@ -684,4 +682,4 @@ var elasticsearchquery = function () {
         console.log(theUrl);
     //}
     return theUrl;
-}
+};

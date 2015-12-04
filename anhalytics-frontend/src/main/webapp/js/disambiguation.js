@@ -7,12 +7,12 @@ var parseDisambNERD = function (sdata) {
     //var entities = jsonObject['entities'];
 
     return jsonObject;
-}
+};
 
 
 var showexpandpre = function (sdata) {
     showexpand(decodeURIComponent(sdata['content']));
-}
+};
 
 var showexpand = function (sdata) {
     if (!sdata) {
@@ -34,7 +34,7 @@ var showexpand = function (sdata) {
 
             piece += '<tr><td><strong>' + jsonObject['senses'][sens]['label'] + '&nbsp;</strong></td><td>' +
                     jsonObject['senses'][sens]['desc']
-                    + '</td><td>'
+                    + '</td><td>';
             if (jsonObject['senses'][sens]['wiki']) {
                 piece += '<a href="http://en.wikipedia.org/wiki?curid=' +
                         jsonObject['senses'][sens]['wiki'] +
@@ -55,10 +55,10 @@ var showexpand = function (sdata) {
     $('#disambiguation_panel').append(piece);
     $('#close-disambiguate-panel').bind('click', function () {
         $('#disambiguation_panel').hide();
-    })
+    });
 
     $('#disambiguation_panel').show();
-}
+};
 
 var getPieceShowexpandNERD = function (jsonObject){
 
@@ -156,7 +156,7 @@ var getPieceShowexpandNERD = function (jsonObject){
     piece += '</div><div><div id="close-disambiguate-panel" \
 					  style="position:relative;float:right;" class="icon-remove icon-white"/></div></div></div>';
     return piece;
-}
+};
 
 var activateDisambButton = function () {
     if ($('#facetview_freetext').val()) {
@@ -165,4 +165,4 @@ var activateDisambButton = function () {
     else {
         $('#disambiguate').attr("disabled", true);
     }
-}
+};

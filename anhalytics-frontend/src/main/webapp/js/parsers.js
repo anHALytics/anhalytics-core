@@ -44,4 +44,4 @@ var parseresultsElasticSearch = function (dataobj) {
         resultobj["aggregations"][item] = dataobj.aggregations[item]["buckets"];
     }
     return resultobj;
-}
+};

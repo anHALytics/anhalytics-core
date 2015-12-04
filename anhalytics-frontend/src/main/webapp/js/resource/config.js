@@ -25,6 +25,6 @@ var defaults = {
     },
     mode_query: "simple", // query input, possible values: simple, complex, nl, semantic, analytics
     complex_fields: 0, // number of fields introduced in the complex query form
-}
+};
 
 

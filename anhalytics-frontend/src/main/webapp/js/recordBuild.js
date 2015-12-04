@@ -2,18 +2,13 @@
 var buildrecord = function (index, node) {
     var record = options.data['records'][index];
     var highlight = options.data['highlights'][index];
-    var score = options.data['scores'][index];
+    //var score = options.data['scores'][index];
 
     var result = '';
 
     var jsonObject = eval(record);
-    //var jsonObject = record;
-
-//			result += '<tr><td>';
     result += '<tr style="border-collapse:collapse;"><td>';
 
-    //result += '<table class="table" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;border:none;">'+
-    //	'<tr style="width:100%;border-collapse:collapse;border:none;">';
 
     result += '<div class="row-fluid">';
 
@@ -94,7 +89,7 @@ var buildrecord = function (index, node) {
         }
     }
 
-    if (!title || (title.length == 0)) {
+    if (!title || (title.length === 0)) {
         if (options['collection'] == 'patent') {
             titles = jsonObject['$teiCorpus.$teiHeader.$fileDesc.$titleStmt.$title.$lang_en'];
         }
@@ -114,7 +109,7 @@ var buildrecord = function (index, node) {
         }
     }
 
-    if (!title || (title.length == 0)) {
+    if (!title || (title.length === 0)) {
         if (options['collection'] == 'patent') {
             titles = jsonObject['$teiCorpus.$teiHeader.$fileDesc.$titleStmt.$title.$lang_fr'];
         }
@@ -134,7 +129,7 @@ var buildrecord = function (index, node) {
         }
     }
 
-    if (!title || (title.length == 0)) {
+    if (!title || (title.length === 0)) {
         if (options['collection'] == 'patent') {
             titles = jsonObject['$teiCorpus.$teiHeader.$fileDesc.$titleStmt.$title.$lang_de'];
         }
@@ -187,7 +182,7 @@ var buildrecord = function (index, node) {
 
         if (authorsLast.length < 4) {
             for (var author in authorsLast) {
-                if (author == 0) {
+                if (author === 0) {
                     if (authorsFirst.length > 0) {
                         result += authorsFirst[0][0] + ". ";
                     }
@@ -566,4 +561,4 @@ var buildrecord = function (index, node) {
     result += '</td></tr>';
 
     node.append(result);
-}
+};
