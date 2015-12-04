@@ -1,4 +1,5 @@
 var defaults = {
+    api_key:"", // this is a google key for freebase image service
     host_nerd: "localhost",
     port_nerd: "8080",
     service: "local", // access to service can be local or proxy, depending on security requirements
