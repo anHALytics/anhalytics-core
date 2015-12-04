@@ -1591,8 +1591,13 @@
         // call the NERD service and propose senses to the user for his query
         var doexpandNERD = function (queryText) {
             //var queryString = '{ "text" : "' + encodeURIComponent(queryText) +'", "shortText" : true }';
-            var queryString = '{ "text" : "' + queryText + '", "shortText" : true }';
-            var urlNERD = "http://" + options.host_nerd + ":" + options.port_nerd + "/processNERDQueryScience";
+            var queryString = '{ "text" : "' + queryText + '", "shortText" : true, "language": {"lang": "en"} }';
+
+            var urlNERD = "http://" + options.host_nerd;
+            if ((!options.port_nerd) || (options.port_nerd.length == 0))
+                urlNERD += options.port_nerd + "processERDSearchQuery";
+            else
+                urlNERD += ":" + options.port_nerd + "/processERDSearchQuery";
             $.ajax({
                 type: "POST",
                 url: urlNERD,
