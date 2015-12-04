@@ -1625,7 +1625,7 @@
              piece += '<p>' + jsonObject['paraphrases'][surf] + '</p>';
              }*/
 
-            piece = getPieceShowexpandNERD();
+            piece = getPieceShowexpandNERD(jsonObject);
             $('#disambiguation_panel').append(piece);
             $('#close-disambiguate-panel').bind('click', function () {
                 $('#disambiguation_panel').hide();
