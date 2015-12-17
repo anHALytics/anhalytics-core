@@ -1,19 +1,20 @@
 package fr.inria.anhalytics.commons.data;
 
 /**
- * Represents a publication file (in order to keep important informations
- * (embargo date, type..))
+ * Represents publication attached file.
  */
-public class PubFile {
-
+public class PublicationFile {
+    //the link of the resource
     private String url;
+    //date the file is available
     private String embargoDate;
-    private String type;
+    //is it an annex or the main file
+    private boolean isAnnexFile;
 
-    public PubFile(String url, String embargoDate, String type) {
+    public PublicationFile(String url, String embargoDate, boolean isAnnexFile) {
         this.url = url;
         this.embargoDate = embargoDate;
-        this.type = type;
+        this.isAnnexFile = isAnnexFile;
     }
 
     /**
@@ -47,15 +48,15 @@ public class PubFile {
     /**
      * @return the type
      */
-    public String getType() {
-        return type;
+    public boolean isAnnexFile() {
+        return isAnnexFile;
     }
 
     /**
      * @param type the type to set
      */
-    public void setType(String type) {
-        this.type = type;
+    public void setIsAnnexFile(boolean isAnnexFile) {
+        this.isAnnexFile = isAnnexFile;
     }
 
 }

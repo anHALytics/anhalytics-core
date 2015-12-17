@@ -220,8 +220,6 @@ UTF8 = {
     }
 };
 
-var googleKey = "AIzaSyBLNMpXpWZxcR9rbjjFQHn_ULbU-w1EZ5U";
-
 function NERTypeMapping(type, def) {
     var label = null;
     switch (type) {

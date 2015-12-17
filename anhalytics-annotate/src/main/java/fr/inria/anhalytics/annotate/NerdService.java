@@ -1,13 +1,13 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
+import fr.inria.anhalytics.commons.exceptions.UnreachableNerdServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -48,11 +48,11 @@ public class NerdService {
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode node = mapper.createObjectNode();
             node.put("text", input);
-			ObjectNode dataTable = mapper.createObjectNode();
-			dataTable.put("lang","fr");
-			dataTable.put("lang","de");
-			dataTable.put("lang","en");
-			node.put("language", dataTable);
+            ObjectNode dataTable = mapper.createObjectNode();
+            dataTable.put("lang", "fr");
+            dataTable.put("lang", "de");
+            dataTable.put("lang", "en");
+            node.put("language", dataTable);
             byte[] postDataBytes = node.toString().getBytes("UTF-8");
 
             OutputStream os = conn.getOutputStream();
@@ -71,13 +71,45 @@ public class NerdService {
             }
             os.close();
             conn.disconnect();
-            
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return output.toString().trim();
+    }
+
+    /**
+     * Checks if Nerd service is responding and available.
+     * @return boolean
+     */
+    public static boolean isNerdReady() throws UnreachableNerdServiceException {
+        
+            
+                System.out.println("sdqsdsdfsd");
+        logger.info("Cheking NERD service...");
+        int responseCode = 0;
+        
+            
+                System.out.println("sdqsdsdfsd");
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL("http://" + AnnotateProperties.getNerd_host() + ":" + AnnotateProperties.getNerd_port());
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("GET");
+            responseCode = conn.getResponseCode();
+        } catch (Exception e) {
+            throw new UnreachableNerdServiceException("NERD service is not reachable, check host and port parameters.");
+        }
+        if (responseCode != 200) {
+            logger.error("NERD service is not alive.");
+            throw new UnreachableNerdServiceException("NERD service is not alive.");
+        }
+        conn.disconnect();
+        logger.info("NERD service is ok and can be used.");
+        return true;
     }
 
 }

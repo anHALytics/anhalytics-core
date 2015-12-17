@@ -2,7 +2,6 @@ package fr.inria.anhalytics.index.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Properties;
 
 /**
@@ -15,23 +14,24 @@ public class IndexProperties {
 
     private static String elasticSearch_host;
     private static String elasticSearch_port;
-    
+
     private static String elasticSearchClusterName;
     private static String teiIndexName;
     private static String annotsIndexName;
-    
+
     private static String workingIndexName;
 
-    public static void init(String path) {
+    public static void init(String properties_filename) {
         Properties props = new Properties();
         try {
-            props.load(new FileInputStream(path));
+            ClassLoader classLoader = IndexProperties.class.getClassLoader();
+            props.load(classLoader.getResourceAsStream(properties_filename));
         } catch (Exception exp) {
-            throw new PropertyException("Cannot open file of index properties" + path, exp);
+            throw new PropertyException("Cannot open file " + properties_filename, exp);
         }
         setElasticSearch_host(props.getProperty("index.elasticSearch_host"));
         setElasticSearch_port(props.getProperty("index.elasticSearch_port"));
-        setElasticSearchClusterName(props.getProperty("index.elasticSearch_cluster"));            
+        setElasticSearchClusterName(props.getProperty("index.elasticSearch_cluster"));
         setTeiIndexName(props.getProperty("index.elasticSearch_indexName"));
         setAnnotsIndexName(props.getProperty("index.elasticSearch_annotsIndexName"));
         if (processName.equals("tei")) {

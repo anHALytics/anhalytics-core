@@ -1,4 +1,4 @@
-.DS_Store
+*.DS_Store
 
 
 *.log*
@@ -23,3 +23,4 @@ config/local/*
 /anhalytics-frontend/target/
 *.bak
 /anhalytics-test/target/
+*nb-configuration.xml

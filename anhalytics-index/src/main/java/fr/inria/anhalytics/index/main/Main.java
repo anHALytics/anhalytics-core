@@ -2,20 +2,19 @@ package fr.inria.anhalytics.index.main;
 
 import fr.inria.anhalytics.index.Indexer;
 import fr.inria.anhalytics.index.properties.IndexProperties;
-import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Main class that implements commands indexing TEIs and associated annotations (appends a standoff for each entry)
  * @author achraf
  */
 public class Main {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands = new ArrayList<String>() {
         {
@@ -24,7 +23,7 @@ public class Main {
         }
     };
 
-    public static void main(String[] args) throws IOException, ParserConfigurationException {
+    public static void main(String[] args) throws UnknownHostException {
         
         if (processArgs(args)) {
             //process name is needed to set properties.
@@ -60,7 +59,7 @@ public class Main {
         return result;
     }
 
-    private void processCommand() throws IOException, ParserConfigurationException {
+    private void processCommand() throws UnknownHostException  {
         String process = IndexProperties.getProcessName();
         Indexer esm = new Indexer();
         try {
@@ -68,15 +67,15 @@ public class Main {
                 esm.setUpElasticSearch(process);
                 // loading based on DocDB XML, with TEI conversion
                 int nbDoc = esm.indexCollection();
-                System.out.println("Total: " + nbDoc + " documents indexed.");
+                logger.info("Total: " + nbDoc + " documents indexed.");
             } else if (process.equals("annotation")) {
                 esm.setUpElasticSearch(process);
 
                 int nbAnnotsIndexed = esm.indexAnnotations();
-                LOGGER.debug("Total: " + nbAnnotsIndexed + " annotations indexed.");
+                logger.info("Total: " + nbAnnotsIndexed + " annotations indexed.");
             }
         } catch (Exception e) {
-            System.err.println("Error when setting-up ElasticSeach cluster");
+            logger.error("Error when setting-up ElasticSeach cluster");
             e.printStackTrace();
         }
     }

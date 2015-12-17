@@ -15,10 +15,11 @@ public class Person {
     private String middlename = "";
     private String surname = "";
     private String url = "";
+    private String email = "";
     private List<Person_Identifier> person_identifiers = null;
     
     public Person(){}
-    public Person(Long personId, String title, String photo, String fullname, String forename, String middlename, String surname, String url, List<Person_Identifier> person_identifiers){
+    public Person(Long personId, String title, String photo, String fullname, String forename, String middlename, String surname, String url, String email, List<Person_Identifier> person_identifiers){
         this.personId = personId;
         this.title = title;
         this.photo = photo;
@@ -27,6 +28,7 @@ public class Person {
         this.middlename = middlename;
         this.surname = surname;
         this.url = url;
+        this.email = email;
         this.person_identifiers = person_identifiers;
     }
 
@@ -154,5 +156,19 @@ public class Person {
      */
     public void setPerson_identifiers(List<Person_Identifier> person_identifiers) {
         this.person_identifiers = person_identifiers;
+    }
+
+    /**
+     * @return the email
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

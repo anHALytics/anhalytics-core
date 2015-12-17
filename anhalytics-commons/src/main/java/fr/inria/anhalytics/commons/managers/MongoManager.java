@@ -4,8 +4,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Set;
@@ -13,8 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author achraf
+ * Abstract class to be sub-classed to use mongoDB service.
+ * 
+ * @author Achraf
  */
 abstract class MongoManager {
     
@@ -34,8 +33,8 @@ abstract class MongoManager {
         try {
                 if(!isTest) {
                     Properties prop = new Properties();
-                    File file = new File(System.getProperty("user.dir"));
-                    prop.load(new FileInputStream(file.getParent() + "/anhalytics-commons/" + "commons.properties"));
+                    ClassLoader classLoader = getClass().getClassLoader();
+                    prop.load(classLoader.getResourceAsStream("commons.properties"));
                     mongodbServer = prop.getProperty("commons.mongodb_host");
                     mongodbPort = Integer.parseInt(prop.getProperty("commons.mongodb_port"));
                     mongodbDb = prop.getProperty("commons.mongodb_db");
@@ -44,13 +43,16 @@ abstract class MongoManager {
                     mongo = new MongoClient(mongodbServer, mongodbPort);
                     if(!mongo.getDatabaseNames().contains(mongodbDb))
                         LOGGER.debug("MongoDB database "+mongodbDb+" does not exist and will be created");
-                    
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
     }
-    
+    /**
+     * Initializes database if it exists and create it otherwise.
+     * 
+     * @param dbName 
+     */
     protected void initDatabase(String dbName){
         db = mongo.getDB(dbName);
         if(!mongo.getDatabaseNames().contains(dbName)){

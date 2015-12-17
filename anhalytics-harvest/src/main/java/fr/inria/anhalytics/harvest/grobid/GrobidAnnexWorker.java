@@ -1,20 +1,22 @@
 package fr.inria.anhalytics.harvest.grobid;
 
-import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import java.io.File;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 
 /**
- *
+ * Process publications annex with grobid.
+ * 
  * @author Achraf
  */
 public class GrobidAnnexWorker extends GrobidWorker {
 
-    public GrobidAnnexWorker(InputStream content, MongoFileManager mongoManager, String date) {
-        super(content, mongoManager, date);
+    public GrobidAnnexWorker(InputStream content, String id, String date) throws UnknownHostException {
+        super(content, id, date);
     }
 
-    protected void storeToGridfs(String zipDirectoryPath) {
+    @Override
+    protected void saveExtractions(String zipDirectoryPath) {
         String tei = null;
         try {
             File directoryPath = new File(zipDirectoryPath);

@@ -2,12 +2,12 @@ package fr.inria.anhalytics.annotate.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Properties;
 
 /**
+ * Represents the properties used for the annotation process.
  *
- * @author achraf
+ * @author Achraf
  */
 public class AnnotateProperties {
 
@@ -16,21 +16,25 @@ public class AnnotateProperties {
     private static String untilDate;
 
     private static String nerd_host = null;
-    
+
     private static String nerd_port = null;
-    
+
     private static boolean isMultiThread;
-    
+
     private static boolean reset;
-    
+
     private static int nbThreads = 1;
 
-    public static void init(String path) {
+    /**
+     * Loads and initializes properties from the file given the filename.
+     */
+    public static void init(String properties_filename) {
         Properties props = new Properties();
         try {
-            props.load(new FileInputStream(path));
+            ClassLoader classLoader = AnnotateProperties.class.getClassLoader();
+            props.load(classLoader.getResourceAsStream(properties_filename));
         } catch (Exception exp) {
-            throw new PropertyException("Cannot open file of annotate properties" + path, exp);
+            throw new PropertyException("Cannot open file " + properties_filename, exp);
         }
         setNerd_host(props.getProperty("annotate.nerd_host"));
         setNerd_port(props.getProperty("annotate.nerd_port"));

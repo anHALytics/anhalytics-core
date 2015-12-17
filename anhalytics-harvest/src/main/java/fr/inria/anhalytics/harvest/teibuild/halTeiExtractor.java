@@ -11,7 +11,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Hal specific tei extraction and update.
+ * Function for extracting data from Hal stored metadata.
  *
  * @author achraf
  */
@@ -20,14 +20,13 @@ public class halTeiExtractor {
     private static XPath xPath = XPathFactory.newInstance().newXPath();
 
     /**
-     * Reorganizes some nodes especially authors/editors that are 'missplaced'
-     * and returns the biblFull to avoid redundancy.
+     * Reorganizes some nodes especially authors/editors that are misplaced, puts them under biblFull node
+     * and returns the result( some data is redundant).
      *
      * @param docAdditionalTei
      * @return
      */
-    // TO BE RENAMED.
-    public static NodeList getTeiHeader(Document docAdditionalTei) {
+    public static NodeList extractHalMetadata(Document docAdditionalTei) {
         /////////////// Hal specific : To be done as a harvesting post process before storing tei ////////////////////
         // remove ugly end-of-line in starting and ending text as it is
         // a problem for stand-off annotations
@@ -38,9 +37,9 @@ public class halTeiExtractor {
             NodeList authors = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/author").evaluate(docAdditionalTei, XPathConstants.NODESET);
             NodeList orgs = (NodeList) xPath.compile("/TEI/text/back/listOrg/org").evaluate(docAdditionalTei, XPathConstants.NODESET);
 
-            removeConsolidatedData(docAdditionalTei, authors);
+            correctDataLocation(docAdditionalTei, authors);
             updateAffiliations(authors, orgs, docAdditionalTei);
-            removeConsolidatedData(docAdditionalTei, editors);
+            correctDataLocation(docAdditionalTei, editors);
             updateAffiliations(editors, orgs, docAdditionalTei);
             docAdditionalTei = removeUnneededParts(docAdditionalTei);
             Utilities.trimEOL(docAdditionalTei.getDocumentElement(), docAdditionalTei);
@@ -53,13 +52,12 @@ public class halTeiExtractor {
     }
 
     /**
-     * WIP...
+     * Moves metadata under biblFull.
      *
      * @param docAdditionalTei
      * @param entities
      */
-    // TO BE RENAMED
-    private static void removeConsolidatedData(Document docAdditionalTei, NodeList entities) throws XPathExpressionException {
+    private static void correctDataLocation(Document docAdditionalTei, NodeList entities) throws XPathExpressionException {
         Node person = null;
         for (int i = entities.getLength() - 1; i >= 0; i--) {
             person = entities.item(i);

@@ -1,22 +1,24 @@
 package fr.inria.anhalytics.harvest.main;
 
+import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.datamine.GrobidMiner;
-import fr.inria.anhalytics.harvest.OAIHarvester;
+import fr.inria.anhalytics.datamine.HALMiner;
+import fr.inria.anhalytics.harvest.HALOAIHarvester;
+import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import fr.inria.anhalytics.harvest.teibuild.TeiBuilderProcess;
 import java.io.File;
-import java.io.IOException;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
- *
+ * Main class that implements commands for harvesting, extracting, inserting in KB and generating TEI.
  * @author Achraf
  */
 public class Main {
@@ -28,16 +30,17 @@ public class Main {
             add("fetchEmbargoPublications");
             add("processGrobid");
             add("generateTei");
-            add("deduplicate");// feeds knowledge base 
-            add("mineGrobidMetadata");// feeds knowledge base 
+            add("harvestIstex");
+            add("seedKnowledgeBase");
+            add("deduplicate");
         }
     };
 
-    public static void main(String[] args) throws IOException, ParserConfigurationException {
+    public static void main(String[] args) throws UnknownHostException {
         try {
             HarvestProperties.init("harvest.properties");
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception exp) {
+            throw new PropertyException("Cannot open file of harvest properties harvest.properties", exp);
         }
 
         if (processArgs(args)) {
@@ -50,12 +53,14 @@ public class Main {
         }
     }
 
-    private void processCommand() throws IOException, ParserConfigurationException {
+    private void processCommand() throws UnknownHostException {
         String process = HarvestProperties.getProcessName();
         GrobidProcess gp = new GrobidProcess();
         TeiBuilderProcess tb = new TeiBuilderProcess();
-        OAIHarvester oai = new OAIHarvester();//tb renamed (Process suffix)
+        HALOAIHarvester oai = new HALOAIHarvester();
         GrobidMiner gm = new GrobidMiner();
+        HALMiner hm = new HALMiner();
+        IstexHarvester ih = new IstexHarvester();
         if (process.equals("harvestAll")) {
             oai.fetchAllDocuments();
             gp.processFulltext();
@@ -73,15 +78,17 @@ public class Main {
             oai.fetchEmbargoPublications();
             return;
         } else if (process.equals("processGrobid")) {
-            //clearTmpDirectory();           
             gp.processFulltext();
             return;
-        } else if (process.equals("mineGrobidMetadata")) {
-            gm.mine();
+        } else if (process.equals("seedKnowledgeBase")) {
+            hm.mine();
             return;
         } else if (process.equals("generateTei")) {
             //warn about xml_id modifications
             tb.build();
+            return;
+        } else if (process.equals("harvestIstex")) {
+            ih.harvest();
             return;
         }
     }

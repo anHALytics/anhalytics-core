@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 public class PersonDAO extends DAO<Person> {
 
     private static final String SQL_INSERT
-            = "INSERT INTO PERSON (title, photo, url) VALUES (?, ?, ?)";
+            = "INSERT INTO PERSON (title, photo, url, email) VALUES (?, ?, ?, ?)";
 
     private static final String SQL_INSERT_PERSON_NAME
             = "INSERT INTO PERSON_NAME (personID, fullname, forename ,middlename , surname, title) VALUES (?, ?, ?, ?, ?, ?)";
@@ -95,6 +95,7 @@ public class PersonDAO extends DAO<Person> {
             statement.setString(1, obj.getTitle());
             statement.setString(2, obj.getPhoto());
             statement.setString(3, obj.getUrl());
+            statement.setString(4, obj.getEmail());
             int code = statement.executeUpdate();
             ResultSet rs = statement.getGeneratedKeys();
 
@@ -144,7 +145,7 @@ public class PersonDAO extends DAO<Person> {
         try {
             ResultSet result = this.connect.createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT p.title, p.photo, p.url, pn.fullname, pn.forename, pn.middlename, pn.surname FROM PERSON p, PERSON_NAME pn WHERE p.personID = " + id + " AND pn.personID = " + id);
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT p.title, p.photo, p.url, p.email, pn.fullname, pn.forename, pn.middlename, pn.surname FROM PERSON p, PERSON_NAME pn WHERE p.personID = " + id + " AND pn.personID = " + id);
             if (result.first()) {
                 person = new Person(
                         id,
@@ -155,6 +156,7 @@ public class PersonDAO extends DAO<Person> {
                         result.getString("pn.middlename"),
                         result.getString("pn.surname"),
                         result.getString("p.url"),
+                        result.getString("p.email"),
                         new ArrayList<Person_Identifier>());
             }
         } catch (SQLException e) {

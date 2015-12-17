@@ -4,7 +4,6 @@ package fr.inria.anhalytics.harvest.service;
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.Properties;
@@ -19,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 
 /**
  * Grobid assets provider.
+ * 
  * @author Achraf
  */
 @Path("/")
@@ -30,22 +30,24 @@ public class AnhalyticsAssetService {
     
     public AnhalyticsAssetService() throws UnknownHostException {
         this.mm = MongoFileManager.getInstance(false);
-        Properties props = new Properties();
+        Properties prop = new Properties();
         try {
-            props.load(new FileInputStream("harvest.properties"));
+            ClassLoader classLoader = AnhalyticsAssetService.class.getClassLoader();
+            prop.load(classLoader.getResourceAsStream("harvest.properties"));
         } catch (Exception exp) {
-            throw new PropertyException("Cannot open file of harvest properties " + "harvest.properties", exp);
+            throw new PropertyException("Cannot open file of harvest.properties", exp);
         }
-        KEY = props.getProperty("harvest.service_key");
+        KEY = prop.getProperty("harvest.service_key");
     }
 
     @Path("asset")
     @GET
-    public Response getImage(@QueryParam("halid") String id, @QueryParam("filename") String filename, @QueryParam("key") String key) {
+    public Response getImage(@QueryParam("id") String id, @QueryParam("filename") String filename, @QueryParam("key") String key) {
+        
         Response response = null;
         if(key.equals(KEY)){
             try {
-                InputStream is = mm.getFile(id, filename, MongoCollectionsInterface.GROBID_ASSETS);
+                InputStream is = mm.findAssetFile(id, filename, MongoCollectionsInterface.GROBID_ASSETS);
                 if (is == null) {
                     response = Response.status(Status.NOT_FOUND).build();
                 } else {

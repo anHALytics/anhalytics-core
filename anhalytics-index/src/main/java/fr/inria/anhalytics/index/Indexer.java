@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.index;
 
-
+import fr.inria.anhalytics.commons.exceptions.ElasticSearchConfigurationException;
+import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import java.io.*;
@@ -20,6 +21,8 @@ import org.json.JsonTapasML;
 import org.json.JSONObject;
 import fr.inria.anhalytics.commons.utilities.IndexingPreprocess;
 import fr.inria.anhalytics.index.properties.IndexProperties;
+import java.util.logging.Level;
+import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
@@ -31,7 +34,7 @@ import org.codehaus.jackson.node.ObjectNode;
  */
 public class Indexer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Indexer.class);
+    private static final Logger logger = LoggerFactory.getLogger(Indexer.class);
 
     private final MongoFileManager mm;
 
@@ -76,7 +79,7 @@ public class Indexer {
                     "Content-Type", "application/x-www-form-urlencoded");
             httpCon.setRequestMethod("DELETE");
             httpCon.connect();
-            System.out.println("ElasticSearch Index " + IndexProperties.getWorkingIndexName() + " deleted: status is "
+            logger.info("ElasticSearch Index " + IndexProperties.getWorkingIndexName() + " deleted: status is "
                     + httpCon.getResponseCode());
             if (httpCon.getResponseCode() == 200) {
                 val = true;
@@ -91,17 +94,26 @@ public class Indexer {
     /**
      *
      */
-    private boolean createIndex() throws Exception {
+    private boolean createIndex() throws IOException  {
         boolean val = false;
 
         // create index
         String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + IndexProperties.getWorkingIndexName();
-        URL url = new URL(urlStr);
+        URL url = null;
+        try {
+            url = new URL(urlStr);
+        } catch (MalformedURLException ex) {
+            java.util.logging.Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
+        }
         HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
         httpCon.setDoOutput(true);
         httpCon.setRequestProperty(
                 "Content-Type", "application/x-www-form-urlencoded");
-        httpCon.setRequestMethod("PUT");
+        try {
+            httpCon.setRequestMethod("PUT");
+        } catch (ProtocolException ex) {
+            java.util.logging.Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         /*System.out.println("ElasticSearch Index " + indexName + " creation: status is " + 
          httpCon.getResponseCode());
@@ -111,10 +123,10 @@ public class Indexer {
         // load custom analyzer
         String analyserStr = null;
         try {
-            File file = new File("src/main/resources/elasticSearch/analyzer.json");
-            analyserStr = FileUtils.readFileToString(file, "UTF-8");
+            ClassLoader classLoader = Indexer.class.getClassLoader();
+            analyserStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/analyzer.json"));
         } catch (Exception e) {
-            throw new Exception("Cannot read analyzer for " + IndexProperties.getWorkingIndexName());
+            throw new ElasticSearchConfigurationException("Cannot read analyzer for " + IndexProperties.getWorkingIndexName());
         }
 
         httpCon.setDoOutput(true);
@@ -124,7 +136,7 @@ public class Indexer {
         out.write(analyserStr);
         out.close();
 
-        System.out.println("ElasticSearch analyzer for " + IndexProperties.getWorkingIndexName() + " : status is "
+        logger.info("ElasticSearch analyzer for " + IndexProperties.getWorkingIndexName() + " : status is "
                 + httpCon.getResponseCode());
         if (httpCon.getResponseCode() == 200) {
             val = true;
@@ -155,17 +167,16 @@ public class Indexer {
         httpCon.setRequestMethod("PUT");
         String mappingStr = null;
         try {
-            File file;
+            ClassLoader classLoader = Indexer.class.getClassLoader();
             if (process.equals("annotation")) {
-                file = new File("src/main/resources/elasticSearch/annotation.json");
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation.json"));
             } else {
-                file = new File("src/main/resources/elasticSearch/npl.json");
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl.json"));
             }
-            mappingStr = FileUtils.readFileToString(file, "UTF-8");
         } catch (Exception e) {
-            throw new Exception("Cannot read mapping for " + IndexProperties.getWorkingIndexName());
+            throw new ElasticSearchConfigurationException("Cannot read mapping for " + IndexProperties.getWorkingIndexName());
         }
-        System.out.println(urlStr);
+        logger.info(urlStr);
 
         httpCon.setDoOutput(true);
         httpCon.setRequestMethod("PUT");
@@ -174,7 +185,7 @@ public class Indexer {
         out.write(mappingStr);
         out.close();
 
-        System.out.println("ElasticSearch mapping for " + IndexProperties.getWorkingIndexName() + " : status is "
+        logger.info("ElasticSearch mapping for " + IndexProperties.getWorkingIndexName() + " : status is "
                 + httpCon.getResponseCode());
         if (httpCon.getResponseCode() == 200) {
             val = true;
@@ -194,15 +205,16 @@ public class Indexer {
         IndexingPreprocess indexingPreprocess = new IndexingPreprocess(mm);
 
         int nb = 0;
-        mm.setGridFS(MongoCollectionsInterface.FINAL_TEIS);
-        if (mm.initTeiFiles(null)) {
+        if (mm.initTeis(null)) {
             int i = 0;
             BulkRequestBuilder bulkRequest = client.prepareBulk();
             bulkRequest.setRefresh(true);
-            while (mm.hasMoreDocuments()) {
-                String tei = mm.nextDocument();
-                String filename = mm.getCurrentFilename();
-                String halID = mm.getCurrentHalID();
+            while (mm.hasMoreTeis()) {
+                String tei = mm.nextTeiDocument();
+                String id = mm.getCurrentRepositoryDocId();
+                if (!mm.isWithFulltext(id)) {
+                    continue;
+                }
 
                 // convert the TEI document into JSON via JsonML
                 //System.out.println(halID);
@@ -210,8 +222,7 @@ public class Indexer {
                 String jsonStr = json.toString();
                 try {
 
-                    jsonStr = indexingPreprocess.process(jsonStr, filename);
-                    
+                    jsonStr = indexingPreprocess.process(jsonStr, id);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -224,13 +235,13 @@ public class Indexer {
                 // index the json in ElasticSearch
                 try {
                     // beware the document type bellow and corresponding mapping!
-                    bulkRequest.add(client.prepareIndex(IndexProperties.getTeiIndexName(), "npl", halID).setSource(jsonStr));
+                    bulkRequest.add(client.prepareIndex(IndexProperties.getTeiIndexName(), "npl", id).setSource(jsonStr));
 
                     if (i >= 100) {
                         BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                         if (bulkResponse.hasFailures()) {
                             // process failures by iterating through each bulk response item	
-                            System.out.println(bulkResponse.buildFailureMessage());
+                            logger.error(bulkResponse.buildFailureMessage());
                         }
                         bulkRequest = client.prepareBulk();
                         bulkRequest.setRefresh(true);
@@ -249,7 +260,7 @@ public class Indexer {
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
             if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item	
-                System.out.println(bulkResponse.buildFailureMessage());
+                logger.error(bulkResponse.buildFailureMessage());
             }
         }
         client.close();
@@ -288,16 +299,15 @@ public class Indexer {
                 bulkRequest.setRefresh(true);
                 while (mm.hasMoreAnnotations()) {
                     String json = mm.nextAnnotation();
-                    String filename = mm.getCurrentFilename();
-                    String halID = mm.getCurrentHalID();
-                    
+                    String id = mm.getCurrentRepositoryDocId();
+
                     // get the xml:id of the elements we want to index from the document
                     // we only index title, abstract and keyphrase annotations !
-                    List<String> validIDs = validDocIDs(halID, mapper);
-                    
+                    List<String> validIDs = validDocIDs(id, mapper);
+
                     JsonNode jsonAnnotation = mapper.readTree(json);
                     JsonNode jn = jsonAnnotation.findPath("nerd");
-                    
+
                     JsonNode newNode = mapper.createObjectNode();
                     Iterator<JsonNode> ite = jn.getElements();
                     while (ite.hasNext()) {
@@ -333,7 +343,7 @@ public class Indexer {
                                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                                 if (bulkResponse.hasFailures()) {
                                     // process failures by iterating through each bulk response item	
-                                    System.out.println(bulkResponse.buildFailureMessage());
+                                    logger.error(bulkResponse.buildFailureMessage());
                                 }
                                 bulkRequest = client.prepareBulk();
                                 bulkRequest.setRefresh(true);
@@ -353,7 +363,7 @@ public class Indexer {
                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                 if (bulkResponse.hasFailures()) {
                     // process failures by iterating through each bulk response item	
-                    System.out.println(bulkResponse.buildFailureMessage());
+                    logger.error(bulkResponse.buildFailureMessage());
                 }
                 System.out.print("\n");
             }
@@ -367,7 +377,7 @@ public class Indexer {
 
     private List<String> validDocIDs(String halID, ObjectMapper mapper) {
         List<String> results = new ArrayList<String>();
-        System.out.println("validDocIDs: " + halID);
+        logger.debug("validDocIDs: " + halID);
 
         String request = "{\"fields\": [ ";
         boolean first = true;
@@ -397,7 +407,7 @@ public class Indexer {
             os.write(postDataBytes);
             os.flush();
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                System.out.println("Failed, HTTP error code : "
+                logger.error("Failed, HTTP error code : "
                         + conn.getResponseCode());
                 return null;
             }

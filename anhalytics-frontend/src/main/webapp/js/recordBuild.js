@@ -16,23 +16,13 @@ var buildrecord = function (index, node) {
     var id = options.data['ids'][index];
 
     var family = id;
-    // family id
-    if (options['collection'] == 'patent') {
-        if (family.length > 1) {
-            result += '<div class="span10" class="height:100%;" id="myCollapsible_' + index + '" data-toggle="collapse" data-target="#abstract_' + index + '" style="white-space:normal;">';
-            result += 'Family: ' + family;
-        }
-    }
-    else {
+    
         result += '<div class="span10" class="height:100%;" id="myCollapsible_' + index + '" data-toggle="collapse" data-target="#abstract_' + index + '" style="white-space:normal;">';
-    }
+    
 
     // date
     var date;
     var dates = null;
-    if (options['collection'] == 'patent')
-        dates = jsonObject['$teiCorpus.$teiHeader.$fileDesc.$sourceDesc.$biblStruct.$monogr.$date'];
-    else {
         dates = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$monogr.$imprint.$date'];
         if (!dates) {
             dates = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$monogr.$imprint.$when'];
@@ -40,32 +30,17 @@ var buildrecord = function (index, node) {
         if (!dates) {
             dates = jsonObject['$teiCorpus.$teiHeader.$editionStmt.$edition.$date'];
         }
-    }
-
-    if (options['collection'] == 'patent') {
-        var rawDate = JSON.stringify(dates);
-        var ind1 = rawDate.indexOf('"');
-        var ind2 = rawDate.indexOf('"', ind1 + 1);
-        date = rawDate.substring(ind1, ind2 + 1);
-
-        if (date && (date.length > 1)) {
-            result += ' - <em>' + date.substring(7, date.length - 1) + '.' + date.substring(5, 7)
-                    + '.' + date.substring(1, 5) + '</em>' + '<br />';
-        }
-    }
 
     var title;
     var titles = null;
     var titleID = null;
     var titleIDs = null;
     var titleAnnotated = null;
-    if (options['collection'] == 'patent')
-        titles = jsonObject['$teiCorpus.$teiHeader.$fileDesc.$titleStmt.$title.$lang_en'];
-    else {
+
         // NPL
         titles = jsonObject['$teiCorpus.$teiHeader.$titleStmt.$title.$title-first'];
         titleIDs = jsonObject['$teiCorpus.$teiHeader.$titleStmt.xml:id'];
-    }
+    
     if (typeof titles == 'string') {
         title = titles;
     }
@@ -90,12 +65,9 @@ var buildrecord = function (index, node) {
     }
 
     if (!title || (title.length === 0)) {
-        if (options['collection'] == 'patent') {
-            titles = jsonObject['$teiCorpus.$teiHeader.$fileDesc.$titleStmt.$title.$lang_en'];
-        }
-        else {
+
             titles = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$title.$lang_en'];
-        }
+        
         if (typeof titles == 'string') {
             title = titles;
         }
@@ -110,12 +82,9 @@ var buildrecord = function (index, node) {
     }
 
     if (!title || (title.length === 0)) {
-        if (options['collection'] == 'patent') {
-            titles = jsonObject['$teiCorpus.$teiHeader.$fileDesc.$titleStmt.$title.$lang_fr'];
-        }
-        else {
+
             titles = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$title.$lang_fr'];
-        }
+        
         if (typeof titles == 'string') {
             title = titles;
         }
@@ -130,12 +99,9 @@ var buildrecord = function (index, node) {
     }
 
     if (!title || (title.length === 0)) {
-        if (options['collection'] == 'patent') {
-            titles = jsonObject['$teiCorpus.$teiHeader.$fileDesc.$titleStmt.$title.$lang_de'];
-        }
-        else {
+
             titles = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.$biblStruct.$title.$lang_de'];
-        }
+        
         if (typeof titles == 'string') {
             title = titles;
         }
@@ -459,35 +425,7 @@ var buildrecord = function (index, node) {
 
     // add image where available
     if (options.display_images) {
-        if ((options['collection'] == 'cendari')) {
-            var img = jsonObject['thumbnail_s'];
-            var img2 = jsonObject['thumbnail_l'];
-            var img3 = jsonObject['thumbnail_m'];
-            var uri = jsonObject['URI'];
-            img[0] = 'data/cache/images/cendari_photo/' + family + ".png";
-            if (img && img2) {
-                result += '<div class="span2"><img alt="bla" src="' + img[0] + '" pbsrc="' + img2[0] +
-                        '" class="PopBoxImageSmall" pbRevertText="" onclick="Pop(this,50,\'PopBoxImageLarge\');" /></div>';
-            }
-            else if (img && img3) {
-                result += '<div class="span2"><img alt="bla" src="' + img[0] + '" pbsrc="' + img3[0] +
-                        '" class="PopBoxImageSmall" pbRevertText="" onclick="Pop(this,50,\'PopBoxImageLarge\');" /></div>';
-            }
-            else if (img) {
-                if (uri) {
-                    result += '<div class="span2"><a href="' + uri[0] + '" target="_blank""><img class="thumbnail" style="float:right; max-width:100px; '
-                            + 'max-height:150px;" src="' + img[0] + '" /></a></div>';
-                }
-                else {
-                    result += '<div class="span2"><img class="thumbnail" style="float:right; max-width:100px; '
-                            + 'max-height:150px;" src="' + img[0] + '" /></div>';
-                }
-            }
-            else {
-                result += '<div class="span2" />';
-            }
-        }
-        else {
+
             var ind = family.indexOf("-");
             if ((ind != -1) && (family.length > ind)) {
                 var pubNum = family.substring(ind + 1, family.length);
@@ -498,7 +436,7 @@ var buildrecord = function (index, node) {
             else {
                 result += '<div class="span2" />';
             }
-        }
+        
     }
 
     //result += '</tr></table>';
@@ -531,7 +469,7 @@ var buildrecord = function (index, node) {
 
     result += "</div>";
 
-    if ((options['collection'] == 'npl') && (options['collection'] != 'cendari')) {
+    if ((options['collection'] == 'npl')) {
         var pdfURL = jsonObject['$teiCorpus.$teiHeader.$sourceDesc.target'];
         var docid = jsonObject._id;
         if (pdfURL || docid) {

@@ -77,7 +77,7 @@ public class GrobidMiner {
         return docID;
     }
 
-    public static Document mine(Document docGrobid, String uri) throws ParserConfigurationException, IOException, XPathExpressionException {
+    public static Document mine(Document docGrobid, String id) throws ParserConfigurationException, IOException, XPathExpressionException {
         PublicationDAO pd = new PublicationDAO(AnhalyticsConnection.getInstance());
         DocumentDAO dd = new DocumentDAO(AnhalyticsConnection.getInstance());
 
@@ -92,7 +92,7 @@ public class GrobidMiner {
 
         NodeList ids = (NodeList) xPath.compile("/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/idno").evaluate(docGrobid, XPathConstants.NODESET);
 
-        fr.inria.anhalytics.entities.Document doc = new fr.inria.anhalytics.entities.Document(null, Utilities.getVersionFromURI(uri), Utilities.innerXmlToString(metadata), uri);
+        fr.inria.anhalytics.entities.Document doc = new fr.inria.anhalytics.entities.Document(null, Utilities.getVersionFromURI(id), Utilities.innerXmlToString(metadata), id);
 
         dd.create(doc);
         docID = Long.toString(doc.getDocID());
@@ -381,23 +381,21 @@ public class GrobidMiner {
     public void mine() throws IOException, ParserConfigurationException {
         InputStream grobid_tei = null;
         Document grobid_doc;
-        mm.setGridFS(MongoCollectionsInterface.GROBID_TEIS);
         for (String date : Utilities.getDates()) {
-            if (mm.initTeiFiles(date)) {
-                logger.info("Mining documents for: " + date);
-                while (mm.hasMoreDocuments()) {
-                    String tei_doc = mm.nextDocument();
-                    String hal_uri = mm.getCurrentHalURI();
+            if (mm.initGrobidTeis(date)) {
+                while (mm.hasMoreBinaryDocuments()) {
+                    String tei_doc = mm.nextTeiDocument();
+                    String id = mm.getCurrentRepositoryDocId();
                     grobid_tei = new ByteArrayInputStream(tei_doc.getBytes());
                     grobid_doc = getDocument(grobid_tei);
                     try {
                         //Extract teis Header metadata
-                        grobid_doc = mine(grobid_doc, hal_uri);
+                        grobid_doc = mine(grobid_doc, id);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
-            }
+                
+            }}
         }
     }
 

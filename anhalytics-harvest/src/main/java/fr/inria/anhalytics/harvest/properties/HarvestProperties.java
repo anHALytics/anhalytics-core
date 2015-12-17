@@ -2,10 +2,10 @@ package fr.inria.anhalytics.harvest.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Properties;
 
 /**
+ * Represents the properties used for the harvesting and tei extraction process.
  *
  * @author achraf
  */
@@ -29,21 +29,22 @@ public class HarvestProperties {
     private static String tmpPath;
 
     private static boolean reset;
-    
+
     private static int nbThreads = 1;
 
-    public static void init(String path) {
+    public static void init(String properties_filename) {
         Properties props = new Properties();
         try {
-            props.load(new FileInputStream(path));
+            ClassLoader classLoader = HarvestProperties.class.getClassLoader();
+            props.load(classLoader.getResourceAsStream(properties_filename));
         } catch (Exception exp) {
-            throw new PropertyException("Cannot open file of harvest properties" + path, exp);
+            throw new PropertyException("Cannot open file "+properties_filename, exp);
         }
         setGrobidHost(props.getProperty("harvest.grobid_host"));
         setGrobidPort(props.getProperty("harvest.grobid_port"));
         //check path
         setTmpPath(props.getProperty("harvest.tmpPath"));
-            // As grobid process may take a long time we can continue on previous works
+        // As grobid process may take a long time we can continue on previous works
         setReset(Boolean.valueOf(props.getProperty("harvest.reset")));
         setTmpPath(props.getProperty("harvest.tmpPath"));
         setPath2grobidHome(props.getProperty("harvest.pGrobidHome"));

@@ -300,6 +300,30 @@
                                                         "type": "string"
                                                     }
                                                 }
+                                            },
+                                            "$figure": {
+                                                "dynamic": "false",
+                                                "properties": {
+                                                    "$head": {
+                                                        "dynamic": "false",
+                                                        "properties": {
+                                                            "$lang_en": {
+                                                                "type": "string",
+                                                                "index": "analyzed",
+                                                                "analyzer": "english",
+                                                                "store": "yes",
+                                                                "term_vector": "with_positions_offsets"
+                                                            }
+                                                        }
+                                                    },
+                                                    "$table": {
+                                                        "type": "string"
+                                                    },
+                                                    "xml:id": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string"
+                                                    }
+                                                }
                                             }
                                         }
                                     },
@@ -513,6 +537,10 @@
                                                     "$idno": {
                                                         "properties": {
                                                             "$type_halAuthorId": {
+                                                                "index": "not_analyzed",
+                                                                "type": "string"
+                                                            },
+                                                            "$type_anhalyticsID": {
                                                                 "index": "not_analyzed",
                                                                 "type": "string"
                                                             }

@@ -1,14 +1,10 @@
 package fr.inria.anhalytics.annotate;
 
-import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.*;
-import java.lang.annotation.Annotation;
 import java.util.*;
-import java.util.logging.Level;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -18,90 +14,82 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 /**
- *
+ ** Runnable that uses the NERD REST service for annotating HAL TEI
+ * documents.Resulting JSON annotations are then stored in MongoDB as persistent
+ * storage.
+ * 
+ * @author Achraf
  */
 public class AnnotatorWorker implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotatorWorker.class);
     private MongoFileManager mm = null;
-    private String filename = null;
     private String tei = null;
-    private String halID = null;
+    private String documentId = null;
 
     public AnnotatorWorker(MongoFileManager mongoManager,
-            String filename,
-            String halID,
+            String documentId,
             String tei) {
         this.mm = mongoManager;
-        this.filename = filename;
-        this.halID = halID;
+        this.documentId = documentId;
         this.tei = tei;
     }
 
     @Override
     public void run() {
-        try {
-            long startTime = System.nanoTime();
-            System.out.println(Thread.currentThread().getName() + " Start. Processing = " + filename);
-            processCommand();
-            long endTime = System.nanoTime();
-            System.out.println(Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
-        } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(AnnotatorWorker.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        long startTime = System.nanoTime();
+        logger.info(Thread.currentThread().getName() + " Start. Processing = " + documentId);
+        processCommand();
+        long endTime = System.nanoTime();
+        logger.info(Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
     }
 
-    private void processCommand() throws IOException {
+    private void processCommand() {
         List<String> halDomainTexts = new ArrayList<String>();
         List<String> halDomains = new ArrayList<String>();
         List<String> meSHDescriptors = new ArrayList<String>();
+        // DocumentBuilderFactory and DocumentBuilder are not thread safe, 
+        // so one per task
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = null;
+        Document docTei = null;
         try {
-            // DocumentBuilderFactory and DocumentBuilder are not thread safe, 
-            // so one per task
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
+            docBuilder = docFactory.newDocumentBuilder();
             // parse the TEI
-            Document docTei
-                    = docBuilder.parse(new InputSource(new ByteArrayInputStream(tei.getBytes("utf-8"))));
-
-            // get the HAL domain 
-            NodeList classes = docTei.getElementsByTagName("classCode");
-            for (int p = 0; p < classes.getLength(); p++) {
-                Node node = classes.item(p);
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    Element e = (Element) (node);
-                    // filter on attribute @scheme="halDomain"
-                    String scheme = e.getAttribute("scheme");
-                    if ((scheme != null) && scheme.equals("halDomain")) {
-                        halDomainTexts.add(e.getTextContent());
-                        String n_att = e.getAttribute("n");
-                        halDomains.add(n_att);
-                    } else if ((scheme != null) && scheme.equals("mesh")) {
-                        meSHDescriptors.add(e.getTextContent());
-                    }
+            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(tei.getBytes("utf-8"))));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        // get the HAL domain 
+        NodeList classes = docTei.getElementsByTagName("classCode");
+        for (int p = 0; p < classes.getLength(); p++) {
+            Node node = classes.item(p);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element e = (Element) (node);
+                // filter on attribute @scheme="halDomain"
+                String scheme = e.getAttribute("scheme");
+                if ((scheme != null) && scheme.equals("halDomain")) {
+                    halDomainTexts.add(e.getTextContent());
+                    String n_att = e.getAttribute("n");
+                    halDomains.add(n_att);
+                } else if ((scheme != null) && scheme.equals("mesh")) {
+                    meSHDescriptors.add(e.getTextContent());
                 }
             }
-            // get all the elements having an attribute id and annotate their text content
-            String jsonAnnotations = annotateDocument(docTei, filename, halID);
-            mm.insertAnnotation(jsonAnnotations);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        logger.debug("\t\t " + filename + " annotated.");
+        // get all the elements having an attribute id and annotate their text content
+        String jsonAnnotations = annotateDocument(docTei, documentId);
+        mm.insertAnnotation(jsonAnnotations);
+        logger.debug("\t\t " + documentId + " annotated.");
     }
-    
+
     /**
-     * Annotation of a complete document
+     * Annotation of a complete document.
      */
     public static String annotateDocument(Document doc,
-            String filename,
-            String halID) {
+            String documentId) {
         StringBuffer json = new StringBuffer();
-        json.append("{ \"filename\" : \"" + filename
-                + "\", \"halID\" : \"" + halID
+        json.append("{ \"repositoryDocId\" : \"" + documentId
                 + "\", \"nerd\" : [");
         annotateNode(doc.getDocumentElement(), true, json);
         json.append("] }");
@@ -109,7 +97,7 @@ public class AnnotatorWorker implements Runnable {
     }
 
     /**
-     * Recursive tree walk for annotating every nodes having a random xml:id
+     * Recursive tree walk for annotating every nodes having a random xml:id.
      */
     public static boolean annotateNode(Node node,
             boolean first,
@@ -126,7 +114,7 @@ public class AnnotatorWorker implements Runnable {
                     NerdService nerdService = new NerdService(text);
                     jsonText = nerdService.runNerd();
                 } catch (Exception ex) {
-                    logger.debug("Text could not be annotated by NERD: " + text);
+                    logger.error("Text could not be annotated by NERD: " + text);
                     ex.printStackTrace();
                 }
                 if (jsonText != null) {
@@ -148,12 +136,15 @@ public class AnnotatorWorker implements Runnable {
         return first;
     }
 
-    public String getFilename() {
-        return filename;
+    /**
+     * return documentId of the file being annotated.
+     */
+    public String getdocumentId() {
+        return documentId;
     }
 
     @Override
     public String toString() {
-        return this.filename;
+        return this.documentId;
     }
 }

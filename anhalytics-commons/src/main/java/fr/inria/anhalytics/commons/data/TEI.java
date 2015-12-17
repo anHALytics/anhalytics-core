@@ -4,17 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Classe for storing publication TEI metadata extracted from OAI-PMH records.
+ * 
  * @author Achraf
  */
 public class TEI {
     
     public TEI(){}
-    public TEI(String id, PubFile file, List<PubFile> annexes, String doi, String documentType, String tei, String ref){
+    public TEI(String id, PublicationFile pdfdocument, List<PublicationFile> annexes, String doi, String documentType, String tei, String ref){
         this.id = id;
         this.tei = tei;
         this.documentType = documentType;
-        this.file = file;
+        this.pdfdocument = pdfdocument;
         this.annexes = annexes;
         this.doi = doi;
         this.ref = ref;
@@ -24,8 +25,8 @@ public class TEI {
     private String doi;
     private String tei;
     private String documentType;
-    private PubFile file;
-    private List<PubFile> annexes;
+    private PublicationFile pdfdocument;
+    private List<PublicationFile> annexes;
     private String ref;
     private List<String> subjects;
 
@@ -122,28 +123,28 @@ public class TEI {
     /**
      * @return the file
      */
-    public PubFile getFile() {
-        return file;
+    public PublicationFile getPdfdocument() {
+        return pdfdocument;
     }
 
     /**
      * @param file the file to set
      */
-    public void setFile(PubFile file) {
-        this.file = file;
+    public void setPdfdocument(PublicationFile pdfdocument) {
+        this.pdfdocument = pdfdocument;
     }
 
     /**
      * @return the annexes
      */
-    public List<PubFile> getAnnexes() {
+    public List<PublicationFile> getAnnexes() {
         return annexes;
     }
 
     /**
      * @param annexes the annexes to set
      */
-    public void setAnnexes(List<PubFile> annexes) {
+    public void setAnnexes(List<PublicationFile> annexes) {
         this.annexes = annexes;
     }
 }

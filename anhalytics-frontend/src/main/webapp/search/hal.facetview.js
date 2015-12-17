@@ -1014,102 +1014,6 @@
 
             }
         };
-/*
-        var donut = function (facetidx, facetkey, width, place) {
-            var facetfield = options.facets[facetidx]['field'];
-            var records = options.data['facets'][facetkey];
-
-            if (records.length == 0) {
-                $('#' + place).hide();
-                return;
-            }
-            else {
-                var siz = 0;
-                for (var item in records) {
-                    siz++;
-                }
-                if (siz == 0) {
-                    $('#' + place).hide();
-                    return;
-                }
-            }
-            $('#' + place).show();
-
-            options.data.facets2[facetkey] = [];
-            var numb = 0;
-            for (var item in records) {
-                if (numb >= options.facets[facetidx]['size']) {
-                    break;
-                }
-                var item2 = item.replace(/\s/g, '');
-                options.data.facets2[facetkey].push({'term': item2, 'count': records[item], 'source': item});
-                numb++;
-            }
-
-            var data = options.data.facets2[facetkey];
-
-            var entries = data.sort(function (a, b) {
-                return a.term < b.term ? -1 : 1;
-            }),
-                    // Create an array holding just the values (counts)
-                    values = pv.map(entries, function (e) {
-                        return e.count;
-                    });
-
-            // Set-up dimensions and color scheme for the chart
-            var w = width,
-                    h = width * 0.75;
-
-            // Create the basis panel
-            var vis = new pv.Panel()
-                    .width(w)
-                    .height(h)
-                    .margin(5, 0, 0, 0);
-
-            // Create the "wedges" of the chart
-            vis.add(pv.Wedge)
-                    // Set-up auxiliary variable to hold state (mouse over / out)
-                    .def("active", -1)
-                    // Pass the normalized data to Protovis
-                    .data(pv.normalize(values))
-                    // Set-up chart position and dimension
-                    .left(w / 2.6)
-                    .top(w / 2.6)
-                    .outerRadius(w / 2.6)
-                    // Create a "donut hole" in the center of the chart
-                    .innerRadius(15)
-                    // Compute the "width" of the wedge
-                    .angle(function (d) {
-                        return d * 2 * Math.PI;
-                    })
-                    .fillStyle(pv.Scale.log(.1, 1).range("#FF7700", "#FCE6D4"))
-                    // Add white stroke
-                    .strokeStyle("#fff")
-                    .event("mousedown", function (d) {
-                        var term = entries[this.index].term;
-                        var source = entries[this.index].source;
-                        if (source)
-                            clickGraph(facetfield, term, source);
-                        else
-                            clickGraph(facetfield, term, term);
-                        //return (alert("Filter the results by '"+term+"'"));
-                    })
-                    .anchor("center")
-                    .add(pv.Label)
-                    .data(entries)
-                    .text(function (d) {
-                        return d.term;
-                    })
-                    .textAngle(0)
-                    .textStyle("black")
-                    .font("09pt sans-serif")
-
-                    // Bind the chart to DOM element
-                    .root.canvas(place)
-                    // And render it.
-                    .render();
-        }
-*/
 
         var donut2 = function (facetidx, facetkey, width, place, update) {
             var vis = d3.select("#facetview_visualisation_" + facetkey + " > .modal-body2");
@@ -1638,63 +1542,6 @@
 
             $('#disambiguation_panel').show();
         };
-/*
-        // execute a query expansion
-        var doexpand = function (queryText) {
-            var header = authenticateIdilia(queryText);
-
-            // query parameters
-            var queryString = "text=" + encodeURIComponent(queryText);
-
-            // there are three possible disambiguation recipe for queries: paidListings, search, productSearch
-            //queryString += "&paraphrasingRecipe=productSearch";
-            queryString += "&paraphrasingRecipe=search";
-            queryString += "&maxCount=10";
-            queryString += "&minWeight=0.0";
-            queryString += "&textMime=" + encodeURIComponent("text/query; charset=utf8");
-            queryString += "&timeout=200";
-            queryString += "&wsdMime=" + encodeURIComponent("application/x-semdoc+xml");
-
-            if (options.service == 'proxy') {
-                // ajax service access via a proxy
-                for (var param in header) {
-                    var obj = header[param];
-                    for (var key in obj) {
-                        queryString += '&' + key + '=' + encodeURIComponent(header[param][key]);
-                    }
-                }
-
-                var proxy = options.proxy_host + "/proxy-disambiguate.jsp?";
-                $.ajax({
-                    type: "get",
-                    url: proxy,
-                    contentType: 'application/json',
-                    dataType: 'jsonp',
-                    data: queryString,
-                    success: showexpandpre
-                });
-            }
-            else {
-                // ajax service access is local
-                $.ajax({
-                    type: "get",
-                    url: "http://api.idilia.com/1/text/paraphrase.mpjson?",
-                    contentType: 'application/json',
-//				   	dataType: 'json',
-                    beforeSend: function (xhr) {
-                        for (var param in header) {
-                            var obj = header[param];
-                            for (var key in obj) {
-                                xhr.setRequestHeader(key, header[param][key]);
-                            }
-                        }
-                    },
-                    data: queryString,
-                    success: showexpand
-                });
-            }
-        }
-*/
 
         // ===============================================
         // building results
@@ -1742,11 +1589,6 @@
                 </ul> \
               </div> \
               ';
-
-            if (options['mode_query'] == 'nl') {
-                metaTmpl += ' <div class="span4">&nbsp;</div> \
-			   ';
-            }
 
             $('#facetview_metadata').html("Not found...");
             if (data.found) {
@@ -1924,105 +1766,30 @@
         var whenready = function () {
             // append the facetview object to this object
             var thefacetview;
-            if (options['mode_query'] == 'simple') {
-                thefacetview = thefacetview_simple;
-            }
-            else if (options['mode_query'] == 'epoque') {
-                thefacetview = thefacetview_epoque;
-            }
-            else if (options['mode_query'] == 'nl') {
-                thefacetview = thefacetview_nl;
-            }
-            else {
-                thefacetview = thefacetview_complex;
-            }
+            thefacetview = thefacetview_simple;
+
 
             thefacetview = thefacetview.replace(/{{HOW_MANY}}/gi, options.paging.size);
             $(obj).append(thefacetview);
+            // setup search option triggers
+            $('#facetview_partial_match').bind('click', fixmatch);
+            $('#facetview_exact_match').bind('click', fixmatch);
+            $('#facetview_fuzzy_match').bind('click', fixmatch);
+            $('#facetview_match_any').bind('click', fixmatch);
+            $('#facetview_match_all').bind('click', fixmatch);
+            $('#facetview_howmany').bind('click', howmany);
 
-            if (options['mode_query'] == 'complex') {
-                // setup default search option triggers
-                $('#facetview_partial_match1').bind('click', fixmatch);
-                $('#facetview_exact_match1').bind('click', fixmatch);
-                $('#facetview_fuzzy_match1').bind('click', fixmatch);
-                $('#facetview_match_any1').bind('click', fixmatch);
-                $('#facetview_match_all1').bind('click', fixmatch);
-                $('#facetview_howmany1').bind('click', howmany);
-
-                $('#field_all_text1').bind('click', set_field);
-                $('#field_title1').bind('click', set_field);
-                $('#field_abstract1').bind('click', set_field);
-                $('#field_claims1').bind('click', set_field);
-                $('#field_description1').bind('click', set_field);
-                $('#field_fulltext1').bind('click', set_field);
-                $('#field_class_ipc1').bind('click', set_field);
-                $('#field_class_ecla1').bind('click', set_field);
-                $('#field_country1').bind('click', set_field);
-                $('#field_affiliation1').bind('click', set_field);
-                $('#field_author1').bind('click', set_field);
-                $('#field_inventor1').bind('click', set_field);
-                $('#field_applicant1').bind('click', set_field);
-
-                $('#lang_all1').bind('click', set_field);
-                $('#lang_en1').bind('click', set_field);
-                $('#lang_de1').bind('click', set_field);
-                $('#lang_fr1').bind('click', set_field);
-
-                $('#must1').bind('click', set_field);
-                $('#should1').bind('click', set_field);
-                $('#must_not1').bind('click', set_field);
-
-                $('#new_field').bind('click', add_field);
-                options['complex_fields'] = 1;
-            }
-            else if (options['mode_query'] == 'nl') {
-                $('#lang_all').bind('click', set_field);
-                $('#lang_en').bind('click', set_field);
-                $('#lang_de').bind('click', set_field);
-                $('#lang_fr').bind('click', set_field);
-
-                $('#facetview_partial_match').bind('click', fixmatch);
-                $('#facetview_exact_match').bind('click', fixmatch);
-                $('#facetview_fuzzy_match').bind('click', fixmatch);
-                $('#facetview_match_any').bind('click', fixmatch);
-                $('#facetview_match_all').bind('click', fixmatch);
-                $('#facetview_howmany').bind('click', howmany);
-            }
-            else {
-                // setup search option triggers
-                $('#facetview_partial_match').bind('click', fixmatch);
-                $('#facetview_exact_match').bind('click', fixmatch);
-                $('#facetview_fuzzy_match').bind('click', fixmatch);
-                $('#facetview_match_any').bind('click', fixmatch);
-                $('#facetview_match_all').bind('click', fixmatch);
-                $('#facetview_howmany').bind('click', howmany);
-            }
 
             // resize the searchbar
-            if (options['mode_query'] == 'complex') {
-                thewidth = $('#facetview_searchbar1').parent().width();
-                $('#facetview_searchbar1').css('width', (thewidth / 2) - 30 + 'px');
-                $('#facetview_freetext1').css('width', (thewidth / 2) - 30 + 'px');
-            }
-            if (options['mode_query'] == 'nl') {
-                thewidth = $('#facetview_searchbar').parent().width();
-                $('#facetview_searchbar').css('width', (thewidth / 2) + 70 + 'px');
-                $('#facetview_freetext').css('width', (thewidth / 1.5) - 20 + 'px');
+            var thewidth = $('#facetview_searchbar').parent().width();
+            $('#facetview_searchbar').css('width', thewidth / 2 + 70 + 'px'); // -50
+            $('#facetview_freetext').css('width', thewidth / 2 + 32 + 'px'); // -88
 
-                var theheight = $('#facetview_searchbar').parent().height();
-                $('#facetview_searchbar').css('height', (theheight) - 20 + 'px');
-                $('#facetview_freetext').css('height', (theheight) - 20 + 'px');
-            }
-            else {
-                var thewidth = $('#facetview_searchbar').parent().width();
-                $('#facetview_searchbar').css('width', thewidth / 2 + 70 + 'px'); // -50
-                $('#facetview_freetext').css('width', thewidth / 2 + 32 + 'px'); // -88
+            $('#disambiguate').bind('click', disambiguateNERD);
+            $('#disambiguation_panel').hide();
 
-                $('#disambiguate').bind('click', disambiguateNERD);
-                $('#disambiguation_panel').hide();
+            //$('#harvest').hide();
 
-                //$('#harvest').hide();
-            }
             // check paging info is available
             !options.paging.size ? options.paging.size = 10 : "";
             !options.paging.from ? options.paging.from = 0 : "";
@@ -2033,14 +1800,10 @@
             // append the filters to the facetview object
             buildfilters();
 
-            if (options['mode_query'] == 'complex') {
-                $('#facetview_freetext1', obj).bindWithDelay('keyup', dosearch, options.freetext_submit_delay);
-            }
-            else {
-                $('#facetview_freetext', obj).bindWithDelay('keyup', dosearch, options.freetext_submit_delay);
-                $('#facetview_freetext', obj).bind('keyup', activateDisambButton);
-                //$('#facetview_freetext', obj).bind('keyup', activateHarvestButton);
-            }
+            $('#facetview_freetext', obj).bindWithDelay('keyup', dosearch, options.freetext_submit_delay);
+            $('#facetview_freetext', obj).bind('keyup', activateDisambButton);
+            //$('#facetview_freetext', obj).bind('keyup', activateHarvestButton);
+
 
             // trigger the search once on load, to get all results
             dosearch();

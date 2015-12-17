@@ -3,21 +3,21 @@ package fr.inria.anhalytics.annotate.main;
 import fr.inria.anhalytics.annotate.Annotator;
 import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import java.io.File;
-import java.io.IOException;
-import javax.xml.parsers.ParserConfigurationException;
+import java.net.UnknownHostException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Main class that implements command for annotating TEIs and saving the result
+ * to Mongodb.
  *
- * @author achraf
+ * @author Achraf
  */
 public class Main {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
-    
-    public static void main(String[] args) throws IOException, ParserConfigurationException {
+
+    public static void main(String[] args) throws UnknownHostException {
         try {
             AnnotateProperties.init("annotate.properties");
         } catch (Exception e) {
@@ -30,28 +30,29 @@ public class Main {
             }
             Main main = new Main();
             main.processCommand();
-        } else return;
+        } else {
+            return;
+        }
     }
-    
-    private void processCommand() throws IOException, ParserConfigurationException {
-        int nbAnnots;
+
+    private void processCommand() throws UnknownHostException {
         Annotator annotator = new Annotator();
         // loading based on DocDB XML, with TEI conversion
         try {
-            
+
             if (AnnotateProperties.isIsMultiThread()) {
-                nbAnnots = annotator.annotateCollectionMultiThreaded();
+
+                annotator.annotateTeiCollectionMultiThreaded();
             } else {
-                nbAnnots = annotator.annotateCollection();
+                annotator.annotateTeiCollection();
             }
-                    
-            logger.debug("Total: " + nbAnnots + " annotations produced.");
         } catch (Exception e) {
-            System.err.println("Error when setting-up the annotator.");
+            logger.error("Error when setting-up the annotator.");
             e.printStackTrace();
         }
-    
+        return;
     }
+
     protected static boolean processArgs(final String[] args) {
         String currArg;
         boolean result = true;
@@ -90,11 +91,14 @@ public class Main {
             if (currArg.equals("-multiThread")) {
                 AnnotateProperties.setIsMultiThread(true);
                 continue;
+            } else {
+                System.out.println(getHelp());
+                result = false;
             }
         }
         return result;
     }
-    
+
     protected static String getHelp() {
         final StringBuffer help = new StringBuffer();
         help.append("HELP ANNOTATE_HAL \n");

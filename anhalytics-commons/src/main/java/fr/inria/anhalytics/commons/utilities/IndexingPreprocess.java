@@ -34,26 +34,30 @@ public class IndexingPreprocess {
         this.mm = mm;
     }
 
-    public String process(String jsonStr) throws Exception {
-        return process(jsonStr, null);
-    }
-
-    public String process(String jsonStr, String filename) throws Exception {
+    /**
+     * Format jsonStr to fit with ES structure.
+     */
+    public String process(String jsonStr, String id) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonRoot = mapper.readTree(jsonStr);
         // root node is the TEI node, we add as a child the "light" annotations in a 
         // standoff element
-        if (filename != null) {
+        if (id != null) {
             JsonNode teiRoot = jsonRoot.findPath("$teiCorpus");
-
+            JsonNode tei = jsonRoot.findPath("$TEI");
+            //check if fulltext is there..
+            if (tei.isNull()) {
+                System.out.println(tei.toString());
+                return null;
+            }
             if ((teiRoot != null) && (!teiRoot.isMissingNode())) {
-                JsonNode standoffNode = getStandoff(mapper, filename);
+                JsonNode standoffNode = getStandoff(mapper, id);
                 ((ArrayNode) teiRoot).add(standoffNode);
             }
         }
 
         // here recursive modification of the json document via Jackson
-        jsonRoot = process(jsonRoot, mapper, null, false, false, false, filename);
+        jsonRoot = process(jsonRoot, mapper, null, false, false, false, id);
 
         if (!filterDocuments(jsonRoot)) {
             return null;
@@ -62,13 +66,16 @@ public class IndexingPreprocess {
         return jsonRoot.toString();
     }
 
+    /**
+     * Process subJson Node and iterate through sub-nodes.
+     */
     private JsonNode process(JsonNode subJson,
             ObjectMapper mapper,
             String currentLang,
             boolean fromArray,
             boolean expandLang,
             boolean isDate,
-            String filename) throws Exception {
+            String id) throws Exception {
         if (subJson.isContainerNode()) {
             if (subJson.isObject()) {
                 Iterator<String> fields = ((ObjectNode) subJson).getFieldNames();
@@ -97,24 +104,6 @@ public class IndexingPreprocess {
                             expandLang = false;
                         }
                     }
-
-                    // ignoring the possibly present $lang_ nodes (this can appear in old version of JsonTapasML)
-                    /*if (field.startsWith("$lang_") || field.startsWith("$lang_")) {
-                     // we need to ignore this node, as the expansion is added automatically when the textual element 
-                     // is reached
-                     JsonNode theChildNode = subJson.path(field);
-                     // the child should then always be an array with a unique textual child
-                     if (theChildNode.isArray()) {
-                     Iterator<JsonNode> ite = theChildNode.getElements();
-                     while (ite.hasNext()) {
-                     JsonNode temp = ite.next();
-                     theChildNode = temp;
-                     break;
-                     }
-                     }
-                     return process(theChildNode, mapper, currentLang, false, expandLang, false, filename);
-                     }
-                     */
                     // we add the full name in order to index it directly without more time consuming
                     // script and concatenation at facet creation time
                     if (field.equals("$persName")) {
@@ -156,8 +145,9 @@ public class IndexingPreprocess {
                     } else if (field.equals("$keywords")) {
                         theKeywordsNode = subJson.path("$keywords");
                         String keywords = "";
-                        if(isDepositorKeywords)
+                        if (isDepositorKeywords) {
                             theDepositorKeywordsNode = theKeywordsNode;
+                        }
                         Iterator<JsonNode> ite2 = theKeywordsNode.getElements();
                         while (ite2.hasNext()) {
                             JsonNode temp2 = ite2.next();
@@ -165,7 +155,7 @@ public class IndexingPreprocess {
                                 // To avoid ambiguity, we wrap the text directy contained into keywords in a text element (otherwise ES doesnt like it)
                                 keywords += temp2.getTextValue();
                                 String xml_id = fields.next();
-                                JsonNode xml_idNode= subJson.path(xml_id);
+                                JsonNode xml_idNode = subJson.path(xml_id);
                                 ((ArrayNode) theKeywordsNode).remove(0);
                                 JsonNode newNode = mapper.createObjectNode();
                                 JsonNode textNode = mapper.createArrayNode();
@@ -184,8 +174,8 @@ public class IndexingPreprocess {
                         theBiblScopeNode = subJson.path("$biblScope");
                     } else if (field.equals("scheme")) {
                         theSchemeNode = subJson.path("scheme");
-                        
-                        if(theSchemeNode.getTextValue().equals("author")){
+
+                        if (theSchemeNode.getTextValue().equals("author")) {
                             isDepositorKeywords = true;
                         }
                     } else if (field.equals("type")) {
@@ -204,40 +194,13 @@ public class IndexingPreprocess {
                         theXmlIdNode = subJson.path("xml:id");
                     }
                 }
-                /*if ( (theSchemeNode != null) && (theClassCodeNode != null) ) {
-                 JsonNode schemeNode = mapper.createObjectNode();
-                 ((ObjectNode) schemeNode).put("$scheme_"+theSchemeNode.getTextValue(),
-                 process(theClassCodeNode, mapper, currentLang, false, expandLang, false, filename));
-                 JsonNode arrayNode = mapper.createArrayNode();		
-                 ((ArrayNode) arrayNode).add(schemeNode);
-                 ((ObjectNode) subJson).put("$classCode", arrayNode); // update value
-                 return subJson;
-                 }*/
-
-                /* 
-                 //inject annotations in the document...
-                 if ( (filename != null) && (theXmlIdNode != null) ) {
-                 if (theTitleNode != null) {
-                 String theId = theXmlIdNode.getTextValue();
-                 System.out.println("filename: " + filename + ", xml:id: " + theId);
-                 String annotation = mm.getAnnotation(filename, theId);
-                 //System.out.println(annotation);
-                 if ( (annotation != null) && (annotation.trim().length() > 0) ) {
-                 JsonNode jsonAnnotation= mapper.readTree(annotation);
-                 JsonNode newNode = mapper.createObjectNode(); 
-                 ((ObjectNode)newNode).put("$title-nerd", jsonAnnotation);
-                 ((ArrayNode)theTitleNode).add(newNode);
-                 }
-                 }
-                 }	
-                 */
                 if ((theSchemeNode != null) && (theClassCodeNode != null)) {
                     JsonNode schemeNode = mapper.createObjectNode();
                     ((ObjectNode) schemeNode).put("$scheme_" + theSchemeNode.getTextValue(),
-                            process(theClassCodeNode, mapper, currentLang, false, expandLang, false, filename));
+                            process(theClassCodeNode, mapper, currentLang, false, expandLang, false, id));
                     if (theNNode != null) {
                         ((ObjectNode) schemeNode).put("$scheme_" + theSchemeNode.getTextValue() + "_abbrev",
-                                process(theNNode, mapper, currentLang, false, expandLang, false, filename));
+                                process(theNNode, mapper, currentLang, false, expandLang, false, id));
                     }
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(schemeNode);
@@ -246,7 +209,7 @@ public class IndexingPreprocess {
                 } else if ((theTypeNode != null) && (thePersonNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(thePersonNode, mapper, currentLang, false, expandLang, false, filename));
+                            process(thePersonNode, mapper, currentLang, false, expandLang, false, id));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$person", arrayNode); // update value
@@ -254,23 +217,15 @@ public class IndexingPreprocess {
                 } else if ((theTypeNode != null) && (theItemNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(theItemNode, mapper, currentLang, false, expandLang, false, filename));
+                            process(theItemNode, mapper, currentLang, false, expandLang, false, id));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$item", arrayNode); // update value
                     return subJson;
-                } /*else if ( (theTypeNode != null) && (theDateNode != null) ) {
-                 JsonNode typeNode = mapper.createObjectNode();
-                 ((ObjectNode) typeNode).put("$type_"+theTypeNode.getTextValue(),
-                 process(theDateNode, mapper, currentLang, false, expandLang, true, filename));
-                 JsonNode arrayNode = mapper.createArrayNode();	
-                 ((ArrayNode) arrayNode).add(typeNode);
-                 ((ObjectNode) subJson).put("$date", arrayNode); // update value
-                 return subJson;
-                 }*/ else if ((theTypeNode != null) && (theKeywordsNode != null)) {
+                } else if ((theTypeNode != null) && (theKeywordsNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(theKeywordsNode, mapper, currentLang, false, expandLang, false, filename));
+                            process(theKeywordsNode, mapper, currentLang, false, expandLang, false, id));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$keywords", arrayNode); // update value
@@ -279,7 +234,7 @@ public class IndexingPreprocess {
                     // we need to set a default "author" type 
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_author",
-                            process(theDepositorKeywordsNode, mapper, currentLang, false, expandLang, false, filename));
+                            process(theDepositorKeywordsNode, mapper, currentLang, false, expandLang, false, id));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$keywords", arrayNode); // update value
@@ -287,7 +242,7 @@ public class IndexingPreprocess {
                 } else if ((theTypeNode != null) && (theIdnoNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(theIdnoNode, mapper, currentLang, false, expandLang, false, filename));
+                            process(theIdnoNode, mapper, currentLang, false, expandLang, false, id));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$idno", arrayNode); // update value
@@ -295,102 +250,12 @@ public class IndexingPreprocess {
                 } else if ((theTypeNode != null) && (theBiblScopeNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(theBiblScopeNode, mapper, currentLang, false, expandLang, false, filename));
+                            process(theBiblScopeNode, mapper, currentLang, false, expandLang, false, id));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$biblScope", arrayNode); // update value
                     return subJson;
                 }
-
-                /*else if ( (theTermNode != null) && (theTypeNode != null) ) {
-                 String localVal = theTypeNode.getTextValue();
-                 if ((localVal != null) && (localVal.equals("classification-symbol")) ) {
-						
-                 JsonNode theChildNode = null;
-                 if (theTermNode.isArray()) {
-                 Iterator<JsonNode> ite = theTermNode.getElements();
-                 while (ite.hasNext()) {
-                 JsonNode temp = ite.next();
-                 theChildNode = temp;
-                 break;
-                 }
-                 }
-                 String localClass = null;
-						
-                 if (theChildNode != null) 
-                 localClass = theChildNode.getTextValue();
-							
-                 if ((localClass != null) && (localClass.indexOf(":") == -1)) {
-                 // we have an ECLA class
-							
-                 // all expansions will be put under a container which can handle more
-                 // than one class (this is due to the possible compact representation)
-                 JsonNode containerNode = mapper.createObjectNode();
-							
-                 // handle old-ages compact form
-                 boolean trace = false;
-                 if (localClass.indexOf("+") != -1) {
-                 System.out.print(localClass + ": ");
-                 trace = true;
-                 }
-                 List<String> classes = normalizeECLAClass(localClass);
-							
-                 for (String localClas : classes) {
-                 if (trace) {
-                 System.out.print(" " + localClas);
-                 } 
-								
-                 List<String> paths = giveECLARootPath(localClas);
-                 String rootPath = "";
-                 for (String theStep : paths) {
-                 rootPath += " " + theStep;
-                 }
-                 rootPath = rootPath.trim();
-                 JsonNode tnode = new TextNode(rootPath);
-                 JsonNode arrayNode = mapper.createArrayNode();	
-                 ((ArrayNode) arrayNode).add(tnode);
-                 ((ObjectNode) containerNode).put("$path", arrayNode); 
-                 ((ObjectNode) containerNode).put("term", localClas); 
-                 // we finally also add an expansion for the level specific statistics
-                 // here at the indexing level we can simply use the path to specify the level
-                 String[] steps = rootPath.split(" ");
-                 JsonNode objectNode = mapper.createObjectNode();
-								
-                 for(int i=0; i<steps.length; i++) {
-                 String label = null;
-                 if (i == 0) {
-                 label = "class";
-                 }
-                 else if (i == 1) {
-                 label = "subclass";
-                 }
-                 else if (i == 2) {
-                 label = "group";
-                 }
-                 else if (i == 3) {
-                 label = "subgroup";
-                 }
-                 else {
-                 label = "ecla-" + (i-4);
-                 }
-								
-                 ((ObjectNode) objectNode).put(label, steps[i]);
-                 }
-                 ((ObjectNode) containerNode).put("$levels", objectNode); 
-                 }
-                 if (trace) {
-                 System.out.println("");
-                 }
-                 ((ObjectNode) subJson).put("$ecla", containerNode); 
-                 }
-                 else if (localClass != null) { 
-                 // we have an ICO code
-                 ((ObjectNode) subJson).put("ico", localClass); 
-                 }						
-						
-                 }
-                 return subJson;
-                 }*/
             }
             JsonNode newNode = null;
             if (subJson.isArray()) {
@@ -398,7 +263,7 @@ public class IndexingPreprocess {
                 Iterator<JsonNode> ite = subJson.getElements();
                 while (ite.hasNext()) {
                     JsonNode temp = ite.next();
-                    ((ArrayNode) newNode).add(process(temp, mapper, currentLang, true, expandLang, isDate, filename));
+                    ((ArrayNode) newNode).add(process(temp, mapper, currentLang, true, expandLang, isDate, id));
                 }
             } else if (subJson.isObject()) {
                 newNode = mapper.createObjectNode();
@@ -407,10 +272,10 @@ public class IndexingPreprocess {
                     String field = fields.next();
                     if (field.equals("$date") || field.equals("when")) {
                         ((ObjectNode) newNode).put(field, process(subJson.path(field), mapper,
-                                currentLang, false, expandLang, true, filename));
+                                currentLang, false, expandLang, true, id));
                     } else {
                         ((ObjectNode) newNode).put(field, process(subJson.path(field), mapper,
-                                currentLang, false, expandLang, false, filename));
+                                currentLang, false, expandLang, false, id));
                     }
                 }
             }
@@ -460,126 +325,11 @@ public class IndexingPreprocess {
         }
     }
 
-    static private String queryECLA
-            = "{\"fields\":[\"rootPath\", \"_id\"],\"query\":{\"query_string\":{\"query\": \"symbol:%CLASS%\"}}}";
-
-    /**
-     * For a given ECLA class, give the full root path, from the root down to
-     * the current class
-     */
-    /*public List<String> giveECLARootPath(String eclaClass) {
-        // This is done via the ECLA tree index in ElasticSearch
-        String query = queryECLA.replace("%CLASS%", eclaClass);
-        List<String> result = new ArrayList<String>();
-        HttpURLConnection connection = null;
-        InputStream is = null;
-        try {
-            // we send a post request to elasticsearch to get the root path
-            URL url = new URL("http://" + IndexProperties + ":" + elasticsearch_port + "/" + eclaTreeIndex + "/_search");
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setUseCaches(false);
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-
-            DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-            wr.writeBytes(query);
-            wr.flush();
-            wr.close();
-
-            is = connection.getInputStream();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.length() == 0) {
-                    continue;
-                }
-                // we put here, so we block if there is no space to add
-                int ind = line.indexOf("ECLARoot");
-                if (ind != -1) {
-                    int ind2 = line.indexOf(" ", ind + 1);
-                    if (ind2 == -1) {
-                        continue;
-                    }
-                    int ind3 = line.indexOf("\"", ind2 + 1);
-                    if (ind3 == -1) {
-                        continue;
-                    }
-                    String subLine = line.substring(ind2, ind3);
-                    StringTokenizer st = new StringTokenizer(subLine, " ");
-                    while (st.hasMoreTokens()) {
-                        result.add(st.nextToken());
-                    }
-                } else {
-                    continue;
-                }
-            }
-        } catch (Exception e) {
-            //Closeables.closeQuietly(is);
-            if (connection != null) {
-                try {
-                    connection.disconnect();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                } finally {
-                    connection = null;
-                }
-            }
-            e.printStackTrace();
-        }
-        return result;
-    }
-*/
-    /**
-     * This method provides a basic handling of the ECLA classes expressed in a
-     * compact way with a "+" symbol. This might over-generate the possible ECLA
-     * classes, so a filter based on the possible valid ECLA classes is
-     * necessary.
-     */
-   /* public List<String> normalizeECLAClass(String classs) {
-        List<String> eclas = new ArrayList<String>();
-        if (classs.indexOf('+') != -1) {
-            StringTokenizer st = new StringTokenizer(classs, "+");
-            String firstClass = null;
-            while (st.hasMoreTokens()) {
-                String clas = st.nextToken();
-                if (firstClass == null) {
-                    firstClass = clas;
-                    eclas.add(firstClass);
-                    //break;
-                } else {
-                    int length = clas.length();
-                    if (length < 7) {
-                        if (!eclas.contains(firstClass + clas)) {
-                            eclas.add(firstClass + clas);
-                        }
-                        int index = clas.indexOf('/');
-                        if (index != -1) {
-                            eclas.add(firstClass.substring(0, index + 1) + clas);
-                        }
-                        clas = firstClass.substring(0, firstClass.length() - length) + clas;
-                    }
-
-                    if (!eclas.contains(clas)) {
-                        eclas.add(clas);
-                    }
-                }
-            }
-        } else {
-            eclas.add(classs);
-        }
-        return eclas;
-    }
-*/
-    private JsonNode getStandoff(ObjectMapper mapper, String filename) throws Exception {
+    private JsonNode getStandoff(ObjectMapper mapper, String id) throws Exception {
         JsonNode standoffNode = null;
-        //System.out.println("filename: " + filename);
-        String annotation = mm.getAnnotations(filename);
-        //System.out.println(annotation);
+        String annotation = mm.getAnnotations(id);
         if ((annotation != null) && (annotation.trim().length() > 0)) {
             JsonNode jsonAnnotation = mapper.readTree(annotation);
-//System.out.println(jsonAnnotation.toString());
             Iterator<JsonNode> iter0 = jsonAnnotation.getElements();
             JsonNode annotNode = mapper.createArrayNode();
             int n = 0;
@@ -617,7 +367,7 @@ public class IndexingPreprocess {
                         JsonNode wikiNode = mapper.createObjectNode();
                         ((ObjectNode) wikiNode).put("wikipediaExternalRef", wikipediaExternalRef);
                         ((ArrayNode) newNode).add(wikiNode);
-                        
+
                         JsonNode preferredTermNode = mapper.createObjectNode();
                         ((ObjectNode) preferredTermNode).put("preferredTerm", preferredTerm);
                         ((ArrayNode) newNode).add(preferredTermNode);
@@ -711,6 +461,9 @@ public class IndexingPreprocess {
         return ok;
     }
 
+    /**
+     * adds fullname node.
+     */
     private void addFullName(JsonNode theChild, ObjectMapper mapper) {
         String fullName = null;
         if (theChild.isArray()) {

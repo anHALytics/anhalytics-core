@@ -1,81 +1,126 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.datamine.HALMiner;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 import org.w3c.dom.Attr;
+import org.xml.sax.InputSource;
 
+/**
+ * Functions that builds tei corpus, eventually appends fulltext.
+ * 
+ * @author Achraf
+ */
 public class TeiBuilder {
 
-    public static Document generateTeiCorpus(InputStream additionalTei, InputStream grobidTei) throws ParserConfigurationException, IOException {
+    /**
+     * appends fulltext grobid tei to existing metadata.
+    */
+    public static Document addGrobidTeiToTei(String finalTei, String grobidTei) {
         Document resultTei = null;
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
         //docFactory.setNamespaceAware(true);
 
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        Document docAdditionalTei = null;
+        DocumentBuilder docBuilder = null;
+        Document tei = null;
         try {
-            docAdditionalTei = docBuilder.parse(additionalTei);
-        } catch (SAXException e) {
-            e.printStackTrace();
-
-        }
-        
-        NodeList teiHeader = halTeiExtractor.getTeiHeader(docAdditionalTei);
-        
-        Document doc = null;
-        try {
-            
-            doc = docBuilder.parse(grobidTei);
-            //Extract grobid tei metadata
-            updateGrobidTEI(doc);
-
-            resultTei = createTEICorpus(doc, teiHeader);
+            docBuilder = docFactory.newDocumentBuilder();
+            tei = docBuilder.parse(new InputSource(new ByteArrayInputStream(finalTei.getBytes("utf-8"))));
         } catch (Exception e) {
             e.printStackTrace();
-            resultTei = createTEICorpus(doc, teiHeader);
         }
+        Document doc = null;
+
+        if (isAlreadyAdded(tei)) {
+            return tei;
+        }
+
+        try {
+            Element grobidTeiElement = null;
+            if (grobidTei != null) {
+                doc = docBuilder.parse(new InputSource(new ByteArrayInputStream(grobidTei.getBytes("utf-8"))));
+                grobidTeiElement = (Element) doc.getDocumentElement();
+                Attr attr = grobidTeiElement.getAttributeNode("xmlns");
+                grobidTeiElement.removeAttributeNode(attr);
+                grobidTeiElement.setAttribute("type", "main");
+                updateGrobidTEI(doc);
+                Utilities.generateIDs(doc);
+            }
+            resultTei = addNodeToTei(tei, grobidTeiElement);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // add random xml:id on textual elements
+
         return resultTei;
     }
 
-    private static void addAdditionalTeiHeader(NodeList biblFull, Node header, Document doc) {
+    private static boolean isAlreadyAdded(Document tei) {
+        NodeList teiElements = tei.getElementsByTagName("tei");
+        Element teiElement = null;
+        for (int i = teiElements.getLength() - 1; i >= 0; i--) {
+            teiElement = (Element) teiElements.item(i);
+            if (teiElement.hasAttribute("type") && teiElement.getAttribute("type").equals("main")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Element createMetadataTeiHeader(NodeList biblFull, Document doc) {
+        Element teiHeader = doc.createElement("teiHeader");
         if (biblFull.getLength() == 0) {
-            return;
+            return teiHeader;
         }
         Node biblFullRoot = biblFull.item(0);
         for (int i = 0; i < biblFullRoot.getChildNodes().getLength(); i++) {
             Node localNode = doc.importNode(biblFullRoot.getChildNodes().item(i), true);
-            header.appendChild(localNode);
+            teiHeader.appendChild(localNode);
         }
+        return teiHeader;
     }
 
-    private static Document createTEICorpus(Document doc, NodeList biblFull) {
-        Element teiHeader = doc.createElement("teiHeader");
-        Element tei = (Element) doc.getDocumentElement();
-        Attr attr = tei.getAttributeNode("xmlns");
-        tei.removeAttributeNode(attr);
-        tei.setAttribute("type", "main");
+    /**
+    * returns Document containing tei corpus with given metadata.
+    */
+    public static Document createTEICorpus(InputStream metadataTeiStream) {
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setValidating(false);
+        //docFactory.setNamespaceAware(true);
+        Document metadataTei = null;
+        DocumentBuilder docBuilder = null;
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+
+            metadataTei = docBuilder.parse(metadataTeiStream);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        NodeList metadataTeiHeader = halTeiExtractor.extractHalMetadata(metadataTei);
+        Document doc = docBuilder.newDocument();
         Element teiCorpus = doc.createElement("teiCorpus");
-        addAdditionalTeiHeader(biblFull, teiHeader, doc);
+        Element teiHeader = createMetadataTeiHeader(metadataTeiHeader, doc);
         teiCorpus.appendChild(teiHeader);
-        teiCorpus.appendChild(tei);
-
-        teiCorpus.setAttributeNode(attr);
-
+        teiCorpus.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
         doc.appendChild(teiCorpus);
-        // add random xml:id on textual elements
         Utilities.generateIDs(doc);
+        return doc;
+    }
+
+    private static Document addNodeToTei(Document doc, Node newNode) {
+        if (newNode != null) {
+            newNode = (Element) doc.importNode(newNode, true);
+            Element teiCorpus = (Element) doc.getElementsByTagName("teiCorpus").item(0);
+            teiCorpus.appendChild(newNode);
+        }
         return doc;
     }
 

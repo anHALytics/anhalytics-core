@@ -25,7 +25,6 @@ public class Conference_EventDAO extends DAO<Conference_Event> {
     private static final String SQL_INSERT_CONFERENCE
             = "INSERT INTO CONFERENCE (title) VALUES (?)";
 
-    
     public Conference_EventDAO(Connection conn) {
         super(conn);
     }
@@ -40,7 +39,11 @@ public class Conference_EventDAO extends DAO<Conference_Event> {
         PreparedStatement statement1;
         try {
             statement1 = connect.prepareStatement(SQL_INSERT_CONFERENCE, Statement.RETURN_GENERATED_KEYS);
-            statement1.setString(1, obj.getConference().getTitle());
+            if (obj.getConference().getTitle() == null) {
+                statement1.setNull(1, java.sql.Types.INTEGER);
+            } else {
+                statement1.setString(1, obj.getConference().getTitle());
+            }
             int code1 = statement1.executeUpdate();
             ResultSet rs1 = statement1.getGeneratedKeys();
 
@@ -48,12 +51,15 @@ public class Conference_EventDAO extends DAO<Conference_Event> {
                 obj.getConference().setConfID(rs1.getLong(1));
             }
 
-            result = true;
-            
-            
             statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+
             statement.setLong(1, obj.getConference().getConfID());
-            statement.setLong(2, obj.getAddress().getAddressId());
+
+            if (obj.getConference() == null) {
+                statement.setLong(2, java.sql.Types.INTEGER);
+            } else {
+                statement.setLong(2, obj.getAddress().getAddressId());
+            }
             statement.setString(3, obj.getStart_date());
             statement.setString(4, obj.getEnd_date());
             statement.setLong(5, obj.getMonograph().getMonographID());

@@ -1,6 +1,6 @@
 package fr.inria.anhalytics.harvest;
 
-import fr.inria.anhalytics.commons.data.PubFile;
+import fr.inria.anhalytics.commons.data.PublicationFile;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -28,5 +28,5 @@ public interface OAIPMHMetadata {
     public String getTei(NodeList tei);
     public String getId(NodeList tei);
     public String getDocumentType(NodeList tei);
-     public PubFile getFile(Node record);
+     public PublicationFile getFile(Node record);
 }

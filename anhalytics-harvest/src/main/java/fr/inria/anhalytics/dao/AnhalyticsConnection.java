@@ -11,7 +11,7 @@ import java.sql.SQLException;
 public class AnhalyticsConnection {
      private static String url = "jdbc:mysql://localhost:3306/anhalytics";
   private static String user = "root";
-  private static String passwd = "admin";
+  private static String passwd = "";
   private static Connection connect;
    
   public static Connection getInstance(){

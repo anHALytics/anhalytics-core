@@ -5,8 +5,10 @@ import com.mongodb.gridfs.GridFSInputFile;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
+import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.exceptions.FileNotFoundException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -20,12 +22,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for retrieving TEI files to be indexed from MongoDB GridFS
+ * Class for retrieving, inserting, updating and organizing metadata TEIs, PDFs
+ * and extracted TEI files from MongoDB GridFS.
  *
+ * @author Achraf
  */
 public class MongoFileManager extends MongoManager implements MongoCollectionsInterface {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MongoFileManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(MongoFileManager.class);
 
     /**
      * A static {@link MongoFileManager} object containing MongoFileManager
@@ -35,22 +39,19 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     private GridFS gfs = null;
 
-    // for files
-    private List<GridFSDBFile> files = null;
+    // index to iterate through files.
     private int indexFile = 0;
 
-    private String currentFilename = null;
-    private String currentHalID = null;
-    private String currentHalURI = null;
+    private String currentRepositoryDocId = null;
+    private String currentDocId = null;
+    private String currentFileType = null;
 
-    // for annotations
     private DBCursor cursor = null;
     private DBCollection collection = null;
 
     public MongoFileManager(boolean isTest) {
         super(isTest);
         initDatabase(mongodbDb);
-
     }
 
     /**
@@ -78,36 +79,17 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return mongoManager;
     }
 
-    public boolean initTeiFiles(String date) {
-        // open the GridFS
-        try {
-            // init the loop
-            BasicDBObject bdbo = new BasicDBObject();
-            if (date != null) {
-                bdbo.append("uploadDate", Utilities.parseStringDate(date));
-            }
-            files = gfs.find(bdbo);
-            if (files.size() > 0) {
-                LOGGER.debug(files.size() + " found and will be processed.");
-            } else if (files.size() == 0) {
-                LOGGER.debug("Nothing found.");
-            }
-            indexFile = 0;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
-
+    /**
+     * This initializes cursor for binaries collection.
+     */
     public boolean initBinaries(String date) {
-        // open the GridFS
+        setGridFSCollection(MongoCollectionsInterface.BINARIES);
         try {
-            // init the loop
             BasicDBObject bdbo = new BasicDBObject();
             if (date != null) {
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
             }
-            files = gfs.find(bdbo);
+            cursor = gfs.getFileList(bdbo);
             indexFile = 0;
         } catch (ParseException e) {
             e.printStackTrace();
@@ -115,15 +97,17 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return true;
     }
 
+    /**
+     * This initializes cursor for annexes collection.
+     */
     public boolean initAnnexes(String date) {
-        // open the GridFS
         try {
             BasicDBObject bdbo = new BasicDBObject();
             if (date != null) {
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
                 bdbo.append("filename", java.util.regex.Pattern.compile("^.pdf"));
             }
-            files = gfs.find(bdbo);
+            cursor = gfs.getFileList(bdbo);
             indexFile = 0;
         } catch (ParseException e) {
             e.printStackTrace();
@@ -131,18 +115,77 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return true;
     }
 
+    /**
+     * This initializes cursor for metadata tei collection.
+     */
+    public boolean initMetadataTeis(String date) throws MongoException {
+        try {
+            setGridFSCollection(MongoCollectionsInterface.ADDITIONAL_TEIS);
+            BasicDBObject bdbo = new BasicDBObject();
+            if (date != null) {
+                bdbo.append("uploadDate", Utilities.parseStringDate(date));
+            }
+            cursor = gfs.getFileList(bdbo);
+            indexFile = 0;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    /**
+     * This initializes cursor for grobid tei collection.
+     */
+    public boolean initGrobidTeis(String date) throws MongoException {
+        try {
+            setGridFSCollection(MongoCollectionsInterface.GROBID_TEIS);
+            BasicDBObject bdbo = new BasicDBObject();
+            if (date != null) {
+                bdbo.append("uploadDate", Utilities.parseStringDate(date));
+            }
+            cursor = gfs.getFileList(bdbo);
+            indexFile = 0;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    /**
+     * This initializes cursor for tei generated collection.
+     */
+    public boolean initTeis(String date) throws MongoException {
+        try {
+            setGridFSCollection(MongoCollectionsInterface.FINAL_TEIS);
+            BasicDBObject bdbo = new BasicDBObject();
+            if (date != null) {
+                bdbo.append("uploadDate", Utilities.parseStringDate(date));
+            }
+            cursor = gfs.getFileList(bdbo);
+            indexFile = 0;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    /**
+     * This initializes cursor for annotations collection.
+     */
     public boolean initAnnotations() throws MongoException {
         collection = getCollection(ANNOTATIONS);
         // index on filename and xml:id
-        collection.ensureIndex(new BasicDBObject("filename", 1));
-        collection.ensureIndex(new BasicDBObject("xml:id", 1));
+        BasicDBObject index = new BasicDBObject();
+        index.put("repositoryDocId", 1);
+        index.put("xml:id", 1);
+        collection.ensureIndex(index, "index", true);
         cursor = collection.find();
         indexFile = 0;
         return true;
     }
 
-    public boolean hasMoreDocuments() {
-        if (indexFile < files.size()) {
+    public boolean hasMoreTeis() {
+        if (indexFile < cursor.size()) {
             return true;
         } else {
             return false;
@@ -157,12 +200,19 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
     }
 
+    public boolean hasMoreBinaryDocuments() {
+        if (indexFile < cursor.size()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public String nextAnnotation() {
         String json = null;
         DBObject obj = cursor.next();
         json = obj.toString();
-        currentFilename = (String) obj.get("filename");
-        currentHalID = (String) obj.get("halID");
+        currentRepositoryDocId = (String) obj.get("repositoryDocId");
 
         if (!cursor.hasNext()) {
             cursor.close();
@@ -171,36 +221,202 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return json;
     }
 
-    public String nextDocument() {
+    public String nextTeiDocument() {
+        InputStream teiStream = null;
         String tei = null;
+        DBObject obj = cursor.next();
+        currentRepositoryDocId = (String) obj.get("repositoryDocId");
+        GridFSDBFile binaryfile = gfs.findOne(currentRepositoryDocId + ".tei.xml");
+        indexFile++;
+        teiStream = binaryfile.getInputStream();
         try {
-            if (indexFile < files.size()) {
-                GridFSDBFile teifile = files.get(indexFile);
-                currentFilename = teifile.getFilename();
-                currentHalURI = Utilities.getHalURIFromFilename(currentFilename);
-                currentHalID = (String) teifile.get("halId");
-                InputStream input = teifile.getInputStream();
-                tei = IOUtils.toString(input, "UTF-8");
-                indexFile++;
-                input.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            tei = IOUtils.toString(teiStream);
+            teiStream.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
-
         return tei;
     }
 
     public InputStream nextBinaryDocument() {
         InputStream input = null;
-        if (indexFile < files.size()) {
-            GridFSDBFile binaryfile = files.get(indexFile);
-            currentFilename = binaryfile.getFilename();
-            currentHalID = (String) binaryfile.get("halId");
-            input = binaryfile.getInputStream();
-            indexFile++;
-        }
+        DBObject obj = cursor.next();
+        currentRepositoryDocId = (String) obj.get("repositoryDocId");
+        GridFSDBFile binaryfile = gfs.findOne(currentRepositoryDocId + ".pdf");
+        currentRepositoryDocId = (String) binaryfile.get("repositoryDocId");
+        currentFileType = (String) binaryfile.getContentType();
+        input = binaryfile.getInputStream();
+        indexFile++;
         return input;
+    }
+
+    /**
+     * Inserts json entry representing annotation result.
+     */
+    public boolean insertAnnotation(String json) {
+        DBCollection c = null;
+        c = db.getCollection("annotations");
+        BasicDBObject index = new BasicDBObject();
+        index.put("repositoryDocId", 1);
+        index.put("xml:id", 1);
+        c.ensureIndex(index, "index", true);
+        DBObject dbObject = (DBObject) JSON.parse(json);
+        WriteResult result = c.insert(dbObject);
+        CommandResult res = result.getCachedLastError();
+        if ((res != null) && (res.ok())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Inserts generated tei using GridFS.
+     */
+    public void insertTei(String teiString, String repositoryDocId, String docId, String date) {
+        try {
+            GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
+            gfs.remove(repositoryDocId + ".tei.xml");
+            GridFSInputFile gfsFile = gfs.createFile(new ByteArrayInputStream(teiString.getBytes()), true);
+            gfsFile.put("uploadDate", Utilities.parseStringDate(date));
+            gfsFile.setFilename(repositoryDocId + ".tei.xml");
+            gfsFile.put("repositoryDocId", repositoryDocId);
+            gfsFile.put("docId", docId);
+            gfsFile.save();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Inserts grobid tei using GridFS.
+     */
+    public void insertGrobidTei(String teiString, String repositoryDocId, String date) {
+        try {
+            GridFS gfs = new GridFS(db, MongoCollectionsInterface.GROBID_TEIS);
+            gfs.remove(repositoryDocId + ".tei.xml");
+            GridFSInputFile gfsFile = gfs.createFile(new ByteArrayInputStream(teiString.getBytes()), true);
+            gfsFile.put("uploadDate", Utilities.parseStringDate(date));
+            gfsFile.setFilename(repositoryDocId + ".tei.xml");
+            gfsFile.put("repositoryDocId", repositoryDocId);
+            gfsFile.save();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Inserts TEI metadata document in the GridFS.
+     */
+    public void insertMetadataTei(String tei, String repositoryDocId, String date) {
+        try {
+            GridFS gfs = new GridFS(db, MongoCollectionsInterface.ADDITIONAL_TEIS);
+            gfs.remove(repositoryDocId + ".tei.xml");
+            GridFSInputFile gfsFile = gfs.createFile(new ByteArrayInputStream(tei.getBytes()), true);
+            gfsFile.put("uploadDate", Utilities.parseStringDate(date));
+            gfsFile.setFilename(repositoryDocId + ".tei.xml");
+            gfsFile.put("repositoryDocId", repositoryDocId);
+            gfsFile.save();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Inserts PDF binary document in the GridFS.
+     */
+    public void insertBinaryDocument(InputStream file, String repositoryDocId, String date) {
+        try {
+            GridFS gfs = new GridFS(db, MongoCollectionsInterface.BINARIES);
+            gfs.remove(repositoryDocId + ".tei.xml");
+            GridFSInputFile gfsFile = gfs.createFile(file, true);
+            gfsFile.put("uploadDate", Utilities.parseStringDate(date));
+            gfsFile.setFilename(repositoryDocId + ".pdf");
+            gfsFile.put("repositoryDocId", repositoryDocId);
+            gfsFile.setContentType("application/pdf");
+            gfsFile.save();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * Updates already existing tei with new (more enriched one, fulltext..).
+     */
+    public void updateTei(String newTei, String repositoryDocId, boolean isFulltextAdded) {
+        GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
+        GridFSDBFile gdf = gfs.findOne(repositoryDocId + ".tei.xml");
+        GridFSInputFile gfsNew = gfs.createFile(new ByteArrayInputStream(newTei.getBytes()), true);
+        gfsNew.put("uploadDate", gdf.getUploadDate());
+        gfsNew.setFilename(gdf.get("repositoryDocId") + ".tei.xml");
+        gfsNew.put("repositoryDocId", gdf.get("repositoryDocId"));
+        gfsNew.put("docId", gdf.get("docId"));
+        gfsNew.put("isFulltextAdded", isFulltextAdded);
+        gfsNew.save();
+        gfs.remove(gdf);
+    }
+
+    /**
+     * inserts a Arxiv/istex TEI document in the GridFS.
+     */
+    public void insertExternalTeiDocument(InputStream file, String identifier, String repository, String namespace, String dateString) {
+        try {
+            GridFS gfs = new GridFS(db, namespace);
+            GridFSInputFile gfsFile = gfs.createFile(file, true);
+            gfsFile.put("uploadDate", Utilities.parseStringDate(dateString));
+            gfsFile.setFilename(identifier + ".tei.xml");
+            gfsFile.put("identifier", identifier);
+            gfsFile.put("repository", repository);
+            gfsFile.setContentType("application/tei+xml");
+            gfsFile.save();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * Inserts document assets with for repositoryDocId in the GridFS.
+     */
+    public void insertGrobidAssetDocument(InputStream file, String repositoryDocId, String fileName, String dateString) throws ParseException {
+        try {
+            GridFS gfs = new GridFS(db, MongoCollectionsInterface.GROBID_ASSETS);
+            BasicDBObject whereQuery = new BasicDBObject();
+            whereQuery.put("repositoryDocId", repositoryDocId);
+            whereQuery.put("fileName", fileName);
+            gfs.remove(whereQuery);
+            //version ?
+            GridFSInputFile gfsFile = gfs.createFile(file, true);
+            gfsFile.put("uploadDate", Utilities.parseStringDate(dateString));
+            gfsFile.setFilename(fileName);
+            gfsFile.put("repositoryDocId", repositoryDocId);
+            gfsFile.setContentType("image/png");
+            gfsFile.save();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Inserts publication annex document.
+     */
+    public void insertAnnexDocument(InputStream file, String repositoryDocId, String fileName, String dateString) throws ParseException {
+        try {
+            GridFS gfs = new GridFS(db, MongoCollectionsInterface.PUB_ANNEXES);
+            BasicDBObject whereQuery = new BasicDBObject();
+            whereQuery.put("repositoryDocId", repositoryDocId);
+            whereQuery.put("filename", fileName);
+            gfs.remove(whereQuery);
+            //version ?
+            GridFSInputFile gfsFile = gfs.createFile(file, true);
+            gfsFile.put("uploadDate", Utilities.parseStringDate(dateString));
+            gfsFile.setFilename(fileName);
+            gfsFile.put("repositoryDocId", repositoryDocId);
+            gfsFile.save();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public void removeDocument(String filename) {
@@ -212,30 +428,17 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
     }
 
-    public boolean insertAnnotation(String json) {
+    /**
+     * Returns the annotation given a repositoryDocId and id (xml:id).
+     */
+    public String getAnnotation(String repositoryDocId, String id) {
         DBCollection c = null;
         c = db.getCollection("annotations");
-        c.ensureIndex(new BasicDBObject("filename", 1));
-        c.ensureIndex(new BasicDBObject("xml:id", 1));
-
-        DBObject dbObject = (DBObject) JSON.parse(json);
-        WriteResult result = c.insert(dbObject);
-        CommandResult res = result.getCachedLastError();
-        if ((res != null) && (res.ok())) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public String getAnnotation(String filename, String id) {
-        DBCollection c = null;
-        c = db.getCollection("annotations");
-        c.ensureIndex(new BasicDBObject("filename", 1));
+        c.ensureIndex(new BasicDBObject("repositoryDocId", 1));
         c.ensureIndex(new BasicDBObject("xml:id", 1));
 
         String result = null;
-        BasicDBObject query = new BasicDBObject("filename", filename);
+        BasicDBObject query = new BasicDBObject("repositoryDocId", repositoryDocId);
         DBCursor curs = null;
         try {
             curs = c.find(query);
@@ -260,18 +463,20 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return result;
     }
 
-    public Map<String, String> getEmbargoRecords(String date) {
-        Map<String, String> files = new HashMap<String, String>();
-        if (db.collectionExists(HARVEST_DIAGNOSTIC)) {
-            collection = db.getCollection(HARVEST_DIAGNOSTIC);
+    public Map<String, PublicationFile> findEmbargoRecordsByDate(String date) {
+        Map<String, PublicationFile> files = new HashMap<String, PublicationFile>();
+        if (db.collectionExists(TO_REQUEST_LATER)) {
+            collection = db.getCollection(TO_REQUEST_LATER);
             BasicDBObject query = new BasicDBObject("date", date);
             DBCursor curs = collection.find(query);
             try {
                 if (curs.hasNext()) {
                     DBObject entry = curs.next();
-                    String url = (String) entry.get("desc");
-                    String id = (String) entry.get("halID");
-                    files.put(id, url);
+                    String url = (String) entry.get("url");
+                    String id = (String) entry.get("repositoryDocId");
+                    boolean isAnnex = (Boolean) entry.get("isAnnex");
+                    PublicationFile pf = new PublicationFile(url, date, isAnnex);
+                    files.put(id, pf);
                 }
             } finally {
                 if (curs != null) {
@@ -282,14 +487,17 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return files;
     }
 
-    public String getAnnotations(String filename) {
+    /**
+     * Returns the annotation for a given repositoryDocId.
+     */
+    public String getAnnotations(String repositoryDocId) {
         DBCollection c = null;
         c = db.getCollection("annotations");
-        c.ensureIndex(new BasicDBObject("filename", 1));
+        c.ensureIndex(new BasicDBObject("repositoryDocId", 1));
         c.ensureIndex(new BasicDBObject("xml:id", 1));
 
         String result = null;
-        BasicDBObject query = new BasicDBObject("filename", filename);
+        BasicDBObject query = new BasicDBObject("repositoryDocId", repositoryDocId);
         DBCursor curs = null;
         try {
             curs = c.find(query);
@@ -308,25 +516,58 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     /**
-     * Check if the given pdf has already been harvested.
+     * Check if the document has been already grobidified.
      */
-    /*public boolean isCollectedDate(String filename) {
-     GridFSDBFile f = (new GridFS(db, ADDITIONAL_TEIS)).findOne(filename);
-     boolean result = false;
-     if (f != null) {
-     result = true;
-     }
-     return result;
-     }*/
-    /**
-     * Check if the given pdf has already been grobidified.
-     */
-    public boolean isGrobidified() {
-        String filename = getCurrentFilename();
-        GridFSDBFile f = (new GridFS(db, GROBID_TEIS)).findOne(filename);
+    public boolean isGrobidified(String repositoryDocId) {
+        GridFS gfs = new GridFS(db, MongoCollectionsInterface.GROBID_TEIS);
+        BasicDBObject whereQuery = new BasicDBObject();
+        whereQuery.put("repositoryDocId", repositoryDocId);
+        List<GridFSDBFile> fs = null;
         boolean result = false;
-        if (f != null) {
+        fs = gfs.find(whereQuery);
+        if (fs.size() > 0) {
             result = true;
+        } else {
+            result = false;
+        }
+        return result;
+    }
+
+    /**
+     * Check if the document fulltext has been already added.
+     */
+    public boolean isWithFulltext(String repositoryDocId) {
+
+        GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
+        BasicDBObject whereQuery = new BasicDBObject();
+        whereQuery.put("repositoryDocId", repositoryDocId);
+
+        Boolean result = false;
+        GridFSDBFile fs = gfs.findOne(whereQuery);
+        Object o = fs.get("isFulltextAdded");
+
+        if (o == null) {
+            return false;
+        } else {
+            result = (Boolean) o;
+        }
+        return result;
+    }
+
+    /**
+     * Checks if the tei document was already data mined.
+     */
+    public boolean isMined(String repositoryDocId) {
+        GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
+        BasicDBObject whereQuery = new BasicDBObject();
+        whereQuery.put("repositoryDocId", repositoryDocId);
+        List<GridFSDBFile> fs = null;
+        boolean result = false;
+        fs = gfs.find(whereQuery);
+        if (fs.size() > 0) {
+            result = true;
+        } else {
+            result = false;
         }
         return result;
     }
@@ -337,11 +578,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public boolean isAnnotated() {
         DBCollection c = null;
         c = db.getCollection("annotations");
-        c.ensureIndex(new BasicDBObject("filename", 1));
+        c.ensureIndex(new BasicDBObject("repositoryDocId", 1));
         c.ensureIndex(new BasicDBObject("xml:id", 1));
         boolean result = false;
-        String filename = getCurrentFilename();
-        BasicDBObject query = new BasicDBObject("filename", filename);
+        BasicDBObject query = new BasicDBObject("repositoryDocId", currentRepositoryDocId);
 
         DBCursor cursor = null;
         try {
@@ -360,92 +600,14 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     /**
-     * Add a TEI/PDF document in the GridFS
-     */
-    public void addDocument(InputStream file, String fileName, String docId, String namespace, String dateString) {
-        try {
-            GridFS gfs = new GridFS(db, namespace);
-            GridFSInputFile gfsFile = gfs.createFile(file, true);
-            gfsFile.put("uploadDate", Utilities.parseStringDate(dateString));
-            gfsFile.setFilename(fileName);
-            gfsFile.put("halId", Utilities.getHalIDFromFilename(fileName));
-            gfsFile.put("docId", docId);
-            gfsFile.save();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    /**
-     * Add a document assets with corresponding desc in the GridFS (otherwise we
-     * could do it with ES ?)
-     */
-    public void addAssetDocument(InputStream file, String id, String fileName, String namespace, String dateString) throws ParseException {
-
-        try {
-            GridFS gfs = new GridFS(db, namespace);
-            BasicDBObject whereQuery = new BasicDBObject();
-            whereQuery.put("halId", id);
-            whereQuery.put("fileName", fileName);
-            gfs.remove(whereQuery);
-            //version ?
-            GridFSInputFile gfsFile = gfs.createFile(file, true);
-            gfsFile.put("uploadDate", Utilities.parseStringDate(dateString));
-            gfsFile.setFilename(fileName);
-            gfsFile.put("halId", id);
-            gfsFile.save();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     */
-    public void addAnnexDocument(InputStream file, String type, String id, String fileName, String namespace, String dateString) throws ParseException {
-
-        try {
-            GridFS gfs = new GridFS(db, namespace);
-            BasicDBObject whereQuery = new BasicDBObject();
-            whereQuery.put("halId", id);
-            whereQuery.put("filename", fileName);
-            gfs.remove(whereQuery);
-            //version ?
-            GridFSInputFile gfsFile = gfs.createFile(file, true);
-            gfsFile.put("uploadDate", Utilities.parseStringDate(dateString));
-            gfsFile.setFilename(fileName);
-            gfsFile.put("halId", id);
-            gfsFile.setContentType(type);
-            gfsFile.save();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String getFinalTeiDocId() throws FileNotFoundException {
-        String docId = null;
-        try {
-            GridFS gfs = new GridFS(db, FINAL_TEIS);
-            BasicDBObject whereQuery = new BasicDBObject();
-            whereQuery.put("halId", currentHalID);
-            whereQuery.put("filename", currentFilename);
-            GridFSDBFile cursor = gfs.findOne(whereQuery);
-            docId = (String) cursor.get("docId");
-        } catch (Exception exp) {
-            throw new FileNotFoundException("Not found asset.");
-        }
-        return docId;
-    }
-
-    /**
      * Returns the asset files using the halID+filename indexes.
      */
-    public InputStream getFile(String halId, String filename, String collection) throws FileNotFoundException {
+    public InputStream findAssetFile(String repositoryDocId, String filename, String collection) throws FileNotFoundException {
         InputStream file = null;
         try {
             GridFS gfs = new GridFS(db, collection);
             BasicDBObject whereQuery = new BasicDBObject();
-            whereQuery.put("halId", halId);
+            whereQuery.put("repositoryDocId", repositoryDocId);
             whereQuery.put("filename", filename);
             GridFSDBFile cursor = gfs.findOne(whereQuery);
             file = cursor.getInputStream();
@@ -455,20 +617,37 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return file;
     }
 
-    public InputStream streamFile(String filename, String collection) {
-        GridFSDBFile file = null;
-        GridFS gfs = new GridFS(db, collection);
-        file = gfs.findOne(filename);
-        return file.getInputStream();
+    public String findTeiById(String repositoryDocId) {
+        String tei = null;
+        try {
+            GridFS gfs = new GridFS(db, FINAL_TEIS);
+            BasicDBObject whereQuery = new BasicDBObject();
+            whereQuery.put("repositoryDocId", currentRepositoryDocId);
+            whereQuery.put("filename", currentRepositoryDocId + ".tei.xml");
+            GridFSDBFile file = gfs.findOne(whereQuery);
+            InputStream teiStream = file.getInputStream();
+            tei = IOUtils.toString(teiStream);
+            teiStream.close();
+        } catch (Exception exp) {
+            exp.printStackTrace();
+        }
+        return tei;
     }
 
-    public void save(String haldID, String process, String desc, String date) {
+    /**
+     * Saves the issue occurring while processing.
+     */
+    public void save(String repositoryDocId, String process, String desc, String date) {
         DBCollection collection = db.getCollection(HARVEST_DIAGNOSTIC);
-        collection.ensureIndex(new BasicDBObject("halId", 1));
-        collection.ensureIndex(new BasicDBObject("process", 1));
+        BasicDBObject index = new BasicDBObject();
+        index.put("repositoryDocId", 1);
+        index.put("process", 1);
+        collection.ensureIndex(index, "index", true);
         BasicDBObject document = new BasicDBObject();
-        document.put("haldID", haldID);
+        document.put("repositoryDocId", repositoryDocId);
         document.put("process", process);
+        
+        collection.findAndRemove(document);
         document.put("desc", desc);
         if (date == null) {
             date = Utilities.formatDate(new Date());
@@ -477,27 +656,57 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         collection.insert(document);
     }
 
-    public void removeEmbargoRecord(String haldID) {
-        DBCollection collection = db.getCollection(HARVEST_DIAGNOSTIC);
+    /**
+     * Saves the resource to be requested later (embargo).
+     */
+    public void saveForLater(String repositoryDocId, String url, boolean isAnnex, String desc, String date) {
+        DBCollection collection = db.getCollection(MongoCollectionsInterface.TO_REQUEST_LATER);
+        BasicDBObject index = new BasicDBObject();
+        index.put("repositoryDocId", 1);
+        index.put("url", 1);
+        collection.ensureIndex(index, "index", true);
+        BasicDBObject document = new BasicDBObject();
+        document.put("repositoryDocId", repositoryDocId);
+        document.put("url", url);
+        collection.findAndRemove(document);
+        document.put("isAnnex", true);
+        document.put("desc", desc);
+        if (date == null) {
+            date = Utilities.formatDate(new Date());
+        }
+        document.put("date", date);
+        collection.insert(document);
+    }
+
+    public void removeEmbargoRecord(String repositoryDocId, String url) {
+        DBCollection collection = db.getCollection(TO_REQUEST_LATER);
         BasicDBObject whereQuery = new BasicDBObject();
-        whereQuery.put("halId", haldID);
+        whereQuery.put("repositoryDocId", repositoryDocId);
+        whereQuery.put("url", url);
         collection.remove(whereQuery);
     }
 
-    public void setGridFS(String collectioName) {
-        collection = getCollection(collectioName);
-        gfs = new GridFS(db, collectioName);
+    public void setGridFSCollection(String collectionName) {
+        if (gfs == null || !gfs.getBucketName().equals(collectionName)) {
+            gfs = new GridFS(db, collectionName);
+        }
     }
 
-    public String getCurrentHalID() {
-        return currentHalID;
+    public String getCurrentRepositoryDocId() {
+        return currentRepositoryDocId;
     }
 
-    public String getCurrentFilename() {
-        return currentFilename;
+    /**
+     * @return the currentFileType
+     */
+    public String getCurrentFileType() {
+        return currentFileType;
     }
 
-    public String getCurrentHalURI() {
-        return currentHalURI;
+    /**
+     * @return the currentDocId
+     */
+    public String getCurrentDocId() {
+        return currentDocId;
     }
 }

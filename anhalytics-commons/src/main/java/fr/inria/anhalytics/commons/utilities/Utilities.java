@@ -48,7 +48,8 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 
 /**
- *
+ * All utilities are grouped here for managing dates, id generations, files DOM nodes..
+ * 
  * @author Achraf
  */
 public class Utilities {
@@ -295,12 +296,11 @@ public class Utilities {
         return date;
     }
 
-    public static String getHalIDFromFilename(String filename) {
-        int ind = filename.indexOf(".");
-        String halID = filename.substring(0, ind);
-        ind = halID.lastIndexOf("v");
+    public static String getHalIDFromHalDocID(String halDocID) {
+        int ind = halDocID.indexOf("v");
+        String halID = "";
         if (ind > -1) {
-            halID = halID.substring(0, ind);
+            halID = halDocID.substring(0, ind);
         }
         return halID;
     }
