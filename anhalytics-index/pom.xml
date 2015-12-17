@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+    <name>anhalytics-index</name>
     <parent>
         <groupId>fr.inria.anhalytics</groupId>
         <artifactId>anhalytics</artifactId>
@@ -13,39 +13,12 @@
     <artifactId>anhalytics-index</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    
-    <contributors>
-        <contributor>
-            <name>Patrice Lopez</name>
-            <roles>
-                <role>Developer</role>
-            </roles>
-        </contributor>
-    </contributors>
-    <licenses>
-        <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-        </license>
-    </licenses>
 
                 
     <build>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-            </resource>
-
-            <resource>
-                <directory>src</directory>
-                <targetPath>source/src</targetPath>
-            </resource>
-            <resource>
-                <directory>${basedir}</directory>
-                <targetPath>source</targetPath>
-                <includes>
-                    <include>pom.xml</include>
-                </includes>
             </resource>
         </resources>
         
@@ -78,9 +51,9 @@
                 <version>3.0</version>
                 <configuration>
                     <!--argLine>-Dlog4j.debug=true</argLine-->
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <encoding>UTF-8</encoding>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
             
@@ -92,9 +65,6 @@
                     <argLine>-Xms256m -Xmx1024m</argLine>
                     <testFailureIgnore>false</testFailureIgnore>
                     <skip>false</skip>
-                    <systemPropertyVariables>
-                        <log4j.configuration>log4j-test.properties</log4j.configuration>
-                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
@@ -128,38 +98,9 @@
         </dependency>
 		
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-                
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>2.10.1</version>
-        </dependency>
-		
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.2</version>
-        </dependency>
-		
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-            <version>4.2</version>
-        </dependency>
-		
-        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20080701</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.8.5</version>
         </dependency>
 		
 		
@@ -168,13 +109,7 @@
             <artifactId>elasticsearch</artifactId>
             <version>1.4.2</version>
         </dependency>
-		
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-            <scope>test</scope>
-        </dependency>
+        
         <dependency>
             <groupId>fr.inria.anhalytics.commons</groupId>
             <artifactId>anhalytics-commons</artifactId>
@@ -183,5 +118,4 @@
         </dependency>
 		
     </dependencies>
-    <name>anhalytics-index</name>
 </project>

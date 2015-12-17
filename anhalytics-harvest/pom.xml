@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+    <name>anhalytics-harvest</name>
     <parent>
         <groupId>fr.inria.anhalytics</groupId>
         <artifactId>anhalytics</artifactId>
@@ -13,38 +13,11 @@
     <artifactId>anhalytics-harvest</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>war</packaging>
-    
-    <contributors>
-        <contributor>
-            <name>Achraf Azhar</name>
-            <roles>
-                <role>Developer</role>
-            </roles>
-        </contributor>
-        <contributor>
-            <name>Patrice Lopez</name>
-            <roles>
-                <role>Developer</role>
-            </roles>
-        </contributor>
-    </contributors>
                 
     <build>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-            </resource>
-
-            <resource>
-                <directory>src</directory>
-                <targetPath>source/src</targetPath>
-            </resource>
-            <resource>
-                <directory>${basedir}</directory>
-                <targetPath>source</targetPath>
-                <includes>
-                    <include>pom.xml</include>
-                </includes>
             </resource>
         </resources>
         
@@ -77,9 +50,9 @@
                 <version>3.0</version>
                 <configuration>
                     <!--argLine>-Dlog4j.debug=true</argLine-->
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <encoding>UTF-8</encoding>                    
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>                    
                 </configuration>
             </plugin>
             
@@ -119,28 +92,6 @@
                     <argLine>-Xms256m -Xmx1024m</argLine>
                     <testFailureIgnore>false</testFailureIgnore>
                     <skip>false</skip>
-                    <systemPropertyVariables>
-                        <log4j.configuration>log4j-test.properties</log4j.configuration>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>maven-jetty-plugin</artifactId>
-                <version>6.1.10</version>
-                <configuration>
-                    <contextPath>/</contextPath>
-                    <scanIntervalSeconds>10</scanIntervalSeconds>
-                    <connectors>
-                        <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-                            <port>8090</port>
-                            <maxIdleTime>60000</maxIdleTime>
-                        </connector>
-                    </connectors>
-                    <resourceBases>
-                        <resourceBase>${basedir}/src/main/webapp</resourceBase>   
-                    </resourceBases>
                 </configuration>
             </plugin>
         </plugins>
@@ -154,18 +105,6 @@
             <artifactId>junit</artifactId>
             <version>4.8.2</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>directory-naming</groupId>
-            <artifactId>naming-java</artifactId>
-            <version>0.8</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.0.1</version>
         </dependency>
 
         <dependency>
@@ -187,18 +126,6 @@
         </dependency>
 		
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-                
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>2.10.1</version>
-        </dependency>
-		
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
             <version>4.2.4</version>
@@ -217,12 +144,6 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>1.9</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>fr.inria.anhalytics.commons</groupId>
             <artifactId>anhalytics-commons</artifactId>
             <version>0.1-SNAPSHOT</version>
@@ -235,11 +156,10 @@
         </dependency>
         
         <dependency>
-	<groupId>mysql</groupId>
-	<artifactId>mysql-connector-java</artifactId>
-	<version>5.1.37</version>
-</dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.37</version>
+        </dependency>
 
     </dependencies>
-    <name>anhalytics-harvest</name>
 </project>
