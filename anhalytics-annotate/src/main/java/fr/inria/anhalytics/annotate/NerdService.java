@@ -87,9 +87,6 @@ public class NerdService {
     public static boolean isNerdReady() throws UnreachableNerdServiceException {
         logger.info("Cheking NERD service...");
         int responseCode = 0;
-        
-            
-                System.out.println("sdqsdsdfsd");
         HttpURLConnection conn = null;
         try {
             URL url = new URL("http://" + AnnotateProperties.getNerd_host() + ":" + AnnotateProperties.getNerd_port());
