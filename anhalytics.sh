@@ -26,105 +26,120 @@ fi
 
 # Print command line usage / help
 usage() {
-	echo "Usage: $0 [-action] [-options]"
+	echo "Usage: $0 [-action] [args]"
 	echo "   -help                        print command line options"
 	echo "   -harvestDaily                harvest the publications of the yesterday"
 	echo "   -harvest                     harvest the publications, if no date limitation process all repository content"
 	echo "   -grobid                      extract TEIs from the downladed binaries buildTei"
-	echo "   -buildTei                    build the corpus tei containing the mtds and the fulltext tei"
+	echo "   -mineData                    extract data from teis and insert them into DB"
+	echo "   -generateTei                 build the corpus tei containing the mtds and the fulltext tei"
 	echo "   -annotate                    process named entities using the NERD service"
 	echo "   -index {tei|annotation}      index either the full tei or annotation into ES"
-	echo "   -dFromDate 'yyyy-mm-dd'      set/filter records to process by starting date"
-	echo "   -dUntilDate 'yyyy-mm-dd'     set/filter records to process by ending date"
+	echo "   -dFromDate yyyy-mm-dd        set/filter records to process by starting date"
+	echo "   -dUntilDate yyyy-mm-dd       set/filter records to process by ending date"
 }
 
-k=0
+array_contains2 () {
+    local in=1
+    local array="$1[@]"
+    local seeking=$2
+
+    for element in "${!array}"; do
+        if [[ $element == $seeking ]]; then
+            in=0
+            break
+        fi
+    done
+    return $in
+}
+
+check_dates_option(){
+    dates=("-dFromDate" "-dUntilDate")
+    if array_contains2 arr "$1" || [ -z "$1" ] 
+        then return 0 
+    else return 1
+    fi
+}
+
 for p in ./anhalytics-*/target
 do
-    directories[$k]=$p
-    k=$((k + 1))
+    if [ "$(ls -A $p)" ]; then
+        continue;
+    else
+        echo "Make sur the project is compiled."
+        exit 0
+    fi
 done
 
 
-if [ ${#directories[@]} -lt 3 ]; then
-  echo "Make sur the project is compiled."
-exit 0
-fi
 
-i=0
-for m in ./anhalytics-*
+for m in ./anhalytics-*/target/*.one-jar.jar
 do
-    modules[$i]=$m
-    i=$((i + 1))
+    if [[ $m == *"harvest"* ]]
+        then
+            modules[0]=$m
+    elif [[ $m == *"annotate"* ]]
+        then
+            modules[1]=$m
+    elif [[ $m == *"index"* ]]
+        then
+            modules[2]=$m
+    fi
 done
 
-
-while true; do
+while true; 
+do
     case $1 in
-	      -help)
+	
+        -help)
             usage
             exit 0
             ;;
-        -harvestDaily)					
-            eval cd "${modules[3]}"; j=0
-						for n in ./target/*.one-jar.jar
-						do
-					    targets[$j]=$n
-					    j=$((j + 1))
-					  done;
-					  "$JAVA" -Xmx2048m -jar "${targets[0]}" -exe harvestDaily
+        -harvestDaily)
+            "$JAVA" -Xmx2048m -jar "${modules[0]}" -exe harvestDaily
             exit 0
             ;;
         -harvest)
-				    eval cd "${modules[3]}"; j=0
-				    for n in ./target/*.one-jar.jar
-				    do
-			        targets[$j]=$n
-			        j=$((j + 1))
-			     done;
-			     "$JAVA" -Xmx2048m -jar "${targets[0]}" -exe harvestAll $2 $3 $4 $5
-           exit 0
-           ;;
+            if check_dates_option "$2" || check_dates_option "$4"
+                then
+            "$JAVA" -Xmx2048m -jar "${modules[0]}" -exe harvestAll $2 $3 $4 $5
+            else usage
+            fi
+            exit 0
+            ;;
         -grobid)
-            eval cd "${modules[3]}"; j=0
-				    for n in ./target/*.one-jar.jar
-				    do
-			        targets[$j]=$n
-			        j=$((j + 1))
-			     done;
-			     "$JAVA" -Xmx2048m -jar "${targets[0]}" -exe processGrobid $2 $3 $4 $5
-           exit 0
-           ;;
-        -buildTei)
-            eval cd "${modules[3]}"; j=0
-				    for n in ./target/*.one-jar.jar
-				    do
-			        targets[$j]=$n
-			        j=$((j + 1))
-			     done;
-			     "$JAVA" -Xmx2048m -jar "${targets[0]}" -exe buildTei $2 $3 $4 $5
-           exit 0
-           ;;
+            if check_dates_option "$2" || check_dates_option "$4"
+                then
+            "$JAVA" -Xmx2048m -jar "${modules[0]}" -exe processGrobid $2 $3 $4 $5
+            else usage
+            fi
+            exit 0
+            ;;
+        -generateTei)
+            if check_dates_option "$2" || check_dates_option "$4"
+                then
+            "$JAVA" -Xmx2048m -jar "${modules[0]}" -exe generateTei $2 $3 $4 $5
+            else usage
+            fi
+            exit 0
+            ;;
         -annotate)
-            eval cd "${modules[0]}"; j=0
-				    for n in ./target/*.one-jar.jar
-				    do
-			        targets[$j]=$n
-			        j=$((j + 1))
-			     done;
-			     "$JAVA" -Xmx2048m -jar "${targets[0]}" $2 $3 $4 $5 $6
-           exit 0
-           ;;
+            if check_dates_option "$2" || check_dates_option "$4"
+                then
+            "$JAVA" -Xmx2048m -jar "${modules[1]}" -multiThread $2 $3 $4 $5
+            else usage
+            fi
+            exit 0
+            ;;
         -index)
-            eval cd "${modules[4]}"; j=0
-				    for n in ./target/*.one-jar.jar
-				    do
-			        targets[$j]=$n
-			        j=$((j + 1))
-			     done;
-			     "$JAVA" -Xmx2048m -jar "${targets[0]}" -index $2
-           exit 0
-           ;;
+            arr=( "tei" "annotation" )
+            if array_contains2 arr "$2"
+                then
+                    "$JAVA" -Xmx2048m -jar "${modules[2]}" -index $2
+            else usage
+            fi
+            exit 0
+            ;;
         *)
             echo "Error parsing argument $1!" >&2
             usage
@@ -132,4 +147,3 @@ while true; do
         ;;
     esac
 done
-
