@@ -36,6 +36,7 @@ public class HarvestProperties {
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file "+properties_filename, exp);
         }
+        setOaiUrl(props.getProperty("harvest.oaipmhurl"));
         setGrobidHost(props.getProperty("harvest.grobid_host"));
         setGrobidPort(props.getProperty("harvest.grobid_port"));
         //check path

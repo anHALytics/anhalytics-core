@@ -31,6 +31,7 @@ public class Main {
             Main main = new Main();
             main.processCommand();
         } else {
+            System.out.println(getHelp());
             return;
         }
     }
@@ -62,7 +63,7 @@ public class Main {
                 System.out.println(getHelp());
                 continue;
             }
-            if (currArg.equals("-dFromDate")) {
+            else if (currArg.equals("-dFromDate")) {
                 String stringDate = args[i + 1];
                 if (!stringDate.isEmpty()) {
                     if (Utilities.isValidDate(stringDate)) {
@@ -75,7 +76,7 @@ public class Main {
                 i++;
                 continue;
             }
-            if (currArg.equals("-dUntilDate")) {
+            else if (currArg.equals("-dUntilDate")) {
                 String stringDate = args[i + 1];
                 if (!stringDate.isEmpty()) {
                     if (Utilities.isValidDate(stringDate)) {
@@ -88,11 +89,10 @@ public class Main {
                 i++;
                 continue;
             }
-            if (currArg.equals("-multiThread")) {
+            else if (currArg.equals("-multiThread")) {
                 AnnotateProperties.setIsMultiThread(true);
                 continue;
             } else {
-                System.out.println(getHelp());
                 result = false;
             }
         }
@@ -101,8 +101,11 @@ public class Main {
 
     protected static String getHelp() {
         final StringBuffer help = new StringBuffer();
-        help.append("HELP ANNOTATE_HAL \n");
+        help.append("HELP ANHALYTICS-ANNOTATE \n");
         help.append("-h: displays help\n");
+        help.append("-multiThread: enables using multiple threads to annotate\n");
+        help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
+        help.append("-dUntilDate: filter until date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         return help.toString();
     }
 }

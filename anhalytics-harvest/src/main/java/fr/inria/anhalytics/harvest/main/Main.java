@@ -17,7 +17,9 @@ import java.util.Calendar;
 import java.util.List;
 
 /**
- * Main class that implements commands for harvesting, extracting, inserting in KB and generating TEI.
+ * Main class that implements commands for harvesting, extracting, inserting in
+ * KB and generating TEI.
+ *
  * @author Achraf
  */
 public class Main {
@@ -49,6 +51,9 @@ public class Main {
             Utilities.setTmpPath(HarvestProperties.getTmpPath());
             Main main = new Main();
             main.processCommand();
+        } else {
+             System.err.println(getHelp());
+             return;
         }
     }
 
@@ -94,7 +99,6 @@ public class Main {
 
     protected static boolean processArgs(final String[] pArgs) {
         boolean result = true;
-        HarvestProperties.setOaiUrl("http://api.archives-ouvertes.fr/oai/hal");
         if (pArgs.length == 0) {
             System.out.println(getHelp());
         } else {
@@ -105,14 +109,7 @@ public class Main {
                     System.out.println(getHelp());
                     result = false;
                     break;
-                }
-                if (currArg.equals("-dOAI")) {
-                    //check if url pattern && requestable
-                    HarvestProperties.setOaiUrl(pArgs[i + 1]);
-                    i++;
-                    continue;
-                }
-                if (currArg.equals("-dFromDate")) {
+                } else if (currArg.equals("-dFromDate")) {
                     String stringDate = pArgs[i + 1];
                     if (!stringDate.isEmpty()) {
                         if (Utilities.isValidDate(stringDate)) {
@@ -124,8 +121,7 @@ public class Main {
                     }
                     i++;
                     continue;
-                }
-                if (currArg.equals("-dUntilDate")) {
+                } else if (currArg.equals("-dUntilDate")) {
                     String stringDate = pArgs[i + 1];
                     if (!stringDate.isEmpty()) {
                         if (Utilities.isValidDate(stringDate)) {
@@ -137,8 +133,7 @@ public class Main {
                     }
                     i++;
                     continue;
-                }
-                if (currArg.equals("-exe")) {
+                } else if (currArg.equals("-exe")) {
                     String command = pArgs[i + 1];
                     if (availableCommands.contains(command)) {
                         HarvestProperties.setProcessName(command);
@@ -149,6 +144,9 @@ public class Main {
                         result = false;
                         break;
                     }
+                } else {
+                    result = false;
+                    break;
                 }
             }
         }
@@ -157,8 +155,11 @@ public class Main {
 
     protected static String getHelp() {
         final StringBuffer help = new StringBuffer();
-        help.append("HELP HAL_OAI_HARVESTER\n");
+        help.append("HELP ANHALYTICS_HARVEST\n");
         help.append("-h: displays help\n");
+        help.append("-dOAI: url of the OAI-PMH service\n");
+        help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
+        help.append("-dUntilDate: filter until date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-exe: gives the command to execute. The value should be one of these : \n");
         help.append("\t" + availableCommands + "\n");
         return help.toString();

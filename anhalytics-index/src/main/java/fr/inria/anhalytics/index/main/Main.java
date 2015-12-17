@@ -35,6 +35,9 @@ public class Main {
             
             Main main = new Main();
             main.processCommand();
+        } else {
+            System.err.println("The possible options are : -index");
+            return;
         }
     }
 
@@ -43,7 +46,11 @@ public class Main {
         boolean result = true;
         for (int i = 0; i < args.length; i++) {
             currArg = args[i];
-            if (currArg.equals("-index")) {
+            if (currArg.equals("-h")) {
+                System.out.println(getHelp());
+                continue;
+            }
+            else if (currArg.equals("-index")) {
                 String command = args[i + 1];
                 if (availableCommands.contains(command)) {
                     IndexProperties.setProcessName(command);
@@ -52,7 +59,8 @@ public class Main {
                     System.err.println("ProcessName value should be one value from this list: " + availableCommands);
                     result = false;
                 }
-            }
+            } else 
+                result = false;
             i++;
             continue;
         }
@@ -78,5 +86,14 @@ public class Main {
             logger.error("Error when setting-up ElasticSeach cluster");
             e.printStackTrace();
         }
+    }
+    
+    protected static String getHelp() {
+        final StringBuffer help = new StringBuffer();
+        help.append("HELP ANHALYTICS_INDEX \n");
+        help.append("-h: displays help\n");
+        help.append("-index: followed by either :\n");
+        help.append("\t" + availableCommands + "\n");
+        return help.toString();
     }
 }
