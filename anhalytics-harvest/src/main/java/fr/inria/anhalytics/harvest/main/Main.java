@@ -9,7 +9,6 @@ import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import fr.inria.anhalytics.harvest.teibuild.TeiBuilderProcess;
-import java.io.File;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -106,14 +105,6 @@ public class Main {
                     System.out.println(getHelp());
                     result = false;
                     break;
-                }
-                if (currArg.equals("-gH")) {
-                    HarvestProperties.setPath2grobidHome(pArgs[i + 1]);
-                    if (pArgs[i + 1] != null) {
-                        HarvestProperties.setPath2grobidProperty((pArgs[i + 1]) + File.separator + "config" + File.separator + "grobid.properties");
-                    }
-                    i++;
-                    continue;
                 }
                 if (currArg.equals("-dOAI")) {
                     //check if url pattern && requestable

@@ -17,10 +17,6 @@ public class HarvestProperties {
 
     private static String untilDate;
 
-    private static String path2grobidHome;
-
-    private static String path2grobidProperty;
-
     private static String oaiUrl;
 
     private static String grobidHost;
@@ -47,8 +43,6 @@ public class HarvestProperties {
         // As grobid process may take a long time we can continue on previous works
         setReset(Boolean.valueOf(props.getProperty("harvest.reset")));
         setTmpPath(props.getProperty("harvest.tmpPath"));
-        setPath2grobidHome(props.getProperty("harvest.pGrobidHome"));
-        setPath2grobidProperty(props.getProperty("harvest.pGrobidProperties"));
         String threads = props.getProperty("harvest.nbThreads");
         try {
             setNbThreads(Integer.parseInt(threads));
@@ -106,34 +100,6 @@ public class HarvestProperties {
      */
     public static void setUntilDate(String untildate) {
         untilDate = untildate;
-    }
-
-    /**
-     * @return the path2grobidHome
-     */
-    public static String getPath2grobidHome() {
-        return path2grobidHome;
-    }
-
-    /**
-     * @param path2grobidHome the path2grobidHome to set
-     */
-    public static void setPath2grobidHome(String path2grobidhome) {
-        path2grobidHome = path2grobidhome;
-    }
-
-    /**
-     * @return the path2grobidProperty
-     */
-    public static String getPath2grobidProperty() {
-        return path2grobidProperty;
-    }
-
-    /**
-     * @param path2grobidProperty the path2grobidProperty to set
-     */
-    public static void setPath2grobidProperty(String path2grobidproperty) {
-        path2grobidProperty = path2grobidproperty;
     }
 
     /**
