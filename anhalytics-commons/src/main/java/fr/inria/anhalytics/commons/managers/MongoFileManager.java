@@ -555,9 +555,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     /**
-     * Checks if the tei document was already data mined.
+     * Checks if the tei corpus document was already data mined.
      */
-    public boolean isMined(String repositoryDocId) {
+    public boolean isFinalTeiCreated(String repositoryDocId) {
         GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
         BasicDBObject whereQuery = new BasicDBObject();
         whereQuery.put("repositoryDocId", repositoryDocId);

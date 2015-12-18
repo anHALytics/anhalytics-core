@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.datamine;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.AddressDAO;
 import fr.inria.anhalytics.dao.AffiliationDAO;
 import fr.inria.anhalytics.dao.AnhalyticsConnection;
@@ -34,14 +35,12 @@ import fr.inria.anhalytics.entities.Publisher;
 import fr.inria.anhalytics.entities.Serial_Identifier;
 import fr.inria.anhalytics.harvest.teibuild.TeiBuilder;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,12 +52,14 @@ import org.w3c.dom.NodeList;
 
 /**
  * Format and Extract HAL metadata to seed the KB.
- * 
+ *
  * @author Achraf
  */
 public class HALMiner extends Miner {
 
     private static final Logger logger = LoggerFactory.getLogger(HALMiner.class);
+
+    private static final AbstractDAOFactory adf = AbstractDAOFactory.getFactory(AbstractDAOFactory.DAO_FACTORY);
 
     private static XPath xPath = XPathFactory.newInstance().newXPath();
 
@@ -73,23 +74,24 @@ public class HALMiner extends Miner {
     }
 
     public void mine() {
-        PublicationDAO pd = new PublicationDAO(AnhalyticsConnection.getInstance());
-        DocumentDAO dd = new DocumentDAO(AnhalyticsConnection.getInstance());
+        PublicationDAO pd = (PublicationDAO) adf.getPublicationDAO();
+
+        DocumentDAO dd = (DocumentDAO) adf.getDocumentDAO();
         for (String date : Utilities.getDates()) {
             if (mm.initMetadataTeis(date)) {
                 while (mm.hasMoreTeis()) {
                     String metadataTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
-                    if (!mm.isMined(uri)) {//check if final tei is created(doesnt check if kb entry is created..)
-                        InputStream metadataTeiStream = new ByteArrayInputStream(metadataTeiString.getBytes());
-                        Document generatedTeiDoc = TeiBuilder.createTEICorpus(metadataTeiStream);
+                    if (!(mm.isFinalTeiCreated(uri) && dd.isMined(uri))) {//check if final tei is created(doesnt check if kb entry is created..)
+                        adf.openTransaction();
+                        Document generatedTeiDoc = null;
                         try {
+                            InputStream metadataTeiStream = new ByteArrayInputStream(metadataTeiString.getBytes());
+                            generatedTeiDoc = TeiBuilder.createTEICorpus(metadataTeiStream);
+
                             metadataTeiStream.close();
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                        Publication pub = new Publication();
-                        try {
+
+                            Publication pub = new Publication();
                             Node title = (Node) xPath.compile("/teiCorpus/teiHeader/titleStmt/title").evaluate(generatedTeiDoc, XPathConstants.NODE);
                             Node language = (Node) xPath.compile("/teiCorpus/teiHeader/profileDesc/langUsage/language").evaluate(generatedTeiDoc, XPathConstants.NODE);
                             NodeList editors = (NodeList) xPath.compile("/teiCorpus/teiHeader/sourceDesc/biblStruct/editor").evaluate(generatedTeiDoc, XPathConstants.NODESET);
@@ -107,7 +109,7 @@ public class HALMiner extends Miner {
 
                             pub.setDoc_title(title.getTextContent());
                             pub.setLanguage(language.getTextContent());
-                            logger.info("#######" + uri + "########");
+                            logger.info("Mining : " + uri + "");
 
                             processMonogr(monogr, pub);
 
@@ -115,13 +117,16 @@ public class HALMiner extends Miner {
                             processPersons(authors, "author", pub, generatedTeiDoc);
                             processPersons(editors, "editor", pub, generatedTeiDoc);
                             processIdentifiers(ids, doc);
-                        } catch (XPathExpressionException xpe) {
+                        } catch (Exception xpe) {
                             xpe.printStackTrace();
+                            adf.rollback();
                         }
+                        adf.endTransaction();
                         mm.insertTei(Utilities.toString(generatedTeiDoc), uri, docID, date);
                     }
                 }
             }
+
         }
         logger.info("DONE.");
     }
@@ -129,7 +134,7 @@ public class HALMiner extends Miner {
     private static void processIdentifiers(NodeList ids, fr.inria.anhalytics.entities.Document doc) {
         String type = null;
         String id = null;
-        Document_IdentifierDAO did = new Document_IdentifierDAO(AnhalyticsConnection.getInstance());
+        Document_IdentifierDAO did = (Document_IdentifierDAO) adf.getDocument_IdentifierDAO();
         for (int i = ids.getLength() - 1; i >= 0; i--) {
 
             Node node = ids.item(i);
@@ -150,9 +155,9 @@ public class HALMiner extends Miner {
     }
 
     private static void processMonogr(NodeList monogr, Publication pub) {
-        MonographDAO md = new MonographDAO(AnhalyticsConnection.getInstance());
-        Conference_EventDAO ced = new Conference_EventDAO(AnhalyticsConnection.getInstance());
-        In_SerialDAO isd = new In_SerialDAO(AnhalyticsConnection.getInstance());
+        MonographDAO md = (MonographDAO) adf.getMonographDAO();
+        Conference_EventDAO ced = (Conference_EventDAO) adf.getConference_EventDAO();
+        In_SerialDAO isd = (In_SerialDAO) adf.getIn_SerialDAO();
         Monograph mn = new Monograph();
         Conference_Event ce = null;
         In_Serial is = new In_Serial();
@@ -244,7 +249,7 @@ public class HALMiner extends Miner {
                 ce = new Conference_Event();
                 ce.setConference(new Conference());
                 Address addr = new Address();
-                AddressDAO ad = new AddressDAO(AnhalyticsConnection.getInstance());
+                AddressDAO ad = (AddressDAO) adf.getAddressDAO();
                 NodeList meeting = node.getChildNodes();
                 for (int j = meeting.getLength() - 1; j >= 0; j--) {
                     Node entry = meeting.item(j);
@@ -297,14 +302,13 @@ public class HALMiner extends Miner {
 
     private static void processPersons(NodeList persons, String type, Publication pub, Document doc) {
         Node person = null;
-        PersonDAO pd = new PersonDAO(AnhalyticsConnection.getInstance());
+        PersonDAO pd = (PersonDAO) adf.getPersonDAO();
         Person prs = new Person();
         Affiliation affiliation = null;
-        AffiliationDAO affd = new AffiliationDAO(AnhalyticsConnection.getInstance());
+        AffiliationDAO affd = (AffiliationDAO) adf.getAffiliationDAO();
         Organisation organisation = null;
-        OrganisationDAO od = new OrganisationDAO(AnhalyticsConnection.getInstance());
+        OrganisationDAO od = (OrganisationDAO) adf.getOrganisationDAO();
         List<Person_Identifier> pis = new ArrayList<Person_Identifier>();
-        logger.debug(" number of authors : " + persons.getLength());
         for (int i = persons.getLength() - 1; i >= 0; i--) {
             person = persons.item(i);
             prs = new Person();
@@ -327,16 +331,17 @@ public class HALMiner extends Miner {
                     } else if (node.getNodeName().equals("email")) {
                         prs.setEmail(node.getTextContent());
                     } else if (node.getNodeName().equals("ptr")) {
-                        Element ptr = (Element)node;
-                        if(ptr.getAttribute("type").equals("url"))
+                        Element ptr = (Element) node;
+                        if (ptr.getAttribute("type").equals("url")) {
                             prs.setUrl(ptr.getAttribute("type"));
+                        }
                     } else if (node.getNodeName().equals("affiliation")) {
 
                         organisation = new Organisation();
                         Location location = new Location();
-                        LocationDAO ld = new LocationDAO(AnhalyticsConnection.getInstance());
+                        LocationDAO ld = (LocationDAO) adf.getLocationDAO();
                         Address addr = new Address();
-                        AddressDAO ad = new AddressDAO(AnhalyticsConnection.getInstance());
+                        AddressDAO ad = (AddressDAO) adf.getAddressDAO();
                         Node org = node.getChildNodes().item(0);
                         if (org != null) {
                             NamedNodeMap nnm = org.getAttributes();
@@ -397,9 +402,13 @@ public class HALMiner extends Miner {
                                 id_type = nnm.item(p).getTextContent();
                             }
                         }
-                        pi.setId(id_value);
-                        pi.setType(id_type);
-                        pis.add(pi);
+                        if (id_type == "anhalyticsID") {
+                            person.removeChild(node);
+                        } else {
+                            pi.setId(id_value);
+                            pi.setType(id_type);
+                            pis.add(pi);
+                        }
                     }
                     //person.removeChild(node);
                 }
@@ -417,6 +426,7 @@ public class HALMiner extends Miner {
                 Editor editor = new Editor(0, prs, pub);
                 pd.createEditor(editor);
             }
+
             Element idno = doc.createElement("idno");
             idno.setAttribute("type", "anhalyticsID");
             idno.setTextContent(Long.toString(prs.getPersonId()));

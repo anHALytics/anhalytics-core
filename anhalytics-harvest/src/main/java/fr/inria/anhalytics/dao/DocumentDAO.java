@@ -67,7 +67,7 @@ public class DocumentDAO extends DAO<Document> {
                 document = new Document(
                         doc_id,
                         result.getString("version"),
-                        result.getString("TEI metadatas"
+                        result.getString("TEImetadatas"
                         ),
                         result.getString("uri"
                         ));
@@ -76,5 +76,35 @@ public class DocumentDAO extends DAO<Document> {
             e.printStackTrace();
         }
         return document;
+    }
+    
+    public Document findByURI(String uri) {
+        Document document = null;
+
+        try {
+            ResultSet result = this.connect.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM document WHERE uri = \"" + uri + "\"");
+            if (result.first()) {
+                document = new Document(
+                        result.getLong("docID"),
+                        result.getString("version"),
+                        result.getString("TEImetadatas"
+                        ),
+                        result.getString("uri"
+                        ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return document;
+    }
+    
+    public boolean isMined(String uri){
+        Document document = findByURI(uri);
+        if(document != null)
+            return true;
+        else
+            return false;
     }
 }
