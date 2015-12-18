@@ -115,6 +115,10 @@ do
             fi
             exit 0
             ;;
+        -mineData)
+            "$JAVA" -Xmx2048m -jar "${modules[0]}" -exe seedKnowledgeBase
+            exit 0
+            ;;
         -generateTei)
             if check_dates_option "$2" || check_dates_option "$4"
                 then
