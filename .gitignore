@@ -15,10 +15,6 @@ anhalytics-commons/target
 anhalytics-commons/target/*
 tempPDF/*
 tempTEI/*
-anhalytics-frontend/search/lib/mathjax
-anhalytics-frontend/search/lib/mathjax/*
-anhalytics-frontend/search/lib/mathjax
-anhalytics-frontend/search/lib/mathjax/*
 config/local/*
 config/generic/*
 /anhalytics-frontend/target/

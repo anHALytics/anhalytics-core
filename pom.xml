@@ -20,7 +20,6 @@
         <module>anhalytics-annotate</module>
         <module>anhalytics-index</module>
         <module>anhalytics-commons</module>
-        <module>anhalytics-frontend</module>
   </modules>
 
     <properties>
