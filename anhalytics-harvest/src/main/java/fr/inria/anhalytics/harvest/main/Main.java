@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Main class that implements commands for harvesting, extracting, inserting in
@@ -30,7 +31,7 @@ public class Main {
             add("harvestDaily");
             add("fetchEmbargoPublications");
             add("processGrobid");
-            add("generateTei");
+            add("appendGrobidFulltext");
             add("harvestIstex");
             add("seedKnowledgeBase");
             add("deduplicate");
@@ -58,6 +59,8 @@ public class Main {
     }
 
     private void processCommand() throws UnknownHostException {
+        Scanner sc = new Scanner(System.in);
+        char reponse=' ';
         String process = HarvestProperties.getProcessName();
         GrobidProcess gp = new GrobidProcess();
         TeiBuilderProcess tb = new TeiBuilderProcess();
@@ -78,18 +81,27 @@ public class Main {
             oai.fetchDocumentsByDate(date);
             gp.processFulltext();
             return;
-        } else if (process.equals("fetchEmbargoPublications")) {
-            oai.fetchEmbargoPublications();
-            return;
         } else if (process.equals("processGrobid")) {
             gp.processFulltext();
             return;
-        } else if (process.equals("seedKnowledgeBase")) {
-            hm.mine();
+        } else if (process.equals("initKnowledgeBase")) {
+            //Initiates HAL knowledge base and creates working corpus TEI.
+            System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
+            reponse = sc.nextLine().charAt(0);
+       
+            if(reponse != 'N')
+                hm.initKnowledgeBase();
             return;
-        } else if (process.equals("generateTei")) {
-            //warn about xml_id modifications
-            tb.build();
+        } else if (process.equals("appendGrobidFulltext")) {
+            //xml_ids are updated, the annotation is time consuming process.      
+            System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
+            reponse = sc.nextLine().charAt(0);
+       
+            if(reponse != 'N')
+                tb.appendGrobidFulltext();
+            return;
+        } else if (process.equals("fetchEmbargoPublications")) {
+            oai.fetchEmbargoPublications();
             return;
         } else if (process.equals("harvestIstex")) {
             ih.harvest();

@@ -73,7 +73,10 @@ public class HALMiner extends Miner {
         return docID;
     }
 
-    public void mine() {
+    /**
+    * Initiates HAL knowledge base and creates working corpus TEI.
+    */
+    public void initKnowledgeBase() {
         PublicationDAO pd = (PublicationDAO) adf.getPublicationDAO();
 
         DocumentDAO dd = (DocumentDAO) adf.getDocumentDAO();
@@ -413,6 +416,7 @@ public class HALMiner extends Miner {
                     //person.removeChild(node);
                 }
             }
+            prs.setFullname(prs.getSurname() + " "+prs.getMiddlename() + " "+prs.getForename());
             prs.setPerson_identifiers(pis);
 
             if (type.equals("author")) {

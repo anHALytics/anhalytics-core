@@ -9,7 +9,7 @@ import org.w3c.dom.Document;
 
 /**
  * Retrieves existing grobid teis and adds fulltext to the final tei.
- * 
+ *
  * @author Achraf
  */
 public class TeiBuilderProcess {
@@ -22,7 +22,10 @@ public class TeiBuilderProcess {
         this.mm = MongoFileManager.getInstance(false);
     }
 
-    public void build() {
+    /**
+     * Adds data TEI extracted with grobid.
+     */
+    public void appendGrobidFulltext() {
         for (String date : Utilities.getDates()) {
             if (mm.initGrobidTeis(date)) {
                 while (mm.hasMoreTeis()) {
