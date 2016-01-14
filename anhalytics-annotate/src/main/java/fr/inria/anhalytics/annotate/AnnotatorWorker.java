@@ -26,13 +26,16 @@ public class AnnotatorWorker implements Runnable {
     private MongoFileManager mm = null;
     private String tei = null;
     private String documentId = null;
+    private String date;
 
     public AnnotatorWorker(MongoFileManager mongoManager,
             String documentId,
-            String tei) {
+            String tei,
+            String date) {
         this.mm = mongoManager;
         this.documentId = documentId;
         this.tei = tei;
+        this.date = date;
     }
 
     @Override
@@ -86,11 +89,12 @@ public class AnnotatorWorker implements Runnable {
     /**
      * Annotation of a complete document.
      */
-    public static String annotateDocument(Document doc,
+    public String annotateDocument(Document doc,
             String documentId) {
         StringBuffer json = new StringBuffer();
         json.append("{ \"repositoryDocId\" : \"" + documentId
-                + "\", \"nerd\" : [");
+                +"\", \"date\" :\"" + date
+                +"\", \"nerd\" : [");
         annotateNode(doc.getDocumentElement(), true, json);
         json.append("] }");
         return json.toString();
@@ -99,7 +103,7 @@ public class AnnotatorWorker implements Runnable {
     /**
      * Recursive tree walk for annotating every nodes having a random xml:id.
      */
-    public static boolean annotateNode(Node node,
+    public boolean annotateNode(Node node,
             boolean first,
             StringBuffer json) {
         if (node.getNodeType() == Node.ELEMENT_NODE) {

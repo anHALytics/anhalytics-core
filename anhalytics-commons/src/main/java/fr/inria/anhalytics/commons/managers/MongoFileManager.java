@@ -94,7 +94,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return true;
+        if (cursor.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -112,7 +116,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return true;
+        if (cursor.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -130,7 +138,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return true;
+        if (cursor.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -148,7 +160,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return true;
+        if (cursor.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -166,22 +182,35 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return true;
+        if (cursor.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
      * This initializes cursor for annotations collection.
      */
-    public boolean initAnnotations() throws MongoException {
+    public boolean initAnnotations(String date) throws MongoException {
         collection = getCollection(ANNOTATIONS);
         // index on filename and xml:id
         BasicDBObject index = new BasicDBObject();
         index.put("repositoryDocId", 1);
         index.put("xml:id", 1);
         collection.ensureIndex(index, "index", true);
-        cursor = collection.find();
+        BasicDBObject bdbo = new BasicDBObject();
+        if (date != null) {
+            bdbo.append("date", date);
+        }
+
+        cursor = collection.find(bdbo);
         indexFile = 0;
-        return true;
+        if (cursor.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public boolean hasMoreTeis() {
@@ -328,7 +357,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public void insertBinaryDocument(InputStream file, String repositoryDocId, String date) {
         try {
             GridFS gfs = new GridFS(db, MongoCollectionsInterface.BINARIES);
-            gfs.remove(repositoryDocId + ".tei.xml");
+            gfs.remove(repositoryDocId + ".pdf");
             GridFSInputFile gfsFile = gfs.createFile(file, true);
             gfsFile.put("uploadDate", Utilities.parseStringDate(date));
             gfsFile.setFilename(repositoryDocId + ".pdf");
@@ -646,7 +675,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         BasicDBObject document = new BasicDBObject();
         document.put("repositoryDocId", repositoryDocId);
         document.put("process", process);
-        
+
         collection.findAndRemove(document);
         document.put("desc", desc);
         if (date == null) {

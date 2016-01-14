@@ -35,7 +35,7 @@ abstract class Harvester {
     /**
      * Harvests the documents submitted on the given date.
      */
-    public void fetchDocumentsByDate(String date) throws IOException, SAXException, ParserConfigurationException, ParseException {
+    protected void fetchDocumentsByDate(String date) throws IOException, SAXException, ParserConfigurationException, ParseException {
     }
 
     /**

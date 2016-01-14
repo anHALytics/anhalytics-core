@@ -26,7 +26,7 @@ public class GrobidProcess {
         this.mm = MongoFileManager.getInstance(false);
     }
 
-    public void processFulltext() {
+    public void processFulltexts() {
         try {
             if (GrobidService.isGrobidOk()) {
                 ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());

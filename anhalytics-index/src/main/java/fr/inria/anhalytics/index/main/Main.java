@@ -1,30 +1,37 @@
 package fr.inria.anhalytics.index.main;
 
+import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.index.Indexer;
 import fr.inria.anhalytics.index.properties.IndexProperties;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Main class that implements commands indexing TEIs and associated annotations (appends a standoff for each entry)
+ * Main class that implements commands indexing TEIs and associated annotations
+ * (appends a standoff for each entry)
+ *
  * @author achraf
  */
 public class Main {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands = new ArrayList<String>() {
         {
-            add("tei");
-            add("annotation");
+            add("index");
+            add("indexDaily");
         }
     };
 
     public static void main(String[] args) throws UnknownHostException {
-        
+
         if (processArgs(args)) {
             //process name is needed to set properties.
             try {
@@ -32,11 +39,11 @@ public class Main {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            
+
             Main main = new Main();
             main.processCommand();
         } else {
-            System.err.println("The possible options are : -index");
+            System.err.println(getHelp());
             return;
         }
     }
@@ -49,50 +56,63 @@ public class Main {
             if (currArg.equals("-h")) {
                 System.out.println(getHelp());
                 continue;
-            }
-            else if (currArg.equals("-index")) {
+            } else if (currArg.equals("-exe")) {
                 String command = args[i + 1];
                 if (availableCommands.contains(command)) {
                     IndexProperties.setProcessName(command);
+                    i++;
                     continue;
                 } else {
-                    System.err.println("ProcessName value should be one value from this list: " + availableCommands);
+                    System.err.println("-exe value should be one value from this list: " + availableCommands);
                     result = false;
+                    break;
                 }
-            } else 
+            } else {
                 result = false;
+            }
             i++;
             continue;
         }
         return result;
     }
 
-    private void processCommand() throws UnknownHostException  {
+    private void processCommand() throws UnknownHostException {
+        Scanner sc = new Scanner(System.in);
+        char reponse = ' ';
         String process = IndexProperties.getProcessName();
         Indexer esm = new Indexer();
-        try {
-            if (process.equals("tei")) {
-                esm.setUpElasticSearch(process);
-                // loading based on DocDB XML, with TEI conversion
-                int nbDoc = esm.indexCollection();
-                logger.info("Total: " + nbDoc + " documents indexed.");
-            } else if (process.equals("annotation")) {
-                esm.setUpElasticSearch(process);
 
-                int nbAnnotsIndexed = esm.indexAnnotations();
-                logger.info("Total: " + nbAnnotsIndexed + " annotations indexed.");
+        if (process.equals("index")) {
+            System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
+            reponse = sc.nextLine().charAt(0);
+
+            if (reponse != 'N') {
+                esm.setUpIndex(IndexProperties.getTeisIndexName());
+                esm.setUpIndex(IndexProperties.getAnnotsIndexName());
             }
-        } catch (Exception e) {
-            logger.error("Error when setting-up ElasticSeach cluster");
-            e.printStackTrace();
+        } else if (process.equals("indexDaily")) {
+            if (esm.isIndexExists()) {
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DATE, -1);
+                String todayDate = dateFormat.format(cal.getTime());
+                Utilities.updateDates(todayDate, todayDate);
+            } else {
+                System.err.println("Make sure both Teis index or annotations index are configured, you can choose re-init option to configure indexes.");
+                esm.close();
+                return;
+            }
         }
+        esm.index();
+        esm.close();
+        return;
     }
-    
+
     protected static String getHelp() {
         final StringBuffer help = new StringBuffer();
         help.append("HELP ANHALYTICS_INDEX \n");
         help.append("-h: displays help\n");
-        help.append("-index: followed by either :\n");
+        help.append("-exe: followed by either :\n");
         help.append("\t" + availableCommands + "\n");
         return help.toString();
     }

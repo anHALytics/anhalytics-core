@@ -30,7 +30,7 @@ public class HALOAIHarvester extends Harvester {
     }
 
     @Override
-    public void fetchDocumentsByDate(String date) {
+    protected void fetchDocumentsByDate(String date) {
         boolean stop = false;
         String tokenn = null;
         while (!stop) {

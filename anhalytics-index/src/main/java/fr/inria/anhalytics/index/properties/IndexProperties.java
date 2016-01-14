@@ -16,10 +16,9 @@ public class IndexProperties {
     private static String elasticSearch_port;
 
     private static String elasticSearchClusterName;
-    private static String teiIndexName;
     private static String annotsIndexName;
 
-    private static String workingIndexName;
+    private static String teisIndexName;
 
     public static void init(String properties_filename) {
         Properties props = new Properties();
@@ -32,13 +31,9 @@ public class IndexProperties {
         setElasticSearch_host(props.getProperty("index.elasticSearch_host"));
         setElasticSearch_port(props.getProperty("index.elasticSearch_port"));
         setElasticSearchClusterName(props.getProperty("index.elasticSearch_cluster"));
-        setTeiIndexName(props.getProperty("index.elasticSearch_indexName"));
         setAnnotsIndexName(props.getProperty("index.elasticSearch_annotsIndexName"));
-        if (processName.equals("tei")) {
-            setWorkingIndexName(props.getProperty("index.elasticSearch_indexName"));
-        } else if (processName.equals("annotation")) {
-            setWorkingIndexName(props.getProperty("index.elasticSearch_annotsIndexName"));
-        }
+        setTeisIndexName(props.getProperty("index.elasticSearch_teisIndexName"));
+        setAnnotsIndexName(props.getProperty("index.elasticSearch_annotsIndexName"));
     }
 
     private static void checkPath(String path) {
@@ -107,20 +102,6 @@ public class IndexProperties {
     }
 
     /**
-     * @return the teiIndexName
-     */
-    public static String getTeiIndexName() {
-        return teiIndexName;
-    }
-
-    /**
-     * @param aTeiIndexName the teiIndexName to set
-     */
-    public static void setTeiIndexName(String aTeiIndexName) {
-        teiIndexName = aTeiIndexName;
-    }
-
-    /**
      * @return the annotsIndexName
      */
     public static String getAnnotsIndexName() {
@@ -137,15 +118,16 @@ public class IndexProperties {
     /**
      * @return the workingIndexName
      */
-    public static String getWorkingIndexName() {
-        return workingIndexName;
+    public static String getTeisIndexName() {
+        return teisIndexName;
     }
 
     /**
      * @param aWorkingIndexName the workingIndexName to set
      */
-    public static void setWorkingIndexName(String aWorkingIndexName) {
-        workingIndexName = aWorkingIndexName;
+    public static void setTeisIndexName(String ateisIndexName) {
+        teisIndexName = ateisIndexName;
     }
+    
 
 }

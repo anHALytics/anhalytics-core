@@ -31,9 +31,12 @@ public class Main {
             add("harvestDaily");
             add("fetchEmbargoPublications");
             add("processGrobid");
+            add("processGrobidDaily");
             add("appendGrobidFulltext");
+            add("appendGrobidFulltextDaily");
             add("harvestIstex");
-            add("seedKnowledgeBase");
+            add("initKnowledgeBase");
+            add("initKnowledgeBaseDaily");
             add("deduplicate");
         }
     };
@@ -53,14 +56,18 @@ public class Main {
             Main main = new Main();
             main.processCommand();
         } else {
-             System.err.println(getHelp());
-             return;
+            System.err.println(getHelp());
+            return;
         }
     }
 
     private void processCommand() throws UnknownHostException {
         Scanner sc = new Scanner(System.in);
-        char reponse=' ';
+        char reponse = ' ';
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        String todayDate = dateFormat.format(cal.getTime());
         String process = HarvestProperties.getProcessName();
         GrobidProcess gp = new GrobidProcess();
         TeiBuilderProcess tb = new TeiBuilderProcess();
@@ -70,43 +77,44 @@ public class Main {
         IstexHarvester ih = new IstexHarvester();
         if (process.equals("harvestAll")) {
             oai.fetchAllDocuments();
-            gp.processFulltext();
-            return;
         } else if (process.equals("harvestDaily")) {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, -1);
-            String date = dateFormat.format(cal.getTime());
-            Utilities.updateDates(date, date);
-            oai.fetchDocumentsByDate(date);
-            gp.processFulltext();
-            return;
+            Utilities.updateDates(todayDate, todayDate);
+            oai.fetchAllDocuments();
         } else if (process.equals("processGrobid")) {
-            gp.processFulltext();
-            return;
+            gp.processFulltexts();
+        } else if (process.equals("processGrobidDaily")) {
+            Utilities.updateDates(todayDate, todayDate);
+            gp.processFulltexts();
         } else if (process.equals("initKnowledgeBase")) {
             //Initiates HAL knowledge base and creates working corpus TEI.
             System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);
-       
-            if(reponse != 'N')
+
+            if (reponse != 'N') {
                 hm.initKnowledgeBase();
+            }
             return;
+        } else if (process.equals("initKnowledgeBaseDaily")) {
+            //Initiates HAL knowledge base and creates working corpus TEI.
+            Utilities.updateDates(todayDate, todayDate);
+            hm.initKnowledgeBase();
         } else if (process.equals("appendGrobidFulltext")) {
             //xml_ids are updated, the annotation is time consuming process.      
             System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);
-       
-            if(reponse != 'N')
+            if (reponse != 'N') {
                 tb.appendGrobidFulltext();
-            return;
+            }
+        } else if (process.equals("appendGrobidFulltextDaily")) {
+            //xml_ids are updated, the annotation is time consuming process.
+            Utilities.updateDates(todayDate, todayDate);
+            tb.appendGrobidFulltext();
         } else if (process.equals("fetchEmbargoPublications")) {
             oai.fetchEmbargoPublications();
-            return;
         } else if (process.equals("harvestIstex")) {
             ih.harvest();
-            return;
         }
+        return;
     }
 
     protected static boolean processArgs(final String[] pArgs) {

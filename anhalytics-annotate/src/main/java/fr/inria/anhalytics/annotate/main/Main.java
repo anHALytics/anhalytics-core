@@ -4,6 +4,11 @@ import fr.inria.anhalytics.annotate.Annotator;
 import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +21,13 @@ import org.slf4j.LoggerFactory;
 public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
+
+    private static List<String> availableCommands = new ArrayList<String>() {
+        {
+            add("annotateAll");
+            add("annotateDaily");
+        }
+    };
 
     public static void main(String[] args) throws UnknownHostException {
         try {
@@ -37,20 +49,17 @@ public class Main {
     }
 
     private void processCommand() throws UnknownHostException {
+        String process = AnnotateProperties.getProcessName();
         Annotator annotator = new Annotator();
-        // loading based on DocDB XML, with TEI conversion
-        try {
-
-            if (AnnotateProperties.isIsMultiThread()) {
-
-                annotator.annotateTeiCollectionMultiThreaded();
-            } else {
-                annotator.annotateTeiCollection();
-            }
-        } catch (Exception e) {
-            logger.error("Error when setting-up the annotator.");
-            e.printStackTrace();
+        if (process.equals("annotateDaily")) {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -1);
+            String todayDate = dateFormat.format(cal.getTime());
+            Utilities.updateDates(todayDate, todayDate);
         }
+
+        annotator.annotate();
         return;
     }
 
@@ -62,8 +71,7 @@ public class Main {
             if (currArg.equals("-h")) {
                 System.out.println(getHelp());
                 continue;
-            }
-            else if (currArg.equals("-dFromDate")) {
+            } else if (currArg.equals("-dFromDate")) {
                 String stringDate = args[i + 1];
                 if (!stringDate.isEmpty()) {
                     if (Utilities.isValidDate(stringDate)) {
@@ -75,8 +83,7 @@ public class Main {
                 }
                 i++;
                 continue;
-            }
-            else if (currArg.equals("-dUntilDate")) {
+            } else if (currArg.equals("-dUntilDate")) {
                 String stringDate = args[i + 1];
                 if (!stringDate.isEmpty()) {
                     if (Utilities.isValidDate(stringDate)) {
@@ -88,10 +95,20 @@ public class Main {
                 }
                 i++;
                 continue;
-            }
-            else if (currArg.equals("-multiThread")) {
+            } else if (currArg.equals("-multiThread")) {
                 AnnotateProperties.setIsMultiThread(true);
                 continue;
+            } else if (currArg.equals("-exe")) {
+                String command = args[i + 1];
+                if (availableCommands.contains(command)) {
+                    AnnotateProperties.setProcessName(command);
+                    i++;
+                    continue;
+                } else {
+                    System.err.println("-exe value should be one value from this list: " + availableCommands);
+                    result = false;
+                    break;
+                }
             } else {
                 result = false;
             }
@@ -106,6 +123,8 @@ public class Main {
         help.append("-multiThread: enables using multiple threads to annotate\n");
         help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-dUntilDate: filter until date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
+        help.append("-exe: gives the command to execute. The value should be one of these : \n");
+        help.append("\t" + availableCommands + "\n");
         return help.toString();
     }
 }

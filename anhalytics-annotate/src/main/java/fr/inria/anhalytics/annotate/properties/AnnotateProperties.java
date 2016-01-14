@@ -10,6 +10,8 @@ import java.util.Properties;
  * @author Achraf
  */
 public class AnnotateProperties {
+    
+    private static String processName;
 
     private static String fromDate;
 
@@ -153,6 +155,20 @@ public class AnnotateProperties {
      */
     public static void setNbThreads(int aNbThreads) {
         nbThreads = aNbThreads;
+    }
+
+    /**
+     * @return the processName
+     */
+    public static String getProcessName() {
+        return processName;
+    }
+
+    /**
+     * @param aProcessName the processName to set
+     */
+    public static void setProcessName(String aProcessName) {
+        processName = aProcessName;
     }
 
 }

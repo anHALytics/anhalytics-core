@@ -11,7 +11,7 @@ import java.util.concurrent.*;
 
 /**
  * Handles threads used to annotate the tei collection from MongoDB.
- * 
+ *
  * @author Patrice Lopez
  */
 public class Annotator {
@@ -24,10 +24,23 @@ public class Annotator {
         this.mm = MongoFileManager.getInstance(false);
     }
 
+    public void annotate() {
+        try {
+            if (AnnotateProperties.isIsMultiThread()) {
+                annotateTeiCollectionMultiThreaded();
+            } else {
+                annotateTeiCollection();
+            }
+        } catch (Exception e) {
+            logger.error("Error when setting-up the annotator.");
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Annotates tei collection entries with fulltext.
      */
-    public void annotateTeiCollection() throws UnreachableNerdServiceException {
+    private void annotateTeiCollection() throws UnreachableNerdServiceException {
         int nb = 0;
         try {
             if (NerdService.isNerdReady()) {
@@ -55,7 +68,7 @@ public class Annotator {
                                 continue;
                             }
                             AnnotatorWorker worker
-                                    = new AnnotatorWorker(mm, id, tei);
+                                    = new AnnotatorWorker(mm, id, tei, date);
                             worker.run();
                             nb++;
                         }
@@ -71,7 +84,7 @@ public class Annotator {
     /**
      * Annotates tei collection entries with fulltext (multithread process).
      */
-    public void annotateTeiCollectionMultiThreaded() throws UnreachableNerdServiceException {
+    private void annotateTeiCollectionMultiThreaded() throws UnreachableNerdServiceException {
         int nb = 0;
         try {
             if (NerdService.isNerdReady()) {
@@ -102,7 +115,7 @@ public class Annotator {
                             }
 
                             Runnable worker
-                                    = new AnnotatorWorker(mm, id, tei);
+                                    = new AnnotatorWorker(mm, id, tei, date);
                             executor.execute(worker);
                             nb++;
                         }
