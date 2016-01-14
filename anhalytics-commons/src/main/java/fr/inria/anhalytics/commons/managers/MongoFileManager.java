@@ -242,7 +242,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         DBObject obj = cursor.next();
         json = obj.toString();
         currentRepositoryDocId = (String) obj.get("repositoryDocId");
-
+        currentDocId = (String) obj.get("docId");
         if (!cursor.hasNext()) {
             cursor.close();
         }
@@ -255,6 +255,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         String tei = null;
         DBObject obj = cursor.next();
         currentRepositoryDocId = (String) obj.get("repositoryDocId");
+        if (obj.containsField("docId")) {
+            currentDocId = (String) obj.get("docId");
+        }
         GridFSDBFile binaryfile = gfs.findOne(currentRepositoryDocId + ".tei.xml");
         indexFile++;
         teiStream = binaryfile.getInputStream();
@@ -519,14 +522,14 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Returns the annotation for a given repositoryDocId.
      */
-    public String getAnnotations(String repositoryDocId) {
+    public String getAnnotations(String docId) {
         DBCollection c = null;
         c = db.getCollection("annotations");
         c.ensureIndex(new BasicDBObject("repositoryDocId", 1));
         c.ensureIndex(new BasicDBObject("xml:id", 1));
 
         String result = null;
-        BasicDBObject query = new BasicDBObject("repositoryDocId", repositoryDocId);
+        BasicDBObject query = new BasicDBObject("docId", docId);
         DBCursor curs = null;
         try {
             curs = c.find(query);

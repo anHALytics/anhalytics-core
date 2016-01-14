@@ -237,6 +237,7 @@ public class Indexer {
                     while (mm.hasMoreTeis()) {
                         String tei = mm.nextTeiDocument();
                         String id = mm.getCurrentRepositoryDocId();
+                        String docId = mm.getCurrentDocId();
                         
                         
                         if (!mm.isWithFulltext(id)) {
@@ -249,7 +250,7 @@ public class Indexer {
                         JSONObject json = JsonTapasML.toJSONObject(tei);
                         String jsonStr = json.toString();
 
-                        jsonStr = indexingPreprocess.process(jsonStr, id);
+                        jsonStr = indexingPreprocess.process(jsonStr, id, docId);
 
                         if (jsonStr == null) {
                             continue;
@@ -257,7 +258,7 @@ public class Indexer {
 
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
-                        bulkRequest.add(client.prepareIndex(IndexProperties.getTeisIndexName(), "npl", id).setSource(jsonStr));
+                        bulkRequest.add(client.prepareIndex(IndexProperties.getTeisIndexName(), "npl", docId).setSource(jsonStr));
 
                         if (i >= 100) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -304,10 +305,10 @@ public class Indexer {
                     while (mm.hasMoreAnnotations()) {
                         String json = mm.nextAnnotation();
                         String id = mm.getCurrentRepositoryDocId();
-
+                        String docId = mm.getCurrentDocId();
                         // get the xml:id of the elements we want to index from the document
                         // we only index title, abstract and keyphrase annotations !
-                        List<String> validIDs = validDocIDs(id, mapper);
+                        List<String> validIDs = validDocIDs(docId, mapper);
 
                         JsonNode jsonAnnotation = mapper.readTree(json);
                         JsonNode jn = jsonAnnotation.findPath("nerd");
@@ -374,9 +375,9 @@ public class Indexer {
         return nb;
     }
 
-    private List<String> validDocIDs(String halID, ObjectMapper mapper) {
+    private List<String> validDocIDs(String id, ObjectMapper mapper) {
         List<String> results = new ArrayList<String>();
-        logger.debug("validDocIDs: " + halID);
+        logger.debug("validDocIDs: " + id);
 
         String request = "{\"fields\": [ ";
         boolean first = true;
@@ -388,7 +389,7 @@ public class Indexer {
             }
             request += "\"" + path + "\"";
         }
-        request += "], \"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + halID + "\"}}}}}";
+        request += "], \"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + id + "\"}}}}}";
         //System.out.println(request);
 
         String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + IndexProperties.getTeisIndexName() + "/_search";

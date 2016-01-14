@@ -50,6 +50,7 @@ public class Annotator {
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
+                            String docID = mm.getCurrentDocId();
                             if (!mm.isWithFulltext(id)) {
                                 continue;
                             }
@@ -68,7 +69,7 @@ public class Annotator {
                                 continue;
                             }
                             AnnotatorWorker worker
-                                    = new AnnotatorWorker(mm, id, tei, date);
+                                    = new AnnotatorWorker(mm, id, docID, tei, date);
                             worker.run();
                             nb++;
                         }
@@ -95,7 +96,7 @@ public class Annotator {
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
-
+                            String docID = mm.getCurrentDocId();
                             if (!mm.isWithFulltext(id)) {
                                 continue;
                             }
@@ -115,7 +116,7 @@ public class Annotator {
                             }
 
                             Runnable worker
-                                    = new AnnotatorWorker(mm, id, tei, date);
+                                    = new AnnotatorWorker(mm, id, docID, tei, date);
                             executor.execute(worker);
                             nb++;
                         }

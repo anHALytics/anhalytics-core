@@ -85,7 +85,7 @@ public class HALMiner extends Miner {
                 while (mm.hasMoreTeis()) {
                     String metadataTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
-                    if (!(mm.isFinalTeiCreated(uri) && dd.isMined(uri))) {//check if final tei is created(doesnt check if kb entry is created..)
+                    if (!dd.isMined(uri)) {
                         adf.openTransaction();
                         Document generatedTeiDoc = null;
                         try {

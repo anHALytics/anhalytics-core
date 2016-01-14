@@ -26,14 +26,17 @@ public class AnnotatorWorker implements Runnable {
     private MongoFileManager mm = null;
     private String tei = null;
     private String documentId = null;
+    private String docId = null;
     private String date;
 
     public AnnotatorWorker(MongoFileManager mongoManager,
             String documentId,
+            String docId,
             String tei,
             String date) {
         this.mm = mongoManager;
         this.documentId = documentId;
+        this.docId = docId;
         this.tei = tei;
         this.date = date;
     }
@@ -81,7 +84,7 @@ public class AnnotatorWorker implements Runnable {
             }
         }
         // get all the elements having an attribute id and annotate their text content
-        String jsonAnnotations = annotateDocument(docTei, documentId);
+        String jsonAnnotations = annotateDocument(docTei, documentId, docId);
         mm.insertAnnotation(jsonAnnotations);
         logger.debug("\t\t " + documentId + " annotated.");
     }
@@ -90,9 +93,10 @@ public class AnnotatorWorker implements Runnable {
      * Annotation of a complete document.
      */
     public String annotateDocument(Document doc,
-            String documentId) {
+            String documentId, String docId) {
         StringBuffer json = new StringBuffer();
         json.append("{ \"repositoryDocId\" : \"" + documentId
+                +"\",\"docId\" : \"" + docId
                 +"\", \"date\" :\"" + date
                 +"\", \"nerd\" : [");
         annotateNode(doc.getDocumentElement(), true, json);

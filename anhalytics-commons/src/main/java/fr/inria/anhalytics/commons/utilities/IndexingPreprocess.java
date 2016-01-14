@@ -37,12 +37,14 @@ public class IndexingPreprocess {
     /**
      * Format jsonStr to fit with ES structure.
      */
-    public String process(String jsonStr, String id) throws Exception {
+    public String process(String jsonStr, String repositoryDocId, String id) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonRoot = mapper.readTree(jsonStr);
         // root node is the TEI node, we add as a child the "light" annotations in a 
         // standoff element
         if (id != null) {
+            
+
             JsonNode teiRoot = jsonRoot.findPath("$teiCorpus");
             JsonNode tei = jsonRoot.findPath("$TEI");
             //check if fulltext is there..
@@ -53,6 +55,10 @@ public class IndexingPreprocess {
             if ((teiRoot != null) && (!teiRoot.isMissingNode())) {
                 JsonNode standoffNode = getStandoff(mapper, id);
                 ((ArrayNode) teiRoot).add(standoffNode);
+                
+                JsonNode repositoryIdNode = mapper.createObjectNode();
+                ((ObjectNode) repositoryIdNode).put("repositoryDocId", repositoryDocId);
+                ((ArrayNode) teiRoot).add(repositoryIdNode);
             }
         }
 
