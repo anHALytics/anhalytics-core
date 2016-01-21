@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.dao;
 
+import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.entities.Document;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -106,5 +107,9 @@ public class DocumentDAO extends DAO<Document> {
             return true;
         else
             return false;
+    }
+    
+    public boolean isCitationsMined(String uri){
+        return isMined(uri);
     }
 }

@@ -111,6 +111,8 @@ public class Main {
             tb.appendGrobidFulltext();
         } else if (process.equals("fetchEmbargoPublications")) {
             oai.fetchEmbargoPublications();
+        } else if (process.equals("initCitationKnowledgeBase")) {
+            gm.processCitations();
         } else if (process.equals("harvestIstex")) {
             ih.harvest();
         }

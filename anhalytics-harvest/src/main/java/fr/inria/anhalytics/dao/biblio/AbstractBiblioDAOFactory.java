@@ -1,12 +1,13 @@
-package fr.inria.anhalytics.dao;
+package fr.inria.anhalytics.dao.biblio;
 
-import fr.inria.anhalytics.dao.anhalytics.DAOFactory;
+import fr.inria.anhalytics.dao.DAO;
+
 
 /**
  *
  * @author azhar
  */
-public abstract class AbstractDAOFactory {
+public abstract class AbstractBiblioDAOFactory {
 
     public static final int DAO_FACTORY = 0;
 
@@ -22,17 +23,9 @@ public abstract class AbstractDAOFactory {
 
     public abstract DAO getAddressDAO();
 
-    public abstract DAO getAffiliationDAO();
-
     public abstract DAO getConference_EventDAO();
 
-    public abstract DAO getDocument_IdentifierDAO();
-
     public abstract DAO getIn_SerialDAO();
-
-    public abstract DAO getLocationDAO();
-
-    public abstract DAO getOrganisationDAO();
 
     public abstract DAO getPersonDAO();
     
@@ -42,12 +35,12 @@ public abstract class AbstractDAOFactory {
     
     public abstract void rollback();
 
-    public static AbstractDAOFactory getFactory(int type) {
+    public static AbstractBiblioDAOFactory getFactory(int type) {
         switch (type) {
             case DAO_FACTORY:
-                return new DAOFactory();
-            case MONGO_DAO_FACTORY:
-                return new MongoDAOFactory();
+                return new fr.inria.anhalytics.dao.biblio.BiblioDAOFactory();
+            //case MONGO_DAO_FACTORY:
+            //    return new BiblioMongoDAOFactory();
             default:
                 return null;
         }

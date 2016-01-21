@@ -3,15 +3,15 @@ package fr.inria.anhalytics.datamine;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.AddressDAO;
-import fr.inria.anhalytics.dao.AffiliationDAO;
-import fr.inria.anhalytics.dao.AnhalyticsConnection;
+import fr.inria.anhalytics.dao.anhalytics.AffiliationDAO;
+import fr.inria.anhalytics.dao.DatabaseConnection;
 import fr.inria.anhalytics.dao.Conference_EventDAO;
-import fr.inria.anhalytics.dao.LocationDAO;
+import fr.inria.anhalytics.dao.anhalytics.LocationDAO;
 import fr.inria.anhalytics.dao.DocumentDAO;
-import fr.inria.anhalytics.dao.Document_IdentifierDAO;
+import fr.inria.anhalytics.dao.anhalytics.Document_IdentifierDAO;
 import fr.inria.anhalytics.dao.In_SerialDAO;
 import fr.inria.anhalytics.dao.MonographDAO;
-import fr.inria.anhalytics.dao.OrganisationDAO;
+import fr.inria.anhalytics.dao.anhalytics.OrganisationDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.dao.PublicationDAO;
 import fr.inria.anhalytics.dao.PublisherDAO;
@@ -203,7 +203,7 @@ public class HALMiner extends Miner {
                     Node entry = imprint.item(j);
                     if (entry.getNodeName().equals("publisher")) {
                         Publisher pls = new Publisher(null, entry.getTextContent());
-                        (new PublisherDAO(AnhalyticsConnection.getInstance())).create(pls);
+                        adf.getPublisherDAO().create(pls);
                         pub.setPublisher(pls);
                         //System.out.println(entry.getTextContent());
                     } else if (entry.getNodeName().equals("date")) {

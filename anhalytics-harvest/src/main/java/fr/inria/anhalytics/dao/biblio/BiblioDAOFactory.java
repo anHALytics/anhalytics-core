@@ -1,5 +1,20 @@
-package fr.inria.anhalytics.dao;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package fr.inria.anhalytics.dao.biblio;
 
+import fr.inria.anhalytics.dao.AddressDAO;
+import fr.inria.anhalytics.dao.Conference_EventDAO;
+import fr.inria.anhalytics.dao.DatabaseConnection;
+import fr.inria.anhalytics.dao.DAO;
+import fr.inria.anhalytics.dao.DocumentDAO;
+import fr.inria.anhalytics.dao.In_SerialDAO;
+import fr.inria.anhalytics.dao.MonographDAO;
+import fr.inria.anhalytics.dao.PersonDAO;
+import fr.inria.anhalytics.dao.PublicationDAO;
+import fr.inria.anhalytics.dao.PublisherDAO;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.slf4j.Logger;
@@ -7,13 +22,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author azhar
+ * @author achraf
  */
-public class DAOFactory extends AbstractDAOFactory {
+public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(DAOFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(BiblioDAOFactory.class);
+    protected static Connection conn = null;
 
-    protected static final Connection conn = AnhalyticsConnection.getInstance();
+    public static void initConnection() {
+        conn = DatabaseConnection.getInstance(DatabaseConnection.anhalytics_biblio_dbName);
+    }
 
     public DAO getDocumentDAO() {
         return new DocumentDAO(conn);
@@ -23,32 +41,16 @@ public class DAOFactory extends AbstractDAOFactory {
         return new AddressDAO(conn);
     }
 
-    public DAO getAffiliationDAO() {
-        return new AffiliationDAO(conn);
-    }
-
     public DAO getConference_EventDAO() {
         return new Conference_EventDAO(conn);
-    }
-
-    public DAO getDocument_IdentifierDAO() {
-        return new Document_IdentifierDAO(conn);
     }
 
     public DAO getIn_SerialDAO() {
         return new In_SerialDAO(conn);
     }
 
-    public DAO getLocationDAO() {
-        return new LocationDAO(conn);
-    }
-
     public DAO getMonographDAO() {
         return new MonographDAO(conn);
-    }
-
-    public DAO getOrganisationDAO() {
-        return new OrganisationDAO(conn);
     }
 
     public DAO getPersonDAO() {

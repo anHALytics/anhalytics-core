@@ -1,5 +1,7 @@
-package fr.inria.anhalytics.dao;
+package fr.inria.anhalytics.dao.anhalytics;
 
+import fr.inria.anhalytics.dao.DocumentDAO;
+import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.entities.Document_Identifier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

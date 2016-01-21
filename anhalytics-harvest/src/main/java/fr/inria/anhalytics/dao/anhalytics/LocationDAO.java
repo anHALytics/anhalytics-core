@@ -1,6 +1,8 @@
-package fr.inria.anhalytics.dao;
+package fr.inria.anhalytics.dao.anhalytics;
 
+import fr.inria.anhalytics.dao.DocumentDAO;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.entities.Address;
 import fr.inria.anhalytics.entities.Location;
 import fr.inria.anhalytics.entities.Organisation;

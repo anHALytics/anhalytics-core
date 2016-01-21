@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.dao;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.entities.Document;
 import fr.inria.anhalytics.entities.Monograph;
 import fr.inria.anhalytics.entities.Publication;

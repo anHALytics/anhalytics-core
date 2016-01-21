@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.dao;
 
+import fr.inria.anhalytics.dao.AbstractDAOFactory;
+import fr.inria.anhalytics.dao.DAO;
+
 /**
  *
  * @author achraf

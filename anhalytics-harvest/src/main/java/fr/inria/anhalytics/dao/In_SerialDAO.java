@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.dao;
 
+import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.entities.Collection;
 import fr.inria.anhalytics.entities.In_Serial;
 import fr.inria.anhalytics.entities.Journal;
