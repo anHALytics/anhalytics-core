@@ -396,6 +396,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             GridFS gfs = new GridFS(db, namespace);
             GridFSInputFile gfsFile = gfs.createFile(file, true);
+            gfs.remove(identifier + ".pdf");
             gfsFile.put("uploadDate", Utilities.parseStringDate(dateString));
             gfsFile.setFilename(identifier + ".tei.xml");
             gfsFile.put("identifier", identifier);
