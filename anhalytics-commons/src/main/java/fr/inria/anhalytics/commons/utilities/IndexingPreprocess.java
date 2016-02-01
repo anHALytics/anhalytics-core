@@ -43,8 +43,6 @@ public class IndexingPreprocess {
         // root node is the TEI node, we add as a child the "light" annotations in a 
         // standoff element
         if (id != null) {
-            
-
             JsonNode teiRoot = jsonRoot.findPath("$teiCorpus");
             JsonNode tei = jsonRoot.findPath("$TEI");
             //check if fulltext is there..
@@ -75,6 +73,9 @@ public class IndexingPreprocess {
     /**
      * Process subJson Node and iterate through sub-nodes.
      */
+    /**
+     * Process subJson Node and iterate through sub-nodes.
+     */
     private JsonNode process(JsonNode subJson,
             ObjectMapper mapper,
             String currentLang,
@@ -88,6 +89,7 @@ public class IndexingPreprocess {
                 JsonNode theSchemeNode = null;
                 JsonNode theClassCodeNode = null;
                 JsonNode theTypeNode = null;
+                JsonNode theUnitNode = null;
                 JsonNode thePersonNode = null;
                 JsonNode theItemNode = null;
                 JsonNode theKeywordsNode = null;
@@ -98,8 +100,10 @@ public class IndexingPreprocess {
                 JsonNode theWhenNode = null;
                 JsonNode theTermNode = null;
                 JsonNode theNNode = null;
+                JsonNode divNode = null;
                 JsonNode theTitleNode = null;
                 JsonNode theXmlIdNode = null;
+                JsonNode theLevelNode = null;
                 boolean isDepositorKeywords = false;
                 while (fields.hasNext()) {
                     String field = fields.next();
@@ -120,6 +124,8 @@ public class IndexingPreprocess {
                         return subJson;
                     } else if (field.equals("$classCode")) {
                         theClassCodeNode = subJson.path("$classCode");
+                    } else if (field.equals("level")) {
+                        theLevelNode = subJson.path("level");
                     } else if (field.equals("$title")) {
                         theTitleNode = subJson.path("$title");
                         // we add a canonical copy of the title under $first, which allows to 
@@ -144,6 +150,8 @@ public class IndexingPreprocess {
                         theNNode = subJson.path("n");
                     } else if (field.equals("$person")) {
                         thePersonNode = subJson.path("$person");
+                    } else if (field.equals("$div")) {
+                        divNode = subJson.path("$div");
                     } else if (field.equals("$item")) {
                         theItemNode = subJson.path("$item");
                     } else if (field.equals("$date")) {
@@ -186,6 +194,8 @@ public class IndexingPreprocess {
                         }
                     } else if (field.equals("type")) {
                         theTypeNode = subJson.path("type");
+                    } else if (field.equals("unit")) {
+                        theUnitNode = subJson.path("unit");
                     } else if (field.equals("when")) {
                         theWhenNode = subJson.path("when");
                     } else if (field.equals("$term")) {
@@ -236,6 +246,22 @@ public class IndexingPreprocess {
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$keywords", arrayNode); // update value
                     return subJson;
+                } else if ((theTypeNode != null) && (theKeywordsNode != null)) {
+                    JsonNode typeNode = mapper.createObjectNode();
+                    ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
+                            process(theKeywordsNode, mapper, currentLang, false, expandLang, false, id));
+                    JsonNode arrayNode = mapper.createArrayNode();
+                    ((ArrayNode) arrayNode).add(typeNode);
+                    ((ObjectNode) subJson).put("$keywords", arrayNode); // update value
+                    return subJson;
+                } else if ((theTypeNode != null) && (divNode != null)) {
+                    JsonNode typeNode = mapper.createObjectNode();
+                    ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
+                            process(divNode, mapper, currentLang, false, expandLang, false, id));
+                    JsonNode arrayNode = mapper.createArrayNode();
+                    ((ArrayNode) arrayNode).add(typeNode);
+                    ((ObjectNode) subJson).put("$div", arrayNode); // update value
+                    return subJson;
                 } else if (theDepositorKeywordsNode != null) {
                     // we need to set a default "author" type 
                     JsonNode typeNode = mapper.createObjectNode();
@@ -253,9 +279,17 @@ public class IndexingPreprocess {
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$idno", arrayNode); // update value
                     return subJson;
-                } else if ((theTypeNode != null) && (theBiblScopeNode != null)) {
+                } else if ((theTypeNode != null) && (theDateNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
+                            process(theDateNode, mapper, currentLang, false, expandLang, false, id));
+                    JsonNode arrayNode = mapper.createArrayNode();
+                    ((ArrayNode) arrayNode).add(typeNode);
+                    ((ObjectNode) subJson).put("$date", arrayNode); // update value
+                    return subJson;
+                } else if ((theUnitNode != null) && (theBiblScopeNode != null)) {
+                    JsonNode typeNode = mapper.createObjectNode();
+                    ((ObjectNode) typeNode).put("$unit_" + theUnitNode.getTextValue(),
                             process(theBiblScopeNode, mapper, currentLang, false, expandLang, false, id));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);

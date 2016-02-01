@@ -37,6 +37,7 @@ public class Main {
             add("harvestIstex");
             add("initKnowledgeBase");
             add("initKnowledgeBaseDaily");
+            add("initCitationKnowledgeBase");
             add("deduplicate");
         }
     };

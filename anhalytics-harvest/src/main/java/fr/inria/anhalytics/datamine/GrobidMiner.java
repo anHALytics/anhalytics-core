@@ -1,11 +1,13 @@
 package fr.inria.anhalytics.datamine;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.AddressDAO;
 import fr.inria.anhalytics.dao.Conference_EventDAO;
 import fr.inria.anhalytics.dao.DocumentDAO;
 import fr.inria.anhalytics.dao.In_SerialDAO;
 import fr.inria.anhalytics.dao.MonographDAO;
+import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.dao.PublicationDAO;
 import fr.inria.anhalytics.dao.biblio.AbstractBiblioDAOFactory;
 import fr.inria.anhalytics.dao.biblio.BiblioDAOFactory;
@@ -14,6 +16,7 @@ import fr.inria.anhalytics.entities.Collection;
 import fr.inria.anhalytics.entities.Conference;
 import fr.inria.anhalytics.entities.Conference_Event;
 import fr.inria.anhalytics.entities.Country;
+import fr.inria.anhalytics.entities.Editor;
 import fr.inria.anhalytics.entities.In_Serial;
 import fr.inria.anhalytics.entities.Journal;
 import fr.inria.anhalytics.entities.Monograph;
@@ -25,6 +28,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -67,7 +72,6 @@ public class GrobidMiner extends Miner {
      */
     public void processCitations() {
         BiblioDAOFactory.initConnection();
-
         DocumentDAO dd = (DocumentDAO) abdf.getDocumentDAO();
 
         for (String date : Utilities.getDates()) {
@@ -80,19 +84,21 @@ public class GrobidMiner extends Miner {
                         continue;
                     }
                     if (!dd.isCitationsMined(uri)) {
+                        logger.info("Extracting metadata from :" + uri);
                         abdf.openTransaction();
                         try {
                             InputStream teiStream = new ByteArrayInputStream(teiString.getBytes());
                             Document teiDoc = getDocument(teiStream);
                             teiStream.close();
-                            Node citations = (Node) xPath.compile("/teiCorpus/TEI/text/back/div[@type='references']").evaluate(teiDoc, XPathConstants.NODE);
+                            Node citations = (Node) xPath.compile("/teiCorpus/TEI/text/back/div[@type='references']/listBibl").evaluate(teiDoc, XPathConstants.NODE);
                             NodeList references = citations.getChildNodes();
                             fr.inria.anhalytics.entities.Document doc = new fr.inria.anhalytics.entities.Document(null, Utilities.getVersionFromURI(uri), Utilities.innerXmlToString(citations), uri);
                             dd.create(doc);
-                            for (int i = 0; i < references.getLength() - 1; i++) {
-                                NodeList biblStructs = references.item(i).getChildNodes();
-                                for (int j = 0; j < biblStructs.getLength() - 1; j++) {
-                                    processBiblStruct(biblStructs.item(j), doc);
+
+                            System.out.println(doc.getDocID());
+                            for (int j = 0; j < references.getLength() - 1; j++) {
+                                if (references.item(j).getNodeType() == Node.ELEMENT_NODE) {
+                                    processBiblStruct((Element) references.item(j), doc);
                                 }
                             }
 
@@ -101,180 +107,204 @@ public class GrobidMiner extends Miner {
                             abdf.rollback();
                         }
                         abdf.endTransaction();
+                        logger.info("Done.");
                     }
                 }
             }
         }
-        //close connection
+        BiblioDAOFactory.closeConnection();
     }
 
-    private void processBiblStruct(Node biblStruct, fr.inria.anhalytics.entities.Document doc) {
+    private void processBiblStruct(Element reference, fr.inria.anhalytics.entities.Document doc) {
         PublicationDAO pd = (PublicationDAO) abdf.getPublicationDAO();
+        MonographDAO md = (MonographDAO) abdf.getMonographDAO();
+        In_SerialDAO isd = (In_SerialDAO) abdf.getIn_SerialDAO();
+        PersonDAO persd = (PersonDAO) abdf.getPersonDAO();
+        Conference_EventDAO ced = (Conference_EventDAO) abdf.getConference_EventDAO();
+
+        Conference_Event ce = null;
+        In_Serial is = null;
         Publication pub = new Publication();
-        Person prs = new Person();
-        NodeList nl = biblStruct.getChildNodes();
-        NodeList nodes = null;
-        for (int i = nl.getLength() - 1; i >= 0; i--) {
-            Node node = nl.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                if (node.getNodeName().equals("analytic")) {
-                    nodes = node.getChildNodes();
-                    for (int z = nodes.getLength() - 1; z >= 0; z--) {
-                        Node node1 = nodes.item(z);
-                        if (node1.getNodeName().equals("title")) {
-                            pub.setDoc_title(node1.getTextContent());
-                            NamedNodeMap nnm = node1.getAttributes();
-                            for (int j = nnm.getLength() - 1; j >= 0; j--) {
-                                if (nnm.item(j).getNodeName().equals("level")) {
-                                    pub.setType(nnm.item(j).getTextContent());
-                                }
-                            }
-                        } else if (nodes.item(z).getNodeName().equals("author")) {
-                            prs = new Person();
-                            NodeList author = nodes.item(z).getChildNodes();
-                            for (int y = author.getLength() - 1; y >= 0; y--) {
-                                Node persName = author.item(y);
-                                if (persName.getNodeType() == Node.ELEMENT_NODE) {
-                                    if (persName.getNodeName().equals("persName")) {
-                                        NodeList persNameNodes = persName.getChildNodes();
-                                        for (int o = persNameNodes.getLength() - 1; o >= 0; o--) {
-                                            if (persNameNodes.item(o).getNodeName().equals("forename")) {
-                                                prs.setForename(persNameNodes.item(o).getTextContent());
-                                            } else if (persNameNodes.item(o).getNodeName().equals("surname")) {
-                                                prs.setSurname(persNameNodes.item(o).getTextContent());
-                                            }
-                                        }
+        Monograph mn = new Monograph();
 
-                                    } else if (persName.getNodeName().equals("email")) {
-                                        prs.setEmail(persName.getTextContent());
-                                    } else if (persName.getNodeName().equals("ptr")) {
-                                        Element ptr = (Element) node;
-                                        if (ptr.getAttribute("type").equals("url")) {
-                                            prs.setUrl(ptr.getAttribute("type"));
-                                        }
+        pub.setDocument(doc);
+        List<Person> prss = new ArrayList<Person>();
+        Node analytic = (reference.getElementsByTagName("analytic")).item(0);
+
+        Node monogr = (reference.getElementsByTagName("monogr")).item(0);
+        NodeList subNodes = null;
+        if (analytic != null && analytic.getNodeType() == Node.ELEMENT_NODE) {
+            subNodes = analytic.getChildNodes();
+            for (int z = subNodes.getLength() - 1; z >= 0; z--) {
+                Node node1 = subNodes.item(z);
+                if (node1.getNodeName().equals("title")) {
+                    pub.setDoc_title(node1.getTextContent());
+                    NamedNodeMap nnm = node1.getAttributes();
+                    for (int j = nnm.getLength() - 1; j >= 0; j--) {
+                        if (nnm.item(j).getNodeName().equals("level")) {
+                            pub.setType(nnm.item(j).getTextContent());
+                        }
+                    }
+                } else if (subNodes.item(z).getNodeName().equals("author")) {
+                    Person prs = new Person();
+                    NodeList author = subNodes.item(z).getChildNodes();
+                    for (int y = author.getLength() - 1; y >= 0; y--) {
+                        Node persName = author.item(y);
+                        if (persName.getNodeType() == Node.ELEMENT_NODE) {
+                            if (persName.getNodeName().equals("persName")) {
+                                NodeList persNameNodes = persName.getChildNodes();
+                                for (int o = persNameNodes.getLength() - 1; o >= 0; o--) {
+                                    if (persNameNodes.item(o).getNodeName().equals("forename")) {
+                                        prs.setForename(persNameNodes.item(o).getTextContent());
+                                    } else if (persNameNodes.item(o).getNodeName().equals("surname")) {
+                                        prs.setSurname(persNameNodes.item(o).getTextContent());
                                     }
+                                }
+
+                            } else if (persName.getNodeName().equals("email")) {
+                                prs.setEmail(persName.getTextContent());
+                            } else if (persName.getNodeName().equals("ptr")) {
+                                Element ptr = (Element) persName;
+                                if (ptr.getAttribute("type").equals("url")) {
+                                    prs.setUrl(ptr.getAttribute("type"));
                                 }
                             }
                         }
                     }
-                } else if (node.getNodeName().equals("monogr")) {
-                    MonographDAO md = (MonographDAO) abdf.getMonographDAO();
-                    Conference_EventDAO ced = (Conference_EventDAO) abdf.getConference_EventDAO();
-                    In_SerialDAO isd = (In_SerialDAO) abdf.getIn_SerialDAO();
-                    Monograph mn = new Monograph();
-                    Conference_Event ce = null;
-                    In_Serial is = new In_Serial();
-                    Journal journal = new Journal();
-                    Collection collection = new Collection();
-                    Serial_Identifier serial_identifier = new Serial_Identifier();
-                    nodes = node.getChildNodes();
-                    for (int c = nodes.getLength() - 1; c >= 0; c--) {
-                        Node node2 = nodes.item(c);
-                        if (node2.getNodeName().equals("title")) {
-                            NamedNodeMap nnm = node2.getAttributes();
-                            mn.setTitle(node2.getTextContent());
-                            System.out.println(node2.getTextContent());
-                            for (int j = nnm.getLength() - 1; j >= 0; j--) {
-                                if (nnm.item(j).getNodeName().equals("level")) {
-                                    mn.setType(nnm.item(j).getTextContent());
-                                    System.out.println(nnm.item(j).getTextContent());
-                                    if (nnm.item(j).getTextContent().equals("j")) {
-                                        journal.setTitle(node2.getTextContent());
-                                    } else {
-                                        collection.setTitle(node2.getTextContent());
-                                    }
-                                }
-                            }
-                        } else if (node.getNodeName().equals("imprint")) {
-                            NodeList imprint = node.getChildNodes();
-
-                            for (int j = imprint.getLength() - 1; j >= 0; j--) {
-                                Node entry = imprint.item(j);
-                                if (entry.getNodeName().equals("publisher")) {
-                                    Publisher pls = new Publisher(null, entry.getTextContent());
-                                    abdf.getPublisherDAO().create(pls);
-                                    pub.setPublisher(pls);
-                                } else if (entry.getNodeName().equals("date")) {
-                                    String type = null;
-                                    String date = null;
-                                    NamedNodeMap nnm = entry.getAttributes();
-                                    for (int p = nnm.getLength() - 1; p >= 0; p--) {
-                                        if (nnm.item(p).getNodeName().equals("type")) {
-                                            type = nnm.item(p).getTextContent();
-                                        } else if (nnm.item(p).getNodeName().equals("when")) {
-                                            date = nnm.item(p).getTextContent();
-                                        }
-                                    }
-                                    pub.setDate_eletronic(date);
-                                } else if (entry.getNodeName().equals("biblScope")) {
-                                    Element ptr = (Element) entry;
-                                    String unit = ptr.getAttribute("unit");
-                                    if (unit.equals("serie")) {
-                                        collection.setTitle(entry.getTextContent());
-                                    } else if (unit.equals("volume")) {
-                                        is.setVolume(entry.getTextContent());
-
-                                    } else if (unit.equals("issue")) {
-                                        is.setNumber(entry.getTextContent());
-                                    } else if (unit.equals("page")) {
-                                        String start = ptr.getAttribute("from");
-                                        String end = ptr.getAttribute("to");
-                                        pub.setStart_page(start);
-                                        pub.setEnd_page(end);
-                                    }
-                                }
-                            }
-                            isd.create(is);
-                        } else if (node.getNodeName().equals("meeting")) {
-                            ce = new Conference_Event();
-                            ce.setConference(new Conference());
-                            Address addr = new Address();
-                            AddressDAO ad = (AddressDAO) abdf.getAddressDAO();
-                            NodeList meeting = node.getChildNodes();
-                            for (int j = meeting.getLength() - 1; j >= 0; j--) {
-                                Node entry = meeting.item(j);
-                                if (entry.getNodeName().equals("title")) {
-                                    ce.getConference().setTitle(entry.getTextContent());
-                                } else if (entry.getNodeName().equals("date")) {
-                                    NamedNodeMap nnm = entry.getAttributes();
-                                    for (int p = nnm.getLength() - 1; p >= 0; p--) {
-                                        if (nnm.item(p).getNodeName().equals("type")) {
-                                            if (nnm.item(p).getTextContent().equals("start")) {
-                                                ce.setStart_date(entry.getTextContent());
-                                            } else if (nnm.item(p).getTextContent().equals("end")) {
-                                                ce.setEnd_date(entry.getTextContent());
-                                            }
-                                        }
-                                    }
-                                } else if (entry.getNodeName().equals("settlement")) {
-                                    addr.setSettlement(entry.getTextContent());
-                                } else if (entry.getNodeName().equals("country")) {
-                                    Country country = new Country();
-                                    addr.setCountryStr(entry.getTextContent());
-                                    NamedNodeMap nnm = entry.getAttributes();
-                                    for (int p = nnm.getLength() - 1; p >= 0; p--) {
-                                        if (nnm.item(p).getNodeName().equals("key")) {
-                                            country.setIso(nnm.item(p).getTextContent());
-                                        }
-                                    }
-                                    addr.setCountry(country);
-                                } else if (entry.getNodeName().equals("region")) {
-                                    addr.setRegion(entry.getTextContent());
-                                }
-
-                            }
-                            ad.create(addr);
-                            ce.setAddress(addr);
-                            ced.create(ce);
-                        }
-
-                    }
-                    md.create(mn);
-                    pub.setMonograph(mn);
+                    prss.add(prs);
                 }
             }
         }
+        if (monogr != null && monogr.getNodeType() == Node.ELEMENT_NODE) {
+            subNodes = monogr.getChildNodes();
+
+            Journal journal = null;
+            Collection collection = null;
+            Serial_Identifier serial_identifier = new Serial_Identifier();
+            for (int c = subNodes.getLength() - 1; c >= 0; c--) {
+                Node node2 = subNodes.item(c);
+                if (node2.getNodeName().equals("title")) {
+                    NamedNodeMap nnm = node2.getAttributes();
+                    mn.setTitle(node2.getTextContent());
+                    if (analytic == null) {
+                        pub.setDoc_title(node2.getTextContent());
+                    }
+                    for (int j = nnm.getLength() - 1; j >= 0; j--) {
+                        if (nnm.item(j).getNodeName().equals("level")) {
+                            mn.setType(nnm.item(j).getTextContent());
+                            if (analytic == null) {
+                                pub.setType(nnm.item(j).getTextContent());
+                            }
+                            if (node2.getTextContent() != null) {
+                                if (nnm.item(j).getTextContent().equals("j")) {
+                                    journal = new Journal(null, node2.getTextContent());
+                                } else {
+                                    collection = new Collection(null, node2.getTextContent());
+                                }
+                            }
+                        }
+                    }
+                } else if (node2.getNodeName().equals("imprint")) {
+                    NodeList imprint = node2.getChildNodes();
+                    is = new In_Serial();
+                    for (int j = imprint.getLength() - 1; j >= 0; j--) {
+                        Node entry = imprint.item(j);
+                        if (entry.getNodeName().equals("publisher")) {
+                            Publisher pls = new Publisher(null, entry.getTextContent());
+                            abdf.getPublisherDAO().create(pls);
+                            pub.setPublisher(pls);
+                        } else if (entry.getNodeName().equals("date")) {
+                            if (entry.getNodeType() == Node.ELEMENT_NODE) {
+                                Element dateElt = (Element) entry;
+                                String type = dateElt.getAttribute("type");
+                                String date = dateElt.getAttribute("when");
+                                pub.setDate_eletronic(date);
+                            }
+                        } else if (entry.getNodeName().equals("biblScope")) {
+                            Element ptr = (Element) entry;
+                            String unit = ptr.getAttribute("unit");
+                            if (unit.equals("serie")) {
+                                collection.setTitle(entry.getTextContent());
+                            } else if (unit.equals("volume")) {
+                                is.setVolume(entry.getTextContent());
+                            } else if (unit.equals("issue")) {
+                                is.setNumber(entry.getTextContent());
+                            } else if (unit.equals("page")) {
+                                String start = ptr.getAttribute("from");
+                                String end = ptr.getAttribute("to");
+                                pub.setStart_page(start);
+                                pub.setEnd_page(end);
+                            }
+                        }
+                    }
+                } else if (node2.getNodeName().equals("meeting")) {
+                    ce = new Conference_Event();
+                    ce.setConference(new Conference());
+                    Address addr = new Address();
+                    AddressDAO ad = (AddressDAO) abdf.getAddressDAO();
+                    NodeList meeting = node2.getChildNodes();
+                    
+                    for (int j = meeting.getLength() - 1; j >= 0; j--) {
+                        Node entry = meeting.item(j);
+                        if (entry.getNodeName().equals("title")) {
+                            ce.getConference().setTitle(entry.getTextContent());
+                        } else if (entry.getNodeName().equals("date")) {
+                            if (entry.getNodeType() == Node.ELEMENT_NODE) {
+                                Element dateElt = (Element) entry;
+                                String type = dateElt.getAttribute("type");
+                                String date = dateElt.getAttribute("when");
+                                if (type.equals("start")) {
+                                    ce.setStart_date(date);
+                                } else if (type.equals("end")) {
+                                    ce.setEnd_date(date);
+                                }
+                            }
+                        } else if (entry.getNodeName().equals("settlement")) {
+                            addr.setSettlement(entry.getTextContent());
+                        } else if (entry.getNodeName().equals("country")) {
+                            Country country = new Country();
+                            addr.setCountryStr(entry.getTextContent());
+                            NamedNodeMap nnm = entry.getAttributes();
+                            for (int p = nnm.getLength() - 1; p >= 0; p--) {
+                                if (nnm.item(p).getNodeName().equals("key")) {
+                                    country.setIso(nnm.item(p).getTextContent());
+                                }
+                            }
+                            addr.setCountry(country);
+                        } else if (entry.getNodeName().equals("region")) {
+                            addr.setRegion(entry.getTextContent());
+                        }
+
+                    }
+                    ad.create(addr);
+                    ce.setAddress(addr);
+                }
+                if (collection != null) {
+                    is.setC(collection);
+                }
+                if (journal != null) {
+                    is.setJ(journal);
+                }
+
+            }
+        }
+
+        md.create(mn);
+
+        if (ce != null) {
+            ce.setMongoraph(mn);
+            ced.create(ce);
+        }
+        if (is != null) {
+            is.setMg(mn);
+            isd.create(is);
+        }
+
+        pub.setMonograph(mn);
         pd.create(pub);
+        for (Person p : prss) {
+            persd.createEditor(new Editor(0, p, pub));
+        }
     }
 
     private Document getDocument(InputStream in) throws IOException, ParserConfigurationException {

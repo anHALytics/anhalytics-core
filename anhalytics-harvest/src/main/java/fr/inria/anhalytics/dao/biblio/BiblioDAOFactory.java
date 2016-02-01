@@ -68,7 +68,7 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
     public void openTransaction() {
         try {
             conn.setAutoCommit(false);
-            logger.info("The autocommit was disabled!");
+            logger.debug("The autocommit was disabled!");
         } catch (SQLException e) {
             logger.error("There was an error disabling autocommit");
         }
@@ -77,7 +77,7 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
     public void endTransaction() {
         try {
             conn.commit();
-            logger.info("The transaction was successfully executed");
+            logger.debug("The transaction was successfully executed");
         } catch (SQLException ex) {
             logger.error("Error happened while commiting the changes.");
         }
@@ -87,10 +87,17 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
         try {
                 // We rollback the transaction, to the last SavePoint!
             conn.rollback();
-            logger.info("The transaction was rollback.");
+            logger.debug("The transaction was rollback.");
         } catch (SQLException e1) {
             logger.error("There was an error making a rollback");
 
+        }
+    }
+    public static void closeConnection() {
+        try {
+            conn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
 }
