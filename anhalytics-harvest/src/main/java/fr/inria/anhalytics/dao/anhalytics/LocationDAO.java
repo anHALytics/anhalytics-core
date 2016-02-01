@@ -42,13 +42,13 @@ public class LocationDAO extends DAO<Location> {
             statement.setLong(2, obj.getAddress().getAddressId());
 
             if (obj.getBegin_date() == null) {
-                statement.setNull(3, java.sql.Types.DATE);
+                statement.setDate(3, new java.sql.Date(00000000L));
             } else {
                 statement.setDate(3, new java.sql.Date(obj.getBegin_date().getTime()));
             }
 
             if (obj.getEnd_date() == null) {
-                statement.setNull(4, java.sql.Types.DATE);
+                statement.setDate(3, new java.sql.Date(00000000L));
             } else {
                 statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
             }

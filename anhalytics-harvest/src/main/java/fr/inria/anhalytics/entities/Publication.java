@@ -15,7 +15,7 @@ public class Publication {
     private String type = "";
     private String doc_title = "";
     private Date date_printed;
-    private String date_eletronic;
+    private String date_eletronic = "";
     private String start_page = "";
     private String end_page = "";
     private String language = "";

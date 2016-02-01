@@ -1,10 +1,7 @@
 package fr.inria.anhalytics.dao;
 
-import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.entities.Author;
 import fr.inria.anhalytics.entities.Editor;
-import fr.inria.anhalytics.entities.Monograph;
-import fr.inria.anhalytics.entities.Organisation;
 import fr.inria.anhalytics.entities.Person;
 import fr.inria.anhalytics.entities.Person_Identifier;
 import java.sql.Connection;
@@ -113,14 +110,15 @@ public class PersonDAO extends DAO<Person> {
             statement1.setString(6, obj.getTitle());
 
             int code1 = statement1.executeUpdate();
+            if (obj.getPerson_identifiers() != null) {
+                for (Person_Identifier pi : obj.getPerson_identifiers()) {
+                    statement2 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
+                    statement2.setLong(1, obj.getPersonId());
+                    statement2.setString(2, pi.getId());
+                    statement2.setString(3, pi.getType());
 
-            for (Person_Identifier pi : obj.getPerson_identifiers()) {
-                statement2 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
-                statement2.setLong(1, obj.getPersonId());
-                statement2.setString(2, pi.getId());
-                statement2.setString(3, pi.getType());
-
-                int code2 = statement2.executeUpdate();
+                    int code2 = statement2.executeUpdate();
+                }
             }
             result = true;
         } catch (SQLException ex) {

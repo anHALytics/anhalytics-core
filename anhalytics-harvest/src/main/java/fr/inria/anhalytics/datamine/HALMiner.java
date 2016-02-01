@@ -4,7 +4,6 @@ import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.AddressDAO;
 import fr.inria.anhalytics.dao.anhalytics.AffiliationDAO;
-import fr.inria.anhalytics.dao.DatabaseConnection;
 import fr.inria.anhalytics.dao.Conference_EventDAO;
 import fr.inria.anhalytics.dao.anhalytics.LocationDAO;
 import fr.inria.anhalytics.dao.DocumentDAO;
@@ -14,7 +13,7 @@ import fr.inria.anhalytics.dao.MonographDAO;
 import fr.inria.anhalytics.dao.anhalytics.OrganisationDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.dao.PublicationDAO;
-import fr.inria.anhalytics.dao.PublisherDAO;
+import fr.inria.anhalytics.dao.anhalytics.DAOFactory;
 import fr.inria.anhalytics.entities.Address;
 import fr.inria.anhalytics.entities.Affiliation;
 import fr.inria.anhalytics.entities.Author;
@@ -77,6 +76,7 @@ public class HALMiner extends Miner {
     * Initiates HAL knowledge base and creates working corpus TEI.
     */
     public void initKnowledgeBase() {
+        DAOFactory.initConnection();
         PublicationDAO pd = (PublicationDAO) adf.getPublicationDAO();
 
         DocumentDAO dd = (DocumentDAO) adf.getDocumentDAO();
@@ -86,6 +86,7 @@ public class HALMiner extends Miner {
                     String metadataTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
                     if (!dd.isMined(uri)) {
+                        logger.info("Extracting metadata from :"+uri);
                         adf.openTransaction();
                         Document generatedTeiDoc = null;
                         try {
@@ -97,6 +98,9 @@ public class HALMiner extends Miner {
                             Publication pub = new Publication();
                             Node title = (Node) xPath.compile("/teiCorpus/teiHeader/titleStmt/title").evaluate(generatedTeiDoc, XPathConstants.NODE);
                             Node language = (Node) xPath.compile("/teiCorpus/teiHeader/profileDesc/langUsage/language").evaluate(generatedTeiDoc, XPathConstants.NODE);
+                            Node type = (Node) xPath.compile("/teiCorpus/teiHeader/profileDesc/textClass/classCode[@scheme=\"halTypology\"]").evaluate(generatedTeiDoc, XPathConstants.NODE);
+                            Node domain = (Node) xPath.compile("/teiCorpus/teiHeader/profileDesc/textClass/classCode[@scheme=\"halDomain\"]").evaluate(generatedTeiDoc, XPathConstants.NODE);
+                            //more than one domain / article
                             NodeList editors = (NodeList) xPath.compile("/teiCorpus/teiHeader/sourceDesc/biblStruct/editor").evaluate(generatedTeiDoc, XPathConstants.NODESET);
                             NodeList authors = (NodeList) xPath.compile("/teiCorpus/teiHeader/sourceDesc/biblStruct/author").evaluate(generatedTeiDoc, XPathConstants.NODESET);
                             Node metadata = (Node) xPath.compile("/teiCorpus/teiHeader").evaluate(generatedTeiDoc, XPathConstants.NODE);
@@ -111,6 +115,7 @@ public class HALMiner extends Miner {
                             pub.setDocument(doc);
 
                             pub.setDoc_title(title.getTextContent());
+                            pub.setType(type.getTextContent());
                             pub.setLanguage(language.getTextContent());
                             logger.info("Mining : " + uri + "");
 
@@ -125,12 +130,14 @@ public class HALMiner extends Miner {
                             adf.rollback();
                         }
                         adf.endTransaction();
+                        logger.info("Done.");
                         mm.insertTei(Utilities.toString(generatedTeiDoc), uri, docID, date);
                     }
                 }
             }
 
         }
+        DAOFactory.closeConnection();
         logger.info("DONE.");
     }
 
@@ -187,7 +194,6 @@ public class HALMiner extends Miner {
                 mn.setTitle(node.getTextContent());
                 for (int j = nnm.getLength() - 1; j >= 0; j--) {
                     if (nnm.item(j).getNodeName().equals("level")) {
-                        pub.setType(nnm.item(j).getTextContent());
                         mn.setType(nnm.item(j).getTextContent());
                         if (nnm.item(j).getTextContent().equals("j")) {
                             journal.setTitle(node.getTextContent());

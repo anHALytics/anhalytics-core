@@ -44,42 +44,22 @@ public class PublicationDAO extends DAO<Publication> {
             else
                 statement.setLong(3, obj.getPublisher().getPublisherID());
             
+            statement.setString(4, obj.getType());
             
-            if(obj.getPublisher().getPublisherID() == null)
-                statement.setNull(4, java.sql.Types.INTEGER);
-            else
-                statement.setString(4, obj.getType());
-            
-            if(obj.getDoc_title() == null)
-                statement.setNull(5, java.sql.Types.VARCHAR);
-            else
-                statement.setString(5, obj.getDoc_title());
+            statement.setString(5, obj.getDoc_title());
             
             if(obj.getDate_printed() == null)
-                statement.setNull(6, java.sql.Types.DATE);
+                statement.setDate(6, new java.sql.Date(00000000L));
             else
                 statement.setDate(6, new java.sql.Date(obj.getDate_printed().getTime()));
             
+            statement.setString(7, obj.getDate_eletronic());
             
-            if(obj.getDate_eletronic() == null)
-                statement.setNull(7, java.sql.Types.DATE);
-            else
-                statement.setString(7, obj.getDate_eletronic());
-            
-            if(obj.getStart_page() == null)
-                statement.setNull(8, java.sql.Types.VARCHAR);
-            else
-                statement.setString(8, obj.getStart_page());
+            statement.setString(8, obj.getStart_page());
 
-            if(obj.getEnd_page() == null)
-                statement.setNull(9, java.sql.Types.VARCHAR);
-            else
-                statement.setString(9, obj.getEnd_page());
+            statement.setString(9, obj.getEnd_page());
             
-            if(obj.getLanguage() == null)
-                statement.setNull(10, java.sql.Types.VARCHAR);
-            else
-                statement.setString(10, obj.getLanguage());
+            statement.setString(10, obj.getLanguage());
             
             
             int code = statement.executeUpdate();
