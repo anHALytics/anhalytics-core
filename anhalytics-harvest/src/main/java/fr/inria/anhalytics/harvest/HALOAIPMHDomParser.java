@@ -2,6 +2,7 @@ package fr.inria.anhalytics.harvest;
 
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
+import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.net.URLEncoder;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
                         List<PublicationFile> annexes = getAnnexes(record);
 
                         String ref = getRef(record);
-                        teis.add(new TEI(id, file, annexes, doi, type, tei, ref));
+                        teis.add(new TEI(Utilities.getHalIDFromHalDocID(id), file, annexes, doi, type, tei, ref));
                         logger.debug("\t \t \t tei of "+id+" extracted.");
                     }
                 }
