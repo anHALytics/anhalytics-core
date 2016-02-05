@@ -11,7 +11,7 @@ public interface MongoCollectionsInterface {
     //files that can't be donwloaded and will be processed later
     public static final String TO_REQUEST_LATER = "to_request_later";
     //metadata teis
-    public static final String ADDITIONAL_TEIS = "additional_teis";
+    public static final String ADDITIONAL_TEIS = "metadata_teis";
     //binary files , pdf
     public static final String BINARIES = "binaries";
     //publications annexes
@@ -23,7 +23,7 @@ public interface MongoCollectionsInterface {
     //grobid provided by grobid after tei extraction
     public static final String GROBID_ASSETS = "grobid_assets";
     //annotation recognized usin nerd
-    public static final String ANNOTATIONS = "annotations";
+    public static final String ANNOTATIONS = "nerd_annotations";
     //metadata harvested frim istex
     public static final String ISTEX_TEIS = "istex_teis";
     public static final String ARXIV_METADATA = "arxiv_metadata";
