@@ -140,7 +140,7 @@ public class HALMiner extends Miner {
         DAOFactory.closeConnection();
         logger.info("DONE.");
     }
-
+    
     private static void processIdentifiers(NodeList ids, fr.inria.anhalytics.entities.Document doc) {
         String type = null;
         String id = null;
@@ -342,7 +342,7 @@ public class HALMiner extends Miner {
                     } else if (node.getNodeName().equals("ptr")) {
                         Element ptr = (Element) node;
                         if (ptr.getAttribute("type").equals("url")) {
-                            prs.setUrl(ptr.getAttribute("type"));
+                            prs.setUrl(ptr.getAttribute("target"));
                         }
                     } else if (node.getNodeName().equals("affiliation")) {
 
