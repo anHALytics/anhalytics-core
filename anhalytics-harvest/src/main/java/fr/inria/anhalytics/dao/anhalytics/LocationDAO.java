@@ -48,7 +48,7 @@ public class LocationDAO extends DAO<Location> {
             }
 
             if (obj.getEnd_date() == null) {
-                statement.setDate(3, new java.sql.Date(00000000L));
+                statement.setDate(4, new java.sql.Date(00000000L));
             } else {
                 statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
             }
