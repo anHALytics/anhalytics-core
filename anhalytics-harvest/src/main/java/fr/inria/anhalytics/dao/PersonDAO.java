@@ -41,6 +41,25 @@ public class PersonDAO extends DAO<Person> {
         super(conn);
     }
 
+    private Long getEntityIdIfAlreadyStored(Person toBeStored) {
+        Long personId = null;
+        for (Person_Identifier id : toBeStored.getPerson_identifiers()) {
+            try {
+                String query = "SELECT pi.personID FROM PERSON_IDENTIFIER pi WHERE pi.ID = \"" + id.getId() + "\"";
+                ResultSet result = this.connect.createStatement(
+                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY).executeQuery(query);
+                if (result.first()) {
+                    personId = result.getLong("pi.personID");
+                    return personId;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return personId;
+    }
+
     public boolean createAuthor(Author author) {
         boolean result = false;
         create(author.getPerson());
@@ -85,44 +104,50 @@ public class PersonDAO extends DAO<Person> {
             throw new IllegalArgumentException("Person is already created, the Person ID is not null.");
         }
 
-        PreparedStatement statement;
-        PreparedStatement statement1;
-        PreparedStatement statement2;
-        try {
-            statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, obj.getTitle());
-            statement.setString(2, obj.getPhoto());
-            statement.setString(3, obj.getUrl());
-            statement.setString(4, obj.getEmail());
-            int code = statement.executeUpdate();
-            ResultSet rs = statement.getGeneratedKeys();
+        Long persId = getEntityIdIfAlreadyStored(obj);
+        if (persId != null) {
+            obj.setPersonId(persId);
+        } else {
+            PreparedStatement statement;
+            PreparedStatement statement1;
+            PreparedStatement statement2;
+            try {
+                statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                statement.setString(1, obj.getTitle());
+                statement.setString(2, obj.getPhoto());
+                statement.setString(3, obj.getUrl());
+                statement.setString(4, obj.getEmail());
+                int code = statement.executeUpdate();
+                ResultSet rs = statement.getGeneratedKeys();
 
-            if (rs.next()) {
-                obj.setPersonId(rs.getLong(1));
-            }
-
-            statement1 = connect.prepareStatement(SQL_INSERT_PERSON_NAME);
-            statement1.setLong(1, obj.getPersonId());
-            statement1.setString(2, obj.getFullname());
-            statement1.setString(3, obj.getForename());
-            statement1.setString(4, obj.getMiddlename());
-            statement1.setString(5, obj.getSurname());
-            statement1.setString(6, obj.getTitle());
-
-            int code1 = statement1.executeUpdate();
-            if (obj.getPerson_identifiers() != null) {
-                for (Person_Identifier pi : obj.getPerson_identifiers()) {
-                    statement2 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
-                    statement2.setLong(1, obj.getPersonId());
-                    statement2.setString(2, pi.getId());
-                    statement2.setString(3, pi.getType());
-
-                    int code2 = statement2.executeUpdate();
+                if (rs.next()) {
+                    obj.setPersonId(rs.getLong(1));
                 }
+
+                statement1 = connect.prepareStatement(SQL_INSERT_PERSON_NAME);
+                statement1.setLong(1, obj.getPersonId());
+                statement1.setString(2, obj.getFullname());
+                statement1.setString(3, obj.getForename());
+                statement1.setString(4, obj.getMiddlename());
+                statement1.setString(5, obj.getSurname());
+                statement1.setString(6, obj.getTitle());
+
+                int code1 = statement1.executeUpdate();
+                if (obj.getPerson_identifiers() != null) {
+                    for (Person_Identifier pi : obj.getPerson_identifiers()) {
+                        statement2 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
+                        statement2.setLong(1, obj.getPersonId());
+                        statement2.setString(2, pi.getId());
+                        statement2.setString(3, pi.getType());
+
+                        int code2 = statement2.executeUpdate();
+                    }
+                }
+                result = true;
+
+            } catch (SQLException ex) {
+                Logger.getLogger(DocumentDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
-            result = true;
-        } catch (SQLException ex) {
-            Logger.getLogger(DocumentDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
         return result;
     }

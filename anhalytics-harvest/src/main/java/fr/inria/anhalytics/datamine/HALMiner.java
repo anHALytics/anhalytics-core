@@ -312,19 +312,20 @@ public class HALMiner extends Miner {
     private static void processPersons(NodeList persons, String type, Publication pub, Document doc) {
         Node person = null;
         PersonDAO pd = (PersonDAO) adf.getPersonDAO();
-        Person prs = new Person();
+        Person prs = null;
         Affiliation affiliation = null;
         AffiliationDAO affd = (AffiliationDAO) adf.getAffiliationDAO();
         Organisation organisation = null;
         OrganisationDAO od = (OrganisationDAO) adf.getOrganisationDAO();
-        List<Person_Identifier> pis = new ArrayList<Person_Identifier>();
         for (int i = persons.getLength() - 1; i >= 0; i--) {
             person = persons.item(i);
             prs = new Person();
             affiliation = new Affiliation();
             NodeList theNodes = person.getChildNodes();
             NodeList nodes = null;
+             List<Person_Identifier> pis = new ArrayList<Person_Identifier>();
             for (int y = theNodes.getLength() - 1; y >= 0; y--) {
+                
                 Node node = theNodes.item(y);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     if (node.getNodeName().equals("persName")) {
@@ -432,11 +433,12 @@ public class HALMiner extends Miner {
                     affiliation.setPerson(prs);
                     affd.create(affiliation);
                 }
-            } else if (type.equals("editor")) {
+            }
+            else if (type.equals("editor")) {
                 Editor editor = new Editor(0, prs, pub);
                 pd.createEditor(editor);
             }
-
+            
             Element idno = doc.createElement("idno");
             idno.setAttribute("type", "anhalyticsID");
             idno.setTextContent(Long.toString(prs.getPersonId()));
