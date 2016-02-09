@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.dao;
 
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import fr.inria.anhalytics.entities.Author;
 import fr.inria.anhalytics.entities.Editor;
 import fr.inria.anhalytics.entities.Person;
@@ -20,7 +21,7 @@ import java.util.logging.Logger;
  */
 public class PersonDAO extends DAO<Person> {
 
-    private static final String SQL_INSERT
+    private static final String SQL_INSERT_PERSON
             = "INSERT INTO PERSON (title, photo, url, email) VALUES (?, ?, ?, ?)";
 
     private static final String SQL_INSERT_PERSON_NAME
@@ -36,21 +37,33 @@ public class PersonDAO extends DAO<Person> {
             = "INSERT INTO EDITOR (rank, personID, publicationID) VALUES (?, ?, ?)";
 
     private static final String READ_QUERY_AUTHORS_BY_DOCID = "SELECT personID FROM AUTHOR WHERE docID = ?";
+    
+    private static final String READ_QUERY_PERSON_BY_ID
+            = "SELECT p.title, p.photo, p.url, p.email, pn.fullname, pn.forename, pn.middlename, pn.surname, pi.person_identifiersID, pi.ID, pi.Type FROM PERSON p, PERSON_NAME pn, PERSON_IDENTIFIER pi WHERE p.personID = ? AND pn.personID = ? AND pi.personID = ?";
 
+    private static final String READ_QUERY_PERSON_BY_IDENTIFIER = "SELECT pi.personID FROM PERSON_IDENTIFIER pi WHERE pi.ID = ?";
+
+    private static final String UPDATE_PERSON = "UPDATE PERSON SET title = ? ,photo = ? ,url = ? WHERE personID = ?";
+
+    private static final String UPDATE_PERSON_NAME = "UPDATE PERSON_NAME SET fullname = ? ,forename = ? ,middlename = ?, surname = ?, title = ? WHERE personID = ?";
+
+    private static final String DELETE_PERSON = "DELETE PERSON, PERSON_NAME, PERSON_IDENTIFIER WHERE personID = ?";
+
+    
     public PersonDAO(Connection conn) {
         super(conn);
     }
 
     private Long getEntityIdIfAlreadyStored(Person toBeStored) {
         Long personId = null;
+        PreparedStatement statement;
         for (Person_Identifier id : toBeStored.getPerson_identifiers()) {
             try {
-                String query = "SELECT pi.personID FROM PERSON_IDENTIFIER pi WHERE pi.ID = \"" + id.getId() + "\"";
-                ResultSet result = this.connect.createStatement(
-                        ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_READ_ONLY).executeQuery(query);
-                if (result.first()) {
-                    personId = result.getLong("pi.personID");
+                statement = connect.prepareStatement(READ_QUERY_PERSON_BY_IDENTIFIER);
+                statement.setString(1, id.getId());
+                ResultSet rs = statement.executeQuery();
+                if (rs.first()) {
+                    personId = rs.getLong("pi.personID");
                     return personId;
                 }
             } catch (SQLException e) {
@@ -107,12 +120,13 @@ public class PersonDAO extends DAO<Person> {
         Long persId = getEntityIdIfAlreadyStored(obj);
         if (persId != null) {
             obj.setPersonId(persId);
+            update(obj);
         } else {
             PreparedStatement statement;
             PreparedStatement statement1;
             PreparedStatement statement2;
             try {
-                statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                statement = connect.prepareStatement(SQL_INSERT_PERSON, Statement.RETURN_GENERATED_KEYS);
                 statement.setString(1, obj.getTitle());
                 statement.setString(2, obj.getPhoto());
                 statement.setString(3, obj.getUrl());
@@ -154,12 +168,55 @@ public class PersonDAO extends DAO<Person> {
 
     @Override
     public boolean delete(Person obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        boolean result = false;
+        try {
+            PreparedStatement preparedStatement = this.connect.prepareStatement(DELETE_PERSON);
+            preparedStatement.setLong(1, obj.getPersonId());
+            preparedStatement.executeUpdate();
+            result = true;
+        } catch (SQLException ex) {
+            Logger.getLogger(PersonDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
     }
 
     @Override
     public boolean update(Person obj) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        boolean result = false;
+        try {
+            PreparedStatement preparedStatement = this.connect.prepareStatement(UPDATE_PERSON);
+            preparedStatement.setString(1, obj.getTitle());
+            preparedStatement.setString(2, obj.getPhoto());
+            preparedStatement.setString(3, obj.getUrl());
+            preparedStatement.setLong(4, obj.getPersonId());
+            int code1 = preparedStatement.executeUpdate();
+
+            PreparedStatement preparedStatement2 = this.connect.prepareStatement(UPDATE_PERSON_NAME);
+            preparedStatement2.setString(1, obj.getFullname());
+            preparedStatement2.setString(2, obj.getForename());
+            preparedStatement2.setString(3, obj.getMiddlename());
+            preparedStatement2.setString(4, obj.getSurname());
+            preparedStatement2.setString(5, obj.getTitle());
+            preparedStatement2.setLong(6, obj.getPersonId());
+            int code2 = preparedStatement2.executeUpdate();
+
+            if (obj.getPerson_identifiers() != null) {
+                for (Person_Identifier pi : obj.getPerson_identifiers()) {
+                    PreparedStatement preparedStatement3 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
+                    preparedStatement3.setLong(1, obj.getPersonId());
+                    preparedStatement3.setString(2, pi.getId());
+                    preparedStatement3.setString(3, pi.getType());
+
+                    int code3 = preparedStatement3.executeUpdate();
+                }
+            }
+            result = true;
+        } catch (MySQLIntegrityConstraintViolationException e) {
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     @Override
@@ -167,21 +224,25 @@ public class PersonDAO extends DAO<Person> {
         Person person = new Person();
 
         try {
-            ResultSet result = this.connect.createStatement(
-                    ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT p.title, p.photo, p.url, p.email, pn.fullname, pn.forename, pn.middlename, pn.surname FROM PERSON p, PERSON_NAME pn WHERE p.personID = " + id + " AND pn.personID = " + id);
-            if (result.first()) {
+            PreparedStatement preparedStatement = this.connect.prepareStatement(READ_QUERY_PERSON_BY_ID);
+            preparedStatement.setLong(1, id);
+            preparedStatement.setLong(2, id);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.first()) {
                 person = new Person(
                         id,
-                        result.getString("p.title"),
-                        result.getString("p.photo"),
-                        result.getString("pn.fullname"),
-                        result.getString("pn.forename"),
-                        result.getString("pn.middlename"),
-                        result.getString("pn.surname"),
-                        result.getString("p.url"),
-                        result.getString("p.email"),
+                        rs.getString("p.title"),
+                        rs.getString("p.photo"),
+                        rs.getString("pn.fullname"),
+                        rs.getString("pn.forename"),
+                        rs.getString("pn.middlename"),
+                        rs.getString("pn.surname"),
+                        rs.getString("p.url"),
+                        rs.getString("p.email"),
                         new ArrayList<Person_Identifier>());
+            }
+            while (rs.next()) {
+                person.getPerson_identifiers().add(new Person_Identifier(rs.getString("pi.ID"), rs.getString("pi.Type")));
             }
         } catch (SQLException e) {
             e.printStackTrace();

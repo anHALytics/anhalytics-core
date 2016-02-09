@@ -36,8 +36,11 @@ import fr.inria.anhalytics.harvest.teibuild.TeiBuilder;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
@@ -73,8 +76,8 @@ public class HALMiner extends Miner {
     }
 
     /**
-    * Initiates HAL knowledge base and creates working corpus TEI.
-    */
+     * Initiates HAL knowledge base and creates working corpus TEI.
+     */
     public void initKnowledgeBase() {
         DAOFactory.initConnection();
         PublicationDAO pd = (PublicationDAO) adf.getPublicationDAO();
@@ -86,7 +89,7 @@ public class HALMiner extends Miner {
                     String metadataTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
                     if (!dd.isMined(uri)) {
-                        logger.info("Extracting metadata from :"+uri);
+                        logger.info("Extracting metadata from :" + uri);
                         adf.openTransaction();
                         Document generatedTeiDoc = null;
                         try {
@@ -140,7 +143,7 @@ public class HALMiner extends Miner {
         DAOFactory.closeConnection();
         logger.info("DONE.");
     }
-    
+
     private static void processIdentifiers(NodeList ids, fr.inria.anhalytics.entities.Document doc) {
         String type = null;
         String id = null;
@@ -222,7 +225,13 @@ public class HALMiner extends Miner {
                             }
                         }
                         date = entry.getTextContent();
-                        if (type == "datePub") {
+                        if (type.equals("datePub")) {
+                            String[] n = date.split("-");
+                            if (n.length == 1) {
+                                date = date + "-01-01";
+                            } else if (n.length == 2) {
+                                date = date + "-01";
+                            }
                             pub.setDate_eletronic(date);
                         }
                     } else if (entry.getNodeName().equals("biblScope")) {
@@ -323,9 +332,8 @@ public class HALMiner extends Miner {
             affiliation = new Affiliation();
             NodeList theNodes = person.getChildNodes();
             NodeList nodes = null;
-             List<Person_Identifier> pis = new ArrayList<Person_Identifier>();
+            List<Person_Identifier> pis = new ArrayList<Person_Identifier>();
             for (int y = theNodes.getLength() - 1; y >= 0; y--) {
-                
                 Node node = theNodes.item(y);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     if (node.getNodeName().equals("persName")) {
@@ -397,8 +405,20 @@ public class HALMiner extends Miner {
                             }
                             ad.create(addr);
                             od.create(organisation);
+                            Date pubDate = null;
+                            if (!pub.getDate_eletronic() .isEmpty()) {
+                                try {
+                                    pubDate = Utilities.parseStringDate(pub.getDate_eletronic());
+                                } catch (ParseException ex) {
+                                    System.out.println(pub.getDate_eletronic());
+                                    ex.printStackTrace();
+                                    //location.setBegin_date(Utilities.parseStringDate(date));
+                                }
+                            }
                             affiliation.addOrganisation(organisation);
+                            affiliation.setBegin_date(pubDate);
                             location.setAddress(addr);
+                            location.setBegin_date(pubDate);
                             location.setOrganisation(organisation);
                             ld.create(location);
                         }
@@ -412,7 +432,7 @@ public class HALMiner extends Miner {
                                 id_type = nnm.item(p).getTextContent();
                             }
                         }
-                        if (id_type == "anhalyticsID") {
+                        if (id_type.equals("anhalyticsID")) {
                             person.removeChild(node);
                         } else {
                             pi.setId(id_value);
@@ -423,7 +443,7 @@ public class HALMiner extends Miner {
                     //person.removeChild(node);
                 }
             }
-            prs.setFullname(prs.getSurname() + " "+prs.getMiddlename() + " "+prs.getForename());
+            prs.setFullname(prs.getSurname() + " " + prs.getMiddlename() + " " + prs.getForename());
             prs.setPerson_identifiers(pis);
 
             if (type.equals("author")) {
@@ -433,12 +453,11 @@ public class HALMiner extends Miner {
                     affiliation.setPerson(prs);
                     affd.create(affiliation);
                 }
-            }
-            else if (type.equals("editor")) {
+            } else if (type.equals("editor")) {
                 Editor editor = new Editor(0, prs, pub);
                 pd.createEditor(editor);
             }
-            
+
             Element idno = doc.createElement("idno");
             idno.setAttribute("type", "anhalyticsID");
             idno.setTextContent(Long.toString(prs.getPersonId()));
