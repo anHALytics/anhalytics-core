@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.entities;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,13 +14,15 @@ public class Organisation {
     private String url = "";
     private String structure = "";
     private List<String> names = null;
+    private List<PART_OF> rels = null;
     public Organisation(){}
-    public Organisation(Long organisationId, String type, String url, String structure, List<String> names){
+    public Organisation(Long organisationId, String type, String url, String structure, List<String> names, List<PART_OF> rels){
         this.organisationId = organisationId;
         this.type = type;
         this.url = url;
         this.structure = structure;
         this.names = names;
+        this.rels = rels;
     }
 
     /**
@@ -95,4 +98,24 @@ public class Organisation {
             this.names = new ArrayList<String>();
         this.names.add(name);
     }
+
+    /**
+     * @return the rels
+     */
+    public List<PART_OF> getRels() {
+        if(this.rels == null)
+            this.rels = new ArrayList<PART_OF>();
+        return rels;
+    }
+
+    /**
+     * @param rels the orgs to set
+     */
+    public void addRel(PART_OF rel) {
+        if(this.rels == null)
+            this.rels = new ArrayList<PART_OF>();
+        this.rels.add(rel);
+    }
+
+  
 }

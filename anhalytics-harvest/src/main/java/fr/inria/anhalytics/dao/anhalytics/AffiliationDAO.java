@@ -5,6 +5,7 @@ import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.entities.Affiliation;
 import fr.inria.anhalytics.entities.Organisation;
+import fr.inria.anhalytics.entities.PART_OF;
 import fr.inria.anhalytics.entities.Person;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -146,7 +147,8 @@ public class AffiliationDAO extends DAO<Affiliation> {
                             rs2.getString("org.url"),
                             rs2.getString("org.description"),
                             //rs2.getString("orgname.name")
-                            new ArrayList<String>()
+                            new ArrayList<String>(),
+                            new ArrayList<PART_OF>()
                     );
                     organisation.addName(rs2.getString("orgname.name"));
                     //System.out.print(rs2.getLong("org.organisationID") + " :  " + rs2.getString("org.STRUTUREcol"));

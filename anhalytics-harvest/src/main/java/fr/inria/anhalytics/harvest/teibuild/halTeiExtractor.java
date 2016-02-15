@@ -7,6 +7,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -20,8 +21,9 @@ public class halTeiExtractor {
     private static XPath xPath = XPathFactory.newInstance().newXPath();
 
     /**
-     * Reorganizes some nodes especially authors/editors that are misplaced, puts them under biblFull node
-     * and returns the result( some data is redundant).
+     * Reorganizes some nodes especially authors/editors that are misplaced,
+     * puts them under biblFull node and returns the result( some data is
+     * redundant).
      *
      * @param docAdditionalTei
      * @return
@@ -84,6 +86,26 @@ public class halTeiExtractor {
         return docAdditionalTei;
     }
 
+    private static void updateOrgType(Element org, NodeList orgs) {
+
+        NodeList relations = org.getElementsByTagName("relation");
+        for (int j = relations.getLength() - 1; j >= 0; j--) {
+            Node relationNode = relations.item(j);
+            if (relationNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element relation = (Element) relationNode;
+                if (relation.getAttribute("type").equals("direct")) {
+                    String id = relation.getAttribute("active");
+                    id = id.replace("#", "");
+                    Node rel = Utilities.findNode(id, orgs);
+                    Node newRel = rel.cloneNode(true);
+                    updateOrgType((Element) newRel, orgs);
+                    
+                    org.appendChild(newRel);
+                }
+            }
+        }
+    }
+
     private static void updateAffiliations(NodeList persons, NodeList orgs, Document docAdditionalTei) {
         Node person = null;
         NodeList theNodes = null;
@@ -98,12 +120,12 @@ public class halTeiExtractor {
                         Node aff = Utilities.findNode(name, orgs);
                         if (aff != null) {
                             //person.removeChild(theNodes.item(y));
-                            Node localNode = docAdditionalTei.importNode(aff, true);
+                            aff = aff.cloneNode(true);
+                            Node localNode = (docAdditionalTei.importNode(aff, true));
                             // we need to rename this attribute because we cannot multiply the id attribute
                             // with the same value (XML doc becomes not well-formed)
                             Element orgElement = (Element) localNode;
-                            orgElement.removeAttribute("xml:id");
-                            orgElement.setAttribute("ref", "#" + name);
+                            updateOrgType(orgElement, orgs);
                             e.removeAttribute("ref");
                             e.appendChild(localNode);
                         }
