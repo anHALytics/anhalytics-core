@@ -10,6 +10,7 @@ import fr.inria.anhalytics.dao.PublisherDAO;
 import fr.inria.anhalytics.dao.MonographDAO;
 import fr.inria.anhalytics.dao.PublicationDAO;
 import fr.inria.anhalytics.dao.Conference_EventDAO;
+import fr.inria.anhalytics.dao.Document_OrganisationDAO;
 import fr.inria.anhalytics.dao.anhalytics.LocationDAO;
 import fr.inria.anhalytics.dao.anhalytics.OrganisationDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
@@ -116,5 +117,10 @@ public class DAOFactory extends AbstractDAOFactory {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public DAO getDocument_OrganisationDAO() {
+        return new Document_OrganisationDAO(conn);
     }
 }

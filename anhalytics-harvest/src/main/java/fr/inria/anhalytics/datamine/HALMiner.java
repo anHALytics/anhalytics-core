@@ -7,6 +7,7 @@ import fr.inria.anhalytics.dao.anhalytics.AffiliationDAO;
 import fr.inria.anhalytics.dao.Conference_EventDAO;
 import fr.inria.anhalytics.dao.anhalytics.LocationDAO;
 import fr.inria.anhalytics.dao.DocumentDAO;
+import fr.inria.anhalytics.dao.Document_OrganisationDAO;
 import fr.inria.anhalytics.dao.anhalytics.Document_IdentifierDAO;
 import fr.inria.anhalytics.dao.In_SerialDAO;
 import fr.inria.anhalytics.dao.MonographDAO;
@@ -21,6 +22,7 @@ import fr.inria.anhalytics.entities.Collection;
 import fr.inria.anhalytics.entities.Conference;
 import fr.inria.anhalytics.entities.Conference_Event;
 import fr.inria.anhalytics.entities.Country;
+import fr.inria.anhalytics.entities.Document_Organisation;
 import fr.inria.anhalytics.entities.Editor;
 import fr.inria.anhalytics.entities.In_Serial;
 import fr.inria.anhalytics.entities.Journal;
@@ -318,7 +320,7 @@ public class HALMiner extends Miner {
         isd.createSerial(is, serial_identifier);
     }
 
-    private static Organisation parseOrg(Node orgNode, Organisation org, Date pubDate) {
+    private static Organisation parseOrg(Node orgNode, Organisation org, Document_Organisation document_organisation, Date pubDate) {
         LocationDAO ld = (LocationDAO) adf.getLocationDAO();
         AddressDAO ad = (AddressDAO) adf.getAddressDAO();
         OrganisationDAO od = (OrganisationDAO) adf.getOrganisationDAO();
@@ -368,13 +370,15 @@ public class HALMiner extends Miner {
 
                     }
                 } else if (ndorg.getNodeName().equals("org")) {
-                    organisationParent = parseOrg(ndorg, organisationParent, pubDate);
+                    organisationParent = parseOrg(ndorg, organisationParent, document_organisation, pubDate);
                 }
             }
             part_of.setBeginDate(pubDate);
             od.create(organisationParent);
+            document_organisation.addOrg(organisationParent);
             part_of.setOrganisation_mother(organisationParent);
             org.addRel(part_of);
+
             if (addrParent != null) {
                 ad.create(addrParent);
                 locationParent.setAddress(addrParent);
@@ -432,7 +436,9 @@ public class HALMiner extends Miner {
                             prs.setUrl(ptr.getAttribute("target"));
                         }
                     } else if (node.getNodeName().equals("affiliation")) {
-
+                        Document_Organisation document_organisation = new Document_Organisation();
+                        Document_OrganisationDAO d_o = (Document_OrganisationDAO) adf.getDocument_OrganisationDAO();
+                        document_organisation.setDoc(pub.getDocument());
                         organisation = new Organisation();
                         Location location = null;
                         LocationDAO ld = (LocationDAO) adf.getLocationDAO();
@@ -451,7 +457,7 @@ public class HALMiner extends Miner {
                                 if (nd.getNodeName().equals("orgName")) {
                                     organisation.addName(nd.getTextContent());
                                 } else if (nd.getNodeName().equals("org")) {
-                                    organisation = parseOrg(nd, organisation, pubDate);
+                                    organisation = parseOrg(nd, organisation, document_organisation, pubDate);
                                 } else if (nd.getNodeName().equals("desc")) {
                                     NodeList desc = nd.getChildNodes();
                                     for (int d = desc.getLength() - 1; d >= 0; d--) {
@@ -482,6 +488,9 @@ public class HALMiner extends Miner {
                                 }
                             }
                             od.create(organisation);
+
+                            document_organisation.addOrg(organisation);
+                            d_o.create(document_organisation);
                             affiliation.addOrganisation(organisation);
                             affiliation.setBegin_date(pubDate);
                             if (addr != null) {

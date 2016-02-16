@@ -32,6 +32,8 @@ public abstract class AbstractDAOFactory {
 
     public abstract DAO getLocationDAO();
 
+    public abstract DAO getDocument_OrganisationDAO();
+    
     public abstract DAO getOrganisationDAO();
 
     public abstract DAO getPersonDAO();

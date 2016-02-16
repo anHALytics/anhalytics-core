@@ -15,7 +15,6 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- Schema anhalytics
 -- -----------------------------------------------------
 DROP DATABASE `anhalytics`;
-
 CREATE SCHEMA IF NOT EXISTS `anhalytics` DEFAULT CHARACTER SET utf8 ;
 USE `anhalytics` ;
 
@@ -25,7 +24,8 @@ USE `anhalytics` ;
 CREATE TABLE IF NOT EXISTS `anhalytics`.`COUNTRY` (
   `countryID` INT(11) NOT NULL AUTO_INCREMENT,
   `ISO` VARCHAR(2) NULL DEFAULT NULL COMMENT 'ISO3166-1',
-  PRIMARY KEY (`countryID`))
+  PRIMARY KEY (`countryID`),
+  UNIQUE INDEX `ISO_UNIQUE` (`ISO` ASC))
 ENGINE = InnoDB
 AUTO_INCREMENT = 0
 DEFAULT CHARACTER SET = utf8;
@@ -248,7 +248,7 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `anhalytics`.`DOCUMENT_ORGANISATION`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics`.`DOCUMENT_ORGANISATION` (
-  `type` ENUM('team','lab','inst') NULL DEFAULT NULL,
+  `type` ENUM('institution','department','laboratory','researchteam') NULL DEFAULT NULL,
   `docID` INT(11) NOT NULL DEFAULT '0',
   `organisationID` INT(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`organisationID`, `docID`),

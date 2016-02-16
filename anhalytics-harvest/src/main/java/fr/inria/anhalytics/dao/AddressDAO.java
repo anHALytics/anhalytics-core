@@ -22,11 +22,10 @@ public class AddressDAO extends DAO<Address> {
 
     private static final String SQL_INSERT_COUNTRY
             = "INSERT INTO COUNTRY (ISO) VALUES (?)";
-    
+
     private static final String SQL_SELECT_LOCATIONSID_BY_ORGID
             = "SELECT addressID FROM LOCATION WHERE organisationID = ?";
 
-    
     public AddressDAO(Connection conn) {
         super(conn);
     }
@@ -42,19 +41,24 @@ public class AddressDAO extends DAO<Address> {
         PreparedStatement statement1;
         try {
             if (obj.getCountry() != null) {
-
-                statement1 = connect.prepareStatement(SQL_INSERT_COUNTRY, Statement.RETURN_GENERATED_KEYS);
-                if (obj.getCountry().getIso() == null) {
-                    statement1.setNull(1, java.sql.Types.VARCHAR);
-                } else {
-                    statement1.setString(1, obj.getCountry().getIso());
+                Country country = null;
+                if (obj.getCountry().getIso() != null) {
+                    country = findCountry(obj.getCountry().getIso());
                 }
-                int code1 = statement1.executeUpdate();
-                ResultSet rs1 = statement1.getGeneratedKeys();
+                if (country == null) {
+                    statement1 = connect.prepareStatement(SQL_INSERT_COUNTRY, Statement.RETURN_GENERATED_KEYS);
+                    if (obj.getCountry().getIso() == null) {
+                        statement1.setNull(1, java.sql.Types.VARCHAR);
+                    } else {
+                        statement1.setString(1, obj.getCountry().getIso());
+                    }
+                    int code1 = statement1.executeUpdate();
+                    ResultSet rs1 = statement1.getGeneratedKeys();
 
-                if (rs1.next()) {
-                    obj.getCountry().setCountryID(rs1.getLong(1));
-                }
+                    if (rs1.next()) {
+                        obj.getCountry().setCountryID(rs1.getLong(1));
+                    }
+                }else obj.getCountry().setCountryID(country.getCountryID());
             }
             statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, obj.getAddrLine());
@@ -119,8 +123,28 @@ public class AddressDAO extends DAO<Address> {
         }
         return address;
     }
-    
-    public Address getOrganisationAddressById(Long orgId){
+
+    public Country findCountry(String iso) {
+        Country country = null;
+
+        try {
+            ResultSet result = this.connect.createStatement(
+                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM COUNTRY WHERE ISO = \"" + iso+"\"");
+            if (result.first()) {
+                country = new Country(
+                        result.getLong("countryID"),
+                        //result.getString("document.docID"),
+                        iso
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return country;
+    }
+
+    public Address getOrganisationAddressById(Long orgId) {
 
         Address address = null;
 
@@ -139,6 +163,6 @@ public class AddressDAO extends DAO<Address> {
         }
 
         return address;
-    
+
     }
 }
