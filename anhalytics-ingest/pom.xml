@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <name>anhalytics-harvest</name>
+    <name>anhalytics-ingest</name>
     <parent>
         <groupId>fr.inria.anhalytics</groupId>
         <artifactId>anhalytics</artifactId>
         <version>0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+    </properties>
     
-    <groupId>fr.inria.anhalytics.harvest</groupId>
-    <artifactId>anhalytics-harvest</artifactId>
+        <groupId>fr.inria.anhalytics.ingest</groupId>
+    <artifactId>anhalytics-ingest</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
-                
+    <packaging>jar</packaging>
+    
     <build>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
-        </resources>
-        
-        <plugins>
+        </resources><plugins>
             <plugin>
                 <groupId>com.jolira</groupId>
                 <artifactId>onejar-maven-plugin</artifactId>
@@ -29,7 +32,7 @@
                 <executions>
                     <execution>
                         <configuration>
-                            <mainClass>fr.inria.anhalytics.harvest.main.Main</mainClass>
+                            <mainClass>fr.inria.anhalytics.ingest.main.Main</mainClass>
                             <!-- Optional -->
                             <onejarVersion>0.97</onejarVersion>
                             <!-- Optional, default is false -->
@@ -53,19 +56,6 @@
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>                    
-                </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.1.1</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                    </archive>
                 </configuration>
             </plugin>
                         
@@ -97,21 +87,8 @@
         </plugins>
         
     </build>
-        
+    
     <dependencies>
-        		
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.0.1</version>
-        </dependency>
         
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -124,37 +101,18 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.7</version>
         </dependency>
-		
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-            <version>4.2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <version>1.3</version>
-            <scope>test</scope>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
-            <version>1.9</version>
-            <type>jar</type>
-        </dependency>
         <dependency>
             <groupId>fr.inria.anhalytics.commons</groupId>
             <artifactId>anhalytics-commons</artifactId>
             <version>0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1</version>
-        </dependency>
         
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.37</version>
+        </dependency>
 
     </dependencies>
 </project>

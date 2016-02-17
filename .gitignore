@@ -21,3 +21,5 @@ config/generic/*
 *.bak
 /anhalytics-test/target/
 *nb-configuration.xml
+/anhalytics-ingest/target/
+/anhalytics-ingest/target/*

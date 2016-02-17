@@ -376,14 +376,18 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Updates already existing tei with new (more enriched one, fulltext..).
      */
-    public void updateTei(String newTei, String repositoryDocId, boolean isFulltextAdded) {
+    public void updateTei(String newTei, String repositoryDocId, String docID, boolean isFulltextAdded) {
         GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
         GridFSDBFile gdf = gfs.findOne(repositoryDocId + ".tei.xml");
         GridFSInputFile gfsNew = gfs.createFile(new ByteArrayInputStream(newTei.getBytes()), true);
         gfsNew.put("uploadDate", gdf.getUploadDate());
         gfsNew.setFilename(gdf.get("repositoryDocId") + ".tei.xml");
         gfsNew.put("repositoryDocId", gdf.get("repositoryDocId"));
-        gfsNew.put("docId", gdf.get("docId"));
+        if (docID == null) {
+            gfsNew.put("docId", gdf.get("docId"));
+        }
+        else
+            gfsNew.put("docId", docID);
         gfsNew.put("isFulltextAdded", isFulltextAdded);
         gfsNew.save();
         gfs.remove(gdf);

@@ -1,12 +1,10 @@
-package fr.inria.anhalytics.harvest.main;
+package fr.inria.anhalytics.ingest.main;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.HALOAIHarvester;
-import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
-import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
-import fr.inria.anhalytics.harvest.properties.HarvestProperties;
-import fr.inria.anhalytics.harvest.teibuild.TeiBuilderProcess;
+import fr.inria.anhalytics.ingest.datamine.GrobidMiner;
+import fr.inria.anhalytics.ingest.datamine.HALMiner;
+import fr.inria.anhalytics.ingest.properties.IngestProperties;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -16,8 +14,6 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Main class that implements commands for harvesting, extracting, inserting in
- * KB and generating TEI.
  *
  * @author Achraf
  */
@@ -25,31 +21,25 @@ public class Main {
 
     private static List<String> availableCommands = new ArrayList<String>() {
         {
-            add("harvestAll");
-            add("harvestDaily");
-            add("generateTei");
-            add("generateTeiDaily");
-            add("fetchEmbargoPublications");
-            add("processGrobid");
-            add("processGrobidDaily");
-            add("appendGrobidFulltext");
-            add("appendGrobidFulltextDaily");
-            add("harvestIstex");
+            
+            add("initKnowledgeBase");
+            add("initKnowledgeBaseDaily");
+            add("initCitationKnowledgeBase");
+            add("deduplicate");
         }
     };
 
     public static void main(String[] args) throws UnknownHostException {
         try {
-            HarvestProperties.init("harvest.properties");
+            IngestProperties.init("ingest.properties");
         } catch (Exception exp) {
-            throw new PropertyException("Cannot open file of harvest properties harvest.properties", exp);
+            throw new PropertyException("Cannot open file of harvest properties ingest.properties", exp);
         }
 
         if (processArgs(args)) {
-            if (HarvestProperties.getFromDate() != null || HarvestProperties.getUntilDate() != null) {
-                Utilities.updateDates(HarvestProperties.getFromDate(), HarvestProperties.getUntilDate());
+            if (IngestProperties.getFromDate() != null || IngestProperties.getUntilDate() != null) {
+                Utilities.updateDates(IngestProperties.getFromDate(), IngestProperties.getUntilDate());
             }
-            Utilities.setTmpPath(HarvestProperties.getTmpPath());
             Main main = new Main();
             main.processCommand();
         } else {
@@ -65,41 +55,24 @@ public class Main {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
         String todayDate = dateFormat.format(cal.getTime());
-        String process = HarvestProperties.getProcessName();
-        GrobidProcess gp = new GrobidProcess();
-        TeiBuilderProcess tb = new TeiBuilderProcess();
-        HALOAIHarvester oai = new HALOAIHarvester();
-        IstexHarvester ih = new IstexHarvester();
-        if (process.equals("harvestAll")) {
-            oai.fetchAllDocuments();
-        } else if (process.equals("harvestDaily")) {
-            Utilities.updateDates(todayDate, todayDate);
-            oai.fetchAllDocuments();
-        } else if (process.equals("generateTei")) {
-            tb.buildTei();
-        } else if (process.equals("generateTeiDaily")) {
-            Utilities.updateDates(todayDate, todayDate);
-            tb.buildTei();
-        }else if (process.equals("processGrobid")) {
-            gp.processFulltexts();
-        } else if (process.equals("processGrobidDaily")) {
-            Utilities.updateDates(todayDate, todayDate);
-            gp.processFulltexts();
-        } else if (process.equals("appendGrobidFulltext")) {
-            //xml_ids are updated, the annotation is time consuming process.      
+        String process = IngestProperties.getProcessName();
+        GrobidMiner gm = new GrobidMiner();
+        HALMiner hm = new HALMiner();
+        if (process.equals("initKnowledgeBase")) {
+            //Initiates HAL knowledge base and creates working corpus TEI.
             System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);
+
             if (reponse != 'N') {
-                tb.appendGrobidFulltext();
+                hm.initKnowledgeBase();
             }
-        } else if (process.equals("appendGrobidFulltextDaily")) {
-            //xml_ids are updated, the annotation is time consuming process.
+            return;
+        } else if (process.equals("initKnowledgeBaseDaily")) {
+            //Initiates HAL knowledge base and creates working corpus TEI.
             Utilities.updateDates(todayDate, todayDate);
-            tb.appendGrobidFulltext();
-        } else if (process.equals("fetchEmbargoPublications")) {
-            oai.fetchEmbargoPublications();
-        } else if (process.equals("harvestIstex")) {
-            ih.harvest();
+            hm.initKnowledgeBase();
+        }  else if (process.equals("initCitationKnowledgeBase")) {
+            gm.processCitations();
         }
         return;
     }
@@ -120,7 +93,7 @@ public class Main {
                     String stringDate = pArgs[i + 1];
                     if (!stringDate.isEmpty()) {
                         if (Utilities.isValidDate(stringDate)) {
-                            HarvestProperties.setFromDate(pArgs[i + 1]);
+                            IngestProperties.setFromDate(pArgs[i + 1]);
                         } else {
                             System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
                             result = false;
@@ -132,7 +105,7 @@ public class Main {
                     String stringDate = pArgs[i + 1];
                     if (!stringDate.isEmpty()) {
                         if (Utilities.isValidDate(stringDate)) {
-                            HarvestProperties.setUntilDate(stringDate);
+                            IngestProperties.setUntilDate(stringDate);
                         } else {
                             System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
                             result = false;
@@ -143,7 +116,7 @@ public class Main {
                 } else if (currArg.equals("-exe")) {
                     String command = pArgs[i + 1];
                     if (availableCommands.contains(command)) {
-                        HarvestProperties.setProcessName(command);
+                        IngestProperties.setProcessName(command);
                         i++;
                         continue;
                     } else {

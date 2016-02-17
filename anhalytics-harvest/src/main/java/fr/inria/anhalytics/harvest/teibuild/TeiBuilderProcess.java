@@ -2,6 +2,8 @@ package fr.inria.anhalytics.harvest.teibuild;
 
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.UnknownHostException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,30 @@ public class TeiBuilderProcess {
 
     public TeiBuilderProcess() throws UnknownHostException {
         this.mm = MongoFileManager.getInstance(false);
+    }
+
+    /**
+     * Clean up metadatas and build a corpus tei.
+     */
+    public void buildTei() {
+        for (String date : Utilities.getDates()) {
+            if (mm.initMetadataTeis(date)) {
+                while (mm.hasMoreTeis()) {
+                    String metadataTeiString = mm.nextTeiDocument();
+                    String uri = mm.getCurrentRepositoryDocId();
+                    Document generatedTeiDoc = null;
+                    try {
+                        logger.info("\t Building tei for: " + uri);
+                        InputStream metadataTeiStream = new ByteArrayInputStream(metadataTeiString.getBytes());
+                        generatedTeiDoc = TeiBuilder.createTEICorpus(metadataTeiStream);
+                        metadataTeiStream.close();
+                        mm.insertTei(Utilities.toString(generatedTeiDoc), uri, null, date);
+                    } catch (Exception xpe) {
+                        xpe.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -42,7 +68,7 @@ public class TeiBuilderProcess {
                             generatedTeiDoc = TeiBuilder.addGrobidTeiToTei(finalTei, grobidTeiString);
                             if (generatedTeiDoc != null) {
                                 String generatedTeiString = Utilities.toString(generatedTeiDoc);
-                                mm.updateTei(generatedTeiString, id, true);
+                                mm.updateTei(generatedTeiString, id, null,true);
                             }
                         }
                     }
