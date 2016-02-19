@@ -21,6 +21,9 @@ public class HarvestProperties {
 
     private static String grobidHost;
     private static String grobidPort;
+    
+    private static String grobidHome;
+    private static String grobidProperties;
 
     private static String tmpPath;
 
@@ -39,6 +42,8 @@ public class HarvestProperties {
         setOaiUrl(props.getProperty("harvest.oaipmhurl"));
         setGrobidHost(props.getProperty("harvest.grobid_host"));
         setGrobidPort(props.getProperty("harvest.grobid_port"));
+        setGrobidHome(props.getProperty("harvest.grobid_home"));
+        setGrobidProperties(props.getProperty("harvest.grobid_properties"));
         //check path
         setTmpPath(props.getProperty("harvest.tmpPath"));
         // As grobid process may take a long time we can continue on previous works
@@ -185,6 +190,34 @@ public class HarvestProperties {
      */
     public static void setNbThreads(int aNbThreads) {
         nbThreads = aNbThreads;
+    }
+
+    /**
+     * @return the grobidHome
+     */
+    public static String getGrobidHome() {
+        return grobidHome;
+    }
+
+    /**
+     * @param aGrobidHome the grobidHome to set
+     */
+    public static void setGrobidHome(String aGrobidHome) {
+        grobidHome = aGrobidHome;
+    }
+
+    /**
+     * @return the grobidProperties
+     */
+    public static String getGrobidProperties() {
+        return grobidProperties;
+    }
+
+    /**
+     * @param aGrobidProperties the grobidProperties to set
+     */
+    public static void setGrobidProperties(String aGrobidProperties) {
+        grobidProperties = aGrobidProperties;
     }
 
 }

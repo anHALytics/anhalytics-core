@@ -76,7 +76,12 @@ public class Main {
             Utilities.updateDates(todayDate, todayDate);
             oai.fetchAllDocuments();
         } else if (process.equals("generateTei")) {
-            tb.buildTei();
+             //xml_ids are updated, the annotation is time consuming process.      
+            System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
+            reponse = sc.nextLine().charAt(0);
+            if (reponse != 'N') {
+                tb.buildTei();
+            }
         } else if (process.equals("generateTeiDaily")) {
             Utilities.updateDates(todayDate, todayDate);
             tb.buildTei();

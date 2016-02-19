@@ -1,15 +1,23 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.harvest.grobid.MyGrobid;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Function for extracting data from Hal stored metadata.
@@ -39,6 +47,7 @@ public class halTeiExtractor {
             NodeList authors = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/author").evaluate(docAdditionalTei, XPathConstants.NODESET);
             NodeList orgs = (NodeList) xPath.compile("/TEI/text/back/listOrg/org").evaluate(docAdditionalTei, XPathConstants.NODESET);
 
+            parseOrgsAddress(docAdditionalTei, orgs);
             correctDataLocation(docAdditionalTei, authors);
             updateAffiliations(authors, orgs, docAdditionalTei);
             correctDataLocation(docAdditionalTei, editors);
@@ -51,6 +60,63 @@ public class halTeiExtractor {
 
         }
         return teiHeader;
+    }
+
+    private static void parseOrgsAddress(Document doc, NodeList orgs) {
+        Node org = null;
+        for (int i = orgs.getLength() - 1; i >= 0; i--) {
+            org = orgs.item(i);
+            if (org.getNodeType() == Node.ELEMENT_NODE) {
+                Element orgElt = (Element) orgs.item(i);
+                NodeList addressNodes = orgElt.getElementsByTagName("addrLine");
+                String grobidResponse = null;
+                if (addressNodes != null) {
+                    Node addrLine = addressNodes.item(0);
+                    if (addrLine != null) {
+                        grobidResponse = MyGrobid.runGrobid(addrLine.getTextContent());
+                        try {
+                            Element node = DocumentBuilderFactory
+                                    .newInstance()
+                                    .newDocumentBuilder()
+                                    .parse(new ByteArrayInputStream(grobidResponse.getBytes()))
+                                    .getDocumentElement();
+                            NodeList line1 = node.getElementsByTagName("orgName");
+                            String addrLineString = "";
+                            for (int z = line1.getLength() - 1; z >= 0; z--) {
+                                addrLineString += line1.item(z).getTextContent();
+                            }
+                            NodeList line2 = node.getElementsByTagName("addrLine");
+                            for (int y = line2.getLength() - 1; y >= 0; y--) {
+                                addrLineString += line2.item(y).getTextContent();
+                            }
+                            addrLine.setTextContent(addrLineString);
+                            
+                            NodeList address = node.getElementsByTagName("address");
+                            for (int n = address.getLength() - 1; n >= 0; n--) {
+                                NodeList addressChilds = address.item(n).getChildNodes();
+                                for (int j = addressChilds.getLength() - 1; j >= 0; j--) {
+
+                                    if (addressChilds.item(j).getNodeType() == Node.ELEMENT_NODE) {
+                                        Element e = (Element) (addressChilds.item(j));
+                                        if (!e.getTagName().equals("addrLine")) {
+                                            Node localNode = (doc.importNode(e, true));
+                                            orgElt.getElementsByTagName("address").item(0).appendChild(localNode);
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (ParserConfigurationException ex) {
+                            Logger.getLogger(halTeiExtractor.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (SAXException ex) {
+                            Logger.getLogger(halTeiExtractor.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IOException ex) {
+                            Logger.getLogger(halTeiExtractor.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            }
+
+        }
     }
 
     /**
@@ -99,7 +165,7 @@ public class halTeiExtractor {
                     Node rel = Utilities.findNode(id, orgs);
                     Node newRel = rel.cloneNode(true);
                     updateOrgType((Element) newRel, orgs);
-                    
+
                     org.appendChild(newRel);
                 }
             }

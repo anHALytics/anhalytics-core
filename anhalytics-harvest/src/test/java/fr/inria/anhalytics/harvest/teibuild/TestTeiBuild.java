@@ -1,6 +1,8 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
+import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,6 +28,11 @@ public class TestTeiBuild extends XMLTestCase {
 
     @Test
     public void testTEIMerging() throws Exception {
+        try {
+            HarvestProperties.init("harvest.properties");
+        } catch (Exception exp) {
+            throw new PropertyException("Cannot open file of harvest properties harvest.properties", exp);
+        }
         XPath xPath = XPathFactory.newInstance().newXPath();
         xPath.setNamespaceContext(new MyNamespaceContext());
         File mtdTeiFile = new File(this.getResourceDir("src/test/resources/").getAbsoluteFile()
