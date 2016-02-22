@@ -362,11 +362,19 @@ public class HALMiner extends Miner {
                             locationParent = new Location();
                             for (int x = addressorg.getLength() - 1; x >= 0; x--) {
                                 Node addrorgnode = addressorg.item(x);
+                                
                                 if (addrorgnode.getNodeName().equals("addrLine")) {
+                                    System.out.println(addrorgnode.getTextContent());
                                     addrParent.setAddrLine(addrorgnode.getTextContent());
                                 } else if (addrorgnode.getNodeName().equals("country")) {
                                     Element countryElt = (Element) addrorgnode;
                                     addrParent.setCountry(new Country(null, countryElt.getAttribute("key")));
+                                } else if (addrorgnode.getNodeName().equals("settlement")) {
+                                    addrParent.setSettlement(addrorgnode.getTextContent());
+                                } else if (addrorgnode.getNodeName().equals("postCode")) {
+                                    addrParent.setPostCode(addrorgnode.getTextContent());
+                                } else if (addrorgnode.getNodeName().equals("region")) {
+                                    addrParent.setRegion(addrorgnode.getTextContent());
                                 }
                             }
 
@@ -450,6 +458,7 @@ public class HALMiner extends Miner {
                             prs.setUrl(ptr.getAttribute("target"));
                         }
                     } else if (node.getNodeName().equals("affiliation")) {
+                        
                         Document_Organisation document_organisation = new Document_Organisation();
                         Document_OrganisationDAO d_o = (Document_OrganisationDAO) adf.getDocument_OrganisationDAO();
                         document_organisation.setDoc(pub.getDocument());
@@ -458,14 +467,15 @@ public class HALMiner extends Miner {
                         LocationDAO ld = (LocationDAO) adf.getLocationDAO();
                         Address addr = null;
                         AddressDAO ad = (AddressDAO) adf.getAddressDAO();
-                        Node org = node.getChildNodes().item(0);
-                        if (org != null && org.getNodeType() == Node.ELEMENT_NODE) {
-                            Element orgElt = (Element) org;
-
+                        NodeList orgChildNodes = node.getChildNodes();
+                        for (int m = orgChildNodes.getLength() - 1; m >= 0; m--) {
+                            Node orgChildNode = orgChildNodes.item(m);
+                        if (orgChildNode != null && orgChildNode.getNodeType() == Node.ELEMENT_NODE) {
+                            Element orgElt = (Element) orgChildNode;
                             organisation.setType(orgElt.getAttribute("type"));
                             organisation.setStructure(orgElt.getAttribute("xml:id"));
 
-                            NodeList nl = org.getChildNodes();
+                            NodeList nl = orgChildNode.getChildNodes();
                             for (int n = nl.getLength() - 1; n >= 0; n--) {
                                 Node nd = nl.item(n);
                                 if (nd.getNodeName().equals("orgName")) {
@@ -478,13 +488,19 @@ public class HALMiner extends Miner {
                                         if (desc.item(d).getNodeName().equals("address")) {
                                             location = new Location();
                                             addr = new Address();
-                                            NodeList address = (nd.getChildNodes().item(0)).getChildNodes();
+                                            NodeList address = (desc.item(d)).getChildNodes();
                                             for (int x = address.getLength() - 1; x >= 0; x--) {
                                                 Node addrnodes = address.item(x);
                                                 if (addrnodes.getNodeName().equals("addrLine")) {
                                                     addr.setAddrLine(addrnodes.getTextContent());
                                                 } else if (addrnodes.getNodeName().equals("country")) {
                                                     addr.setCountry(new Country(null, (addrnodes.getAttributes()).item(0).getTextContent()));
+                                                } else if (addrnodes.getNodeName().equals("settlement")) {
+                                                    addr.setSettlement(addrnodes.getTextContent());
+                                                } else if (addrnodes.getNodeName().equals("postCode")) {
+                                                    addr.setPostCode(addrnodes.getTextContent());
+                                                } else if (addrnodes.getNodeName().equals("region")) {
+                                                    addr.setRegion(addrnodes.getTextContent());
                                                 }
                                             }
                                         } else if (desc.item(d).getNodeName().equals("ref")) {
@@ -514,7 +530,7 @@ public class HALMiner extends Miner {
                                 location.setOrganisation(organisation);
                                 ld.create(location);
                             }
-                        }
+                        }}
                     } else if (node.getNodeName().equals("idno")) {
                         Person_Identifier pi = new Person_Identifier();
                         NamedNodeMap nnm = node.getAttributes();
