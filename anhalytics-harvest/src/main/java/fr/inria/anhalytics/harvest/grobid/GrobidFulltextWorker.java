@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.UnknownHostException;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Worker to extract tei/assets from a publication binary.
@@ -13,6 +15,8 @@ import org.apache.commons.io.FileUtils;
  */
 public class GrobidFulltextWorker extends GrobidWorker {
 
+    private static final Logger logger = LoggerFactory.getLogger(GrobidFulltextWorker.class);
+    
     public GrobidFulltextWorker(InputStream content, String id, String date) throws UnknownHostException {
         super(content, id, date);
     }
@@ -39,8 +43,8 @@ public class GrobidFulltextWorker extends GrobidWorker {
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex.getCause());
         }
     }
 }

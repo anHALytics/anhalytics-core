@@ -37,6 +37,8 @@ public class GrobidService {
     private boolean generateIDs = false;
     private String date;
     
+    int TIMEOUT_VALUE = 30000;
+    
     public GrobidService(int start, int end, boolean generateIDs, String date) {
         this.start = start;
         this.end = end;
@@ -59,8 +61,8 @@ public class GrobidService {
         try {
             URL url = new URL("http://" + HarvestProperties.getGrobidHost() + ":" + HarvestProperties.getGrobidPort() + "/processFulltextAssetDocument");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            //conn.setConnectTimeout(5000);
-            //conn.setReadTimeout(1000*10);
+            conn.setConnectTimeout(TIMEOUT_VALUE);
+            conn.setReadTimeout(TIMEOUT_VALUE);
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
             FileBody fileBody = new FileBody(new File(filepath));
@@ -115,7 +117,7 @@ public class GrobidService {
             conn.disconnect();
             
         } catch (ConnectException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
             try {
                 Thread.sleep(20000);
                 runFullTextGrobid(filepath);
@@ -123,7 +125,7 @@ public class GrobidService {
                 Thread.currentThread().interrupt();
             }
         } catch (HttpRetryException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
             try {
                 Thread.sleep(20000);
                 runFullTextGrobid(filepath);
@@ -133,9 +135,9 @@ public class GrobidService {
         } catch(SocketTimeoutException e){
             throw new GrobidTimeoutException("Grobid processing timed out.");
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         } catch(IOException e){
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
         return zipDirectoryPath;        
     }

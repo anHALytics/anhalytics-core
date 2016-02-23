@@ -92,7 +92,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             cursor = gfs.getFileList(bdbo);
             indexFile = 0;
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
         if (cursor.size() > 0) {
             return true;
@@ -114,7 +114,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             cursor = gfs.getFileList(bdbo);
             indexFile = 0;
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
         if (cursor.size() > 0) {
             return true;
@@ -136,7 +136,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             cursor = gfs.getFileList(bdbo);
             indexFile = 0;
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
         if (cursor.size() > 0) {
             return true;
@@ -158,7 +158,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             cursor = gfs.getFileList(bdbo);
             indexFile = 0;
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
         if (cursor.size() > 0) {
             return true;
@@ -180,7 +180,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             cursor = gfs.getFileList(bdbo);
             indexFile = 0;
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
         if (cursor.size() > 0) {
             return true;
@@ -265,7 +265,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             tei = IOUtils.toString(teiStream);
             teiStream.close();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.error(ex.getMessage(), ex.getCause());
         }
         return tei;
     }
@@ -286,20 +286,26 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      * Inserts json entry representing annotation result.
      */
     public boolean insertAnnotation(String json) {
-        DBCollection c = null;
-        c = db.getCollection("annotations");
-        BasicDBObject index = new BasicDBObject();
-        index.put("repositoryDocId", 1);
-        index.put("xml:id", 1);
-        c.ensureIndex(index, "index", true);
-        DBObject dbObject = (DBObject) JSON.parse(json);
-        WriteResult result = c.insert(dbObject);
-        CommandResult res = result.getCachedLastError();
-        if ((res != null) && (res.ok())) {
-            return true;
-        } else {
-            return false;
+        boolean done = false;
+        try {
+            DBCollection c = null;
+            c = db.getCollection("annotations");
+            BasicDBObject index = new BasicDBObject();
+            index.put("repositoryDocId", 1);
+            index.put("xml:id", 1);
+            c.ensureIndex(index, "index", true);
+            DBObject dbObject = (DBObject) JSON.parse(json);
+            WriteResult result = c.insert(dbObject);
+            CommandResult res = result.getCachedLastError();
+            if ((res != null) && (res.ok())) {
+                done = true;
+            } else {
+                done = false;
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e.getCause());
         }
+        return done;
     }
 
     /**
@@ -316,7 +322,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.put("docId", docId);
             gfsFile.save();
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
     }
 
@@ -333,7 +339,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.put("repositoryDocId", repositoryDocId);
             gfsFile.save();
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
     }
 
@@ -350,7 +356,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.put("repositoryDocId", repositoryDocId);
             gfsFile.save();
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
     }
 
@@ -368,7 +374,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.setContentType("application/pdf");
             gfsFile.save();
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
 
     }
@@ -377,20 +383,24 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      * Updates already existing tei with new (more enriched one, fulltext..).
      */
     public void updateTei(String newTei, String repositoryDocId, String docID, boolean isFulltextAdded) {
-        GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
-        GridFSDBFile gdf = gfs.findOne(repositoryDocId + ".tei.xml");
-        GridFSInputFile gfsNew = gfs.createFile(new ByteArrayInputStream(newTei.getBytes()), true);
-        gfsNew.put("uploadDate", gdf.getUploadDate());
-        gfsNew.setFilename(gdf.get("repositoryDocId") + ".tei.xml");
-        gfsNew.put("repositoryDocId", gdf.get("repositoryDocId"));
-        if (docID == null) {
-            gfsNew.put("docId", gdf.get("docId"));
+        try {
+            GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
+            GridFSDBFile gdf = gfs.findOne(repositoryDocId + ".tei.xml");
+            GridFSInputFile gfsNew = gfs.createFile(new ByteArrayInputStream(newTei.getBytes()), true);
+            gfsNew.put("uploadDate", gdf.getUploadDate());
+            gfsNew.setFilename(gdf.get("repositoryDocId") + ".tei.xml");
+            gfsNew.put("repositoryDocId", gdf.get("repositoryDocId"));
+            if (docID == null) {
+                gfsNew.put("docId", gdf.get("docId"));
+            } else {
+                gfsNew.put("docId", docID);
+            }
+            gfsNew.put("isFulltextAdded", isFulltextAdded);
+            gfsNew.save();
+            gfs.remove(gdf);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e.getCause());
         }
-        else
-            gfsNew.put("docId", docID);
-        gfsNew.put("isFulltextAdded", isFulltextAdded);
-        gfsNew.save();
-        gfs.remove(gdf);
     }
 
     /**
@@ -408,7 +418,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.setContentType("application/tei+xml");
             gfsFile.save();
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
 
     }
@@ -431,7 +441,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.setContentType("image/png");
             gfsFile.save();
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
     }
 
@@ -452,7 +462,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.put("repositoryDocId", repositoryDocId);
             gfsFile.save();
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
     }
 
@@ -461,7 +471,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             GridFS gfs = new GridFS(db, FINAL_TEIS);
             gfs.remove(filename);
         } catch (MongoException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e.getCause());
         }
     }
 
@@ -665,8 +675,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             InputStream teiStream = file.getInputStream();
             tei = IOUtils.toString(teiStream);
             teiStream.close();
-        } catch (Exception exp) {
-            exp.printStackTrace();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e.getCause());
         }
         return tei;
     }
@@ -675,52 +685,64 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      * Saves the issue occurring while processing.
      */
     public void save(String repositoryDocId, String process, String desc, String date) {
-        DBCollection collection = db.getCollection(HARVEST_DIAGNOSTIC);
-        BasicDBObject index = new BasicDBObject();
-        index.put("repositoryDocId", 1);
-        index.put("process", 1);
-        collection.ensureIndex(index, "index", true);
-        BasicDBObject document = new BasicDBObject();
-        document.put("repositoryDocId", repositoryDocId);
-        document.put("process", process);
+        try {
+            DBCollection collection = db.getCollection(HARVEST_DIAGNOSTIC);
+            BasicDBObject index = new BasicDBObject();
+            index.put("repositoryDocId", 1);
+            index.put("process", 1);
+            collection.ensureIndex(index, "index", true);
+            BasicDBObject document = new BasicDBObject();
+            document.put("repositoryDocId", repositoryDocId);
+            document.put("process", process);
 
-        collection.findAndRemove(document);
-        document.put("desc", desc);
-        if (date == null) {
-            date = Utilities.formatDate(new Date());
+            collection.findAndRemove(document);
+            document.put("desc", desc);
+            if (date == null) {
+                date = Utilities.formatDate(new Date());
+            }
+            document.put("date", date);
+            collection.insert(document);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e.getCause());
         }
-        document.put("date", date);
-        collection.insert(document);
     }
 
     /**
      * Saves the resource to be requested later (embargo).
      */
     public void saveForLater(String repositoryDocId, String url, boolean isAnnex, String desc, String date) {
-        DBCollection collection = db.getCollection(MongoCollectionsInterface.TO_REQUEST_LATER);
-        BasicDBObject index = new BasicDBObject();
-        index.put("repositoryDocId", 1);
-        index.put("url", 1);
-        collection.ensureIndex(index, "index", true);
-        BasicDBObject document = new BasicDBObject();
-        document.put("repositoryDocId", repositoryDocId);
-        document.put("url", url);
-        collection.findAndRemove(document);
-        document.put("isAnnex", true);
-        document.put("desc", desc);
-        if (date == null) {
-            date = Utilities.formatDate(new Date());
+        try {
+            DBCollection collection = db.getCollection(MongoCollectionsInterface.TO_REQUEST_LATER);
+            BasicDBObject index = new BasicDBObject();
+            index.put("repositoryDocId", 1);
+            index.put("url", 1);
+            collection.ensureIndex(index, "index", true);
+            BasicDBObject document = new BasicDBObject();
+            document.put("repositoryDocId", repositoryDocId);
+            document.put("url", url);
+            collection.findAndRemove(document);
+            document.put("isAnnex", true);
+            document.put("desc", desc);
+            if (date == null) {
+                date = Utilities.formatDate(new Date());
+            }
+            document.put("date", date);
+            collection.insert(document);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e.getCause());
         }
-        document.put("date", date);
-        collection.insert(document);
     }
 
     public void removeEmbargoRecord(String repositoryDocId, String url) {
-        DBCollection collection = db.getCollection(TO_REQUEST_LATER);
-        BasicDBObject whereQuery = new BasicDBObject();
-        whereQuery.put("repositoryDocId", repositoryDocId);
-        whereQuery.put("url", url);
-        collection.remove(whereQuery);
+        try {
+            DBCollection collection = db.getCollection(TO_REQUEST_LATER);
+            BasicDBObject whereQuery = new BasicDBObject();
+            whereQuery.put("repositoryDocId", repositoryDocId);
+            whereQuery.put("url", url);
+            collection.remove(whereQuery);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e.getCause());
+        }
     }
 
     public void setGridFSCollection(String collectionName) {

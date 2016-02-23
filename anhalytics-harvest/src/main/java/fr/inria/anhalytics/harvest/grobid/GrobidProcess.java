@@ -56,9 +56,9 @@ public class GrobidProcess {
                 }
             }
         } catch (IOException ioex) {
-            ioex.printStackTrace();
+            logger.error(ioex.getMessage(), ioex.getCause());
         }
-        System.out.println("Finished all threads");
+        logger.info("Finished all threads");
     }
 
     public void processAnnexes() throws IOException {
@@ -86,7 +86,7 @@ public class GrobidProcess {
             executor.shutdown();
             while (!executor.isTerminated()) {
             }
-            System.out.println("Finished all threads");
+            logger.info("Finished all threads");
         }
     }
 }
