@@ -47,7 +47,7 @@ public class Main {
 
         if (processArgs(args)) {
             if (HarvestProperties.getFromDate() != null || HarvestProperties.getUntilDate() != null) {
-                Utilities.updateDates(HarvestProperties.getFromDate(), HarvestProperties.getUntilDate());
+                Utilities.updateDates(HarvestProperties.getUntilDate(), HarvestProperties.getFromDate());
             }
             Utilities.setTmpPath(HarvestProperties.getTmpPath());
             Main main = new Main();

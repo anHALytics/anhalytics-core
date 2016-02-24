@@ -71,10 +71,10 @@ public class Utilities {
         Calendar toDay = Calendar.getInstance();
         int todayYear = toDay.get(Calendar.YEAR);
         int todayMonth = toDay.get(Calendar.MONTH) + 1;
-        for (int year = todayYear; year >= 1960; year--) {
+        for (int year = 1960; year <= todayYear ; year++) {
             int monthYear = (year == todayYear) ? todayMonth : 12;
-            for (int month = monthYear; month >= 1; month--) {
-                for (int day = daysInMonth(year, month); day >= 1; day--) {
+            for (int month = 1; month <= monthYear; month++) {
+                for (int day = 1; day <=daysInMonth(year, month); day++) {
                     StringBuilder date = new StringBuilder();
                     date.append(String.format("%04d", year));
                     date.append("-");
