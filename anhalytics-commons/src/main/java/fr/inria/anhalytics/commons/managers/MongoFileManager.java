@@ -687,15 +687,17 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public void save(String repositoryDocId, String process, String desc, String date) {
         try {
             DBCollection collection = db.getCollection(HARVEST_DIAGNOSTIC);
-            BasicDBObject index = new BasicDBObject();
-            index.put("repositoryDocId", 1);
-            index.put("process", 1);
-            collection.ensureIndex(index, "index", true);
+
             BasicDBObject document = new BasicDBObject();
             document.put("repositoryDocId", repositoryDocId);
             document.put("process", process);
 
             collection.findAndRemove(document);
+
+            BasicDBObject index = new BasicDBObject();
+            index.put("repositoryDocId", 1);
+            index.put("process", 1);
+            collection.ensureIndex(index, "index", true);
             document.put("desc", desc);
             if (date == null) {
                 date = Utilities.formatDate(new Date());

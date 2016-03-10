@@ -141,8 +141,6 @@ public class halTeiExtractor {
     private static Document removeUnneededParts(Document docAdditionalTei) throws XPathExpressionException {
         Node analytic = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/analytic").evaluate(docAdditionalTei, XPathConstants.NODE);
         analytic.getParentNode().removeChild(analytic);
-        Node editionStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/editionStmt").evaluate(docAdditionalTei, XPathConstants.NODE);
-        editionStmt.getParentNode().removeChild(editionStmt);
         Node publicationStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/publicationStmt").evaluate(docAdditionalTei, XPathConstants.NODE);
         publicationStmt.getParentNode().removeChild(publicationStmt);
         Node seriesStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/seriesStmt").evaluate(docAdditionalTei, XPathConstants.NODE);

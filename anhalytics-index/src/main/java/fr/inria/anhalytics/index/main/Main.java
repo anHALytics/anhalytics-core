@@ -2,6 +2,7 @@ package fr.inria.anhalytics.index.main;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.index.Indexer;
+import fr.inria.anhalytics.index.MetadataIndexer;
 import fr.inria.anhalytics.index.properties.IndexProperties;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
@@ -27,6 +28,7 @@ public class Main {
         {
             add("index");
             add("indexDaily");
+            add("indexMtds");
         }
     };
 
@@ -37,7 +39,7 @@ public class Main {
             try {
                 IndexProperties.init("index.properties");
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
 
             Main main = new Main();
@@ -82,6 +84,7 @@ public class Main {
         String process = IndexProperties.getProcessName();
         Indexer esm = new Indexer();
 
+        MetadataIndexer mi = new MetadataIndexer();
         if (process.equals("index")) {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);
@@ -90,6 +93,9 @@ public class Main {
                 esm.setUpIndex(IndexProperties.getTeisIndexName());
                 esm.setUpIndex(IndexProperties.getAnnotsIndexName());
             }
+            esm.indexAnnotations();
+            esm.indexTeiCollection();
+            esm.close();
         } else if (process.equals("indexDaily")) {
             if (esm.isIndexExists()) {
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -102,9 +108,21 @@ public class Main {
                 esm.close();
                 return;
             }
+            esm.indexAnnotations();
+            esm.indexTeiCollection();
+            esm.close();
+        } else if (process.equals("indexMtds")) {
+            System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
+            reponse = sc.nextLine().charAt(0);
+
+            if (reponse != 'N') {
+                mi.setUpIndex(IndexProperties.getMetadataIndexName());
+            }
+            mi.indexAuthors();
+            mi.indexPublications();
+            mi.indexOrganisations();
+            mi.close();
         }
-        esm.index();
-        esm.close();
         return;
     }
 

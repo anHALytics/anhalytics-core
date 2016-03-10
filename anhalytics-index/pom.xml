@@ -116,6 +116,13 @@
             <version>0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>fr.inria.anhalytics.ingest</groupId>
+            <artifactId>anhalytics-ingest</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
 		
     </dependencies>
 </project>

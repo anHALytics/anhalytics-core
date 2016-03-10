@@ -45,6 +45,8 @@ public class Document_Identifier {
      * @param id the id to set
      */
     public void setId(String id) {
+        if(id.length() > 150)
+            id = id.substring(0, 149);
         this.id = id;
     }
 
@@ -59,6 +61,8 @@ public class Document_Identifier {
      * @param type the type to set
      */
     public void setType(String type) {
+        if(type.length() > 55)
+            type = type.substring(0, 54);
         this.type = type;
     }
 

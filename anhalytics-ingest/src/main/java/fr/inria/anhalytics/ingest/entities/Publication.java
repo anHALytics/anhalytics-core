@@ -1,6 +1,9 @@
 package fr.inria.anhalytics.ingest.entities;
 
+import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -105,6 +108,8 @@ public class Publication {
      * @param type the type to set
      */
     public void setType(String type) {
+        if(type.length() > 45)
+            type = type.substring(0, 44);
         this.type = type;
     }
 
@@ -147,6 +152,8 @@ public class Publication {
      * @param date_eletronic the date_eletronic to set
      */
     public void setDate_eletronic(String date_eletronic) {
+        if(date_eletronic.length() > 45)
+            date_eletronic = date_eletronic.substring(0, 44);
         this.date_eletronic = date_eletronic;
     }
 
@@ -161,6 +168,8 @@ public class Publication {
      * @param start_page the start_page to set
      */
     public void setStart_page(String start_page) {
+        if(start_page.length() > 45)
+            start_page = start_page.substring(0, 44);
         this.start_page = start_page;
     }
 
@@ -175,6 +184,8 @@ public class Publication {
      * @param end_page the end_page to set
      */
     public void setEnd_page(String end_page) {
+        if(end_page.length() > 45)
+            end_page = end_page.substring(0, 44);
         this.end_page = end_page;
     }
 
@@ -189,6 +200,22 @@ public class Publication {
      * @param language the language to set
      */
     public void setLanguage(String language) {
+        if(language.length() > 45)
+            language = language.substring(0, 44);
         this.language = language;
+    }
+    
+    public Map<String, Object> getPublicationDocument() {
+        Map<String, Object> publicationDocument = new HashMap<String, Object>();
+        publicationDocument.put("publicationID", this.getPublicationID());
+        publicationDocument.put("type", this.getType());
+        publicationDocument.put("doc_title", this.getDoc_title());
+        publicationDocument.put("date_printed", Utilities.formatDate(this.getDate_printed()));
+        publicationDocument.put("date_electronic", this.getDate_eletronic());
+        publicationDocument.put("start_page", this.getStart_page());
+        publicationDocument.put("end_page", this.getEnd_page());
+        publicationDocument.put("publisher", this.getPublisher().getPublisherDocument());
+        publicationDocument.put("monograph", this.getMonograph().getMonographDocument());
+        return publicationDocument;
     }
 }

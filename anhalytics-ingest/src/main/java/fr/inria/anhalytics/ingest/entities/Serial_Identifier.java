@@ -44,6 +44,8 @@ public class Serial_Identifier {
      * @param id the id to set
      */
     public void setId(String id) {
+        if(id.length() > 45)
+            this.id = id.substring(0, 44);
         this.id = id;
     }
 

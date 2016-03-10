@@ -2,21 +2,27 @@ package fr.inria.anhalytics.ingest.entities;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author azhar
  */
 public class Organisation {
+
     private Long organisationId;
     private String type = "";
     private String url = "";
     private String structure = "";
     private List<String> names = null;
     private List<PART_OF> rels = null;
-    public Organisation(){}
-    public Organisation(Long organisationId, String type, String url, String structure, List<String> names, List<PART_OF> rels){
+
+    public Organisation() {
+    }
+
+    public Organisation(Long organisationId, String type, String url, String structure, List<String> names, List<PART_OF> rels) {
         this.organisationId = organisationId;
         this.type = type;
         this.url = url;
@@ -50,6 +56,8 @@ public class Organisation {
      * @param type the type to set
      */
     public void setType(String type) {
+        if(type.length() > 45)
+            type = type.substring(0, 44);
         this.type = type;
     }
 
@@ -64,6 +72,8 @@ public class Organisation {
      * @param url the url to set
      */
     public void setUrl(String url) {
+        if(url.length() > 255)
+            url = url.substring(0, 254);
         this.url = url;
     }
 
@@ -78,6 +88,8 @@ public class Organisation {
      * @param structure the structure to set
      */
     public void setStructure(String structure) {
+        if(structure.length() > 45)
+            structure = structure.substring(0, 44);
         this.structure = structure;
     }
 
@@ -85,8 +97,9 @@ public class Organisation {
      * @return the name
      */
     public List<String> getNames() {
-        if(this.names == null)
+        if (this.names == null) {
             this.names = new ArrayList<String>();
+        }
         return names;
     }
 
@@ -94,8 +107,11 @@ public class Organisation {
      * @param name the name to set
      */
     public void addName(String name) {
-        if(this.names == null)
+        if (this.names == null) {
             this.names = new ArrayList<String>();
+        }
+        if(name.length() > 150)
+            name = name.substring(0, 149);
         this.names.add(name);
     }
 
@@ -103,8 +119,9 @@ public class Organisation {
      * @return the rels
      */
     public List<PART_OF> getRels() {
-        if(this.rels == null)
+        if (this.rels == null) {
             this.rels = new ArrayList<PART_OF>();
+        }
         return rels;
     }
 
@@ -112,10 +129,23 @@ public class Organisation {
      * @param rels the orgs to set
      */
     public void addRel(PART_OF rel) {
-        if(this.rels == null)
+        if (this.rels == null) {
             this.rels = new ArrayList<PART_OF>();
+        }
         this.rels.add(rel);
     }
 
-  
+    public Map<String, Object> getOrganisationDocument() {
+        Map<String, Object> organisationDocument = new HashMap<String, Object>();
+        Map<String, Object> organisationNamesDocument = new HashMap<String, Object>();
+        organisationDocument.put("organisationId", this.getOrganisationId());
+        organisationDocument.put("names", this.getNames());
+        organisationDocument.put("type", this.getType());
+        organisationDocument.put("structId", this.getStructure());
+        organisationDocument.put("url", this.getUrl());
+        //organisationDocument.put("orgs", this.getRels());
+        return organisationDocument;
+
+    }
+
 }

@@ -46,6 +46,7 @@ public class TeiBuilderProcess {
                 }
             }
         }
+        logger.info("Done");
     }
 
     /**

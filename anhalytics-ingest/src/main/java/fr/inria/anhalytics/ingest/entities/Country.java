@@ -38,6 +38,8 @@ public class Country {
      * @param iso the iso to set
      */
     public void setIso(String iso) {
+        if(iso.length() > 2)
+            iso = iso.substring(0, 1);
         this.iso = iso;
     }
 }

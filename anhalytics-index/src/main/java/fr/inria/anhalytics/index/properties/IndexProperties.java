@@ -19,6 +19,7 @@ public class IndexProperties {
     private static String annotsIndexName;
 
     private static String teisIndexName;
+    private static String metadataIndexName;
 
     public static void init(String properties_filename) {
         Properties props = new Properties();
@@ -34,6 +35,7 @@ public class IndexProperties {
         setAnnotsIndexName(props.getProperty("index.elasticSearch_annotsIndexName"));
         setTeisIndexName(props.getProperty("index.elasticSearch_teisIndexName"));
         setAnnotsIndexName(props.getProperty("index.elasticSearch_annotsIndexName"));
+        setMetadataIndexName(props.getProperty("index.elasticSearch_mtdsIndexName"));
     }
 
     private static void checkPath(String path) {
@@ -127,6 +129,20 @@ public class IndexProperties {
      */
     public static void setTeisIndexName(String ateisIndexName) {
         teisIndexName = ateisIndexName;
+    }
+
+    /**
+     * @return the metadataIndexName
+     */
+    public static String getMetadataIndexName() {
+        return metadataIndexName;
+    }
+
+    /**
+     * @param aMetadataIndexName the metadataIndexName to set
+     */
+    public static void setMetadataIndexName(String aMetadataIndexName) {
+        metadataIndexName = aMetadataIndexName;
     }
     
 

@@ -9,14 +9,14 @@ public class In_Serial {
     private Journal j;
     private Collection c;
     private String volume="";
-    private String number="";
+    private String issue="";
     public In_Serial(){}
-    public In_Serial(Monograph mg, Journal j, Collection c, String volume, String number){
+    public In_Serial(Monograph mg, Journal j, Collection c, String volume, String issue){
         this.mg = mg;
         this.j = j;
         this.c = c;
         this.volume = volume;
-        this.number = number;
+        this.issue = issue;
     }
 
     /**
@@ -72,20 +72,24 @@ public class In_Serial {
      * @param volume the volume to set
      */
     public void setVolume(String volume) {
+        if(volume.length() > 45)
+            volume = volume.substring(0, 44);
         this.volume = volume;
     }
 
     /**
      * @return the number
      */
-    public String getNumber() {
-        return number;
+    public String getIssue() {
+        return issue;
     }
 
     /**
      * @param number the number to set
      */
-    public void setNumber(String number) {
-        this.number = number;
+    public void setIssue(String issue) {
+        if(issue.length() > 45)
+            issue = issue.substring(0, 44);
+        this.issue = issue;
     }
 }

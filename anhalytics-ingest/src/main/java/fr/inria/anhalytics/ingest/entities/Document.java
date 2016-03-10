@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.ingest.entities;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author azhar
@@ -46,6 +49,8 @@ public class Document {
      * @param version the version to set
      */
     public void setVersion(String version) {
+        if(version.length() > 45)
+            version = version.substring(0, 44);
         this.version = version;
     }
 
@@ -74,39 +79,55 @@ public class Document {
      * @param uri the uri to set
      */
     public void setUri(String uri) {
+        if(uri.length() > 45)
+            uri = uri.substring(0, 44);
         this.uri = uri;
     }
 
-    
     /**
-     * The user ID is unique for each User. So this should compare User by ID only.
+     * The user ID is unique for each User. So this should compare User by ID
+     * only.
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object other) {
         return (other instanceof Document) && (docID != null)
-             ? docID.equals(((Document) other).docID)
-             : (other == this);
+                ? docID.equals(((Document) other).docID)
+                : (other == this);
     }
 
     /**
-     * The user ID is unique for each User. So User with same ID should return same hashcode.
+     * The user ID is unique for each User. So User with same ID should return
+     * same hashcode.
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
-        return (docID != null) 
-             ? (this.getClass().hashCode() + docID.hashCode()) 
-             : super.hashCode();
+        return (docID != null)
+                ? (this.getClass().hashCode() + docID.hashCode())
+                : super.hashCode();
     }
 
     /**
-     * Returns the String representation of this User. Not required, it just pleases reading logs.
+     * Returns the String representation of this User. Not required, it just
+     * pleases reading logs.
+     *
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return String.format("User[docID=%d,version=%s,uri=%s,tei_metadata=%s]", 
-            docID, version, uri, tei_metadata);
+        return String.format("User[docID=%d,version=%s,uri=%s,tei_metadata=%s]",
+                docID, version, uri, tei_metadata);
+    }
+
+    public Map<String, Object> getDocumentDocument() {
+        Map<String, Object> documentDocument = new HashMap<String, Object>();
+        documentDocument.put("docID", this.getDocID());
+        documentDocument.put("version", this.getVersion());
+        //documentDocument.put("tei_metadata", this.getTei_metadata());
+        documentDocument.put("uri", this.getUri());
+        return documentDocument;
     }
 }

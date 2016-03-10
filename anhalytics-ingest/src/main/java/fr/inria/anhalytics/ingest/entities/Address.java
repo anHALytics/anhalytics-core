@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.ingest.entities;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author azhar
@@ -10,21 +13,21 @@ public class Address {
     private String addrLine = "";
     private String postBox = "";
     private String postCode = "";
-    private String Settlement = "";
+    private String settlement = "";
     private String region = "";
     private Country country;
-    
-    private String countryStr="";
+
+    private String countryStr = "";
 
     public Address() {
     }
 
-    public Address(Long addressId, String addrLine, String postBox, String postCode, String Settlement, String region, String countryStr, Country country) {
+    public Address(Long addressId, String addrLine, String postBox, String postCode, String settlement, String region, String countryStr, Country country) {
         this.addressId = addressId;
         this.addrLine = addrLine;
         this.postBox = postBox;
         this.postCode = postCode;
-        this.Settlement = Settlement;
+        this.settlement = settlement;
         this.region = region;
         this.country = country;
         this.countryStr = countryStr;
@@ -55,6 +58,8 @@ public class Address {
      * @param addrLine the addrLine to set
      */
     public void setAddrLine(String addrLine) {
+        if(addrLine.length() > 150)
+            addrLine = addrLine.substring(0, 149);
         this.addrLine = addrLine;
     }
 
@@ -69,6 +74,8 @@ public class Address {
      * @param postBox the postBox to set
      */
     public void setPostBox(String postBox) {
+        if(postBox.length() > 45)
+            postBox = postBox.substring(0, 44);
         this.postBox = postBox;
     }
 
@@ -83,6 +90,8 @@ public class Address {
      * @param postCode the postCode to set
      */
     public void setPostCode(String postCode) {
+        if(postCode.length() > 45)
+            postCode = postCode.substring(0, 44);
         this.postCode = postCode;
     }
 
@@ -90,14 +99,16 @@ public class Address {
      * @return the Settlement
      */
     public String getSettlement() {
-        return Settlement;
+        return settlement;
     }
 
     /**
      * @param Settlement the Settlement to set
      */
-    public void setSettlement(String Settlement) {
-        this.Settlement = Settlement;
+    public void setSettlement(String settlement) {
+        if(settlement.length() > 45)
+            settlement = settlement.substring(0, 44);
+        this.settlement = settlement;
     }
 
     /**
@@ -111,6 +122,8 @@ public class Address {
      * @param region the region to set
      */
     public void setRegion(String region) {
+        if(region.length() > 45)
+            region = region.substring(0, 44);
         this.region = region;
     }
 
@@ -139,6 +152,21 @@ public class Address {
      * @param countryStr the countryStr to set
      */
     public void setCountryStr(String countryStr) {
+        if(countryStr.length() > 45)
+            countryStr = countryStr.substring(0, 44);
         this.countryStr = countryStr;
+    }
+
+    public Map<String, Object> getAddressDocument() {
+        Map<String, Object> addressDocument = new HashMap<String, Object>();
+        addressDocument.put("addressId", this.getAddressId());
+        addressDocument.put("addrLine", this.getAddrLine());
+        addressDocument.put("country", this.getCountryStr());
+        addressDocument.put("postBox", this.getPostBox());
+        addressDocument.put("postCode", this.getPostCode());
+        addressDocument.put("region", this.getRegion());
+        addressDocument.put("settlement", this.getSettlement());
+        return addressDocument;
+
     }
 }

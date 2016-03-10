@@ -45,6 +45,8 @@ public class Document_Organisation {
      * @param type the type to set
      */
     public void setType(String type) {
+        if(type.length() > 55)
+            type = type.substring(0, 54);
         this.type = type;
     }
 

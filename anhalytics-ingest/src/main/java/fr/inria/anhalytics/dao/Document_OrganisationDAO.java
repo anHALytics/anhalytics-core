@@ -7,25 +7,22 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author achraf
  */
 public class Document_OrganisationDAO extends DAO<Document_Organisation> {
-    
-    
+
     private static final String SQL_INSERT
             = "INSERT INTO DOCUMENT_ORGANISATION (docID, organisationID, type) VALUES (?, ?, ?)";
-    
-     public Document_OrganisationDAO(Connection conn) {
+
+    public Document_OrganisationDAO(Connection conn) {
         super(conn);
     }
 
     @Override
-    public boolean create(Document_Organisation obj) {
+    public boolean create(Document_Organisation obj) throws SQLException {
         boolean result = false;
         if (obj.getDoc() == null || obj.getOrgs() == null) {
             throw new IllegalArgumentException("No Document nor organisation is already created, the Affiliation ID is not null.");
@@ -42,10 +39,9 @@ public class Document_OrganisationDAO extends DAO<Document_Organisation> {
                 result = true;
             }
         } catch (MySQLIntegrityConstraintViolationException e) {
-        } catch (SQLException ex) {
-            Logger.getLogger(DocumentDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return result;    }
+        return result;
+    }
 
     @Override
     public boolean delete(Document_Organisation obj) {

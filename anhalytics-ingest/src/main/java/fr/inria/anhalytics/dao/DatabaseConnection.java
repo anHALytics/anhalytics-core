@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.dao;
 
+import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.ingest.properties.IngestProperties;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,21 +15,33 @@ import org.slf4j.LoggerFactory;
 public class DatabaseConnection {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnection.class);
-    public static String anhalytics_dbName = "anhalytics";
-    public static String anhalytics_biblio_dbName = "anhalytics_biblio";
-    private static String url = "jdbc:mysql://localhost:3306/";
-    private static String user = "root";
-    private static String passwd = "";
-    private static Connection connect;
+    private static Connection connectDB;
+    private static Connection connectBiblioDB;
+    
+    public static Connection getDBInstance() {
+        try {
+            if (connectDB == null ) {
 
-    public static Connection getInstance(String dbName) {
-        if (connect == null) {
-            try {
-                connect = DriverManager.getConnection(IngestProperties.getMysql_url() + dbName, IngestProperties.getMysql_user(), IngestProperties.getMysql_pass());
-            } catch (SQLException e) {
-                e.printStackTrace();
+                connectDB = DriverManager.getConnection(IngestProperties.getMysql_url() + IngestProperties.getMysql_db(), IngestProperties.getMysql_user(), IngestProperties.getMysql_pass());
+
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return connect;
+        return connectDB;
     }
+    
+    public static Connection getBiblioDBInstance() {
+        try {
+            if (connectBiblioDB == null ) {
+
+                connectBiblioDB = DriverManager.getConnection(IngestProperties.getMysql_url() + IngestProperties.getMysql_bibliodb(), IngestProperties.getMysql_user(), IngestProperties.getMysql_pass());
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return connectBiblioDB;
+    }
+    
 }

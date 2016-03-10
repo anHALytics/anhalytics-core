@@ -22,7 +22,7 @@ public interface OAIPMHMetadata {
     
     enum ConsideredTypes {
 
-        ART, COMM, OUV, POSTER, DOUV, PATENT, REPORT, THESE, HDR, LECTURE, COUV, OTHER, UNDEFINED
+        ART, COMM, OUV, POSTER, DOUV, PATENT, REPORT, THESE, HDR, LECTURE, COUV, OTHER, UNDEFINED  //IMG, VIDEO, AUDIOS, SON, MAP
     };
     
     public String getTei(NodeList tei);

@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.ingest.entities;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author azhar
@@ -42,6 +45,17 @@ public class Publisher {
      * @param name the name to set
      */
     public void setName(String name) {
+        if(name.length() > 150)
+            name = name.substring(0, 149);
         this.name = name;
     }
+    
+    public Map<String, Object> getPublisherDocument() {
+    Map<String, Object> publisherDocument = new HashMap<String, Object>();
+    publisherDocument.put("publisherID", this.getPublisherID());
+    publisherDocument.put("name", this.getName());
+    return publisherDocument;
+    
+    }
+    
 }

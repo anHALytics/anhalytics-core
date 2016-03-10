@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.ingest.entities;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author azhar
@@ -46,6 +49,8 @@ public class Monograph {
      * @param type the type to set
      */
     public void setType(String type) {
+        if(type.length() > 45)
+            type = type.substring(0, 44);
         this.type = type;
     }
 
@@ -74,6 +79,18 @@ public class Monograph {
      * @param shortname the shortname to set
      */
     public void setShortname(String shortname) {
+        if(shortname.length() > 45)
+            shortname = shortname.substring(0, 44);
         this.shortname = shortname;
+    }
+
+    public Map<String, Object> getMonographDocument() {
+        Map<String, Object> monographDocument = new HashMap<String, Object>();
+        monographDocument.put("monographID", this.getMonographID());
+        monographDocument.put("title", this.getTitle());
+        monographDocument.put("type", this.getType());
+        monographDocument.put("shortname", this.getShortname());
+        return monographDocument;
+
     }
 }

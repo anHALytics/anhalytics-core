@@ -50,6 +50,8 @@ public class Conference_Event {
      * @param start_date the start_date to set
      */
     public void setStart_date(String start_date) {
+        if(start_date.length() > 45)
+            start_date = start_date.substring(0, 44);
         this.start_date = start_date;
     }
 
@@ -64,6 +66,8 @@ public class Conference_Event {
      * @param end_date the end_date to set
      */
     public void setEnd_date(String end_date) {
+        if(end_date.length() > 45)
+            end_date = end_date.substring(0, 44);
         this.end_date = end_date;
     }
 

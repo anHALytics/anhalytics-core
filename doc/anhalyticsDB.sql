@@ -14,7 +14,6 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 -- Schema anhalytics
 -- -----------------------------------------------------
-DROP DATABASE `anhalytics`;
 CREATE SCHEMA IF NOT EXISTS `anhalytics` DEFAULT CHARACTER SET utf8 ;
 USE `anhalytics` ;
 
@@ -36,10 +35,10 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics`.`ADDRESS` (
   `addressID` INT(11) NOT NULL AUTO_INCREMENT,
-  `addrLine` TEXT NULL DEFAULT NULL,
+  `addrLine` VARCHAR(150) NULL DEFAULT NULL,
   `postBox` VARCHAR(45) NULL DEFAULT NULL,
   `postCode` VARCHAR(45) NULL DEFAULT NULL,
-  `settlement` VARCHAR(255) NULL DEFAULT NULL,
+  `settlement` VARCHAR(45) NULL DEFAULT NULL,
   `region` VARCHAR(45) NULL DEFAULT NULL,
   `country` VARCHAR(45) NULL DEFAULT NULL,
   `countryID` INT(11) NULL DEFAULT NULL,
@@ -121,7 +120,8 @@ CREATE TABLE IF NOT EXISTS `anhalytics`.`DOCUMENT` (
   `version` VARCHAR(45) NULL DEFAULT NULL,
   `TEImetadatas` LONGTEXT NULL DEFAULT NULL,
   `URI` VARCHAR(45) NULL DEFAULT NULL,
-  PRIMARY KEY (`docID`))
+  PRIMARY KEY (`docID`),
+  UNIQUE INDEX `URI_UNIQUE` (`URI` ASC))
 ENGINE = InnoDB
 AUTO_INCREMENT = 0
 DEFAULT CHARACTER SET = utf8;
@@ -169,7 +169,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics`.`CONFERENCE` (
   `conferenceID` INT(11) NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(255) NULL DEFAULT NULL,
+  `title` TEXT NULL DEFAULT NULL,
   PRIMARY KEY (`conferenceID`))
 ENGINE = InnoDB
 AUTO_INCREMENT = 0
@@ -283,7 +283,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics`.`PUBLISHER` (
   `publisherID` INT(11) NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) NULL DEFAULT NULL,
+  `name` VARCHAR(150) NULL DEFAULT NULL,
   PRIMARY KEY (`publisherID`))
 ENGINE = InnoDB
 AUTO_INCREMENT = 0
@@ -302,10 +302,10 @@ CREATE TABLE IF NOT EXISTS `anhalytics`.`PUBLICATION` (
   `doc_title` TEXT NULL DEFAULT NULL,
   `date_printed` DATE NULL DEFAULT NULL,
   `date_electronic` VARCHAR(45) NULL DEFAULT NULL,
-  `start_page` VARCHAR(150) NULL DEFAULT NULL,
+  `start_page` VARCHAR(45) NULL DEFAULT NULL,
   `end_page` VARCHAR(45) NULL DEFAULT NULL,
   `language` VARCHAR(45) NULL DEFAULT NULL,
-  `domain` VARCHAR(255) NULL DEFAULT NULL,
+  `domain` VARCHAR(150) NULL DEFAULT NULL,
   PRIMARY KEY (`publicationID`),
   INDEX `fk_PUBLICATION_DOCUMENT1_idx` (`docID` ASC),
   INDEX `fk_PUBLICATION_MONOGRAPH1_idx` (`monographID` ASC),
@@ -372,7 +372,7 @@ CREATE TABLE IF NOT EXISTS `anhalytics`.`IN_SERIAL` (
   `monographID` INT(11) NOT NULL DEFAULT '0',
   `collectionID` INT(11) NULL DEFAULT NULL,
   `journalID` INT(11) NULL DEFAULT NULL,
-  `volume` VARCHAR(150) NULL DEFAULT NULL,
+  `volume` VARCHAR(45) NULL DEFAULT NULL,
   `number` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`monographID`),
   INDEX `fk_MONOGRAPH_has_COLLECTION_COLLECTION1_idx` (`collectionID` ASC),
@@ -449,7 +449,7 @@ DEFAULT CHARACTER SET = utf8;
 CREATE TABLE IF NOT EXISTS `anhalytics`.`ORGANISATION_NAME` (
   `organisation_nameID` INT(11) NOT NULL AUTO_INCREMENT,
   `organisationID` INT(11) NOT NULL,
-  `name` VARCHAR(255) NULL DEFAULT NULL,
+  `name` VARCHAR(150) NULL DEFAULT NULL,
   PRIMARY KEY (`organisation_nameID`),
   INDEX `fk_ORGANISATION_NAME_ORGANISATION1_idx` (`organisationID` ASC),
   CONSTRAINT `fk_ORGANISATION_NAME_ORGANISATION1`
@@ -512,10 +512,10 @@ DEFAULT CHARACTER SET = utf8;
 CREATE TABLE IF NOT EXISTS `anhalytics`.`PERSON_NAME` (
   `person_nameID` INT(11) NOT NULL AUTO_INCREMENT,
   `personID` INT(11) NOT NULL,
-  `fullname` VARCHAR(255) NULL DEFAULT NULL,
-  `forename` VARCHAR(255) NULL DEFAULT NULL,
+  `fullname` VARCHAR(150) NULL DEFAULT NULL,
+  `forename` VARCHAR(150) NULL DEFAULT NULL,
   `middlename` VARCHAR(45) NULL DEFAULT NULL,
-  `surname` VARCHAR(255) NULL DEFAULT NULL,
+  `surname` VARCHAR(150) NULL DEFAULT NULL,
   `title` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`person_nameID`),
   INDEX `fk_PERSON_NAME_PERSON1_idx` (`personID` ASC),

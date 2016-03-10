@@ -1,6 +1,5 @@
 package fr.inria.anhalytics.dao;
 
-import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.ingest.entities.Collection;
 import fr.inria.anhalytics.ingest.entities.In_Serial;
 import fr.inria.anhalytics.ingest.entities.Journal;
@@ -37,7 +36,7 @@ public class In_SerialDAO extends DAO<In_Serial> {
     }
 
     @Override
-    public boolean create(In_Serial obj) {
+    public boolean create(In_Serial obj) throws SQLException {
         boolean result = false;
         /*if (obj.getMg()!= null) {
          throw new IllegalArgumentException("Monograph is already created, the Monograph ID is not null.");
@@ -46,85 +45,75 @@ public class In_SerialDAO extends DAO<In_Serial> {
         PreparedStatement statement;
         PreparedStatement statement1;
         PreparedStatement statement2;
-        try {
-            if (obj.getJ() != null) {
-                statement = connect.prepareStatement(SQL_INSERT_JOURNAL, Statement.RETURN_GENERATED_KEYS);
-                statement.setString(1, obj.getJ().getTitle());
+        if (obj.getJ() != null) {
+            statement = connect.prepareStatement(SQL_INSERT_JOURNAL, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, obj.getJ().getTitle());
 
-                int code = statement.executeUpdate();
-                ResultSet rs = statement.getGeneratedKeys();
+            int code = statement.executeUpdate();
+            ResultSet rs = statement.getGeneratedKeys();
 
-                if (rs.next()) {
-                    obj.getJ().setJournalID(rs.getLong(1));
-                }
-
-                result = true;
+            if (rs.next()) {
+                obj.getJ().setJournalID(rs.getLong(1));
             }
-            if (obj.getC() != null) {
-                statement1 = connect.prepareStatement(SQL_INSERT_COLLECTION, Statement.RETURN_GENERATED_KEYS);
-                statement1.setString(1, obj.getC().getTitle());
-
-                int code1 = statement1.executeUpdate();
-                ResultSet rs1 = statement1.getGeneratedKeys();
-
-                if (rs1.next()) {
-                    obj.getC().setCollectionID(rs1.getLong(1));
-                }
-            }
-            statement2 = connect.prepareStatement(SQL_INSERT);
-            statement2.setLong(1, obj.getMg().getMonographID());
-            
-
-            if (obj.getC() == null) {
-                statement2.setNull(2, java.sql.Types.INTEGER);
-            } else {
-                statement2.setLong(2, obj.getC().getCollectionID());
-            }
-
-            if (obj.getJ() == null) {
-                statement2.setNull(3, java.sql.Types.INTEGER);
-            } else {
-                statement2.setLong(3, obj.getJ().getJournalID());
-            }
-            statement2.setString(4, obj.getVolume());
-            statement2.setString(5, obj.getNumber());
-
-            int code2 = statement2.executeUpdate();
 
             result = true;
-        } catch (SQLException ex) {
-            Logger.getLogger(DocumentDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
+        if (obj.getC() != null) {
+            statement1 = connect.prepareStatement(SQL_INSERT_COLLECTION, Statement.RETURN_GENERATED_KEYS);
+            statement1.setString(1, obj.getC().getTitle());
+
+            int code1 = statement1.executeUpdate();
+            ResultSet rs1 = statement1.getGeneratedKeys();
+
+            if (rs1.next()) {
+                obj.getC().setCollectionID(rs1.getLong(1));
+            }
+        }
+        statement2 = connect.prepareStatement(SQL_INSERT);
+        statement2.setLong(1, obj.getMg().getMonographID());
+
+        if (obj.getC() == null) {
+            statement2.setNull(2, java.sql.Types.INTEGER);
+        } else {
+            statement2.setLong(2, obj.getC().getCollectionID());
+        }
+
+        if (obj.getJ() == null) {
+            statement2.setNull(3, java.sql.Types.INTEGER);
+        } else {
+            statement2.setLong(3, obj.getJ().getJournalID());
+        }
+        statement2.setString(4, obj.getVolume());
+        statement2.setString(5, obj.getIssue());
+
+        int code2 = statement2.executeUpdate();
+
+        result = true;
         return false;
     }
 
-    public boolean createSerial(In_Serial obj, Serial_Identifier obj1) {
-        create(obj);
+    public boolean createSerialIdentifier(Serial_Identifier obj1) throws SQLException {
         boolean result = false;
         /*if (obj.getMg()!= null) {
          throw new IllegalArgumentException("Monograph is already created, the Monograph ID is not null.");
          }*/
 
         PreparedStatement statement;
-        try {
-            statement = connect.prepareStatement(SQL_INSERT_SERIAL_IDENTIFIER, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, obj1.getId());
-            statement.setString(2, obj1.getType());
-            statement.setLong(3, obj.getJ().getJournalID());
-            statement.setLong(4, obj.getC().getCollectionID());
+        statement = connect.prepareStatement(SQL_INSERT_SERIAL_IDENTIFIER, Statement.RETURN_GENERATED_KEYS);
+        statement.setString(1, obj1.getId());
+        statement.setString(2, obj1.getType());
+        statement.setLong(3, obj1.getJournal().getJournalID());
+        statement.setLong(4, obj1.getCollection().getCollectionID());
 
-            int code = statement.executeUpdate();
-            ResultSet rs = statement.getGeneratedKeys();
+        int code = statement.executeUpdate();
+        ResultSet rs = statement.getGeneratedKeys();
 
-            if (rs.next()) {
-                obj1.setSerial_IdentifierID(rs.getLong(1));
-            }
-
-            result = true;
-
-        } catch (SQLException ex) {
-            Logger.getLogger(DocumentDAO.class.getName()).log(Level.SEVERE, null, ex);
+        if (rs.next()) {
+            obj1.setSerial_IdentifierID(rs.getLong(1));
         }
+
+        result = true;
+
         return false;
     }
 
@@ -141,21 +130,20 @@ public class In_SerialDAO extends DAO<In_Serial> {
     @Override
     public In_Serial find(Long id) {
         In_Serial in_serial = new In_Serial();
-
         try {
             ResultSet result = this.connect.createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM IN_SERIAL WHERE monographID = " + id);
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM monograph, in_serial LEFT JOIN collection ON collection.collectionID = in_serial.collectionID LEFT JOIN journal ON journal.journalID = in_serial.journalID WHERE in_serial.monographID = "+id+" AND monograph.monographID = "+id);
             if (result.first()) {
                 in_serial = new In_Serial(
-                        new Monograph(),
-                        new Journal(),
-                        new Collection(),
+                        new Monograph(result.getLong("monograph.monographID"),result.getString("monograph.type"), result.getString("monograph.title"), result.getString("monograph.shortname") ),
+                        new Journal(result.getLong("journal.journalID"), result.getString("journal.title")),
+                        new Collection(result.getLong("collection.collectionID"), result.getString("collection.title")),
                         result.getString("volume"),
                         result.getString("number"));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
         return in_serial;
     }

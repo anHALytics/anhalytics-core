@@ -5,6 +5,7 @@
  */
 package fr.inria.anhalytics.ingest.dao.biblio;
 
+import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.dao.AddressDAO;
 import fr.inria.anhalytics.dao.Conference_EventDAO;
 import fr.inria.anhalytics.dao.DatabaseConnection;
@@ -15,6 +16,7 @@ import fr.inria.anhalytics.dao.MonographDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.dao.PublicationDAO;
 import fr.inria.anhalytics.dao.PublisherDAO;
+import fr.inria.anhalytics.ingest.properties.IngestProperties;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.slf4j.Logger;
@@ -30,7 +32,14 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
     protected static Connection conn = null;
 
     public static void initConnection() {
-        conn = DatabaseConnection.getInstance(DatabaseConnection.anhalytics_biblio_dbName);
+        if (conn == null) {
+            try {
+                IngestProperties.init("ingest.properties");
+            } catch (Exception exp) {
+                throw new PropertyException("Cannot open file of harvest properties ingest.properties", exp);
+            }
+            conn = DatabaseConnection.getBiblioDBInstance();
+        }
     }
 
     public DAO getDocumentDAO() {
@@ -68,7 +77,7 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
     public void openTransaction() {
         try {
             conn.setAutoCommit(false);
-            logger.debug("The autocommit was disabled!");
+            logger.debug("Storing entry");
         } catch (SQLException e) {
             logger.error("There was an error disabling autocommit");
         }
@@ -77,7 +86,7 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
     public void endTransaction() {
         try {
             conn.commit();
-            logger.debug("The transaction was successfully executed");
+            logger.debug("Entry stored");
         } catch (SQLException ex) {
             logger.error("Error happened while commiting the changes.");
         }
@@ -85,7 +94,7 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
 
     public void rollback() {
         try {
-                // We rollback the transaction, to the last SavePoint!
+            // We rollback the transaction, to the last SavePoint!
             conn.rollback();
             logger.debug("The transaction was rollback.");
         } catch (SQLException e1) {
@@ -93,6 +102,7 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
 
         }
     }
+
     public static void closeConnection() {
         try {
             conn.close();

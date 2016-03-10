@@ -1,15 +1,21 @@
 package fr.inria.anhalytics.ingest.entities;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author azhar
  */
 public class Collection {
+
     private Long collectionID;
-    private String title="";
-    
-    public Collection(){}
-    public Collection(Long collectionID, String title){
+    private String title = "";
+
+    public Collection() {
+    }
+
+    public Collection(Long collectionID, String title) {
         this.collectionID = collectionID;
         this.title = title;
     }
@@ -40,5 +46,12 @@ public class Collection {
      */
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Map<String, Object> getCollectionDocument() {
+        Map<String, Object> collectionDocument = new HashMap<String, Object>();
+        collectionDocument.put("collectionID", this.getCollectionID());
+        collectionDocument.put("title", this.getTitle());
+        return collectionDocument;
     }
 }

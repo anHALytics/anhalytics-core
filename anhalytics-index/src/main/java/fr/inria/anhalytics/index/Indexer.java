@@ -1,18 +1,14 @@
 package fr.inria.anhalytics.index;
 
 import fr.inria.anhalytics.commons.exceptions.ElasticSearchConfigurationException;
-import fr.inria.anhalytics.commons.exceptions.PropertyException;
-import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import java.io.*;
 import java.util.*;
 
 import java.net.*;
-import org.apache.commons.io.FileUtils;
 import org.elasticsearch.common.settings.*;
 import org.elasticsearch.client.*;
 import org.elasticsearch.action.bulk.*;
-import org.elasticsearch.action.index.*;
 import org.elasticsearch.common.transport.*;
 import org.elasticsearch.client.transport.*;
 import org.slf4j.Logger;

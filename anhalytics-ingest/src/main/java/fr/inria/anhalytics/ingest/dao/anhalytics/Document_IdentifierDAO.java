@@ -25,29 +25,25 @@ public class Document_IdentifierDAO extends DAO<Document_Identifier> {
     }
 
     @Override
-    public boolean create(Document_Identifier obj) {
+    public boolean create(Document_Identifier obj) throws SQLException {
         boolean result = false;
         if (obj.getDoc_identifierID() != null) {
             throw new IllegalArgumentException("Document_Identifier is already created, the Document_Identifier ID is not null.");
         }
 
         PreparedStatement statement;
-        try {
-            statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-            statement.setLong(1, obj.getDoc().getDocID());
-            statement.setString(2, obj.getId());
-            statement.setString(3, obj.getType());
-            int code = statement.executeUpdate();
-            ResultSet rs = statement.getGeneratedKeys();
+        statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+        statement.setLong(1, obj.getDoc().getDocID());
+        statement.setString(2, obj.getId());
+        statement.setString(3, obj.getType());
+        int code = statement.executeUpdate();
+        ResultSet rs = statement.getGeneratedKeys();
 
-            if (rs.next()) {
-                obj.setDoc_identifierID(rs.getLong(1));
-            }
-
-            result = true;
-        } catch (SQLException ex) {
-            Logger.getLogger(DocumentDAO.class.getName()).log(Level.SEVERE, null, ex);
+        if (rs.next()) {
+            obj.setDoc_identifierID(rs.getLong(1));
         }
+
+        result = true;
         return result;
     }
 

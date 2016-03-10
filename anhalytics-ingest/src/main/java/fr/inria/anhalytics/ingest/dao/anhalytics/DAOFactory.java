@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.ingest.dao.anhalytics;
 
+import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.dao.DatabaseConnection;
@@ -16,6 +17,7 @@ import fr.inria.anhalytics.ingest.dao.anhalytics.OrganisationDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.ingest.dao.anhalytics.AffiliationDAO;
 import fr.inria.anhalytics.ingest.dao.anhalytics.Document_IdentifierDAO;
+import fr.inria.anhalytics.ingest.properties.IngestProperties;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -33,8 +35,16 @@ public class DAOFactory extends AbstractDAOFactory {
     protected static Connection conn = null;
 
     public static void initConnection() {
-        conn = DatabaseConnection.getInstance(DatabaseConnection.anhalytics_dbName);
+        if (conn == null) {
+            try {
+                IngestProperties.init("ingest.properties");
+            } catch (Exception exp) {
+                throw new PropertyException("Cannot open file of harvest properties ingest.properties", exp);
+            }
+            conn = DatabaseConnection.getDBInstance();
+        }
     }
+
     public DAO getDocumentDAO() {
         return new DocumentDAO(conn);
     }
@@ -86,7 +96,7 @@ public class DAOFactory extends AbstractDAOFactory {
     public void openTransaction() {
         try {
             conn.setAutoCommit(false);
-            logger.debug("The autocommit was disabled!");
+            logger.debug("Storing entry");
         } catch (SQLException e) {
             logger.error("There was an error disabling autocommit");
         }
@@ -95,7 +105,7 @@ public class DAOFactory extends AbstractDAOFactory {
     public void endTransaction() {
         try {
             conn.commit();
-            logger.debug("The transaction was successfully executed");
+            logger.debug("Stored");
         } catch (SQLException ex) {
             logger.error("Error happened while commiting the changes.");
         }
@@ -103,7 +113,7 @@ public class DAOFactory extends AbstractDAOFactory {
 
     public void rollback() {
         try {
-                // We rollback the transaction, to the last SavePoint!
+            // We rollback the transaction, to the last SavePoint!
             conn.rollback();
             logger.debug("The transaction was rollback.");
         } catch (SQLException e1) {
@@ -111,6 +121,7 @@ public class DAOFactory extends AbstractDAOFactory {
 
         }
     }
+
     public static void closeConnection() {
         try {
             conn.close();

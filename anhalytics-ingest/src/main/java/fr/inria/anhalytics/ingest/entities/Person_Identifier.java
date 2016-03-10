@@ -5,7 +5,7 @@ package fr.inria.anhalytics.ingest.entities;
  * @author azhar
  */
 public class Person_Identifier {
-    
+
     private String id = "";
     private String type = "";
 
@@ -28,6 +28,9 @@ public class Person_Identifier {
      * @param id the id to set
      */
     public void setId(String id) {
+        if (id.length() > 150) {
+            id = id.substring(0, 149);
+        }
         this.id = id;
     }
 
@@ -42,6 +45,9 @@ public class Person_Identifier {
      * @param type the type to set
      */
     public void setType(String type) {
+        if (type.length() > 45) {
+            type = type.substring(0, 44);
+        }
         this.type = type;
     }
 }
