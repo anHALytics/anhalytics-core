@@ -62,7 +62,7 @@ public class TeiBuilderProcess {
                     grobidTeiString = Utilities.trimEncodedCharaters(grobidTeiString);
 
                     if (!mm.isWithFulltext(id)) {
-                        finalTei = mm.findTeiById(id);
+                        finalTei = mm.findFinalTeiById(id);
                         if (finalTei != null) {
                             Document generatedTeiDoc = null;
                             logger.info("\t Building tei for: " + id);

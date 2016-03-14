@@ -72,27 +72,26 @@ public class HALOAIHarvester extends Harvester {
         String today_date = dateFormat.format(cal.getTime());
         Utilities.updateDates(null, today_date);
         for (String date : Utilities.getDates()) {
-            Map<String, PublicationFile> files = mm.findEmbargoRecordsByDate("2016-12-11");
+            List<TEI> files = mm.findEmbargoRecordsByDate(today_date);
             System.out.println(files);
-            Iterator it = files.entrySet().iterator();
             logger.info("\t [Embargo publications] Extracting publications teis for : " + date);
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry) it.next();
-                PublicationFile pf = (PublicationFile) pair.getValue();
-                String id = (String) pair.getKey();
+            for (TEI file : files) {
+                PublicationFile pf = file.getPdfdocument();
+                String id = file.getId();
+                String type = file.getDocumentType();
+                
                 System.out.println(id + "   " + pf.isAnnexFile());
                 try {
                     logger.info("\t\t Processing tei for " + id);
-                    boolean donwloaded = requestFile(pf, id, date);
+                    boolean donwloaded = requestFile(pf, id, type, date);
                     if (donwloaded) {
                         mm.removeEmbargoRecord(id, pf.getUrl());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    mm.saveForLater(id, pf.getUrl(), pf.isAnnexFile(), "unableToDownload", date);
+                    mm.saveForLater(id, pf.getUrl(), type, pf.isAnnexFile(), "unableToDownload", date);
                     logger.error("\t\t  Error occured while processing tei for " + id);
                 }
-                it.remove(); // avoids a ConcurrentModificationException
             }
 
         }

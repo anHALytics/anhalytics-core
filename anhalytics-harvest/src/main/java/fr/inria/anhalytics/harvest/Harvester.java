@@ -55,11 +55,11 @@ abstract class Harvester {
                 String teiString = tei.getTei();
                 if (teiString.length() > 0) {
                     logger.info("\t\t\t\t Storing tei " + tei.getId());
-                    mm.insertMetadataTei(teiString, tei.getId(), date);
+                    mm.insertMetadataTei(teiString, tei.getId(), tei.getDocumentType(), date);
 
                     if (tei.getPdfdocument() != null) {
                         logger.info("\t\t\t\t downloading PDF file.");
-                        requestFile(tei.getPdfdocument(), tei.getId(), date);
+                        requestFile(tei.getPdfdocument(), tei.getId(), tei.getDocumentType(), date);
                     } else {
                         mm.save(tei.getId(), "harvestProcess", "no url for binary", date);
                         logger.info("\t\t\t\t PDF not found !");
@@ -86,7 +86,7 @@ abstract class Harvester {
     protected void downloadAnnexes(List<PublicationFile> annexes, String id, String date) throws ParseException, IOException {
         //annexes
         for (PublicationFile file : annexes) {
-            requestFile(file, id, date);
+            requestFile(file, id, "annex", date);
             // diagnose annexes (not found)?
         }
     }
@@ -95,7 +95,7 @@ abstract class Harvester {
      * Requests the given file if is not under embargo and register it either as
      * main file or as an annex.
      */
-    protected boolean requestFile(PublicationFile file, String id, String date) throws ParseException, IOException {
+    protected boolean requestFile(PublicationFile file, String id, String type, String date) throws ParseException, IOException {
         InputStream inBinary = null;
         Date embDate = Utilities.parseStringDate(file.getEmbargoDate());
         Date today = new Date();
@@ -103,10 +103,10 @@ abstract class Harvester {
             logger.info("\t\t\t Downloading: " + file.getUrl());
             inBinary = Utilities.request(file.getUrl(), false);
             if (inBinary == null) {
-                mm.saveForLater(id, file.getUrl(), file.isAnnexFile(), "nostream", date);
+                mm.saveForLater(id, file.getUrl(), type, file.isAnnexFile(), "nostream", date);
             } else {
                 if (!file.isAnnexFile()) {
-                    mm.insertBinaryDocument(inBinary, id, date);
+                    mm.insertBinaryDocument(inBinary, id, type, date);
                 } else {
                     int n = file.getUrl().lastIndexOf("/");
                     String filename = file.getUrl().substring(n + 1);
@@ -117,7 +117,7 @@ abstract class Harvester {
             inBinary.close();
             return true;
         } else {
-            mm.saveForLater(id, file.getUrl(), file.isAnnexFile(), "embargo", file.getEmbargoDate());
+            mm.saveForLater(id, file.getUrl(), type, file.isAnnexFile(), "embargo", file.getEmbargoDate());
             logger.info("\t\t\t file under embargo !");
             return false;
         }

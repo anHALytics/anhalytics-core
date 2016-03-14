@@ -6,6 +6,7 @@ import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import fr.inria.anhalytics.commons.data.PublicationFile;
+import fr.inria.anhalytics.commons.data.TEI;
 import fr.inria.anhalytics.commons.exceptions.FileNotFoundException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.ByteArrayInputStream;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +46,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     private String currentRepositoryDocId = null;
     private String currentDocId = null;
+    private String currentDocType = null;
     private String currentFileType = null;
 
     private DBCursor cursor = null;
@@ -346,7 +349,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Inserts TEI metadata document in the GridFS.
      */
-    public void insertMetadataTei(String tei, String repositoryDocId, String date) {
+    public void insertMetadataTei(String tei, String repositoryDocId, String type, String date) {
         try {
             GridFS gfs = new GridFS(db, MongoCollectionsInterface.ADDITIONAL_TEIS);
             gfs.remove(repositoryDocId + ".tei.xml");
@@ -354,6 +357,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.put("uploadDate", Utilities.parseStringDate(date));
             gfsFile.setFilename(repositoryDocId + ".tei.xml");
             gfsFile.put("repositoryDocId", repositoryDocId);
+            gfsFile.put("documentType", type);
             gfsFile.save();
         } catch (ParseException e) {
             logger.error(e.getMessage(), e.getCause());
@@ -363,7 +367,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Inserts PDF binary document in the GridFS.
      */
-    public void insertBinaryDocument(InputStream file, String repositoryDocId, String date) {
+    public void insertBinaryDocument(InputStream file, String repositoryDocId, String type, String date) {
         try {
             GridFS gfs = new GridFS(db, MongoCollectionsInterface.BINARIES);
             gfs.remove(repositoryDocId + ".pdf");
@@ -371,6 +375,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.put("uploadDate", Utilities.parseStringDate(date));
             gfsFile.setFilename(repositoryDocId + ".pdf");
             gfsFile.put("repositoryDocId", repositoryDocId);
+            gfsFile.put("documentType", type);
             gfsFile.setContentType("application/pdf");
             gfsFile.save();
         } catch (ParseException e) {
@@ -510,8 +515,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return result;
     }
 
-    public Map<String, PublicationFile> findEmbargoRecordsByDate(String date) {
-        Map<String, PublicationFile> files = new HashMap<String, PublicationFile>();
+    public List<TEI> findEmbargoRecordsByDate(String date) {
+        List<TEI> files = new ArrayList<TEI>();
         if (db.collectionExists(TO_REQUEST_LATER)) {
             collection = db.getCollection(TO_REQUEST_LATER);
             BasicDBObject query = new BasicDBObject("date", date);
@@ -521,9 +526,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                     DBObject entry = curs.next();
                     String url = (String) entry.get("url");
                     String id = (String) entry.get("repositoryDocId");
+                    String type = (String) entry.get("documentType");
                     boolean isAnnex = (Boolean) entry.get("isAnnex");
                     PublicationFile pf = new PublicationFile(url, date, isAnnex);
-                    files.put(id, pf);
+                    TEI metadata = new TEI(id, pf, null, id, type, null, null);
+                    files.add(metadata);
                 }
             } finally {
                 if (curs != null) {
@@ -663,11 +670,19 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
         return file;
     }
+    
+    public String findFinalTeiById(String repositoryDocId) {
+        return findTeiById(repositoryDocId, MongoCollectionsInterface.FINAL_TEIS);
+    }
 
-    public String findTeiById(String repositoryDocId) {
+    public String findMetadataTeiById(String repositoryDocId) {
+        return findTeiById(repositoryDocId, MongoCollectionsInterface.ADDITIONAL_TEIS);
+    }
+    
+    private String findTeiById(String repositoryDocId, String collection) {
         String tei = null;
         try {
-            GridFS gfs = new GridFS(db, FINAL_TEIS);
+            GridFS gfs = new GridFS(db, collection);
             BasicDBObject whereQuery = new BasicDBObject();
             whereQuery.put("repositoryDocId", currentRepositoryDocId);
             whereQuery.put("filename", currentRepositoryDocId + ".tei.xml");
@@ -712,7 +727,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Saves the resource to be requested later (embargo).
      */
-    public void saveForLater(String repositoryDocId, String url, boolean isAnnex, String desc, String date) {
+    public void saveForLater(String repositoryDocId, String url, String type, boolean isAnnex, String desc, String date) {
         try {
             DBCollection collection = db.getCollection(MongoCollectionsInterface.TO_REQUEST_LATER);
             BasicDBObject index = new BasicDBObject();
@@ -725,6 +740,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             collection.findAndRemove(document);
             document.put("isAnnex", true);
             document.put("desc", desc);
+            document.put("documentType", type);
             if (date == null) {
                 date = Utilities.formatDate(new Date());
             }
@@ -769,5 +785,19 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      */
     public String getCurrentDocId() {
         return currentDocId;
+    }
+
+    /**
+     * @return the currentDocType
+     */
+    public String getCurrentDocType() {
+        return currentDocType;
+    }
+
+    /**
+     * @param currentDocType the currentDocType to set
+     */
+    public void setCurrentDocType(String currentDocType) {
+        this.currentDocType = currentDocType;
     }
 }
