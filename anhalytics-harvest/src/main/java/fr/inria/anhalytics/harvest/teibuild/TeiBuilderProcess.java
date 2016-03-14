@@ -33,13 +33,14 @@ public class TeiBuilderProcess {
                 while (mm.hasMoreTeis()) {
                     String metadataTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
+                    String type = mm.getCurrentDocType();
                     Document generatedTeiDoc = null;
                     try {
                         logger.info("\t Building tei for: " + uri);
                         InputStream metadataTeiStream = new ByteArrayInputStream(metadataTeiString.getBytes());
                         generatedTeiDoc = TeiBuilder.createTEICorpus(metadataTeiStream);
                         metadataTeiStream.close();
-                        mm.insertTei(Utilities.toString(generatedTeiDoc), uri, null, date);
+                        mm.insertTei(Utilities.toString(generatedTeiDoc), uri, type, null, date);
                     } catch (Exception xpe) {
                         xpe.printStackTrace();
                     }

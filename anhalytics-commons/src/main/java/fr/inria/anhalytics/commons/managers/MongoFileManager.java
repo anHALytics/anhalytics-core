@@ -258,6 +258,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         String tei = null;
         DBObject obj = cursor.next();
         currentRepositoryDocId = (String) obj.get("repositoryDocId");
+        currentDocType = (String) obj.get("documentType");
         if (obj.containsField("docId")) {
             currentDocId = (String) obj.get("docId");
         }
@@ -279,6 +280,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         currentRepositoryDocId = (String) obj.get("repositoryDocId");
         GridFSDBFile binaryfile = gfs.findOne(currentRepositoryDocId + ".pdf");
         currentRepositoryDocId = (String) binaryfile.get("repositoryDocId");
+        currentDocType = (String) binaryfile.get("documentType");
         currentFileType = (String) binaryfile.getContentType();
         input = binaryfile.getInputStream();
         indexFile++;
@@ -314,7 +316,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Inserts generated tei using GridFS.
      */
-    public void insertTei(String teiString, String repositoryDocId, String docId, String date) {
+    public void insertTei(String teiString, String repositoryDocId, String type, String docId, String date) {
         try {
             GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
             gfs.remove(repositoryDocId + ".tei.xml");
@@ -323,6 +325,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.setFilename(repositoryDocId + ".tei.xml");
             gfsFile.put("repositoryDocId", repositoryDocId);
             gfsFile.put("docId", docId);
+            gfsFile.put("documentType", type);
             gfsFile.save();
         } catch (ParseException e) {
             logger.error(e.getMessage(), e.getCause());
@@ -395,6 +398,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsNew.put("uploadDate", gdf.getUploadDate());
             gfsNew.setFilename(gdf.get("repositoryDocId") + ".tei.xml");
             gfsNew.put("repositoryDocId", gdf.get("repositoryDocId"));
+            gfsNew.put("documentType", gdf.get("documentType"));
             if (docID == null) {
                 gfsNew.put("docId", gdf.get("docId"));
             } else {
@@ -670,7 +674,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
         return file;
     }
-    
+
     public String findFinalTeiById(String repositoryDocId) {
         return findTeiById(repositoryDocId, MongoCollectionsInterface.FINAL_TEIS);
     }
@@ -678,15 +682,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public String findMetadataTeiById(String repositoryDocId) {
         return findTeiById(repositoryDocId, MongoCollectionsInterface.ADDITIONAL_TEIS);
     }
-    
+
     private String findTeiById(String repositoryDocId, String collection) {
         String tei = null;
         try {
-            GridFS gfs = new GridFS(db, collection);
-            BasicDBObject whereQuery = new BasicDBObject();
-            whereQuery.put("repositoryDocId", currentRepositoryDocId);
-            whereQuery.put("filename", currentRepositoryDocId + ".tei.xml");
-            GridFSDBFile file = gfs.findOne(whereQuery);
+            GridFSDBFile file = findGridFSDBfileTeiById(repositoryDocId, collection);
             InputStream teiStream = file.getInputStream();
             tei = IOUtils.toString(teiStream);
             teiStream.close();
@@ -694,6 +694,15 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             logger.error(e.getMessage(), e.getCause());
         }
         return tei;
+    }
+
+    private GridFSDBFile findGridFSDBfileTeiById(String repositoryDocId, String collection) {
+        GridFS gfs = new GridFS(db, collection);
+        BasicDBObject whereQuery = new BasicDBObject();
+        whereQuery.put("repositoryDocId", currentRepositoryDocId);
+        whereQuery.put("filename", currentRepositoryDocId + ".tei.xml");
+        GridFSDBFile file = gfs.findOne(whereQuery);
+        return file;
     }
 
     /**
