@@ -7,6 +7,8 @@ import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
@@ -26,6 +28,9 @@ public class GrobidProcess {
         this.mm = MongoFileManager.getInstance(false);
     }
 
+    static final public List<String> toBeGrobidified
+            = Arrays.asList("ART", "COMM", "OUV", "POSTER", "DOUV", "PATENT", "REPORT", "COUV", "OTHER", "UNDEFINED");
+
     public void processFulltexts() {
         try {
             if (GrobidService.isGrobidOk()) {
@@ -35,19 +40,22 @@ public class GrobidProcess {
                         while (mm.hasMoreBinaryDocuments()) {
                             InputStream content = mm.nextBinaryDocument();
                             String id = mm.getCurrentRepositoryDocId();
-                            if (!HarvestProperties.isReset()) {
-                                if (mm.isGrobidified(id)) {
-                                    continue;
+                            String type = mm.getCurrentDocType();
+                            System.out.println(type);
+                            if (toBeGrobidified.contains(type)) {if (!HarvestProperties.isReset()) {
+                                    if (mm.isGrobidified(id)) {
+                                        continue;
+                                    }
                                 }
+                                try {
+                                    Runnable worker = new GrobidFulltextWorker(content, id, date);
+                                    executor.execute(worker);
+                                } catch (final Exception exp) {
+                                    logger.error("An error occured while processing the file " + id
+                                            + ". Continuing the process for the other files" + exp.getMessage());
+                                }
+                                content.close();
                             }
-                            try {
-                                Runnable worker = new GrobidFulltextWorker(content, id, date);
-                                executor.execute(worker);
-                            } catch (final Exception exp) {
-                                logger.error("An error occured while processing the file " + id
-                                        + ". Continuing the process for the other files" + exp.getMessage());
-                            }
-                            content.close();
                         }
                     }
                 }
