@@ -700,7 +700,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         GridFS gfs = new GridFS(db, collection);
         BasicDBObject whereQuery = new BasicDBObject();
         whereQuery.put("repositoryDocId", currentRepositoryDocId);
-        whereQuery.put("filename", currentRepositoryDocId + ".tei.xml");
         GridFSDBFile file = gfs.findOne(whereQuery);
         return file;
     }
