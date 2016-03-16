@@ -7,7 +7,7 @@ import java.util.Properties;
 /**
  * Represents the properties used for the annotation process.
  *
- * @author Achraf
+ * @author Achraf, Patrice
  */
 public class AnnotateProperties {
     
@@ -21,11 +21,17 @@ public class AnnotateProperties {
 
     private static String nerd_port = null;
 
+    private static String keyterm_host = null;
+
+    private static String keyterm_port = null;
+
     private static boolean isMultiThread;
 
     private static boolean reset;
 
-    private static int nbThreads = 1;
+    private static int nerd_nbThreads = 1;
+
+    private static int keyterm_nbThreads = 1;
 
     /**
      * Loads and initializes properties from the file given the filename.
@@ -38,11 +44,21 @@ public class AnnotateProperties {
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file " + properties_filename, exp);
         }
-        setNerd_host(props.getProperty("annotate.nerd_host"));
-        setNerd_port(props.getProperty("annotate.nerd_port"));
-        String threads = props.getProperty("annotate.nbThreads");
+
+        setNerdHost(props.getProperty("annotate.nerd_host"));
+        setNerdPort(props.getProperty("annotate.nerd_port"));
+        String threads = props.getProperty("annotate.nerd.nbThreads");
         try {
-            setNbThreads(Integer.parseInt(threads));
+            setNerdNbThreads(Integer.parseInt(threads));
+        } catch (java.lang.NumberFormatException e) {
+            e.printStackTrace();
+        }
+
+        setKeytermHost(props.getProperty("annotate.keyterm_host"));
+        setKeytermPort(props.getProperty("annotate.keyterm_port"));
+        threads = props.getProperty("annotate.keyterm.nbThreads");
+        try {
+            setKeytermNbThreads(Integer.parseInt(threads));
         } catch (java.lang.NumberFormatException e) {
             e.printStackTrace();
         }
@@ -104,29 +120,57 @@ public class AnnotateProperties {
     /**
      * @return the nerd_host
      */
-    public static String getNerd_host() {
+    public static String getNerdHost() {
         return nerd_host;
     }
 
     /**
      * @param aNerd_host the nerd_host to set
      */
-    public static void setNerd_host(String aNerd_host) {
+    public static void setNerdHost(String aNerd_host) {
         nerd_host = aNerd_host;
     }
 
     /**
      * @return the nerd_port
      */
-    public static String getNerd_port() {
+    public static String getNerdPort() {
         return nerd_port;
     }
 
     /**
      * @param aNerd_port the nerd_port to set
      */
-    public static void setNerd_port(String aNerd_port) {
+    public static void setNerdPort(String aNerd_port) {
         nerd_port = aNerd_port;
+    }
+
+    /**
+     * @return the host name of the keyterm extraction service
+     */
+    public static String getKeytermHost() {
+        return keyterm_host;
+    }
+
+    /**
+     * @param aNerd_host the host name for the keyterm extraction service
+     */
+    public static void setKeytermHost(String aKeyterm_host) {
+        keyterm_host = aKeyterm_host;
+    }
+
+    /**
+     * @return the port of the keyterm extraction service
+     */
+    public static String getKeytermPort() {
+        return nerd_port;
+    }
+
+    /**
+     * @param aNerd_port the port for the keyterm extraction service
+     */
+    public static void setKeytermPort(String aKeyterm_port) {
+        keyterm_port = aKeyterm_port;
     }
 
     /**
@@ -146,15 +190,29 @@ public class AnnotateProperties {
     /**
      * @return the nbThreads
      */
-    public static int getNbThreads() {
-        return nbThreads;
+    public static int getNerdNbThreads() {
+        return nerd_nbThreads;
     }
 
     /**
      * @param aNbThreads the nbThreads to set
      */
-    public static void setNbThreads(int aNbThreads) {
-        nbThreads = aNbThreads;
+    public static void setNerdNbThreads(int aNbThreads) {
+        nerd_nbThreads = aNbThreads;
+    }
+
+    /**
+     * @return return the number of threads to be used for calling the keyterm extraction service
+     */
+    public static int getKeytermNbThreads() {
+        return keyterm_nbThreads;
+    }
+
+    /**
+     * @param aNbThreads the number of threads to be used for calling the keyterm extraction service
+     */
+    public static void setKeytermNbThreads(int aNbThreads) {
+        keyterm_nbThreads = aNbThreads;
     }
 
     /**

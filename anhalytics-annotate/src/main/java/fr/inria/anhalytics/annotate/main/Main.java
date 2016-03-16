@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.annotate.main;
 
 import fr.inria.anhalytics.annotate.Annotator;
+import fr.inria.anhalytics.annotate.Annotator.Annotator_Type;
 import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.net.UnknownHostException;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * Main class that implements command for annotating TEIs and saving the result
  * to Mongodb.
  *
- * @author Achraf
+ * @author Achraf, Patrice
  */
 public class Main {
 
@@ -25,6 +26,8 @@ public class Main {
     private static List<String> availableCommands = new ArrayList<String>() {
         {
             add("annotateAll");
+            add("annotateAllNerd");
+            add("annotateAllKeyTerm");
             add("annotateDaily");
         }
     };
@@ -52,15 +55,22 @@ public class Main {
         String process = AnnotateProperties.getProcessName();
         Annotator annotator = new Annotator();
         if (process.equals("annotateDaily")) {
+
+            // ??
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, -1);
             String todayDate = dateFormat.format(cal.getTime());
             Utilities.updateDates(todayDate, todayDate);
-        }
 
-        annotator.annotate();
-        return;
+        } else if (process.equals("annotateAllNerd")) {
+            annotator.annotate(Annotator_Type.NERD);
+        } else if (process.equals("annotateAllKeyTerm")) {
+            annotator.annotate(Annotator_Type.KEYTERM);
+        } else if (process.equals("annotateAllKeyTerm")) {
+            annotator.annotate(Annotator_Type.NERD);
+            annotator.annotate(Annotator_Type.KEYTERM);
+        }
     }
 
     protected static boolean processArgs(final String[] args) {

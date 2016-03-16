@@ -39,7 +39,7 @@ public class NerdService {
     public String runNerd() {
         StringBuffer output = new StringBuffer();
         try {
-            URL url = new URL("http://" + AnnotateProperties.getNerd_host() + ":" + AnnotateProperties.getNerd_port() + "/" + REQUEST);
+            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + AnnotateProperties.getNerdPort() + "/" + REQUEST);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
@@ -76,7 +76,7 @@ public class NerdService {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        } 
         return output.toString().trim();
     }
 
@@ -89,7 +89,7 @@ public class NerdService {
         int responseCode = 0;
         HttpURLConnection conn = null;
         try {
-            URL url = new URL("http://" + AnnotateProperties.getNerd_host() + ":" + AnnotateProperties.getNerd_port());
+            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + AnnotateProperties.getNerdPort());
             conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("GET");

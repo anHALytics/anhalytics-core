@@ -4,10 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
 
 import java.io.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.net.HttpRetryException;
 import java.net.ConnectException;
 
@@ -27,40 +29,36 @@ import org.apache.commons.io.IOUtils;
  *
  *  @author Patrice Lopez
  */
-public class KeyTermExtracterService {
+public class KeyTermExtractionService {
 	
-    private static final Logger logger = LoggerFactory.getLogger(KeyTermExtracterService.class);
+    private static final Logger logger = LoggerFactory.getLogger(KeyTermExtractionService.class);
 
-    private String keyterm_host = null;
-    private String keyterm_port = null;
-    private String input = null;
+    private String name = null; // name of the file
+    private String tei = null; // tei content
 
     static private String RESOURCEPATH = "processKeyTermArticleTEI";
 
-    public KeyTermExtracterService(String input, String keytermHost, String keytermPort) {
-        this.input = input;
-        this.keyterm_host = keytermHost;
-        this.keyterm_port = keytermPort;
+    public KeyTermExtractionService(String name, String tei) {
+        this.name = name;
+        this.tei = tei;
     }
 	
     /**
-     * Call the Keyterm extraction service on server for TEI documents.
+     * Call the Keyterm extraction service on server for a TEI document.
      *
-	 * @param inBinary input stream of the PDF to be processed	
-     * @return the resulting extractions are in JSON 
+     * @return the resulting extracted disambiguated terms in JSON 
      */
-    public String runKeytermExtraction(InputStream inBinary) {
+    public String runKeyTermExtraction() {
         StringBuffer output = new StringBuffer();
         try {
-            URL url = new URL("http://" + keyterm_host + ":" + keyterm_port + "/" + RESOURCEPATH);
+            URL url = new URL("http://" + AnnotateProperties.getKeytermHost()  + ":" + AnnotateProperties.getKeytermPort()  + "/" + RESOURCEPATH);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
 
-            String filepath = Utilities.storeTmpFile(inBinary);
-            FileBody fileBody = new FileBody(new File(filepath));
+            StringBody contentBody = new StringBody(tei, Charset.forName("UTF-8"));
             MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.STRICT);
-            multipartEntity.addPart("input", fileBody);
+            multipartEntity.addPart(name, contentBody);
             
             conn.setRequestProperty("Content-Type", multipartEntity.getContentType().getValue());
             OutputStream out = conn.getOutputStream();
@@ -71,12 +69,12 @@ public class KeyTermExtracterService {
             }
             
             if (conn.getResponseCode() == HttpURLConnection.HTTP_UNAVAILABLE) {
-                throw new HttpRetryException("Failed : HTTP error code : "
+                throw new HttpRetryException("Failed: service not available - HTTP error code : "
                         + conn.getResponseCode(), conn.getResponseCode());
             }
 
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new RuntimeException("Failed : HTTP error code : "
+                throw new RuntimeException("Failed: HTTP error code : "
                         + conn.getResponseCode());
             }
             
@@ -93,7 +91,7 @@ public class KeyTermExtracterService {
             e.printStackTrace();
             try {
                 Thread.sleep(20000);
-                runKeytermExtraction(inBinary);
+                runKeyTermExtraction();
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
@@ -102,7 +100,7 @@ public class KeyTermExtracterService {
             e.printStackTrace();
             try {
                 Thread.sleep(20000);
-                runKeytermExtraction(inBinary);
+                runKeyTermExtraction();
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }

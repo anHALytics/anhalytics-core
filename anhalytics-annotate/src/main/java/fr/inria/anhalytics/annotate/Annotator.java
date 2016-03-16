@@ -12,7 +12,7 @@ import java.util.concurrent.*;
 /**
  * Handles threads used to annotate the tei collection from MongoDB.
  *
- * @author Patrice Lopez
+ * @author Patrice
  */
 public class Annotator {
 
@@ -20,16 +20,31 @@ public class Annotator {
 
     private final MongoFileManager mm;
 
+    public enum Annotator_Type {
+        NERD("NERD"),
+        KEYTERM("KeyTerm");
+
+        private String name;
+
+        private Annotator_Type(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
     public Annotator() throws UnknownHostException {
         this.mm = MongoFileManager.getInstance(false);
     }
 
-    public void annotate() {
+    public void annotate(Annotator_Type annotator_type) {
         try {
             if (AnnotateProperties.isIsMultiThread()) {
-                annotateTeiCollectionMultiThreaded();
+                annotateTeiCollectionMultiThreaded(annotator_type);
             } else {
-                annotateTeiCollection();
+                annotateTeiCollection(annotator_type);
             }
         } catch (Exception e) {
             logger.error("Error when setting-up the annotator.");
@@ -40,7 +55,7 @@ public class Annotator {
     /**
      * Annotates tei collection entries with fulltext.
      */
-    private void annotateTeiCollection() throws UnreachableNerdServiceException {
+    private void annotateTeiCollection(Annotator_Type annotator_type) throws UnreachableNerdServiceException {
         int nb = 0;
         try {
             if (NerdService.isNerdReady()) {
@@ -68,8 +83,12 @@ public class Annotator {
                                 logger.debug("skipping " + id + ": file too large");
                                 continue;
                             }
-                            AnnotatorWorker worker
-                                    = new AnnotatorWorker(mm, id, docID, tei, date);
+                            Runnable worker = null;
+                            if (annotator_type == Annotator_Type.NERD) {
+                                worker = new NerdAnnotatorWorker(mm, id, docID, tei, date);
+                            } else if (annotator_type == Annotator_Type.KEYTERM) {
+                                worker = new KeyTermAnnotatorWorker(mm, id, docID, tei, date);    
+                            }
                             worker.run();
                             nb++;
                         }
@@ -85,11 +104,11 @@ public class Annotator {
     /**
      * Annotates tei collection entries with fulltext (multithread process).
      */
-    private void annotateTeiCollectionMultiThreaded() throws UnreachableNerdServiceException {
+    private void annotateTeiCollectionMultiThreaded(Annotator_Type annotator_type) throws UnreachableNerdServiceException {
         int nb = 0;
         try {
             if (NerdService.isNerdReady()) {
-                ThreadPoolExecutor executor = getThreadsExecutor();
+                ThreadPoolExecutor executor = getThreadsExecutor(annotator_type);
                 for (String date : Utilities.getDates()) {
                     if (mm.initTeis(date)) {
                         //logger.debug("processing teis for :" + date);
@@ -115,10 +134,12 @@ public class Annotator {
                                 continue;
                             }
 
-                            Runnable worker
-                                    = new AnnotatorWorker(mm, id, docID, tei, date);
-                            executor.execute(worker);
-                            nb++;
+                            Runnable worker = null;
+                            if (annotator_type == Annotator_Type.NERD) {
+                                worker = new NerdAnnotatorWorker(mm, id, docID, tei, date);
+                                worker.run();
+                                nb++;
+                            }
                         }
                     }
                 }
@@ -133,10 +154,15 @@ public class Annotator {
         }
     }
 
-    private ThreadPoolExecutor getThreadsExecutor() {
+    private ThreadPoolExecutor getThreadsExecutor(Annotator_Type annotator_type) {
         // max queue of tasks of 50 
         BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(50);
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(AnnotateProperties.getNbThreads(), AnnotateProperties.getNbThreads(), 60000,
+        int nbThreads = 1;
+        if (annotator_type == annotator_type.NERD)
+            nbThreads = AnnotateProperties.getNerdNbThreads();
+        else if (annotator_type == annotator_type.KEYTERM)
+            nbThreads = AnnotateProperties.getKeytermNbThreads();
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(nbThreads, nbThreads, 60000,
                 TimeUnit.MILLISECONDS, blockingQueue);
 
         // this is for handling rejected tasks (e.g. queue is full)

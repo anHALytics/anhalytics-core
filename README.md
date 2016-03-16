@@ -1,4 +1,4 @@
-# AnHALytics
+# AnHALytics Core
 
 [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
@@ -38,21 +38,28 @@ For building and running the project, you will need the following components.
 
 ###### 2. GROBID (GeneRation Of BIbliographic Data)
 
-[Grobid](https://github.com/kermitt2/grobid) is used for document digestion, which means extracting metadata and structured full text in ([TEI](http://www.tei-c.org/Guidelines/)). [Grobid](https://github.com/kermitt2/grobid) is a machine learning library for extracting bibliographical information and structured full texts from technical and scientific documents, in particular from PDF distributed under Apache 2 license.
+[Grobid](https://github.com/kermitt2/grobid) is used as entry point for document digestion, which means extracting metadata and structured full text in ([TEI](http://www.tei-c.org/Guidelines/)). [Grobid](https://github.com/kermitt2/grobid) is a machine learning library for extracting bibliographical information and structured full texts from technical and scientific documents, in particular from PDF. It is distributed under Apache 2 license.
 
 Clone the project from github:
 
 	git clone https://github.com/kermitt2/grobid.git
 
-AnHALytics uses GROBID as a service so that we can use distribution and multithreaded process easily. See the [GROBID documentation](http://grobid.readthedocs.org) on how to start the RESTful service. Once the service is ready, update the ``anhalytics-harvest/harvest.properties`` file.
+AnHALytics uses GROBID as a service so that we can use distribution and multithreaded process easily. See the [GROBID documentation](http://grobid.readthedocs.org) on how to start the RESTful service. Once the service is ready, update the ``anhalytics-harvest/src/main/resources/harvest.properties`` file.
 
-###### 3. Nerd (Named Entity Recognition and Disambiguisation)
+###### 3. (N)ERD - Entity Recognition and Disambiguisation
 
-The NERD service annotates the text by recognizing and disambiguating terms. Entities are currently identified against Wikipedia/FreeBase. In this project, the NERD is using the free disambiguation service, and the recognition and disambiguation is not constrained by a preliminary Named Entity Recognition. 
+Our (N)ERD service annotates the text by recognizing and disambiguating terms. Entities are currently identified against Wikipedia/FreeBase. In this project, the (N)ERD is using the free disambiguation service, and the recognition and disambiguation is not constrained by a preliminary Named Entity Recognition. 
 
 At the present date, only the NER part of the NERD is available in open source (see [grobid-ner](https://github.com/kermitt2/grobid-ner). The full NERD repo will be made publicly available on GitHub soon under Apache 2 license. 
 
-###### 4. ElasticSearch
+###### 4. Keyterm extraction and disambiguation 
+
+This key term extraction service is based on the [keyphrase extraction tool](http://www.aclweb.org/anthology/S10-1055) developed and ranked first at [SemEval-2010, task 5 - Automatic Keyphrase Extraction from Scientific Articles](http://www.aclweb.org/anthology/S10-1004). _Term_ in this context has to be understood as a complex technical term, e.g. a phrase having a specialized meaning given a technical or scientific field. In addition to key term extraction, the weighted vector of terms is disambiguated by the above (N)ERD service, resulting in a weighted list of Wikipedia topics.  
+
+The full NERD repo will be made publicly available on GitHub soon under Apache 2 license. 
+
+
+###### 5. ElasticSearch
 
 [Elasticsearch](https://github.com/elastic/elasticsearch) is a distributed RESTful search engine. Specify (and adapt if you want more shards and replicas) the following in the ElasticSearch config file (elasticsearch.yml):
 
@@ -66,17 +73,17 @@ At the present date, only the NER part of the NERD is available in open source (
 
 don't forget to update ``anhalytics-frontend/src/main/webapp/js/resource/config.js`` and ``anhalytics-index/index.properties`` with the correct settings for your local installation of ElasticSearch and NERD service.
 
-###### 5. MongoDB
+###### 6. MongoDB
 
 A running instance of [MongoDB](https://www.mongodb.org) is required for document persistence and document provision. Once installed, add an admin user and update the sub-project property file ``anhalytics-commons/commons.properties``.
 
-###### 6. Web server
+###### 7. Web server
 
-A web server, such as Tomcat or Jetty, is necessary to deploy the front demos which are packaged in a war file.
+A web application server, such as Tomcat, JBoss or Jetty, is necessary to deploy the complementary front demos which are packaged in a war file.
 
 ### Project design
 
-AnHALytics has (so far) six components corresponding to six sub-projects:
+anHALytics-core has (so far) six components corresponding to six sub-projects:
 
 0. __common__ contains methods and resources shared by several other components. 
 1. __harvest__ performs the document acquisition and digestion: harvesting scientific documents and production of TEI representations combined with downloaded metadata. 
@@ -164,11 +171,25 @@ An executable jar file is produced under the directory ``anhalytics-annotate/tar
 The following command displays the help:
 > java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -h
 
-###### Annotation of the HAL collection
+For launching the full annotation of all the documents using all the available annotators: 
+
+>java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -multiThread -exe annotateAll
+
+(-multiThread option is recommended, it takes time)
+
+###### Annotation of the HAL collection with the (N)ERD service
 
 The annotation on the HAL collection can be launch with the command in the main directory of the sub-project ``anhalytics-annotate/``:
 
->java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -multiThread
+>java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -multiThread -exe annotateAllNerd
+
+(-multiThread option is recommended, it takes time)
+
+###### Annotation of the HAL collection with the KeyTerm extraction and disambiguation service
+
+The annotation on the HAL collection can be launch with the command in the main directory of the sub-project ``anhalytics-annotate/``:
+
+>java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -multiThread -exe annotateAllKeyTerm
 
 (-multiThread option is recommended, it takes time)
 
@@ -191,10 +212,12 @@ For indexing the produced annotations in ElasticSearch, in the main directory of
 
 #### 4. Frontends
 
-A war file is produced under the directory ``anhalytics-frontend/target``, you can use Tomcat for instance to deploy it (make sur the ES and Nerd options are set). The front-end javascript web application will call ElasticSearch and MongoDB services as set in the main project. 
+A war file is produced under the directory ``anhalytics-frontend/target``, you can use Tomcat for instance to deploy it (make sur the ES and Nerd options are set). The front-end javascript web application will call ElasticSearch and MongoDB services as set in the main project. In addition, the front-end can also call the NERD service for performing query disambiguation. 
 
 Some elements of the search frontend have been inspired by [FacetView 1](https://github.com/okfn/facetview) from Open Knowledge Foundation and Cottage Labs, thanks to them!
 
 #### 5. Test
 
-In progress...
+This subproject is dedicated to integration and end-to-end tests - in contrast to unit tests which come with each specific sub-project.
+
+Work in progress...
