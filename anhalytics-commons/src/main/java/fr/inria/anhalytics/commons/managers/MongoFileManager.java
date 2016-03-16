@@ -48,6 +48,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     private String currentDocId = null;
     private String currentDocType = null;
     private String currentFileType = null;
+    private String currentFileName = null;
 
     private DBCursor cursor = null;
     private DBCollection collection = null;
@@ -193,6 +194,28 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     /**
+     * This initializes cursor for grobid assets files.
+     */
+    public boolean initAssets(String date) throws MongoException {
+        try {
+            setGridFSCollection(MongoCollectionsInterface.GROBID_ASSETS);
+            BasicDBObject bdbo = new BasicDBObject();
+            if (date != null) {
+                bdbo.append("uploadDate", Utilities.parseStringDate(date));
+            }
+            cursor = gfs.getFileList(bdbo);
+            indexFile = 0;
+        } catch (ParseException e) {
+            logger.error(e.getMessage(), e.getCause());
+        }
+        if (cursor.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * This initializes cursor for annotations collection.
      */
     public boolean initAnnotations(String date) throws MongoException {
@@ -225,6 +248,14 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     public boolean hasMoreAnnotations() {
+        if (indexFile < cursor.size()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean hasMoreAssets() {
         if (indexFile < cursor.size()) {
             return true;
         } else {
@@ -285,6 +316,16 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         input = binaryfile.getInputStream();
         indexFile++;
         return input;
+    }
+
+    public String nextAsset() {
+        InputStream input = null;
+        DBObject obj = cursor.next();
+        currentRepositoryDocId = (String) obj.get("repositoryDocId");
+        currentFileType = (String) obj.get("contentType");
+        currentFileName = (String) obj.get("filename");
+        indexFile++;
+        return currentFileName;
     }
 
     /**
@@ -660,14 +701,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Returns the asset files using the halID+filename indexes.
      */
-    public InputStream findAssetFile(String repositoryDocId, String filename, String collection) throws FileNotFoundException {
+    public InputStream findAssetFile(String repositoryDocId, String filename) throws FileNotFoundException {
         InputStream file = null;
         try {
-            GridFS gfs = new GridFS(db, collection);
-            BasicDBObject whereQuery = new BasicDBObject();
-            whereQuery.put("repositoryDocId", repositoryDocId);
-            whereQuery.put("filename", filename);
-            GridFSDBFile cursor = gfs.findOne(whereQuery);
+            GridFSDBFile cursor = findAssetBasicDBFile(repositoryDocId, filename);
             file = cursor.getInputStream();
         } catch (Exception exp) {
             throw new FileNotFoundException("Not found asset.");
@@ -675,8 +712,21 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return file;
     }
 
+    private GridFSDBFile findAssetBasicDBFile(String repositoryDocId, String filename) {
+        GridFS gfs = new GridFS(db, MongoCollectionsInterface.GROBID_ASSETS);
+        BasicDBObject whereQuery = new BasicDBObject();
+        whereQuery.put("repositoryDocId", repositoryDocId);
+        whereQuery.put("filename", filename);
+        GridFSDBFile cursor = gfs.findOne(whereQuery);
+        return cursor;
+    }
+
     public String findFinalTeiById(String repositoryDocId) {
         return findTeiById(repositoryDocId, MongoCollectionsInterface.FINAL_TEIS);
+    }
+
+    public String findGrobidTeiById(String repositoryDocId) {
+        return findTeiById(repositoryDocId, MongoCollectionsInterface.GROBID_TEIS);
     }
 
     public String findMetadataTeiById(String repositoryDocId) {
@@ -807,5 +857,25 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      */
     public void setCurrentDocType(String currentDocType) {
         this.currentDocType = currentDocType;
+    }
+
+    /**
+     * @return the currentFileName
+     */
+    public String getCurrentFileName() {
+        return currentFileName;
+    }
+
+    /**
+     * @param currentFileName the currentFileName to set
+     */
+    public void setCurrentFileName(String currentFileName) {
+        this.currentFileName = currentFileName;
+    }
+
+    public void addLegendToAsset(String legend) {
+        GridFSDBFile file = findAssetBasicDBFile(currentRepositoryDocId, currentFileName);
+        file.put("legend", legend);
+        file.save();
     }
 }

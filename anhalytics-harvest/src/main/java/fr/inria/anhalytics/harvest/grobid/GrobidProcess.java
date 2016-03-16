@@ -4,6 +4,7 @@ import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -41,8 +42,8 @@ public class GrobidProcess {
                             InputStream content = mm.nextBinaryDocument();
                             String id = mm.getCurrentRepositoryDocId();
                             String type = mm.getCurrentDocType();
-                            System.out.println(type);
-                            if (toBeGrobidified.contains(type)) {if (!HarvestProperties.isReset()) {
+                            if (toBeGrobidified.contains(type)) {
+                                if (!HarvestProperties.isReset()) {
                                     if (mm.isGrobidified(id)) {
                                         continue;
                                     }
@@ -95,6 +96,31 @@ public class GrobidProcess {
             while (!executor.isTerminated()) {
             }
             logger.info("Finished all threads");
+        }
+    }
+
+    public void addAssetsLegend() {
+        try {
+            for (String date : Utilities.getDates()) {
+                if (mm.initAssets(date)) {
+                    while (mm.hasMoreBinaryDocuments()) {
+                        String filename = mm.nextAsset();
+                        String currentRepositoryId = mm.getCurrentRepositoryDocId();
+                        System.out.println(currentRepositoryId);
+                        String tei = mm.findGrobidTeiById(currentRepositoryId);
+                        InputStream teiStream = new ByteArrayInputStream(tei.getBytes());
+                        String legend = AssetLegendExtracter.extractLegendFromTei(filename, teiStream);
+                        teiStream.close();
+                        if (legend != null) {
+                            System.out.println(legend);
+                            //mm.addLegendToAsset(legend);
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception exp) {
+            exp.printStackTrace();
         }
     }
 }

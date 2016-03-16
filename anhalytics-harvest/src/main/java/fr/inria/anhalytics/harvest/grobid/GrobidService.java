@@ -61,8 +61,8 @@ public class GrobidService {
         try {
             URL url = new URL("http://" + HarvestProperties.getGrobidHost() + ":" + HarvestProperties.getGrobidPort() + "/processFulltextAssetDocument");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(TIMEOUT_VALUE);
-            conn.setReadTimeout(TIMEOUT_VALUE);
+            //conn.setConnectTimeout(TIMEOUT_VALUE);
+            //conn.setReadTimeout(TIMEOUT_VALUE);
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
             FileBody fileBody = new FileBody(new File(filepath));

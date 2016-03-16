@@ -47,7 +47,7 @@ public class AnhalyticsAssetService {
         Response response = null;
         if(key.equals(KEY)){
             try {
-                InputStream is = mm.findAssetFile(id, filename, MongoCollectionsInterface.GROBID_ASSETS);
+                InputStream is = mm.findAssetFile(id, filename);
                 if (is == null) {
                     response = Response.status(Status.NOT_FOUND).build();
                 } else {

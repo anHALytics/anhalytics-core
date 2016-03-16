@@ -35,6 +35,7 @@ public class Main {
             add("appendGrobidFulltext");
             add("appendGrobidFulltextDaily");
             add("harvestIstex");
+            add("assetLegend");
         }
     };
 
@@ -105,6 +106,8 @@ public class Main {
             oai.fetchEmbargoPublications();
         } else if (process.equals("harvestIstex")) {
             ih.harvest();
+        }else if (process.equals("assetLegend")) {
+            gp.addAssetsLegend();
         }
         return;
     }
