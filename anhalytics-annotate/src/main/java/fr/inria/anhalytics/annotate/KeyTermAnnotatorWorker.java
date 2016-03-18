@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
@@ -34,7 +35,7 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
             String docId,
             String tei,
             String date) {
-        super(mongoManager, documentId, docId, date);
+        super(mongoManager, documentId, docId, date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
         this.tei = tei;
     }
 
@@ -65,7 +66,7 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
             }
         }*/
 
-        mm.insertAnnotation(annotateDocument(tei, documentId, docId));
+        mm.insertAnnotation(annotateDocument(tei, documentId, docId), annotationsCollection);
         logger.debug("\t\t " + documentId + " annotated by the KeyTerm extraction and disambiguation service.");
     }
 

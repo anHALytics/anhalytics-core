@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
  * Class for retrieving, inserting, updating and organizing metadata TEIs, PDFs
  * and extracted TEI files from MongoDB GridFS.
  *
+ * WARNING: to keep in mind - this is not thread safe !
+ *
  * @author Achraf
  */
 public class MongoFileManager extends MongoManager implements MongoCollectionsInterface {
@@ -217,9 +219,12 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     /**
      * This initializes cursor for annotations collection.
+     *
+     * @param annotationCollection the annotation collection to initialize, 
+     * e.g. MongoCollectionsInterface.NERD_ANNOTATIONS, MongoCollectionsInterface.KEYTERM_ANNOTATIONS, etc. 
      */
-    public boolean initAnnotations(String date) throws MongoException {
-        collection = getCollection(ANNOTATIONS);
+    public boolean initAnnotations(String date, String annotationsCollection) throws MongoException {
+        collection = getCollection(annotationsCollection);
         // index on filename and xml:id
         BasicDBObject index = new BasicDBObject();
         index.put("repositoryDocId", 1);
@@ -331,11 +336,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Inserts json entry representing annotation result.
      */
-    public boolean insertAnnotation(String json) {
+    public boolean insertAnnotation(String json, String annotationsCollection) {
         boolean done = false;
         try {
             DBCollection c = null;
-            c = db.getCollection("annotations");
+            c = db.getCollection(annotationsCollection);
             BasicDBObject index = new BasicDBObject();
             index.put("repositoryDocId", 1);
             index.put("xml:id", 1);
@@ -528,9 +533,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Returns the annotation given a repositoryDocId and id (xml:id).
      */
-    public String getAnnotation(String repositoryDocId, String id) {
+    public String getAnnotation(String repositoryDocId, String id, String annotationsCollection) {
         DBCollection c = null;
-        c = db.getCollection("annotations");
+        c = db.getCollection(annotationsCollection);
         c.ensureIndex(new BasicDBObject("repositoryDocId", 1));
         c.ensureIndex(new BasicDBObject("xml:id", 1));
 
@@ -589,9 +594,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Returns the annotation for a given repositoryDocId.
      */
-    public String getAnnotations(String docId) {
+    public String getAnnotations(String docId, String annotationsCollection) {
         DBCollection c = null;
-        c = db.getCollection("annotations");
+        c = db.getCollection(annotationsCollection);
         c.ensureIndex(new BasicDBObject("repositoryDocId", 1));
         c.ensureIndex(new BasicDBObject("xml:id", 1));
 
@@ -674,9 +679,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Check if the current document has already been annotated.
      */
-    public boolean isAnnotated() {
+    public boolean isAnnotated(String annotationsCollection) {
         DBCollection c = null;
-        c = db.getCollection("annotations");
+        c = db.getCollection(annotationsCollection);
         c.ensureIndex(new BasicDBObject("repositoryDocId", 1));
         c.ensureIndex(new BasicDBObject("xml:id", 1));
         boolean result = false;

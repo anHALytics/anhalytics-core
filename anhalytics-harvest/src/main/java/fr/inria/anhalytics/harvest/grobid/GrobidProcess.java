@@ -49,7 +49,7 @@ public class GrobidProcess {
                                     }
                                 }
                                 try {
-                                    Runnable worker = new GrobidFulltextWorker(content, id, date);
+                                    Runnable worker = new GrobidSimpleFulltextWorker(content, id, date);
                                     executor.execute(worker);
                                 } catch (final Exception exp) {
                                     logger.error("An error occured while processing the file " + id

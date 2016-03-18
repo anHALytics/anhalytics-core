@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.commons.utilities;
 
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import org.codehaus.jackson.*;
 import org.codehaus.jackson.node.*;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -367,7 +368,7 @@ public class IndexingPreprocess {
 
     private JsonNode getStandoff(ObjectMapper mapper, String id) throws Exception {
         JsonNode standoffNode = null;
-        String annotation = mm.getAnnotations(id);
+        String annotation = mm.getAnnotations(id, MongoCollectionsInterface.NERD_ANNOTATIONS);
         if ((annotation != null) && (annotation.trim().length() > 0)) {
             JsonNode jsonAnnotation = mapper.readTree(annotation);
             Iterator<JsonNode> iter0 = jsonAnnotation.getElements();

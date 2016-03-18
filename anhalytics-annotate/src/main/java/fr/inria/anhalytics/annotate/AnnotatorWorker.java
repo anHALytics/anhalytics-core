@@ -25,17 +25,18 @@ public class AnnotatorWorker implements Runnable {
     protected String documentId = null;
     protected String docId = null;
     protected String date;
+    protected String annotationsCollection;
 
     public AnnotatorWorker(MongoFileManager mongoManager,
             String documentId,
             String docId,
-            //String tei,
-            String date) {
+            String date, 
+            String annotationsCollection) {
         this.mm = mongoManager;
         this.documentId = documentId;
         this.docId = docId;
-        //this.tei = tei;
         this.date = date;
+        this.annotationsCollection = annotationsCollection;
     }
 
     @Override

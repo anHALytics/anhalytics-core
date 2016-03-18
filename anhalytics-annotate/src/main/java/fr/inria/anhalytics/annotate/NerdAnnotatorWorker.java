@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
@@ -34,7 +35,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
             String docId,
             String tei,
             String date) {
-        super(mongoManager, documentId, docId, date);
+        super(mongoManager, documentId, docId, date, MongoCollectionsInterface.NERD_ANNOTATIONS);
         this.tei = tei;
     }
 
@@ -78,8 +79,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
             }
         }*/
         // get all the elements having an attribute id and annotate their text content
-        String jsonAnnotations = annotateDocument(docTei, documentId, docId);
-        mm.insertAnnotation(jsonAnnotations);
+        mm.insertAnnotation(annotateDocument(docTei, documentId, docId), annotationsCollection);
         logger.debug("\t\t " + documentId + " annotated by the NERD service.");
     }
 

@@ -2,8 +2,10 @@ package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.exceptions.UnreachableNerdServiceException;
+import fr.inria.anhalytics.annotate.exceptions.AnnotatorNotAvailableException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.UnknownHostException;
@@ -55,8 +57,16 @@ public class Annotator {
     /**
      * Annotates tei collection entries with fulltext.
      */
-    private void annotateTeiCollection(Annotator_Type annotator_type) throws UnreachableNerdServiceException {
+    private void annotateTeiCollection(Annotator_Type annotator_type) 
+        throws UnreachableNerdServiceException, AnnotatorNotAvailableException {
         int nb = 0;
+        String annotationsCollection = null;
+        if (annotator_type == Annotator_Type.NERD)
+            annotationsCollection = MongoCollectionsInterface.NERD_ANNOTATIONS;
+        else if (annotator_type == Annotator_Type.KEYTERM)
+            annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
+        else
+            throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type); 
         try {
             if (NerdService.isNerdReady()) {
                 for (String date : Utilities.getDates()) {
@@ -71,7 +81,7 @@ public class Annotator {
                             }
                             // check if the document is already annotated
                             if (!AnnotateProperties.isReset()) {
-                                if (mm.isAnnotated()) {
+                                if (mm.isAnnotated(annotationsCollection)) {
                                     logger.debug("skipping " + id + ": already annotated");
                                     continue;
                                 }
@@ -104,8 +114,16 @@ public class Annotator {
     /**
      * Annotates tei collection entries with fulltext (multithread process).
      */
-    private void annotateTeiCollectionMultiThreaded(Annotator_Type annotator_type) throws UnreachableNerdServiceException {
+    private void annotateTeiCollectionMultiThreaded(Annotator_Type annotator_type) 
+        throws UnreachableNerdServiceException, AnnotatorNotAvailableException {
         int nb = 0;
+        String annotationsCollection = null;
+        if (annotator_type == Annotator_Type.NERD)
+            annotationsCollection = MongoCollectionsInterface.NERD_ANNOTATIONS;
+        else if (annotator_type == Annotator_Type.KEYTERM)
+            annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
+        else
+            throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type); 
         try {
             if (NerdService.isNerdReady()) {
                 ThreadPoolExecutor executor = getThreadsExecutor(annotator_type);
@@ -121,7 +139,7 @@ public class Annotator {
                             }
                             // check if the document is already annotated
                             if (!AnnotateProperties.isReset()) {
-                                if (mm.isAnnotated()) {
+                                if (mm.isAnnotated(annotationsCollection)) {
                                     logger.debug("skipping " + id + ": already annotated");
                                     continue;
                                 }

@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 abstract class GrobidWorker implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(GrobidWorker.class);
-    private InputStream content;
+    protected InputStream content;
     protected MongoFileManager mm;
     protected String date;
     protected String id;
@@ -39,7 +39,7 @@ abstract class GrobidWorker implements Runnable {
         logger.info(Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
     }
 
-    private void processCommand() {
+    protected void processCommand() {
         try {
             GrobidService grobidService = new GrobidService(2, -1, true, date);//configured for HAL, first page is added to the document
 
@@ -49,7 +49,7 @@ abstract class GrobidWorker implements Runnable {
 
             if (mb <= 15) { // for now we extract just files with less size (avoid thesis..which may take long time)
                 logger.info("\t\t Tei extraction for : " + id + " sizing :" + mb + "mb");
-                String resultPath = grobidService.runFullTextGrobid(filepath);
+                String resultPath = grobidService.runFullTextAssetGrobid(filepath);
                 saveExtractions(resultPath);
 
                 FileUtils.deleteDirectory(new File(resultPath));

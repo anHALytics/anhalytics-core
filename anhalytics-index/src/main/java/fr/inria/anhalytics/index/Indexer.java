@@ -2,6 +2,7 @@ package fr.inria.anhalytics.index;
 
 import fr.inria.anhalytics.commons.exceptions.ElasticSearchConfigurationException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import java.io.*;
 import java.util.*;
 
@@ -294,7 +295,7 @@ public class Indexer {
         try {
             ObjectMapper mapper = new ObjectMapper();
             for (String date : Utilities.getDates()) {
-                if (mm.initAnnotations(date)) {
+                if (mm.initAnnotations(date, MongoCollectionsInterface.NERD_ANNOTATIONS)) {
                     int i = 0;
                     BulkRequestBuilder bulkRequest = client.prepareBulk();
                     bulkRequest.setRefresh(true);
