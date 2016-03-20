@@ -49,11 +49,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
             logger.warn("Processing of " + id + " timed out");
         } catch (RuntimeException e) {
             logger.error("\t\t error occurred while processing " + id);
-            if (e.getMessage().contains("timed out")) {
-                mm.save(id, "processGrobid", "timed out", date);
-            } else if (e.getMessage().contains("failed")) {
-                mm.save(id, "processGrobid", "failed", date);
-            }
+                mm.save(id, "processGrobid", e.getMessage(), date);
             logger.error(e.getMessage(), e.getCause());
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex.getCause());
