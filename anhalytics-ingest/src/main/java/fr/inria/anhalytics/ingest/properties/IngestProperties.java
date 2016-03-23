@@ -1,6 +1,8 @@
 package fr.inria.anhalytics.ingest.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Properties;
 
 /**
@@ -27,8 +29,8 @@ public class IngestProperties {
     public static void init(String properties_filename) {
         Properties props = new Properties();
         try {
-            ClassLoader classLoader = IngestProperties.class.getClassLoader();
-            props.load(classLoader.getResourceAsStream(properties_filename));
+            File file = new File(System.getProperty("user.dir"));
+            props.load(new FileInputStream(file.getParent()+File.separator+"config"+File.separator+"local"+File.separator+properties_filename));
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file " + properties_filename, exp);
         }

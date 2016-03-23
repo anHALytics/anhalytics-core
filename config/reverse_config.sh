@@ -4,13 +4,13 @@
 mkdir -p local
 
 # saving local config files
-cp ../anhalytics-annotate/src/main/resources/annotate.properties local/
-cp ../anhalytics-commons/src/main/resources/commons.properties local/
-cp ../anhalytics-harvest/src/main/resources/harvest.properties local/
-cp ../anhalytics-index/src/main/resources/index.properties local/
+cp ../anhalytics-annotate/annotate.properties local/
+cp ../anhalytics-commons/commons.properties local/
+cp ../anhalytics-harvest/harvest.properties local/
+cp ../anhalytics-index/index.properties local/
 
 # writing generic config files
-cp generic/annotate.properties ../anhalytics-annotate/src/main/resources/
-cp generic/commons.properties ../anhalytics-commons/src/main/resources/
-cp generic/harvest.properties ../anhalytics-harvest/src/main/resources/
-cp generic/index.properties ../anhalytics-index/src/main/resources/
+cp generic/annotate.properties ../anhalytics-annotate/
+cp generic/commons.properties ../anhalytics-commons/
+cp generic/harvest.properties ../anhalytics-harvest/
+cp generic/index.properties ../anhalytics-index/
