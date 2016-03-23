@@ -16,7 +16,6 @@ anhalytics-commons/target/*
 tempPDF/*
 tempTEI/*
 config/local/*
-config/generic/*
 /anhalytics-frontend/target/
 *.bak
 /anhalytics-test/target/
