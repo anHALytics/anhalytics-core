@@ -20,5 +20,9 @@ config/local/*
 *.bak
 /anhalytics-test/target/
 *nb-configuration.xml
-/anhalytics-ingest/target/
-/anhalytics-ingest/target/*
+anhalytics-ingest/target/
+anhalytics-ingest/target/*
+config/local/
+config/local/*
+config/local/annotate.properties
+config/local/harvest.properties
