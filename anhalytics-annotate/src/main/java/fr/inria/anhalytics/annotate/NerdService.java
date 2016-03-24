@@ -39,7 +39,7 @@ public class NerdService {
     public String runNerd() {
         StringBuffer output = new StringBuffer();
         try {
-            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + AnnotateProperties.getNerdPort() + "/" + REQUEST);
+            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + AnnotateProperties.getNerdPort() + "/nerd/service/" + REQUEST);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
@@ -48,11 +48,11 @@ public class NerdService {
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode node = mapper.createObjectNode();
             node.put("text", input);
-            ObjectNode dataTable = mapper.createObjectNode();
-            dataTable.put("lang", "fr");
-            dataTable.put("lang", "de");
-            dataTable.put("lang", "en");
-            node.put("language", dataTable);
+            ArrayNode dataTable = mapper.createArrayNode();
+            dataTable.add("fr");
+            dataTable.add("de");
+            dataTable.add("en");
+            node.put("resultLanguages", dataTable);
             byte[] postDataBytes = node.toString().getBytes("UTF-8");
 
             OutputStream os = conn.getOutputStream();
@@ -89,7 +89,8 @@ public class NerdService {
         int responseCode = 0;
         HttpURLConnection conn = null;
         try {
-            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + AnnotateProperties.getNerdPort());
+            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + 
+				AnnotateProperties.getNerdPort() + "/nerd/service/isalive");
             conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("GET");

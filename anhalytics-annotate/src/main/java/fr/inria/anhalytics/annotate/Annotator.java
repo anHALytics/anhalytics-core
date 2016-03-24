@@ -105,7 +105,7 @@ public class Annotator {
                     }
                 }
             }
-            logger.debug("Total: " + nb + " annotations produced.");
+            logger.debug("Total: " + nb + " documents annotated.");
         } finally {
             mm.close();
         }
@@ -125,7 +125,8 @@ public class Annotator {
         else
             throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type); 
         try {
-            if (NerdService.isNerdReady()) {
+            //if (NerdService.isNerdReady()) 
+			{
                 ThreadPoolExecutor executor = getThreadsExecutor(annotator_type);
                 for (String date : Utilities.getDates()) {
                     if (mm.initTeis(date)) {
@@ -155,17 +156,21 @@ public class Annotator {
                             Runnable worker = null;
                             if (annotator_type == Annotator_Type.NERD) {
                                 worker = new NerdAnnotatorWorker(mm, id, docID, tei, date);
-                                worker.run();
-                                nb++;
-                            }
+							}
+							else {
+								worker = new KeyTermAnnotatorWorker(mm, id, docID, tei, date);    
+							}
+								
+                            worker.run();
+                            nb++;
                         }
                     }
-                }
+				}
                 executor.shutdown();
                 while (!executor.isTerminated()) {
                 }
                 logger.info("Finished all threads");
-                logger.debug("Total: " + nb + " annotations produced.");
+                logger.debug("Total: " + nb + " documents annotated.");
             }
         } finally {
             mm.close();

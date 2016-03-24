@@ -154,7 +154,9 @@ The final TEI is built and has the following struture
 ```
 
 At least the GROBID TEI is necessary to produce the final TEI, you can do so with:
-> java -Xmx2048m -jar target/anhalytics-harvest-```<current version>```.one-jar.jar -exe buildTei
+
+> java -Xmx2048m -jar target/anhalytics-harvest-```<current version>```.one-jar.jar -exe generateTei
+> java -Xmx2048m -jar target/anhalytics-harvest-```<current version>```.one-jar.jar -exe appendGrobidFulltext	
 
 ###### Document storage and provision
 
@@ -173,7 +175,7 @@ The following command displays the help:
 
 For launching the full annotation of all the documents using all the available annotators: 
 
->java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -multiThread -exe annotateAll
+> java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -multiThread -exe annotateAll
 
 (-multiThread option is recommended, it takes time)
 
@@ -181,7 +183,7 @@ For launching the full annotation of all the documents using all the available a
 
 The annotation on the HAL collection can be launch with the command in the main directory of the sub-project ``anhalytics-annotate/``:
 
->java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -multiThread -exe annotateAllNerd
+> java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -multiThread -exe annotateAllNerd
 
 (-multiThread option is recommended, it takes time)
 
@@ -189,7 +191,7 @@ The annotation on the HAL collection can be launch with the command in the main 
 
 The annotation on the HAL collection can be launch with the command in the main directory of the sub-project ``anhalytics-annotate/``:
 
->java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -multiThread -exe annotateAllKeyTerm
+> java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -multiThread -exe annotateAllKeyTerm
 
 (-multiThread option is recommended, it takes time)
 

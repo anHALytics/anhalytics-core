@@ -51,14 +51,14 @@ public class KeyTermExtractionService {
     public String runKeyTermExtraction() {
         StringBuffer output = new StringBuffer();
         try {
-            URL url = new URL("http://" + AnnotateProperties.getKeytermHost()  + ":" + AnnotateProperties.getKeytermPort()  + "/" + RESOURCEPATH);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            URL url = new URL("http://" + AnnotateProperties.getKeytermHost()  + ":" + AnnotateProperties.getKeytermPort()  + "/keyterm/" + RESOURCEPATH);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();		
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
 
             StringBody contentBody = new StringBody(tei, Charset.forName("UTF-8"));
             MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.STRICT);
-            multipartEntity.addPart(name, contentBody);
+            multipartEntity.addPart("file", contentBody);
             
             conn.setRequestProperty("Content-Type", multipartEntity.getContentType().getValue());
             OutputStream out = conn.getOutputStream();

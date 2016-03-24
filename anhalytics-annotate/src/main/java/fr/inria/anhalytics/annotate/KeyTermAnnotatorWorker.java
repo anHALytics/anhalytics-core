@@ -82,17 +82,17 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
                 +"\", \"keyterm\" : ");
         String jsonText = null;
         try {
-            KeyTermExtractionService keyTermService = new KeyTermExtractionService(docId, tei);
+            KeyTermExtractionService keyTermService = new KeyTermExtractionService(documentId, tei);
             jsonText = keyTermService.runKeyTermExtraction();
         } catch (Exception ex) {
-            logger.error("TEI could not be processed by the keyterm extractor: " + tei);
+            logger.error("TEI could not be processed by the keyterm extractor: " + documentId);
             ex.printStackTrace();
         }
         if (jsonText != null) {
-            json.append(jsonText);
+            json.append(jsonText).append("}");
         }
         else
-            json.append("{}");
+            json.append("{} }");
         return json.toString();
     }
 }
