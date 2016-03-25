@@ -155,6 +155,7 @@ public class MetadataIndexer {
         List<Organisation> organisations = odao.findAllOrganisations();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
         AddressDAO adao = (AddressDAO) adf.getAddressDAO();
+        PersonDAO pdao = (PersonDAO) adf.getPersonDAO();
         for (Organisation org : organisations) {
             Map<String, Object> organisationDocument = org.getOrganisationDocument();
             Address addr = (adao.getOrganisationAddress(org.getOrganisationId()));
@@ -182,6 +183,14 @@ public class MetadataIndexer {
                 orgDocumentsDocument.add(doc.getDocumentDocument());
             }
             organisationDocument.put("publications", orgDocumentsDocument);
+            
+            
+            List<Person> authors = pdao.getPersonsByOrgID(org.getOrganisationId());
+            List<Map<String, Object>> authorsDocument = new ArrayList<Map<String, Object>>();
+            for (Person author : authors) {
+                authorsDocument.add(author.getPersonDocument());
+            }
+            organisationDocument.put("authors", authorsDocument);
             client.prepareIndex(IndexProperties.getMetadataIndexName(), "organisations", "" + org.getOrganisationId())
                     .setSource(organisationDocument).execute().actionGet();
         }

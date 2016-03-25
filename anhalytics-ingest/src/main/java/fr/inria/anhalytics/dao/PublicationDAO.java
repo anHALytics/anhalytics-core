@@ -156,6 +156,8 @@ public class PublicationDAO extends DAO<Publication> {
                 Logger.getLogger(PublicationDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        preparedStatement.close();
+        rs.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         }

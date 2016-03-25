@@ -269,16 +269,7 @@ public class OrganisationDAO extends DAO<Organisation> {
             PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECTALL);
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
-
-                organisations.add(new Organisation(
-                        rs.getLong("org.organisationID"),
-                        rs.getString("org.type"),
-                        rs.getString("org.url"),
-                        rs.getString("org.structID"),
-                        new ArrayList<String>(),
-                        findMothers(rs.getLong("org.organisationID"))
-                ));
-
+                organisations.add(find(rs.getLong("org.organisationID")));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
