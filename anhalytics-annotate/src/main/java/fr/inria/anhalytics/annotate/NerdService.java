@@ -85,7 +85,7 @@ public class NerdService {
      * @return boolean
      */
     public static boolean isNerdReady() throws UnreachableNerdServiceException {
-        logger.info("Cheking NERD service...");
+        logger.info("Checking NERD service...");
         int responseCode = 0;
         HttpURLConnection conn = null;
         try {

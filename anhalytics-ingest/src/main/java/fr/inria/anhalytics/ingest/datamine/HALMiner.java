@@ -151,7 +151,7 @@ public class HALMiner extends Miner {
                         adf.endTransaction();
                         if (generatedTeiDoc != null) {
                             String generatedTeiString = Utilities.toString(generatedTeiDoc);
-                            mm.updateTei(generatedTeiString, uri, docID, true);
+                            mm.updateTei(generatedTeiString, uri, docID, false);
                         }
                     }
                 }

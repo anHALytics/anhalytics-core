@@ -57,16 +57,17 @@ public class Annotator {
     /**
      * Annotates tei collection entries with fulltext.
      */
-    private void annotateTeiCollection(Annotator_Type annotator_type) 
-        throws UnreachableNerdServiceException, AnnotatorNotAvailableException {
+    private void annotateTeiCollection(Annotator_Type annotator_type)
+            throws UnreachableNerdServiceException, AnnotatorNotAvailableException {
         int nb = 0;
         String annotationsCollection = null;
-        if (annotator_type == Annotator_Type.NERD)
+        if (annotator_type == Annotator_Type.NERD) {
             annotationsCollection = MongoCollectionsInterface.NERD_ANNOTATIONS;
-        else if (annotator_type == Annotator_Type.KEYTERM)
+        } else if (annotator_type == Annotator_Type.KEYTERM) {
             annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
-        else
-            throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type); 
+        } else {
+            throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
+        }
         try {
             if (NerdService.isNerdReady()) {
                 for (String date : Utilities.getDates()) {
@@ -97,7 +98,7 @@ public class Annotator {
                             if (annotator_type == Annotator_Type.NERD) {
                                 worker = new NerdAnnotatorWorker(mm, id, docID, tei, date);
                             } else if (annotator_type == Annotator_Type.KEYTERM) {
-                                worker = new KeyTermAnnotatorWorker(mm, id, docID, tei, date);    
+                                worker = new KeyTermAnnotatorWorker(mm, id, docID, tei, date);
                             }
                             worker.run();
                             nb++;
@@ -114,16 +115,17 @@ public class Annotator {
     /**
      * Annotates tei collection entries with fulltext (multithread process).
      */
-    private void annotateTeiCollectionMultiThreaded(Annotator_Type annotator_type) 
-        throws UnreachableNerdServiceException, AnnotatorNotAvailableException {
+    private void annotateTeiCollectionMultiThreaded(Annotator_Type annotator_type)
+            throws UnreachableNerdServiceException, AnnotatorNotAvailableException {
         int nb = 0;
         String annotationsCollection = null;
-        if (annotator_type == Annotator_Type.NERD)
+        if (annotator_type == Annotator_Type.NERD) {
             annotationsCollection = MongoCollectionsInterface.NERD_ANNOTATIONS;
-        else if (annotator_type == Annotator_Type.KEYTERM)
+        } else if (annotator_type == Annotator_Type.KEYTERM) {
             annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
-        else
-            throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type); 
+        } else {
+            throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
+        }
         try {
             //if (NerdService.isNerdReady()) 
 			{
@@ -181,10 +183,11 @@ public class Annotator {
         // max queue of tasks of 50 
         BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(50);
         int nbThreads = 1;
-        if (annotator_type == annotator_type.NERD)
+        if (annotator_type == annotator_type.NERD) {
             nbThreads = AnnotateProperties.getNerdNbThreads();
-        else if (annotator_type == annotator_type.KEYTERM)
+        } else if (annotator_type == annotator_type.KEYTERM) {
             nbThreads = AnnotateProperties.getKeytermNbThreads();
+        }
         ThreadPoolExecutor executor = new ThreadPoolExecutor(nbThreads, nbThreads, 60000,
                 TimeUnit.MILLISECONDS, blockingQueue);
 

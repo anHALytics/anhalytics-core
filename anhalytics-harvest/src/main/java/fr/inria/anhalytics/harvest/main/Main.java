@@ -60,8 +60,6 @@ public class Main {
     }
 
     private void processCommand() throws UnknownHostException {
-        Scanner sc = new Scanner(System.in);
-        char reponse = ' ';
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
@@ -77,12 +75,7 @@ public class Main {
             Utilities.updateDates(todayDate, todayDate);
             oai.fetchAllDocuments();
         } else if (process.equals("generateTei")) {
-             //xml_ids are updated, the annotation is time consuming process.      
-            System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
-            reponse = sc.nextLine().charAt(0);
-            if (reponse != 'N') {
-                tb.buildTei();
-            }
+            tb.buildTei();
         } else if (process.equals("generateTeiDaily")) {
             Utilities.updateDates(todayDate, todayDate);
             tb.buildTei();
@@ -92,14 +85,8 @@ public class Main {
             Utilities.updateDates(todayDate, todayDate);
             gp.processFulltexts();
         } else if (process.equals("appendGrobidFulltext")) {
-            //xml_ids are updated, the annotation is time consuming process.      
-            System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
-            reponse = sc.nextLine().charAt(0);
-            if (reponse != 'N') {
                 tb.appendGrobidFulltext();
-            }
         } else if (process.equals("appendGrobidFulltextDaily")) {
-            //xml_ids are updated, the annotation is time consuming process.
             Utilities.updateDates(todayDate, todayDate);
             tb.appendGrobidFulltext();
         } else if (process.equals("fetchEmbargoPublications")) {

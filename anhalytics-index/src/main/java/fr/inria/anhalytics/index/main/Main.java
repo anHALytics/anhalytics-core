@@ -93,8 +93,9 @@ public class Main {
                 esm.setUpIndex(IndexProperties.getTeisIndexName());
                 esm.setUpIndex(IndexProperties.getAnnotsIndexName());
             }
-            esm.indexAnnotations();
+            
             esm.indexTeiCollection();
+            esm.indexAnnotations();
             esm.close();
         } else if (process.equals("indexDaily")) {
             if (esm.isIndexExists()) {
@@ -108,8 +109,9 @@ public class Main {
                 esm.close();
                 return;
             }
-            esm.indexAnnotations();
+            
             esm.indexTeiCollection();
+            esm.indexAnnotations();
             esm.close();
         } else if (process.equals("indexMtds")) {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
