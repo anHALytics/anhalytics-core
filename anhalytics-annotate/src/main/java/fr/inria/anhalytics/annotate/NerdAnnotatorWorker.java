@@ -111,23 +111,25 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
                 // get the textual content of the element
                 // annotate
                 String text = e.getTextContent();
-                String jsonText = null;
-                try {
-                    NerdService nerdService = new NerdService(text);
-                    jsonText = nerdService.runNerd();
-                } catch (Exception ex) {
-                    logger.error("Text could not be annotated by NERD: " + text);
-                    ex.printStackTrace();
-                }
-                if (jsonText != null) {
-                    // resulting annotations, with the corresponding id
-                    if (first) {
-                        first = false;
-                    } else {
-                        json.append(", ");
-                    }
-                    json.append("{ \"xml:id\" : \"" + id + "\", \"nerd\" : " + jsonText + " }");
-                }
+				if ( (text != null) && (text.trim().length() > 1)) {
+	                String jsonText = null;
+	                try {
+	                    NerdService nerdService = new NerdService(text);
+	                    jsonText = nerdService.runNerd();
+	                } catch (Exception ex) {
+	                    logger.error("Text could not be annotated by NERD: " + text);
+	                    ex.printStackTrace();
+	                }
+	                if (jsonText != null) {
+	                    // resulting annotations, with the corresponding id
+	                    if (first) {
+	                        first = false;
+	                    } else {
+	                        json.append(", ");
+	                    }
+	                    json.append("{ \"xml:id\" : \"" + id + "\", \"nerd\" : " + jsonText + " }");
+	                }
+				}
             }
         }
         NodeList nodeList = node.getChildNodes();
