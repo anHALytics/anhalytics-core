@@ -100,6 +100,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } catch (ParseException e) {
             logger.error(e.getMessage(), e.getCause());
         }
+        logger.info(cursor.size() + "documents found for : "+date);
         if (cursor.size() > 0) {
             return true;
         } else {
@@ -122,6 +123,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } catch (ParseException e) {
             logger.error(e.getMessage(), e.getCause());
         }
+        logger.info(cursor.size() + "documents found for : "+date);
         if (cursor.size() > 0) {
             return true;
         } else {
@@ -144,6 +146,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } catch (ParseException e) {
             logger.error(e.getMessage(), e.getCause());
         }
+        logger.info(cursor.size() + "documents found for : "+date);
         if (cursor.size() > 0) {
             return true;
         } else {
@@ -166,6 +169,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } catch (ParseException e) {
             logger.error(e.getMessage(), e.getCause());
         }
+        logger.info(cursor.size() + "documents found for : "+date);
         if (cursor.size() > 0) {
             return true;
         } else {
@@ -184,10 +188,12 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
             }
             cursor = gfs.getFileList(bdbo);
+            cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT);
             indexFile = 0;
         } catch (ParseException e) {
             logger.error(e.getMessage(), e.getCause());
         }
+        logger.info(cursor.size() + "documents found for : "+date);
         if (cursor.size() > 0) {
             return true;
         } else {
@@ -220,8 +226,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * This initializes cursor for annotations collection.
      *
-     * @param annotationCollection the annotation collection to initialize, 
-     * e.g. MongoCollectionsInterface.NERD_ANNOTATIONS, MongoCollectionsInterface.KEYTERM_ANNOTATIONS, etc. 
+     * @param annotationCollection the annotation collection to initialize, e.g.
+     * MongoCollectionsInterface.NERD_ANNOTATIONS,
+     * MongoCollectionsInterface.KEYTERM_ANNOTATIONS, etc.
      */
     public boolean initAnnotations(String date, String annotationsCollection) throws MongoException {
         collection = getCollection(annotationsCollection);
@@ -450,7 +457,15 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             } else {
                 gfsNew.put("docId", docID);
             }
-            gfsNew.put("isFulltextAdded", isFulltextAdded);
+
+            Object o = gdf.get("isFulltextAdded");
+
+            if (o == null) {
+                gfsNew.put("isFulltextAdded", isFulltextAdded);
+            } else {
+                gfsNew.put("isFulltextAdded", gdf.get("isFulltextAdded"));
+            }
+
             gfsNew.save();
             gfs.remove(gdf);
         } catch (Exception e) {
