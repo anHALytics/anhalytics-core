@@ -890,6 +890,9 @@
                     }
                 }
             },
+            "repositoryDocId":{"type":"string",
+                "index": "not_analyzed"
+                },
             "xmlns": {
                 "include_in_all": false,
                 "index": "no",

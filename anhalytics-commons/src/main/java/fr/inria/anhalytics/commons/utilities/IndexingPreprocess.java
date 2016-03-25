@@ -43,6 +43,7 @@ public class IndexingPreprocess {
         JsonNode jsonRoot = mapper.readTree(jsonStr);
         // root node is the TEI node, we add as a child the "light" annotations in a 
         // standoff element
+                ((ObjectNode) jsonRoot).put("repositoryDocId", repositoryDocId);
         if (id != null) {
             JsonNode teiRoot = jsonRoot.findPath("$teiCorpus");
             JsonNode tei = jsonRoot.findPath("$TEI");
@@ -55,9 +56,7 @@ public class IndexingPreprocess {
                 JsonNode standoffNode = getStandoff(mapper, id);
                 ((ArrayNode) teiRoot).add(standoffNode);
                 
-                JsonNode repositoryIdNode = mapper.createObjectNode();
-                ((ObjectNode) repositoryIdNode).put("repositoryDocId", repositoryDocId);
-                ((ArrayNode) teiRoot).add(repositoryIdNode);
+                
             }
         }
 
