@@ -42,6 +42,7 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
     public List<TEI> getTeis(InputStream in) {
         teis = new ArrayList<TEI>();
         setDoc(parse(in));
+        Utilities.generateIDs(doc);
         Element rootElement = doc.getDocumentElement();
         NodeList listRecords = getRecords(rootElement);
 

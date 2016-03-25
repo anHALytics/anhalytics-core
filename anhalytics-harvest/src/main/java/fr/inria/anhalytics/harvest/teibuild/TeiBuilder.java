@@ -1,6 +1,5 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
-import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import javax.xml.parsers.DocumentBuilder;
@@ -51,7 +50,6 @@ public class TeiBuilder {
                 grobidTeiElement.removeAttributeNode(attr);
                 grobidTeiElement.setAttribute("type", "main");
                 updateGrobidTEI(doc);
-                Utilities.generateIDs(doc);
             }
             resultTei = addNodeToTei(tei, grobidTeiElement);
         } catch (Exception e) {
@@ -111,7 +109,6 @@ public class TeiBuilder {
         teiCorpus.appendChild(teiHeader);
         teiCorpus.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
         doc.appendChild(teiCorpus);
-        Utilities.generateIDs(doc);
         return doc;
     }
 

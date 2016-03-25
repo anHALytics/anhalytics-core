@@ -37,6 +37,7 @@ public class GrobidFulltextWorker extends GrobidWorker {
                         } else if (currFile.getName().toLowerCase().endsWith(".xml")) {
                             tei = Utilities.readFile(currFile.getAbsolutePath());
                             tei = Utilities.trimEncodedCharaters(tei);
+                            tei = generateIdsTeiDoc(tei);
                             System.out.println(id);
                             mm.insertGrobidTei(tei, id, date);
                         }

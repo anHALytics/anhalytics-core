@@ -192,11 +192,19 @@ public class Utilities {
         NodeList terms = doc.getElementsByTagName("term");
         NodeList funders = doc.getElementsByTagName("funder");
         NodeList codes = doc.getElementsByTagName("classCode");
+        NodeList ps = doc.getElementsByTagName("p");
+        NodeList heads = doc.getElementsByTagName("head");
+        NodeList figdescs = doc.getElementsByTagName("figDesc");
+        NodeList items = doc.getElementsByTagName("item");
         generateID(titles);
         generateID(abstracts);
         generateID(terms);
         generateID(funders);
         generateID(codes);
+        generateID(ps);
+        generateID(heads);
+        generateID(figdescs);
+        generateID(items);
     }
 
     private static void generateID(NodeList theNodes) {

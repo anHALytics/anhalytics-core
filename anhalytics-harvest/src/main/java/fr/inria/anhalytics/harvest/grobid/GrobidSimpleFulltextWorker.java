@@ -37,6 +37,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
             if (mb <= 15) {
                 logger.info("\t\t TEI extraction for : " + id + " sizing :" + mb + "mb");
                 String tei = grobidService.runFullTextGrobid(filepath).trim();
+                tei = generateIdsTeiDoc(tei);
                 mm.insertGrobidTei(tei, id, date);
 
                 logger.debug("\t\t " + id + " processed.");
