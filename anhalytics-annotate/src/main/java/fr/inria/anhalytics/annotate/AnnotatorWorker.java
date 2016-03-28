@@ -3,15 +3,6 @@ package fr.inria.anhalytics.annotate;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.*;
-import java.util.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 
 /**
  * Runnable for annotating HAL documents.
@@ -23,18 +14,18 @@ public class AnnotatorWorker implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(AnnotatorWorker.class);
     protected MongoFileManager mm = null;
     protected String documentId = null;
-    protected String docId = null;
+    protected String anhalyticsId = null;
     protected String date;
     protected String annotationsCollection;
 
     public AnnotatorWorker(MongoFileManager mongoManager,
             String documentId,
-            String docId,
+            String anhalyticsId,
             String date, 
             String annotationsCollection) {
         this.mm = mongoManager;
         this.documentId = documentId;
-        this.docId = docId;
+        this.anhalyticsId = anhalyticsId;
         this.date = date;
         this.annotationsCollection = annotationsCollection;
     }

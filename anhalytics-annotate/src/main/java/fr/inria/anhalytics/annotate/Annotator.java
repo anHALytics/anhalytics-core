@@ -76,7 +76,7 @@ public class Annotator {
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
-                            String docID = mm.getCurrentDocId();
+                            String anhalyticsId = mm.getCurrentAnhalyticsId();
                             if (!mm.isWithFulltext(id)) {
                                 continue;
                             }
@@ -96,9 +96,9 @@ public class Annotator {
                             }
                             Runnable worker = null;
                             if (annotator_type == Annotator_Type.NERD) {
-                                worker = new NerdAnnotatorWorker(mm, id, docID, tei, date);
+                                worker = new NerdAnnotatorWorker(mm, id, anhalyticsId, tei, date);
                             } else if (annotator_type == Annotator_Type.KEYTERM) {
-                                worker = new KeyTermAnnotatorWorker(mm, id, docID, tei, date);
+                                worker = new KeyTermAnnotatorWorker(mm, id, anhalyticsId, tei, date);
                             }
                             worker.run();
                             nb++;
@@ -127,7 +127,7 @@ public class Annotator {
             throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
         }
         try {
-            //if (NerdService.isNerdReady()) 
+            if (NerdService.isNerdReady()) 
 			{
                 ThreadPoolExecutor executor = getThreadsExecutor(annotator_type);
                 for (String date : Utilities.getDates()) {
@@ -136,7 +136,7 @@ public class Annotator {
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
-                            String docID = mm.getCurrentDocId();
+                            String anhalyticsId = mm.getCurrentAnhalyticsId();
                             if (!mm.isWithFulltext(id)) {
                                 continue;
                             }
@@ -157,10 +157,10 @@ public class Annotator {
 
                             Runnable worker = null;
                             if (annotator_type == Annotator_Type.NERD) {
-                                worker = new NerdAnnotatorWorker(mm, id, docID, tei, date);
+                                worker = new NerdAnnotatorWorker(mm, id, anhalyticsId, tei, date);
 							}
 							else {
-								worker = new KeyTermAnnotatorWorker(mm, id, docID, tei, date);    
+								worker = new KeyTermAnnotatorWorker(mm, id, anhalyticsId, tei, date);    
 							}
 								
                             worker.run();

@@ -1,13 +1,11 @@
 package fr.inria.anhalytics.harvest.grobid;
 
 import fr.inria.anhalytics.commons.exceptions.GrobidTimeoutException;
-import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +17,8 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(GrobidSimpleFulltextWorker.class);
     
-    public GrobidSimpleFulltextWorker(InputStream content, String id, String date) throws UnknownHostException {
-        super(content, id, date);
+    public GrobidSimpleFulltextWorker(InputStream content, String id, String anhalyticsId, String date) throws UnknownHostException {
+        super(content, id, anhalyticsId, date);
     }
 
     @Override
@@ -38,7 +36,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
                 logger.info("\t\t TEI extraction for : " + id + " sizing :" + mb + "mb");
                 String tei = grobidService.runFullTextGrobid(filepath).trim();
                 tei = generateIdsTeiDoc(tei);
-                mm.insertGrobidTei(tei, id, date);
+                mm.insertGrobidTei(tei, id, anhalyticsId, date);
 
                 logger.debug("\t\t " + id + " processed.");
             } else {

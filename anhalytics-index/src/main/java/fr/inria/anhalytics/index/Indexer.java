@@ -234,7 +234,7 @@ public class Indexer {
                     while (mm.hasMoreTeis()) {
                         String tei = mm.nextTeiDocument();
                         String id = mm.getCurrentRepositoryDocId();
-                        String docId = mm.getCurrentDocId();
+                        String anhalyticsId = mm.getCurrentAnhalyticsId();
                         
                         
                         if (!mm.isWithFulltext(id)) {
@@ -247,7 +247,7 @@ public class Indexer {
                         JSONObject json = JsonTapasML.toJSONObject(tei);
                         String jsonStr = json.toString();
 
-                        jsonStr = indexingPreprocess.process(jsonStr, id, docId);
+                        jsonStr = indexingPreprocess.process(jsonStr, id, anhalyticsId);
 
                         if (jsonStr == null) {
                             continue;
@@ -255,7 +255,7 @@ public class Indexer {
 
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
-                        bulkRequest.add(client.prepareIndex(IndexProperties.getTeisIndexName(), "npl", docId).setSource(jsonStr));
+                        bulkRequest.add(client.prepareIndex(IndexProperties.getTeisIndexName(), "npl", anhalyticsId).setSource(jsonStr));
 
                         if (i >= 100) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -301,11 +301,10 @@ public class Indexer {
                     bulkRequest.setRefresh(true);
                     while (mm.hasMoreAnnotations()) {
                         String json = mm.nextAnnotation();
-                        String id = mm.getCurrentRepositoryDocId();
-                        String docId = mm.getCurrentDocId();
+                        String anhalyticsId = mm.getCurrentAnhalyticsId();
                         // get the xml:id of the elements we want to index from the document
                         // we only index title, abstract and keyphrase annotations !
-                        List<String> validIDs = validDocIDs(docId, mapper);
+                        List<String> validIDs = validDocIDs(anhalyticsId, mapper);
 
                         JsonNode jsonAnnotation = mapper.readTree(json);
                         JsonNode jn = jsonAnnotation.findPath("nerd");
@@ -372,9 +371,9 @@ public class Indexer {
         return nb;
     }
 
-    private List<String> validDocIDs(String id, ObjectMapper mapper) {
+    private List<String> validDocIDs(String anhalyticsId, ObjectMapper mapper) {
         List<String> results = new ArrayList<String>();
-        logger.debug("validDocIDs: " + id);
+        logger.debug("validDocIDs: " + anhalyticsId);
 
         String request = "{\"fields\": [ ";
         boolean first = true;
@@ -386,7 +385,7 @@ public class Indexer {
             }
             request += "\"" + path + "\"";
         }
-        request += "], \"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + id + "\"}}}}}";
+        request += "], \"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
         //System.out.println(request);
 
         String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + IndexProperties.getTeisIndexName() + "/_search";

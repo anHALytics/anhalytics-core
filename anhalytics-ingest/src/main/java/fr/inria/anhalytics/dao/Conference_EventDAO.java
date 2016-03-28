@@ -15,7 +15,7 @@ import java.sql.Statement;
  *
  * @author azhar
  */
-public class Conference_EventDAO extends DAO<Conference_Event> {
+public class Conference_EventDAO extends DAO<Conference_Event, Long> {
 
     private static final String SQL_INSERT
             = "INSERT INTO CONFERENCE_EVENT (conferenceID, addressID, start_date, end_date, monographID) VALUES (?, ?, ?, ?, ?)";

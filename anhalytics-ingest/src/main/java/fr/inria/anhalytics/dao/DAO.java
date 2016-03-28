@@ -3,7 +3,7 @@ package fr.inria.anhalytics.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public abstract class DAO<T> {
+public abstract class DAO<E, T> {
 
     protected Connection connect = null;
 
@@ -15,23 +15,23 @@ public abstract class DAO<T> {
      * @param obj
      * @return boolean
      */
-    public abstract boolean create(T obj) throws SQLException ;
+    public abstract boolean create(E obj) throws SQLException ;
 
     /**
      * @param obj
      * @return boolean
      */
-    public abstract boolean delete(T obj) throws SQLException;
+    public abstract boolean delete(E obj) throws SQLException;
 
     /**
      * @param obj
      * @return boolean
      */
-    public abstract boolean update(T obj) throws SQLException;
+    public abstract boolean update(E obj) throws SQLException;
 
     /**
      * @param id
      * @return T
      */
-    public abstract T find(Long id) throws SQLException;
+    public abstract E find(T id) throws SQLException;
 }

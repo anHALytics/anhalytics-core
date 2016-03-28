@@ -26,12 +26,14 @@ abstract class GrobidWorker implements Runnable {
     protected MongoFileManager mm;
     protected String date;
     protected String id;
+    protected String anhalyticsId;
 
-    public GrobidWorker(InputStream content, String id, String date) throws UnknownHostException {
+    public GrobidWorker(InputStream content, String id, String anhalyticsId, String date) throws UnknownHostException {
         this.content = content;
         this.mm = MongoFileManager.getInstance(false);
         this.date = date;
-        this.id = mm.getCurrentRepositoryDocId();
+        this.id = id;
+        this.anhalyticsId = anhalyticsId;
     }
 
     @Override

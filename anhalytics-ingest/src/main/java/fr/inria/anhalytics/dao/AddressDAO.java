@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author azhar
  */
-public class AddressDAO extends DAO<Address> {
+public class AddressDAO extends DAO<Address, Long> {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AddressDAO.class);
 

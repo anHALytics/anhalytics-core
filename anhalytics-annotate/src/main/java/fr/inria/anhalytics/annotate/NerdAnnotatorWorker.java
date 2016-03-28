@@ -5,7 +5,6 @@ import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
-import java.util.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -32,10 +31,10 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
 
     public NerdAnnotatorWorker(MongoFileManager mongoManager,
             String documentId,
-            String docId,
+            String anhalyticsId,
             String tei,
             String date) {
-        super(mongoManager, documentId, docId, date, MongoCollectionsInterface.NERD_ANNOTATIONS);
+        super(mongoManager, documentId, anhalyticsId, date, MongoCollectionsInterface.NERD_ANNOTATIONS);
         this.tei = tei;
     }
 
@@ -79,7 +78,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
             }
         }*/
         // get all the elements having an attribute id and annotate their text content
-        mm.insertAnnotation(annotateDocument(docTei, documentId, docId), annotationsCollection);
+        mm.insertAnnotation(annotateDocument(docTei, documentId, anhalyticsId), annotationsCollection);
         logger.debug("\t\t " + documentId + " annotated by the NERD service.");
     }
 
@@ -90,7 +89,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
             String documentId, String docId) {
         StringBuffer json = new StringBuffer();
         json.append("{ \"repositoryDocId\" : \"" + documentId
-                +"\",\"docId\" : \"" + docId
+                +"\",\"anhalyticsId\" : \"" + anhalyticsId
                 +"\", \"date\" :\"" + date
                 +"\", \"nerd\" : [");
         annotateNode(doc.getDocumentElement(), true, json);

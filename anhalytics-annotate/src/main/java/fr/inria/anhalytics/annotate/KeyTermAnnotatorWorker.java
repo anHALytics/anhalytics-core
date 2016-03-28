@@ -32,10 +32,10 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
 
     public KeyTermAnnotatorWorker(MongoFileManager mongoManager,
             String documentId,
-            String docId,
+            String anhalyticsId,
             String tei,
             String date) {
-        super(mongoManager, documentId, docId, date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
+        super(mongoManager, documentId, anhalyticsId, date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
         this.tei = tei;
     }
 
@@ -66,7 +66,7 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
             }
         }*/
 
-        mm.insertAnnotation(annotateDocument(tei, documentId, docId), annotationsCollection);
+        mm.insertAnnotation(annotateDocument(tei, documentId, anhalyticsId), annotationsCollection);
         logger.debug("\t\t " + documentId + " annotated by the KeyTerm extraction and disambiguation service.");
     }
 
@@ -77,7 +77,7 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
             String documentId, String docId) {
         StringBuffer json = new StringBuffer();
         json.append("{ \"repositoryDocId\" : \"" + documentId
-                +"\",\"docId\" : \"" + docId
+                +"\",\"anhalyticsId\" : \"" + anhalyticsId
                 +"\", \"date\" :\"" + date
                 +"\", \"keyterm\" : ");
         String jsonText = null;

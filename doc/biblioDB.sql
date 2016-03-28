@@ -128,7 +128,7 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `anhalytics_biblio`.`DOCUMENT`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`DOCUMENT` (
-  `docID` INT(11) NOT NULL AUTO_INCREMENT,
+  `docID` VARCHAR(45) NOT NULL,
   `version` VARCHAR(45) NULL DEFAULT NULL,
   `TEImetadatas` LONGTEXT NULL DEFAULT NULL,
   `URI` VARCHAR(45) NULL DEFAULT NULL,
@@ -172,7 +172,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PUBLICATION` (
   `publicationID` INT(11) NOT NULL AUTO_INCREMENT,
-  `docID` INT(11) NULL DEFAULT NULL,
+  `docID` VARCHAR(45) NOT NULL,
   `monographID` INT(11) NULL DEFAULT NULL,
   `publisherID` INT(11) NULL DEFAULT NULL,
   `type` VARCHAR(45) NULL DEFAULT NULL COMMENT 'analytics\nmonograph',
@@ -183,7 +183,6 @@ CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PUBLICATION` (
   `end_page` VARCHAR(45) NULL DEFAULT NULL,
   `language` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`publicationID`),
-  INDEX `fk_PUBLICATION_DOCUMENT1_idx` (`docID` ASC),
   INDEX `fk_PUBLICATION_MONOGRAPH1_idx` (`monographID` ASC),
   INDEX `fk_PUBLICATION_PUBLISHER1_idx` (`publisherID` ASC),
   CONSTRAINT `fk_PUBLICATION_DOCUMENT1`

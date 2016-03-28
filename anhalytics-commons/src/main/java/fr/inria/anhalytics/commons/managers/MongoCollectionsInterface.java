@@ -9,6 +9,8 @@ public interface MongoCollectionsInterface {
 
     // PL note: could be changed to an enum class
 
+    // where anhalytics identifiers are generated
+    public static final String IDENTIFIERS = "identifiers";
     // mainly for grobid process to analyze extraction performance
     public static final String HARVEST_DIAGNOSTIC = "diagnostic";
     // files that can't be donwloaded and will be processed later

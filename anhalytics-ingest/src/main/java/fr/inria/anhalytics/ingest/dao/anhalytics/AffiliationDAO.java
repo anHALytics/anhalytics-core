@@ -22,14 +22,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author azhar
  */
-public class AffiliationDAO extends DAO<Affiliation> {
+public class AffiliationDAO extends DAO<Affiliation, Long> {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AffiliationDAO.class);
 
     private static final String SQL_INSERT
             = "INSERT INTO AFFILIATION (organisationID, personID, begin_date, end_date) VALUES (?, ?, ?, ?)";
-
-    private static final String SQL_SELECT_AFFILIATION_BY_PERSONID = "SELECT * FROM AFFILIATION WHERE personID = ?";
 
     private static final String SQL_SELECT_ORG_BY_ID = "SELECT org.organisationID, org.type, org.url , org.description, orgname.name FROM ORGANISATION org, ORGANISATION_NAME orgname WHERE org.organisationID = ? AND orgname.organisationID = ?";
 
@@ -105,38 +103,6 @@ public class AffiliationDAO extends DAO<Affiliation> {
         return affiliation;
     }
 
-    public List<Affiliation> getAffiliationByPersonID(Person person) {
-        List<Affiliation> affiliations = new ArrayList<Affiliation>();
-
-        Affiliation affiliation = null;
-        Organisation organisation = null;
-        try {
-            PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_AFFILIATION_BY_PERSONID);
-            ps.setLong(1, person.getPersonId());
-            // process the results
-            ResultSet rs = ps.executeQuery();
-            AbstractDAOFactory adf = AbstractDAOFactory.getFactory(AbstractDAOFactory.DAO_FACTORY);
-            OrganisationDAO odap = (OrganisationDAO) adf.getOrganisationDAO();
-            while (rs.next()) {
-                try {
-                    affiliation = new Affiliation(
-                            rs.getLong("affiliationID"),
-                            new ArrayList<Organisation>(),
-                            person,
-                            Utilities.parseStringDate(rs.getString("begin_date")),
-                            Utilities.parseStringDate(rs.getString("end_date"))
-                    );
-                } catch (ParseException ex) {
-                    Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                organisation = odap.find(rs.getLong("organisationID"));
-                affiliation.addOrganisation(organisation);
-                affiliations.add(affiliation);
-            }
-        } catch (SQLException ex) {
-            logger.error(ex.getMessage());
-        }
-        return affiliations;
-    }
+    
 
 }

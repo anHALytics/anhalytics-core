@@ -10,7 +10,6 @@ import fr.inria.anhalytics.dao.MonographDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.dao.PublicationDAO;
 import fr.inria.anhalytics.index.properties.IndexProperties;
-import fr.inria.anhalytics.ingest.dao.anhalytics.AffiliationDAO;
 import fr.inria.anhalytics.ingest.dao.anhalytics.DAOFactory;
 import fr.inria.anhalytics.ingest.dao.anhalytics.OrganisationDAO;
 import fr.inria.anhalytics.ingest.dao.biblio.AbstractBiblioDAOFactory;
@@ -67,14 +66,13 @@ public class MetadataIndexer {
 
     public void indexAuthors() {
         PersonDAO pdao = (PersonDAO) adf.getPersonDAO();
-        AffiliationDAO afdao = (AffiliationDAO) adf.getAffiliationDAO();
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
         AddressDAO adao = (AddressDAO) adf.getAddressDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
         List<Person> persons = pdao.findAllAuthors();
         for (Person person : persons) {
             Map<String, Object> jsonDocument = person.getPersonDocument();
-            List<Affiliation> affs = afdao.getAffiliationByPersonID(person);
+            List<Affiliation> affs = odao.getAffiliationByPersonID(person);
             List<Map<String, Object>> organisations = new ArrayList<Map<String, Object>>();
             for (Affiliation aff : affs) {
 
@@ -90,7 +88,7 @@ public class MetadataIndexer {
                 orgDocument.put("address", orgAddress);
                 organisations.add(orgDocument);
             }
-            jsonDocument.put("publications", pdao.getDocIdsOfAuthor(person.getPersonId()));
+            jsonDocument.put("publications", ddao.getDocumentsByAuthorId(person.getPersonId()));
             jsonDocument.put("affiliations", organisations);
             client.prepareIndex(IndexProperties.getMetadataIndexName(), "authors", "" + person.getPersonId())
                     .setSource(jsonDocument).execute().actionGet();
@@ -128,7 +126,7 @@ public class MetadataIndexer {
 
             //document_organisation
             //biblioadf  references
-            Document docRef = biblioddao.findByURI(doc.getUri());
+            Document docRef = biblioddao.find(doc.getDocID());
 
             List<Map<String, Object>> referencesPubDocument = new ArrayList<Map<String, Object>>();
             if (docRef != null) {

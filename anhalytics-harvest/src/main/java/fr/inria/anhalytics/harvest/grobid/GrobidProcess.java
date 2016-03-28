@@ -42,6 +42,7 @@ public class GrobidProcess {
                             InputStream content = mm.nextBinaryDocument();
                             String id = mm.getCurrentRepositoryDocId();
                             String type = mm.getCurrentDocType();
+                            String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
                             if (toBeGrobidified.contains(type)) {
                                 if (!HarvestProperties.isReset()) {
                                     if (mm.isGrobidified(id)) {
@@ -49,7 +50,7 @@ public class GrobidProcess {
                                     }
                                 }
                                 try {
-                                    Runnable worker = new GrobidSimpleFulltextWorker(content, id, date);
+                                    Runnable worker = new GrobidSimpleFulltextWorker(content, id, currentAnhalyticsId, date);
                                     executor.execute(worker);
                                 } catch (final Exception exp) {
                                     logger.error("An error occured while processing the file " + id
@@ -78,10 +79,11 @@ public class GrobidProcess {
                 if (mm.initAnnexes(date)) {
                     while (mm.hasMoreBinaryDocuments()) {
                         InputStream content = mm.nextBinaryDocument();
+                        String anhalyticsId = mm.getCurrentAnhalyticsId();
                         if (mm.getCurrentFileType().contains(".pdf")) {
                             String id = mm.getCurrentRepositoryDocId();
                             try {
-                                Runnable worker = new GrobidAnnexWorker(content, id, date);
+                                Runnable worker = new GrobidAnnexWorker(content, id, anhalyticsId, date);
                                 executor.execute(worker);
                             } catch (final Exception exp) {
                                 logger.error("An error occured while processing the file " + id
@@ -106,6 +108,7 @@ public class GrobidProcess {
                     while (mm.hasMoreBinaryDocuments()) {
                         String filename = mm.nextAsset();
                         String currentRepositoryId = mm.getCurrentRepositoryDocId();
+                        String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
                         System.out.println(currentRepositoryId);
                         String tei = mm.findGrobidTeiById(currentRepositoryId);
                         InputStream teiStream = new ByteArrayInputStream(tei.getBytes());

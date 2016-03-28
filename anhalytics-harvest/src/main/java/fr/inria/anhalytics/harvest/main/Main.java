@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Main class that implements commands for harvesting, extracting, inserting in
@@ -79,13 +78,13 @@ public class Main {
         } else if (process.equals("generateTeiDaily")) {
             Utilities.updateDates(todayDate, todayDate);
             tb.buildTei();
-        }else if (process.equals("processGrobid")) {
+        } else if (process.equals("processGrobid")) {
             gp.processFulltexts();
         } else if (process.equals("processGrobidDaily")) {
             Utilities.updateDates(todayDate, todayDate);
             gp.processFulltexts();
         } else if (process.equals("appendGrobidFulltext")) {
-                tb.appendGrobidFulltext();
+            tb.appendGrobidFulltext();
         } else if (process.equals("appendGrobidFulltextDaily")) {
             Utilities.updateDates(todayDate, todayDate);
             tb.appendGrobidFulltext();
@@ -93,7 +92,7 @@ public class Main {
             oai.fetchEmbargoPublications();
         } else if (process.equals("harvestIstex")) {
             ih.harvest();
-        }else if (process.equals("assetLegend")) {
+        } else if (process.equals("assetLegend")) {
             gp.addAssetsLegend();
         }
         return;

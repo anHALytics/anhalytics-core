@@ -38,30 +38,27 @@ public class IndexingPreprocess {
     /**
      * Format jsonStr to fit with ES structure.
      */
-    public String process(String jsonStr, String repositoryDocId, String id) throws Exception {
+    public String process(String jsonStr, String repositoryDocId, String anhalyticsId) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonRoot = mapper.readTree(jsonStr);
         // root node is the TEI node, we add as a child the "light" annotations in a 
         // standoff element
-                ((ObjectNode) jsonRoot).put("repositoryDocId", repositoryDocId);
-        if (id != null) {
-            JsonNode teiRoot = jsonRoot.findPath("$teiCorpus");
-            JsonNode tei = jsonRoot.findPath("$TEI");
-            //check if fulltext is there..
-            if (tei.isNull()) {
-                System.out.println(tei.toString());
-                return null;
-            }
-            if ((teiRoot != null) && (!teiRoot.isMissingNode())) {
-                JsonNode standoffNode = getStandoff(mapper, id);
-                ((ArrayNode) teiRoot).add(standoffNode);
-                
-                
-            }
+        ((ObjectNode) jsonRoot).put("repositoryDocId", repositoryDocId);
+        JsonNode teiRoot = jsonRoot.findPath("$teiCorpus");
+        JsonNode tei = jsonRoot.findPath("$TEI");
+        //check if fulltext is there..
+        if (tei.isNull()) {
+            System.out.println(tei.toString());
+            return null;
+        }
+        if ((teiRoot != null) && (!teiRoot.isMissingNode())) {
+            JsonNode standoffNode = getStandoff(mapper, anhalyticsId);
+            ((ArrayNode) teiRoot).add(standoffNode);
+
         }
 
         // here recursive modification of the json document via Jackson
-        jsonRoot = process(jsonRoot, mapper, null, false, false, false, id);
+        jsonRoot = process(jsonRoot, mapper, null, false, false, false, anhalyticsId);
 
         if (!filterDocuments(jsonRoot)) {
             return null;
@@ -82,7 +79,7 @@ public class IndexingPreprocess {
             boolean fromArray,
             boolean expandLang,
             boolean isDate,
-            String id) throws Exception {
+            String anhalyticsId) throws Exception {
         if (subJson.isContainerNode()) {
             if (subJson.isObject()) {
                 Iterator<String> fields = ((ObjectNode) subJson).getFieldNames();
@@ -213,10 +210,10 @@ public class IndexingPreprocess {
                 if ((theSchemeNode != null) && (theClassCodeNode != null)) {
                     JsonNode schemeNode = mapper.createObjectNode();
                     ((ObjectNode) schemeNode).put("$scheme_" + theSchemeNode.getTextValue(),
-                            process(theClassCodeNode, mapper, currentLang, false, expandLang, false, id));
+                            process(theClassCodeNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
                     if (theNNode != null) {
                         ((ObjectNode) schemeNode).put("$scheme_" + theSchemeNode.getTextValue() + "_abbrev",
-                                process(theNNode, mapper, currentLang, false, expandLang, false, id));
+                                process(theNNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
                     }
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(schemeNode);
@@ -225,7 +222,7 @@ public class IndexingPreprocess {
                 } else if ((theTypeNode != null) && (thePersonNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(thePersonNode, mapper, currentLang, false, expandLang, false, id));
+                            process(thePersonNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$person", arrayNode); // update value
@@ -233,7 +230,7 @@ public class IndexingPreprocess {
                 } else if ((theTypeNode != null) && (theItemNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(theItemNode, mapper, currentLang, false, expandLang, false, id));
+                            process(theItemNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$item", arrayNode); // update value
@@ -241,7 +238,7 @@ public class IndexingPreprocess {
                 } else if ((theTypeNode != null) && (theKeywordsNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(theKeywordsNode, mapper, currentLang, false, expandLang, false, id));
+                            process(theKeywordsNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$keywords", arrayNode); // update value
@@ -249,7 +246,7 @@ public class IndexingPreprocess {
                 } else if ((theTypeNode != null) && (theKeywordsNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(theKeywordsNode, mapper, currentLang, false, expandLang, false, id));
+                            process(theKeywordsNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$keywords", arrayNode); // update value
@@ -257,7 +254,7 @@ public class IndexingPreprocess {
                 } else if ((theTypeNode != null) && (divNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(divNode, mapper, currentLang, false, expandLang, false, id));
+                            process(divNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$div", arrayNode); // update value
@@ -266,7 +263,7 @@ public class IndexingPreprocess {
                     // we need to set a default "author" type 
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_author",
-                            process(theDepositorKeywordsNode, mapper, currentLang, false, expandLang, false, id));
+                            process(theDepositorKeywordsNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$keywords", arrayNode); // update value
@@ -274,7 +271,7 @@ public class IndexingPreprocess {
                 } else if ((theTypeNode != null) && (theIdnoNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(theIdnoNode, mapper, currentLang, false, expandLang, false, id));
+                            process(theIdnoNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$idno", arrayNode); // update value
@@ -282,7 +279,7 @@ public class IndexingPreprocess {
                 } else if ((theTypeNode != null) && (theDateNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(theDateNode, mapper, currentLang, false, expandLang, false, id));
+                            process(theDateNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$date", arrayNode); // update value
@@ -290,7 +287,7 @@ public class IndexingPreprocess {
                 } else if ((theUnitNode != null) && (theBiblScopeNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$unit_" + theUnitNode.getTextValue(),
-                            process(theBiblScopeNode, mapper, currentLang, false, expandLang, false, id));
+                            process(theBiblScopeNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$biblScope", arrayNode); // update value
@@ -303,7 +300,7 @@ public class IndexingPreprocess {
                 Iterator<JsonNode> ite = subJson.getElements();
                 while (ite.hasNext()) {
                     JsonNode temp = ite.next();
-                    ((ArrayNode) newNode).add(process(temp, mapper, currentLang, true, expandLang, isDate, id));
+                    ((ArrayNode) newNode).add(process(temp, mapper, currentLang, true, expandLang, isDate, anhalyticsId));
                 }
             } else if (subJson.isObject()) {
                 newNode = mapper.createObjectNode();
@@ -312,10 +309,10 @@ public class IndexingPreprocess {
                     String field = fields.next();
                     if (field.equals("$date") || field.equals("when")) {
                         ((ObjectNode) newNode).put(field, process(subJson.path(field), mapper,
-                                currentLang, false, expandLang, true, id));
+                                currentLang, false, expandLang, true, anhalyticsId));
                     } else {
                         ((ObjectNode) newNode).put(field, process(subJson.path(field), mapper,
-                                currentLang, false, expandLang, false, id));
+                                currentLang, false, expandLang, false, anhalyticsId));
                     }
                 }
             }
@@ -365,9 +362,9 @@ public class IndexingPreprocess {
         }
     }
 
-    private JsonNode getStandoff(ObjectMapper mapper, String id) throws Exception {
+    private JsonNode getStandoff(ObjectMapper mapper, String anhalyticsId) throws Exception {
         JsonNode standoffNode = null;
-        String annotation = mm.getAnnotations(id, MongoCollectionsInterface.NERD_ANNOTATIONS);
+        String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.NERD_ANNOTATIONS);
         if ((annotation != null) && (annotation.trim().length() > 0)) {
             JsonNode jsonAnnotation = mapper.readTree(annotation);
             Iterator<JsonNode> iter0 = jsonAnnotation.getElements();

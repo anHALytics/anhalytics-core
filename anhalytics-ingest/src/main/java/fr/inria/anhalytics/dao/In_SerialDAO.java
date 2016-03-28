@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  *
  * @author azhar
  */
-public class In_SerialDAO extends DAO<In_Serial> {
+public class In_SerialDAO extends DAO<In_Serial, Long> {
 
     private static final String SQL_INSERT
             = "INSERT INTO IN_SERIAL (monographID, collectionID, journalID, volume, number) VALUES (?, ?, ?, ?, ?)";

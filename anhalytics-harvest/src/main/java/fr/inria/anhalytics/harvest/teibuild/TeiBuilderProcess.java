@@ -34,13 +34,14 @@ public class TeiBuilderProcess {
                     String metadataTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
                     String type = mm.getCurrentDocType();
+                    String anhalyticsId = mm.getCurrentAnhalyticsId();
                     Document generatedTeiDoc = null;
                     try {
                         logger.info("\t Building tei for: " + uri);
                         InputStream metadataTeiStream = new ByteArrayInputStream(metadataTeiString.getBytes());
                         generatedTeiDoc = TeiBuilder.createTEICorpus(metadataTeiStream);
                         metadataTeiStream.close();
-                        mm.insertTei(Utilities.toString(generatedTeiDoc), uri, type, null, date);
+                        mm.insertTei(Utilities.toString(generatedTeiDoc), uri, type, anhalyticsId, date);
                     } catch (Exception xpe) {
                         xpe.printStackTrace();
                     }
@@ -70,7 +71,7 @@ public class TeiBuilderProcess {
                             generatedTeiDoc = TeiBuilder.addGrobidTeiToTei(finalTei, grobidTeiString);
                             if (generatedTeiDoc != null) {
                                 String generatedTeiString = Utilities.toString(generatedTeiDoc);
-                                mm.updateTei(generatedTeiString, id, null,true);
+                                mm.updateTei(generatedTeiString, id, true);
                             }
                         }
                     }

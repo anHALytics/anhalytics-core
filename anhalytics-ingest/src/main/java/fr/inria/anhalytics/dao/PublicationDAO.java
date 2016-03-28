@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author azhar
  */
-public class PublicationDAO extends DAO<Publication> {
+public class PublicationDAO extends DAO<Publication, Long> {
     
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PublicationDAO.class);
 
@@ -52,7 +52,7 @@ public class PublicationDAO extends DAO<Publication> {
 
         PreparedStatement statement;
         statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-        statement.setLong(1, obj.getDocument().getDocID());
+        statement.setString(1, obj.getDocument().getDocID());
         statement.setLong(2, obj.getMonograph().getMonographID());
         if (obj.getPublisher().getPublisherID() == null) {
             statement.setNull(3, java.sql.Types.INTEGER);
@@ -111,7 +111,7 @@ public class PublicationDAO extends DAO<Publication> {
             try {
                 publication = new Publication(
                         publication_id,
-                        new Document(rs.getLong("docID"), rs.getString("version"), rs.getString("TEImetadatas"), rs.getString("URI")),
+                        new Document(rs.getString("docID"), rs.getString("version"), rs.getString("TEImetadatas"), rs.getString("URI")),
                         new Monograph(rs.getLong("monographID"), rs.getString("monograph.type"), rs.getString("title"), rs.getString("shortname")),
                         new Publisher(rs.getLong("publisherID"), rs.getString("name")),
                         rs.getString("publication.type"),
@@ -129,12 +129,12 @@ public class PublicationDAO extends DAO<Publication> {
         return publication;
     }
 
-    public List<Publication> findByDocId(Long doc_id) {
+    public List<Publication> findByDocId(String doc_id) {
         List<Publication> publications = new ArrayList<Publication>();
         try{
         PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_BY_DOCID);
-        preparedStatement.setLong(1, doc_id);
-        preparedStatement.setLong(2, doc_id);
+        preparedStatement.setString(1, doc_id);
+        preparedStatement.setString(2, doc_id);
         ResultSet rs = preparedStatement.executeQuery();
         while (rs.next()) {
             try {

@@ -116,7 +116,7 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `anhalytics`.`DOCUMENT`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics`.`DOCUMENT` (
-  `docID` INT(11) NOT NULL AUTO_INCREMENT,
+  `docID` VARCHAR(45) NOT NULL,
   `version` VARCHAR(45) NULL DEFAULT NULL,
   `TEImetadatas` LONGTEXT NULL DEFAULT NULL,
   `URI` VARCHAR(45) NULL DEFAULT NULL,
@@ -131,12 +131,11 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `anhalytics`.`AUTHOR`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics`.`AUTHOR` (
-  `docID` INT(11) NOT NULL DEFAULT '0',
+  `docID` VARCHAR(45) NOT NULL,
   `personID` INT(11) NOT NULL DEFAULT '0',
   `rank` INT(11) NULL DEFAULT NULL,
   `corresp` TINYINT(1) NULL DEFAULT NULL,
   PRIMARY KEY (`docID`, `personID`),
-  INDEX `fk_authorShip_document1_idx` (`docID` ASC),
   INDEX `fk_authorShip_person1_idx` (`personID` ASC),
   CONSTRAINT `fk_authorShip_document1`
     FOREIGN KEY (`docID`)
@@ -229,11 +228,10 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics`.`DOCUMENT_IDENTIFIER` (
   `document_identifierID` INT(11) NOT NULL AUTO_INCREMENT,
-  `docID` INT(11) NOT NULL,
+  `docID` VARCHAR(45) NOT NULL,
   `ID` VARCHAR(150) NULL DEFAULT NULL,
   `Type` VARCHAR(55) NULL DEFAULT NULL,
   PRIMARY KEY (`document_identifierID`),
-  INDEX `fk_IDENTIFIERS_DOCUMENT1_idx` (`docID` ASC),
   CONSTRAINT `fk_IDENTIFIERS_DOCUMENT1`
     FOREIGN KEY (`docID`)
     REFERENCES `anhalytics`.`DOCUMENT` (`docID`)
@@ -249,10 +247,9 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics`.`DOCUMENT_ORGANISATION` (
   `type` ENUM('institution','department','laboratory','researchteam') NULL DEFAULT NULL,
-  `docID` INT(11) NOT NULL DEFAULT '0',
+  `docID` VARCHAR(45) NOT NULL,
   `organisationID` INT(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`organisationID`, `docID`),
-  INDEX `fk_DOC_structure_document1_idx` (`docID` ASC),
   INDEX `fk_DOC_structure_structure1_idx` (`organisationID` ASC),
   CONSTRAINT `fk_DOC_structure_document1`
     FOREIGN KEY (`docID`)
@@ -295,7 +292,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics`.`PUBLICATION` (
   `publicationID` INT(11) NOT NULL AUTO_INCREMENT,
-  `docID` INT(11) NULL DEFAULT NULL,
+  `docID` VARCHAR(45) NOT NULL,
   `monographID` INT(11) NULL DEFAULT NULL,
   `publisherID` INT(11) NULL DEFAULT NULL,
   `type` VARCHAR(45) NULL DEFAULT NULL COMMENT 'analytics\nmonograph',
@@ -307,7 +304,6 @@ CREATE TABLE IF NOT EXISTS `anhalytics`.`PUBLICATION` (
   `language` VARCHAR(45) NULL DEFAULT NULL,
   `domain` VARCHAR(150) NULL DEFAULT NULL,
   PRIMARY KEY (`publicationID`),
-  INDEX `fk_PUBLICATION_DOCUMENT1_idx` (`docID` ASC),
   INDEX `fk_PUBLICATION_MONOGRAPH1_idx` (`monographID` ASC),
   INDEX `fk_PUBLICATION_PUBLISHER1_idx` (`publisherID` ASC),
   CONSTRAINT `fk_PUBLICATION_DOCUMENT1`
@@ -558,8 +554,8 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `anhalytics`.`REFERENCE`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics`.`REFERENCE` (
-  `citingDocID` INT(11) NOT NULL DEFAULT '0',
-  `citedDocID` INT(11) NOT NULL DEFAULT '0',
+  `citingDocID` VARCHAR(45) NOT NULL,
+  `citedDocID` VARCHAR(45) NOT NULL,
   `citation_text` BLOB NULL DEFAULT NULL,
   PRIMARY KEY (`citingDocID`, `citedDocID`),
   INDEX `fk_DOCUMENT_has_DOCUMENT_DOCUMENT2_idx` (`citedDocID` ASC),

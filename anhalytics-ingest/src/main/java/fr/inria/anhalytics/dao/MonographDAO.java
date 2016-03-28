@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  *
  * @author azhar
  */
-public class MonographDAO extends DAO<Monograph> {
+public class MonographDAO extends DAO<Monograph, Long> {
     
      private static final String SQL_INSERT
             = "INSERT INTO MONOGRAPH (type, title, shortname) VALUES (?, ?, ?)";

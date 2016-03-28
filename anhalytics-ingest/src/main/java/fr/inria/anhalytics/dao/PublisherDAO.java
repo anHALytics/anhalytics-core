@@ -11,7 +11,7 @@ import java.sql.Statement;
  *
  * @author azhar
  */
-public class PublisherDAO extends DAO<Publisher> {
+public class PublisherDAO extends DAO<Publisher, Long> {
 
     private static final String SQL_INSERT
             = "INSERT INTO PUBLISHER (name) VALUES (?)";

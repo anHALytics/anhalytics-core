@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  *
  * @author azhar
  */
-public class Document_IdentifierDAO extends DAO<Document_Identifier> {
+public class Document_IdentifierDAO extends DAO<Document_Identifier, Long> {
 
     private static final String SQL_INSERT
             = "INSERT INTO DOCUMENT_IDENTIFIER (docID, ID, Type) VALUES (?, ?, ?)";
@@ -33,7 +33,7 @@ public class Document_IdentifierDAO extends DAO<Document_Identifier> {
 
         PreparedStatement statement;
         statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-        statement.setLong(1, obj.getDoc().getDocID());
+        statement.setString(1, obj.getDoc().getDocID());
         statement.setString(2, obj.getId());
         statement.setString(3, obj.getType());
         int code = statement.executeUpdate();
