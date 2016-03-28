@@ -39,7 +39,7 @@ public class NerdService {
     public String runNerd() {
         StringBuffer output = new StringBuffer();
         try {
-            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + AnnotateProperties.getNerdPort() + "/nerd/service/" + REQUEST);
+            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + AnnotateProperties.getNerdPort() + "/service/" + REQUEST);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
@@ -90,11 +90,13 @@ public class NerdService {
         HttpURLConnection conn = null;
         try {
             URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + 
-				AnnotateProperties.getNerdPort() + "/nerd/service/isalive");
+				AnnotateProperties.getNerdPort() + "/service/isalive");
             conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("GET");
             responseCode = conn.getResponseCode();
+            System.out.println(url.getHost());
+            System.out.println(responseCode);
         } catch (Exception e) {
             throw new UnreachableNerdServiceException("NERD service is not reachable, check host and port parameters.");
         }
