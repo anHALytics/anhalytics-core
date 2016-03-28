@@ -88,7 +88,11 @@ public class MetadataIndexer {
                 orgDocument.put("address", orgAddress);
                 organisations.add(orgDocument);
             }
-            jsonDocument.put("publications", ddao.getDocumentsByAuthorId(person.getPersonId()));
+            List<Map<String, Object>> publications = new ArrayList<Map<String, Object>>();
+            for (Document doc : ddao.getDocumentsByAuthorId(person.getPersonId())) {
+                publications.add(doc.getDocumentDocument());
+            }
+            jsonDocument.put("publications", publications);
             jsonDocument.put("affiliations", organisations);
             client.prepareIndex(IndexProperties.getMetadataIndexName(), "authors", "" + person.getPersonId())
                     .setSource(jsonDocument).execute().actionGet();
@@ -131,7 +135,7 @@ public class MetadataIndexer {
             List<Map<String, Object>> referencesPubDocument = new ArrayList<Map<String, Object>>();
             if (docRef != null) {
                 List<Publication> referencesPub = bibliopubdao.findByDocId(docRef.getDocID());
-                
+
                 for (Publication referencePub : referencesPub) {
                     In_Serial in = bibliinsddao.find(referencePub.getMonograph().getMonographID());
                     Map<String, Object> referencePubDocument = referencePub.getPublicationDocument();
@@ -177,12 +181,11 @@ public class MetadataIndexer {
             organisationDocument.put("relations", orgRelationsDocument);
             List<Document> docs = ddao.getDocumentsByOrgId(org.getOrganisationId());
             List<Map<String, Object>> orgDocumentsDocument = new ArrayList<Map<String, Object>>();
-            for(Document doc:docs){
+            for (Document doc : docs) {
                 orgDocumentsDocument.add(doc.getDocumentDocument());
             }
             organisationDocument.put("publications", orgDocumentsDocument);
-            
-            
+
             List<Person> authors = pdao.getPersonsByOrgID(org.getOrganisationId());
             List<Map<String, Object>> authorsDocument = new ArrayList<Map<String, Object>>();
             for (Person author : authors) {
@@ -342,7 +345,7 @@ public class MetadataIndexer {
     }
 
     public void close() {
-        
+
         BiblioDAOFactory.closeConnection();
         DAOFactory.closeConnection();
         this.client.close();
