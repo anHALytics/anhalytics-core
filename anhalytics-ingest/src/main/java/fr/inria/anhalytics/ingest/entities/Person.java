@@ -221,6 +221,7 @@ public class Person {
         personDocument.put("email", this.getEmail());
         personDocument.put("title", this.getTitle());
         personDocument.put("photo", this.getPhoto());
+        personDocument.put("phone", this.getPhone());
         personDocument.put("url", this.getUrl());
         for (Person_Identifier pi : this.getPerson_identifiers()) {
             personIdentifierDocument.put(pi.getType(), pi.getId());
