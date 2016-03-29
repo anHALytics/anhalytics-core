@@ -77,6 +77,8 @@ public class Annotator {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
                             String anhalyticsId = mm.getCurrentAnhalyticsId();
+                            if(anhalyticsId.isEmpty())
+                                continue;
                             if (!mm.isWithFulltext(id)) {
                                 continue;
                             }
@@ -137,6 +139,8 @@ public class Annotator {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
                             String anhalyticsId = mm.getCurrentAnhalyticsId();
+                            if(anhalyticsId.isEmpty())
+                                continue;
                             if (!mm.isWithFulltext(id)) {
                                 continue;
                             }

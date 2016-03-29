@@ -87,6 +87,8 @@ public class HALMiner extends Miner {
                     String metadataTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
                     String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
+                    if(currentAnhalyticsId.isEmpty())
+                        continue;
                     if (!dd.isMined(currentAnhalyticsId)) {
                         adf.openTransaction();
                         Document generatedTeiDoc = null;

@@ -235,7 +235,8 @@ public class Indexer {
                         String tei = mm.nextTeiDocument();
                         String id = mm.getCurrentRepositoryDocId();
                         String anhalyticsId = mm.getCurrentAnhalyticsId();
-                        
+                        if(anhalyticsId.isEmpty())
+                                continue;
                         
                         if (!mm.isWithFulltext(id)) {
                             //No interest to index docs without fulltext.
@@ -302,6 +303,8 @@ public class Indexer {
                     while (mm.hasMoreAnnotations()) {
                         String json = mm.nextAnnotation();
                         String anhalyticsId = mm.getCurrentAnhalyticsId();
+                        if(anhalyticsId.isEmpty())
+                                continue;
                         // get the xml:id of the elements we want to index from the document
                         // we only index title, abstract and keyphrase annotations !
                         List<String> validIDs = validDocIDs(anhalyticsId, mapper);

@@ -36,6 +36,8 @@ public class TeiBuilderProcess {
                     String type = mm.getCurrentDocType();
                     String anhalyticsId = mm.getCurrentAnhalyticsId();
                     Document generatedTeiDoc = null;
+                    if(anhalyticsId.isEmpty())
+                        continue;
                     try {
                         logger.info("\t Building tei for: " + uri);
                         InputStream metadataTeiStream = new ByteArrayInputStream(metadataTeiString.getBytes());
@@ -61,6 +63,9 @@ public class TeiBuilderProcess {
                     String finalTei = null;
                     String grobidTeiString = mm.nextTeiDocument();
                     String id = mm.getCurrentRepositoryDocId();
+                    String anhalyticsId = mm.getCurrentAnhalyticsId();
+                    if(anhalyticsId.isEmpty())
+                        continue;
                     grobidTeiString = Utilities.trimEncodedCharaters(grobidTeiString);
 
                     if (!mm.isWithFulltext(id)) {

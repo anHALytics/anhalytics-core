@@ -75,6 +75,8 @@ public class GrobidMiner extends Miner {
                     String teiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
                     String anhalyticsId = mm.getCurrentAnhalyticsId();
+                    if(anhalyticsId.isEmpty())
+                        continue;
                     if (!mm.isWithFulltext(uri)) {
                         //No interest to index docs without fulltext.
                         continue;
