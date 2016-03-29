@@ -40,7 +40,7 @@ public class PersonDAO extends DAO<Person, Long> {
 
     private static final String READ_QUERY_EDITORS_BY_PUBID = "SELECT personID FROM EDITOR WHERE publicationID = ?";
     
-    private static final String SQL_SELECT_PERSON_BY_ORGID = "SELECT * FROM AFFILIATION WHERE organisationID = ?";
+    private static final String SQL_SELECT_PERSON_BY_ORGID = "SELECT DISTINCT personID FROM AFFILIATION WHERE organisationID = ?";
 
     private static final String READ_QUERY_PERSON_BY_ID
             = "SELECT p.title, p.phone ,p.photo, p.url, p.email, pn.fullname, pn.forename, pn.middlename, pn.surname, pi.person_identifierID, pi.ID, pi.Type FROM PERSON p, PERSON_NAME pn LEFT JOIN PERSON_IDENTIFIER AS pi ON pi.personID = ? WHERE p.personID = ? AND pn.personID = ?";
