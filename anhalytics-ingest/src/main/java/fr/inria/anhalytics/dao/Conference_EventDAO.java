@@ -93,7 +93,7 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
 
         ResultSet result = this.connect.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM monograph WHERE monographID = " + id);
+                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM MONOGRAPH WHERE monographID = " + id);
         if (result.first()) {
             conference_event = new Conference_Event(
                     id,

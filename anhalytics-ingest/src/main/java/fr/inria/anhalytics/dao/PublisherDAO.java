@@ -57,7 +57,7 @@ public class PublisherDAO extends DAO<Publisher, Long> {
 
         ResultSet result = this.connect.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM publisher WHERE publisherID = " + publisher_id);
+                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM PUBLISHER WHERE publisherID = " + publisher_id);
         if (result.first()) {
             publisher = new Publisher(
                     publisher_id,
@@ -71,7 +71,7 @@ public class PublisherDAO extends DAO<Publisher, Long> {
         Publisher publisher = null;
         ResultSet result = this.connect.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM publisher WHERE name = \"" + obj.getName() + "\"");
+                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM PUBLISHER WHERE name = \"" + obj.getName() + "\"");
         if (result.first()) {
             publisher = new Publisher(
                     result.getLong("publisherID"),

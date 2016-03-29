@@ -70,7 +70,7 @@ public class MonographDAO extends DAO<Monograph, Long> {
         try {
             ResultSet result = this.connect.createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM monograph WHERE monographID = " + monographID);
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM MONOGRAPH WHERE monographID = " + monographID);
             if (result.first()) {
                 monograph = new Monograph(
                         monographID,

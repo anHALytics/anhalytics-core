@@ -73,7 +73,7 @@ public class LocationDAO extends DAO<Location, Long> {
 
         ResultSet result = this.connect.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM location WHERE locationID = " + id);
+                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM LOCATION WHERE locationID = " + id);
         if (result.first()) {
             try {
                 location = new Location(

@@ -64,7 +64,7 @@ public class DocumentDAO extends DAO<Document, String> {
         try {
             ResultSet result = this.connect.createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM document WHERE docID = '" + doc_id + "'");
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM DOCUMENT WHERE docID = '" + doc_id + "'");
             if (result.first()) {
                 document = new Document(
                         doc_id,

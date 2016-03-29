@@ -86,7 +86,7 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
 
         ResultSet result = this.connect.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM affiliation WHERE affiliationID = " + id);
+                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM AFFILIATION WHERE affiliationID = " + id);
         if (result.first()) {
             try {
                 affiliation = new Affiliation(

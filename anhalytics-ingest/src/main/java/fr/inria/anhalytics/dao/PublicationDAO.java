@@ -29,10 +29,10 @@ public class PublicationDAO extends DAO<Publication, Long> {
             = "INSERT INTO PUBLICATION (docID, monographID, publisherID, type, doc_title, date_printed, date_electronic, start_page, end_page, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_SELECT
-            = "SELECT * FROM document ,monograph ,publisher, publication WHERE publicationID = ? AND document.docID = publication.docID AND monograph.monographID = publication.monographID AND publisher.publisherID = publication.publisherID";
+            = "SELECT * FROM DOCUMENT ,MONOGRAPH ,PUBLISHER, PUBLICATION WHERE publicationID = ? AND DOCUMENT.docID = PUBLICATION.docID AND MONOGRAPH.monographID = PUBLICATION.monographID AND PUBLISHER.publisherID = PUBLICATION.publisherID";
 
     private static final String SQL_SELECT_BY_DOCID
-            = "SELECT * FROM document, publication LEFT JOIN publisher ON publisher.publisherID = publication.publisherID LEFT JOIN monograph  ON monograph.monographID = publication.monographID WHERE publication.docID = ? AND document.docID = ?";
+            = "SELECT * FROM DOCUMENT, PUBLICATION LEFT JOIN PUBLISHER ON PUBLISHER.publisherID = PUBLICATION.publisherID LEFT JOIN MONOGRAPH  ON MONOGRAPH.monographID = PUBLICATION.monographID WHERE PUBLICATION.docID = ? AND DOCUMENT.docID = ?";
 
     private static final String SQL_UPDATE
             = "UPDATE PUBLICATION SET type = ? ,doc_title = ? ,date_printed = ?,date_electronic = ?,start_page = ?,end_page = ? WHERE publicationID = ?";
@@ -112,9 +112,9 @@ public class PublicationDAO extends DAO<Publication, Long> {
                 publication = new Publication(
                         publication_id,
                         new Document(rs.getString("docID"), rs.getString("version"), rs.getString("TEImetadatas"), rs.getString("URI")),
-                        new Monograph(rs.getLong("monographID"), rs.getString("monograph.type"), rs.getString("title"), rs.getString("shortname")),
+                        new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
                         new Publisher(rs.getLong("publisherID"), rs.getString("name")),
-                        rs.getString("publication.type"),
+                        rs.getString("PUBLICATION.type"),
                         rs.getString("doc_title"),
                         Utilities.parseStringDate(rs.getString("date_printed")),
                         rs.getString("date_eletronic"),
@@ -139,11 +139,11 @@ public class PublicationDAO extends DAO<Publication, Long> {
         while (rs.next()) {
             try {
                 publications.add(new Publication(
-                        rs.getLong("publication.publicationID"),
+                        rs.getLong("PUBLICATION.publicationID"),
                         new Document(doc_id, rs.getString("version"), rs.getString("TEImetadatas"), rs.getString("URI")),
-                        new Monograph(rs.getLong("monographID"), rs.getString("monograph.type"), rs.getString("title"), rs.getString("shortname")),
+                        new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
                         new Publisher(rs.getLong("publisherID"), rs.getString("name")),
-                        rs.getString("publication.type"),
+                        rs.getString("PUBLICATION.type"),
                         rs.getString("doc_title"),
                         Utilities.parseStringDate(rs.getString("date_printed")),
                         rs.getString("date_electronic"),
