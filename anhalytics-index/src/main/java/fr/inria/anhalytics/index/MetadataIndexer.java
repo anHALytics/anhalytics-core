@@ -107,6 +107,7 @@ public class MetadataIndexer {
         DocumentDAO biblioddao = (DocumentDAO) biblioadf.getDocumentDAO();
         In_SerialDAO bibliinsddao = (In_SerialDAO) biblioadf.getIn_SerialDAO();
         PersonDAO pdao = (PersonDAO) adf.getPersonDAO();
+        PersonDAO bibliopdao = (PersonDAO) biblioadf.getPersonDAO();
         MonographDAO mdao = (MonographDAO) adf.getMonographDAO();
         List<Document> documents = ddao.findAllDocuments();
         for (Document doc : documents) {
@@ -143,6 +144,12 @@ public class MetadataIndexer {
                     referencePubDocument.put("collection", in.getC().getCollectionDocument());
                     referencePubDocument.put("issue", in.getIssue());
                     referencePubDocument.put("volume", in.getVolume());
+                    List<Person> referenceAuthors = bibliopdao.getEditorsByPubId(referencePub.getPublicationID());
+                    List<Map<String, Object>> referenceAuthorsDocument = new ArrayList<Map<String, Object>>();
+                    for (Person author : referenceAuthors) {
+                        referenceAuthorsDocument.add(author.getPersonDocument());
+                    }
+                    referencePubDocument.put("authors", referenceAuthorsDocument);
                     referencesPubDocument.add(referencePubDocument);
                 }
             }
