@@ -4,6 +4,7 @@ import fr.inria.anhalytics.commons.exceptions.ElasticSearchConfigurationExceptio
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.AddressDAO;
+import fr.inria.anhalytics.dao.Conference_EventDAO;
 import fr.inria.anhalytics.dao.DocumentDAO;
 import fr.inria.anhalytics.dao.In_SerialDAO;
 import fr.inria.anhalytics.dao.MonographDAO;
@@ -16,6 +17,7 @@ import fr.inria.anhalytics.ingest.dao.biblio.AbstractBiblioDAOFactory;
 import fr.inria.anhalytics.ingest.dao.biblio.BiblioDAOFactory;
 import fr.inria.anhalytics.ingest.entities.Address;
 import fr.inria.anhalytics.ingest.entities.Affiliation;
+import fr.inria.anhalytics.ingest.entities.Conference_Event;
 import fr.inria.anhalytics.ingest.entities.Document;
 import fr.inria.anhalytics.ingest.entities.In_Serial;
 import fr.inria.anhalytics.ingest.entities.Organisation;
@@ -29,6 +31,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -109,6 +112,7 @@ public class MetadataIndexer {
         PersonDAO pdao = (PersonDAO) adf.getPersonDAO();
         PersonDAO bibliopdao = (PersonDAO) biblioadf.getPersonDAO();
         MonographDAO mdao = (MonographDAO) adf.getMonographDAO();
+        Conference_EventDAO ced = (Conference_EventDAO) adf.getConference_EventDAO();
         List<Document> documents = ddao.findAllDocuments();
         for (Document doc : documents) {
             Map<String, Object> documentDocument = doc.getDocumentDocument();
@@ -120,8 +124,14 @@ public class MetadataIndexer {
             }
             documentDocument.put("authors", authorsDocument);
             List<Publication> pubs = pubdao.findByDocId(doc.getDocID());
-            documentDocument.put("publication", pubs.get(0).getPublicationDocument());
-
+            Map<String, Object> publicationDocument = pubs.get(0).getPublicationDocument();
+            Map<String, Object> monographDocument = (HashMap<String, Object>)publicationDocument.get("monograph");
+            Conference_Event conf = ced.findByMonograph(pubs.get(0).getMonograph().getMonographID());
+            if(conf != null){
+                monographDocument.put("conference", conf.getConference_EventDocument());
+                System.out.println(publicationDocument.toString());
+            }
+            documentDocument.put("publication", publicationDocument);
             List<Person> editors = pdao.getEditorsByPubId(pubs.get(0).getPublicationID());//suppose one-one relation..
             List<Map<String, Object>> editorsDocument = new ArrayList<Map<String, Object>>();
             for (Person editor : editors) {

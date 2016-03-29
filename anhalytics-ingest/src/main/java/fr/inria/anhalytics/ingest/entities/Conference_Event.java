@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.ingest.entities;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author azhar
@@ -16,13 +19,13 @@ public class Conference_Event {
     public Conference_Event() {
     }
 
-    public Conference_Event(Long conf_eventID, String start_date, String end_date, Monograph monograph, Conference conference, Address adress) {
+    public Conference_Event(Long conf_eventID, String start_date, String end_date, Monograph monograph, Conference conference, Address address) {
         this.conf_eventID = conf_eventID;
         this.start_date = start_date;
         this.end_date = end_date;
         this.monograph = monograph;
         this.conference = conference;
-
+        this.address = address;
     }
 
     /**
@@ -50,8 +53,9 @@ public class Conference_Event {
      * @param start_date the start_date to set
      */
     public void setStart_date(String start_date) {
-        if(start_date.length() > 45)
+        if (start_date.length() > 45) {
             start_date = start_date.substring(0, 44);
+        }
         this.start_date = start_date;
     }
 
@@ -66,8 +70,9 @@ public class Conference_Event {
      * @param end_date the end_date to set
      */
     public void setEnd_date(String end_date) {
-        if(end_date.length() > 45)
+        if (end_date.length() > 45) {
             end_date = end_date.substring(0, 44);
+        }
         this.end_date = end_date;
     }
 
@@ -111,5 +116,15 @@ public class Conference_Event {
      */
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public Map<String, Object> getConference_EventDocument() {
+        Map<String, Object> conference_EventDocument = new HashMap<String, Object>();
+        conference_EventDocument.put("conf_eventID", this.getConf_eventID());
+        conference_EventDocument.put("address", this.getAddress().getAddressDocument());
+        conference_EventDocument.put("start_date", this.getStart_date());
+        conference_EventDocument.put("end_date", this.getEnd_date());
+        conference_EventDocument.put("title", this.getConference().getTitle());
+        return conference_EventDocument;
     }
 }
