@@ -79,9 +79,6 @@ public class Annotator {
                             String anhalyticsId = mm.getCurrentAnhalyticsId();
                             if(anhalyticsId.isEmpty())
                                 continue;
-                            if (!mm.isWithFulltext(id)) {
-                                continue;
-                            }
                             // check if the document is already annotated
                             if (!AnnotateProperties.isReset()) {
                                 if (mm.isAnnotated(annotationsCollection)) {
@@ -141,9 +138,6 @@ public class Annotator {
                             String anhalyticsId = mm.getCurrentAnhalyticsId();
                             if(anhalyticsId.isEmpty())
                                 continue;
-                            if (!mm.isWithFulltext(id)) {
-                                continue;
-                            }
                             // check if the document is already annotated
                             if (!AnnotateProperties.isReset()) {
                                 if (mm.isAnnotated(annotationsCollection)) {

@@ -237,11 +237,6 @@ public class Indexer {
                         String anhalyticsId = mm.getCurrentAnhalyticsId();
                         if(anhalyticsId.isEmpty())
                                 continue;
-                        
-                        if (!mm.isWithFulltext(id)) {
-                            //No interest to index docs without fulltext.
-                            continue;
-                        }
 
                         // convert the TEI document into JSON via JsonML
                         //System.out.println(halID);

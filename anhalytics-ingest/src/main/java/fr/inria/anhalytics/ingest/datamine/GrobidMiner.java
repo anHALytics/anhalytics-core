@@ -77,10 +77,6 @@ public class GrobidMiner extends Miner {
                     String anhalyticsId = mm.getCurrentAnhalyticsId();
                     if(anhalyticsId.isEmpty())
                         continue;
-                    if (!mm.isWithFulltext(uri)) {
-                        //No interest to index docs without fulltext.
-                        continue;
-                    }
                     if (!dd.isCitationsMined(anhalyticsId)) {
                         logger.info("Extracting :" + uri);
                         abdf.openTransaction();
