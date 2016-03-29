@@ -369,7 +369,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Inserts generated tei using GridFS.
      */
-    public void insertTei(String teiString, String repositoryDocId, String type, String anhalyticsId, String date) {
+    public void insertTei(String teiString, String repositoryDocId, String anhalyticsId, String date) {
         try {
             GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
             gfs.remove(repositoryDocId + ".tei.xml");
@@ -378,7 +378,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.setFilename(repositoryDocId + ".tei.xml");
             gfsFile.put("repositoryDocId", repositoryDocId);
             gfsFile.put("anhalyticsId", anhalyticsId);
-            gfsFile.put("documentType", type);
             gfsFile.save();
         } catch (ParseException e) {
             logger.error(e.getMessage(), e.getCause());
@@ -665,14 +664,16 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Check if the document fulltext has been already added.
      */
-    public boolean isWithFulltext(String repositoryDocId) {
+    public boolean isWithFulltext(String anhalyticsId) {
 
         GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
         BasicDBObject whereQuery = new BasicDBObject();
-        whereQuery.put("repositoryDocId", repositoryDocId);
+        whereQuery.put("anhalyticsId", anhalyticsId);
 
         Boolean result = false;
         GridFSDBFile fs = gfs.findOne(whereQuery);
+        if(fs == null)
+            return false;
         Object o = fs.get("isFulltextAdded");
 
         if (o == null) {
@@ -751,22 +752,22 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return cursor;
     }
 
-    public String findFinalTeiById(String repositoryDocId) {
-        return findTeiById(repositoryDocId, MongoCollectionsInterface.FINAL_TEIS);
+    public String findFinalTeiById(String anhalyticsId) {
+        return findTeiById(anhalyticsId, MongoCollectionsInterface.FINAL_TEIS);
     }
 
-    public String findGrobidTeiById(String repositoryDocId) {
-        return findTeiById(repositoryDocId, MongoCollectionsInterface.GROBID_TEIS);
+    public String findGrobidTeiById(String anhalyticsId) {
+        return findTeiById(anhalyticsId, MongoCollectionsInterface.GROBID_TEIS);
     }
 
-    public String findMetadataTeiById(String repositoryDocId) {
-        return findTeiById(repositoryDocId, MongoCollectionsInterface.ADDITIONAL_TEIS);
+    public String findMetadataTeiById(String anhalyticsId) {
+        return findTeiById(anhalyticsId, MongoCollectionsInterface.ADDITIONAL_TEIS);
     }
 
-    private String findTeiById(String repositoryDocId, String collection) {
+    private String findTeiById(String anhalyticsId, String collection) {
         String tei = null;
         try {
-            GridFSDBFile file = findGridFSDBfileTeiById(repositoryDocId, collection);
+            GridFSDBFile file = findGridFSDBfileTeiById(anhalyticsId, collection);
             InputStream teiStream = file.getInputStream();
             tei = IOUtils.toString(teiStream);
             teiStream.close();
@@ -776,10 +777,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return tei;
     }
 
-    private GridFSDBFile findGridFSDBfileTeiById(String repositoryDocId, String collection) {
+    private GridFSDBFile findGridFSDBfileTeiById(String anhalyticsId, String collection) {
         GridFS gfs = new GridFS(db, collection);
         BasicDBObject whereQuery = new BasicDBObject();
-        whereQuery.put("repositoryDocId", currentRepositoryDocId);
+        whereQuery.put("anhalyticsId", anhalyticsId);
         GridFSDBFile file = gfs.findOne(whereQuery);
         return file;
     }

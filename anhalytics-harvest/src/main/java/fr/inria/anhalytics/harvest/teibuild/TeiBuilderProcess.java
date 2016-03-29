@@ -25,28 +25,27 @@ public class TeiBuilderProcess {
     }
 
     /**
-     * Clean up metadatas and build a corpus tei.
+     * Clean up metadatas , add grobid TEI and build a corpus tei.
      */
     public void buildTei() {
         for (String date : Utilities.getDates()) {
-            if (mm.initMetadataTeis(date)) {
+            if (mm.initGrobidTeis(date)) {
                 while (mm.hasMoreTeis()) {
-                    String metadataTeiString = mm.nextTeiDocument();
+                    String grobidTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
-                    String type = mm.getCurrentDocType();
                     String anhalyticsId = mm.getCurrentAnhalyticsId();
                     Document generatedTeiDoc = null;
-                    if(anhalyticsId.isEmpty())
+                    if (anhalyticsId.isEmpty()) {
                         continue;
-                    try {
-                        logger.info("\t Building tei for: " + uri);
-                        InputStream metadataTeiStream = new ByteArrayInputStream(metadataTeiString.getBytes());
-                        generatedTeiDoc = TeiBuilder.createTEICorpus(metadataTeiStream);
-                        metadataTeiStream.close();
-                        mm.insertTei(Utilities.toString(generatedTeiDoc), uri, type, anhalyticsId, date);
-                    } catch (Exception xpe) {
-                        xpe.printStackTrace();
                     }
+                    logger.info("\t Building tei for: " + uri);
+                    grobidTeiString = Utilities.trimEncodedCharaters(grobidTeiString);
+                    generatedTeiDoc = createTEI(anhalyticsId, grobidTeiString);
+                    if (generatedTeiDoc != null) {
+                        String tei = Utilities.toString(generatedTeiDoc);
+                        mm.insertTei(tei, uri, anhalyticsId, date);
+                    }
+
                 }
             }
         }
@@ -56,32 +55,22 @@ public class TeiBuilderProcess {
     /**
      * Adds data TEI extracted with grobid.
      */
-    public void appendGrobidFulltext() {
-        for (String date : Utilities.getDates()) {
-            if (mm.initGrobidTeis(date)) {
-                while (mm.hasMoreTeis()) {
-                    String finalTei = null;
-                    String grobidTeiString = mm.nextTeiDocument();
-                    String id = mm.getCurrentRepositoryDocId();
-                    String anhalyticsId = mm.getCurrentAnhalyticsId();
-                    if(anhalyticsId.isEmpty())
-                        continue;
-                    grobidTeiString = Utilities.trimEncodedCharaters(grobidTeiString);
-
-                    if (!mm.isWithFulltext(id)) {
-                        finalTei = mm.findFinalTeiById(id);
-                        if (finalTei != null) {
-                            Document generatedTeiDoc = null;
-                            logger.info("\t Building tei for: " + id);
-                            generatedTeiDoc = TeiBuilder.addGrobidTeiToTei(finalTei, grobidTeiString);
-                            if (generatedTeiDoc != null) {
-                                String generatedTeiString = Utilities.toString(generatedTeiDoc);
-                                mm.updateTei(generatedTeiString, id, true);
-                            }
-                        }
-                    }
+    private Document createTEI(String anhalyticsId, String grobidTei) {
+        Document generatedTeiDoc = null;
+        try {
+            if (!mm.isWithFulltext(anhalyticsId)) {
+                String metadataTei = mm.findMetadataTeiById(anhalyticsId);
+                if (metadataTei != null) {
+                    logger.info("\t\t Metadata found, Building tei for: " + mm.getCurrentRepositoryDocId());
+                    InputStream metadataTeiStream = new ByteArrayInputStream(metadataTei.getBytes());
+                    generatedTeiDoc = TeiBuilder.createTEICorpus(metadataTeiStream);
+                    metadataTeiStream.close();
+                    generatedTeiDoc = TeiBuilder.addGrobidTeiToTei(Utilities.toString(generatedTeiDoc), grobidTei);
                 }
             }
+        } catch (Exception xpe) {
+            xpe.printStackTrace();
         }
+        return generatedTeiDoc;
     }
 }

@@ -31,8 +31,6 @@ public class Main {
             add("fetchEmbargoPublications");
             add("processGrobid");
             add("processGrobidDaily");
-            add("appendGrobidFulltext");
-            add("appendGrobidFulltextDaily");
             add("harvestIstex");
             add("assetLegend");
         }
@@ -83,11 +81,6 @@ public class Main {
         } else if (process.equals("processGrobidDaily")) {
             Utilities.updateDates(todayDate, todayDate);
             gp.processFulltexts();
-        } else if (process.equals("appendGrobidFulltext")) {
-            tb.appendGrobidFulltext();
-        } else if (process.equals("appendGrobidFulltextDaily")) {
-            Utilities.updateDates(todayDate, todayDate);
-            tb.appendGrobidFulltext();
         } else if (process.equals("fetchEmbargoPublications")) {
             oai.fetchEmbargoPublications();
         } else if (process.equals("harvestIstex")) {
