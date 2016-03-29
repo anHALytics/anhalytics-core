@@ -161,7 +161,7 @@ public class Annotator {
 								worker = new KeyTermAnnotatorWorker(mm, id, anhalyticsId, tei, date);    
 							}
 								
-                            worker.run();
+                            executor.execute(worker);
                             nb++;
                         }
                     }
