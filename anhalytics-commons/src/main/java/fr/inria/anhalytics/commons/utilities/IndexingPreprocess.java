@@ -502,10 +502,10 @@ public class IndexingPreprocess {
      * adds fullname node.
      */
     private void addFullName(JsonNode theChild, ObjectMapper mapper) {
-        String fullName = null;
+        String fullName = "";
         if (theChild.isArray()) {
-            String forename = null;
-            String surname = null;
+            String forename = "";
+            String surname = "";
             Iterator<JsonNode> ite = theChild.getElements();
             while (ite.hasNext()) {
                 JsonNode temp = ite.next();
