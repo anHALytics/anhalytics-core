@@ -442,6 +442,20 @@
                                                 "analyzer": "english",
                                                 "store": "yes",
                                                 "term_vector": "with_positions_offsets"
+                                            },
+                                            "$lang_fr": {
+                                                "type": "string",
+                                                "index": "analyzed",
+                                                "analyzer": "french",
+                                                "store": "yes",
+                                                "term_vector": "with_positions_offsets"
+                                            },
+                                            "$lang_de": {
+                                                "type": "string",
+                                                "index": "analyzed",
+                                                "analyzer": "german",
+                                                "store": "yes",
+                                                "term_vector": "with_positions_offsets"
                                             }
                                         }
                                     },
