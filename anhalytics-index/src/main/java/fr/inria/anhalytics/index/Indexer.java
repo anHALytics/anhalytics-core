@@ -226,17 +226,19 @@ public class Indexer {
         int nb = 0;
         try {
             for (String date : Utilities.getDates()) {
+
+                BulkRequestBuilder bulkRequest = client.prepareBulk();
+                bulkRequest.setRefresh(true);
                 if (mm.initTeis(date)) {
                     int i = 0;
-                    BulkRequestBuilder bulkRequest = client.prepareBulk();
-                    bulkRequest.setRefresh(true);
-                    
+
                     while (mm.hasMoreTeis()) {
                         String tei = mm.nextTeiDocument();
                         String id = mm.getCurrentRepositoryDocId();
                         String anhalyticsId = mm.getCurrentAnhalyticsId();
-                        if(anhalyticsId.isEmpty())
-                                continue;
+                        if (anhalyticsId.isEmpty()) {
+                            continue;
+                        }
 
                         // convert the TEI document into JSON via JsonML
                         //System.out.println(halID);
@@ -291,15 +293,16 @@ public class Indexer {
         try {
             ObjectMapper mapper = new ObjectMapper();
             for (String date : Utilities.getDates()) {
+                BulkRequestBuilder bulkRequest = client.prepareBulk();
+                bulkRequest.setRefresh(true);
                 if (mm.initAnnotations(date, MongoCollectionsInterface.NERD_ANNOTATIONS)) {
                     int i = 0;
-                    BulkRequestBuilder bulkRequest = client.prepareBulk();
-                    bulkRequest.setRefresh(true);
                     while (mm.hasMoreAnnotations()) {
                         String json = mm.nextAnnotation();
                         String anhalyticsId = mm.getCurrentAnhalyticsId();
-                        if(anhalyticsId.isEmpty())
-                                continue;
+                        if (anhalyticsId.isEmpty()) {
+                            continue;
+                        }
                         // get the xml:id of the elements we want to index from the document
                         // we only index title, abstract and keyphrase annotations !
                         List<String> validIDs = validDocIDs(anhalyticsId, mapper);
