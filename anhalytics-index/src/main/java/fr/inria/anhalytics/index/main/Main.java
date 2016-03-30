@@ -112,13 +112,8 @@ public class Main {
 
         MetadataIndexer mi = new MetadataIndexer();
         if (process.equals("index")) {
-            System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
-            reponse = sc.nextLine().charAt(0);
-
-            if (reponse != 'N') {
-                esm.setUpIndex(IndexProperties.getTeisIndexName());
-                esm.setUpIndex(IndexProperties.getAnnotsIndexName());
-            }
+            esm.setUpIndex(IndexProperties.getTeisIndexName());
+            esm.setUpIndex(IndexProperties.getAnnotsIndexName());
 
             esm.indexTeiCollection();
             esm.indexAnnotations();
