@@ -38,7 +38,7 @@ public class Main {
 
         if (processArgs(args)) {
             if (IngestProperties.getFromDate() != null || IngestProperties.getUntilDate() != null) {
-                Utilities.updateDates(IngestProperties.getFromDate(), IngestProperties.getUntilDate());
+                Utilities.updateDates(IngestProperties.getUntilDate(), IngestProperties.getFromDate());
             }
             Main main = new Main();
             main.processCommand();

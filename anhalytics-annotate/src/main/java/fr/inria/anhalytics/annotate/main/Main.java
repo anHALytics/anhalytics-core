@@ -41,7 +41,7 @@ public class Main {
 
         if (processArgs(args)) {
             if (AnnotateProperties.getFromDate() != null || AnnotateProperties.getUntilDate() != null) {
-                Utilities.updateDates(AnnotateProperties.getFromDate(), AnnotateProperties.getUntilDate());
+                Utilities.updateDates(AnnotateProperties.getUntilDate(), AnnotateProperties.getFromDate());
             }
             Main main = new Main();
             main.processCommand();

@@ -41,7 +41,9 @@ public class Main {
             } catch (Exception e) {
                 logger.error(e.getMessage());
             }
-
+            if (IndexProperties.getFromDate() != null || IndexProperties.getUntilDate() != null) {
+                Utilities.updateDates(IndexProperties.getUntilDate(), IndexProperties.getFromDate());
+            }
             Main main = new Main();
             main.processCommand();
         } else {
@@ -69,6 +71,30 @@ public class Main {
                     result = false;
                     break;
                 }
+            } else if (currArg.equals("-dFromDate")) {
+                String stringDate = args[i + 1];
+                if (!stringDate.isEmpty()) {
+                    if (Utilities.isValidDate(stringDate)) {
+                        IndexProperties.setFromDate(args[i + 1]);
+                    } else {
+                        System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
+                        result = false;
+                    }
+                }
+                i++;
+                continue;
+            } else if (currArg.equals("-dUntilDate")) {
+                String stringDate = args[i + 1];
+                if (!stringDate.isEmpty()) {
+                    if (Utilities.isValidDate(stringDate)) {
+                        IndexProperties.setUntilDate(stringDate);
+                    } else {
+                        System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
+                        result = false;
+                    }
+                }
+                i++;
+                continue;
             } else {
                 result = false;
             }
@@ -93,7 +119,7 @@ public class Main {
                 esm.setUpIndex(IndexProperties.getTeisIndexName());
                 esm.setUpIndex(IndexProperties.getAnnotsIndexName());
             }
-            
+
             esm.indexTeiCollection();
             esm.indexAnnotations();
             esm.close();
@@ -109,17 +135,12 @@ public class Main {
                 esm.close();
                 return;
             }
-            
+
             esm.indexTeiCollection();
             esm.indexAnnotations();
             esm.close();
         } else if (process.equals("indexMtds")) {
-            System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
-            reponse = sc.nextLine().charAt(0);
-
-            if (reponse != 'N') {
-                mi.setUpIndex(IndexProperties.getMetadataIndexName());
-            }
+            mi.setUpIndex(IndexProperties.getMetadataIndexName());
             mi.indexAuthors();
             mi.indexPublications();
             mi.indexOrganisations();

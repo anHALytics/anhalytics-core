@@ -21,6 +21,10 @@ public class IndexProperties {
 
     private static String teisIndexName;
     private static String metadataIndexName;
+    
+     private static String fromDate;
+
+    private static String untilDate;
 
     public static void init(String properties_filename) {
         Properties props = new Properties();
@@ -144,6 +148,34 @@ public class IndexProperties {
      */
     public static void setMetadataIndexName(String aMetadataIndexName) {
         metadataIndexName = aMetadataIndexName;
+    }
+
+    /**
+     * @return the fromDate
+     */
+    public static String getFromDate() {
+        return fromDate;
+    }
+
+    /**
+     * @param aFromDate the fromDate to set
+     */
+    public static void setFromDate(String aFromDate) {
+        fromDate = aFromDate;
+    }
+
+    /**
+     * @return the untilDate
+     */
+    public static String getUntilDate() {
+        return untilDate;
+    }
+
+    /**
+     * @param aUntilDate the untilDate to set
+     */
+    public static void setUntilDate(String aUntilDate) {
+        untilDate = aUntilDate;
     }
     
 
