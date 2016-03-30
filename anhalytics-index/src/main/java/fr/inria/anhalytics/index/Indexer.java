@@ -273,6 +273,7 @@ public class Indexer {
                     }
                     // last bulk
                     BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                    System.out.print(".");
                     if (bulkResponse.hasFailures()) {
                         // process failures by iterating through each bulk response item	
                         logger.error(bulkResponse.buildFailureMessage());
@@ -359,6 +360,7 @@ public class Indexer {
                     }
                     // last bulk
                     BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                    System.out.print(".");
                     if (bulkResponse.hasFailures()) {
                         // process failures by iterating through each bulk response item	
                         logger.error(bulkResponse.buildFailureMessage());
