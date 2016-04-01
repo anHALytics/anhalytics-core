@@ -36,6 +36,7 @@ public class TeiBuilderProcess {
                     String anhalyticsId = mm.getCurrentAnhalyticsId();
                     Document generatedTeiDoc = null;
                     if (anhalyticsId.isEmpty()) {
+                        logger.info("skipping "+uri+" No anHALytics id provided");
                         continue;
                     }
                     logger.info("\t Building tei for: " + uri);

@@ -237,6 +237,7 @@ public class Indexer {
                         String id = mm.getCurrentRepositoryDocId();
                         String anhalyticsId = mm.getCurrentAnhalyticsId();
                         if (anhalyticsId.isEmpty()) {
+                            logger.info("skipping "+id+" No anHALytics id provided");
                             continue;
                         }
 
@@ -300,8 +301,10 @@ public class Indexer {
                     int i = 0;
                     while (mm.hasMoreAnnotations()) {
                         String json = mm.nextAnnotation();
+                        String id = mm.getCurrentRepositoryDocId();
                         String anhalyticsId = mm.getCurrentAnhalyticsId();
                         if (anhalyticsId.isEmpty()) {
+                            logger.info("skipping "+id+" No anHALytics id provided");
                             continue;
                         }
                         // get the xml:id of the elements we want to index from the document

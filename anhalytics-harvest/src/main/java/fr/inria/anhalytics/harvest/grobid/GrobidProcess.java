@@ -46,9 +46,11 @@ public class GrobidProcess {
                             if (toBeGrobidified.contains(type)) {
                                 if (!HarvestProperties.isReset()) {
                                     if (mm.isGrobidified(id)) {
+                                        logger.info("skipping "+id+" Already grobidified");
                                         continue;
                                     }
                                     if (currentAnhalyticsId.isEmpty()) {
+                                        logger.info("skipping "+id+" No anHALytics id provided");
                                         continue;
                                     }
                                 }

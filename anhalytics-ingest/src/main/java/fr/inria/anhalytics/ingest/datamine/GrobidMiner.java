@@ -75,8 +75,10 @@ public class GrobidMiner extends Miner {
                     String teiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
                     String anhalyticsId = mm.getCurrentAnhalyticsId();
-                    if(anhalyticsId.isEmpty())
+                    if(anhalyticsId.isEmpty()){
+                        logger.info("skipping "+uri+" No anHALytics id provided");
                         continue;
+                    }
                     if (!dd.isCitationsMined(anhalyticsId)) {
                         logger.info("Extracting :" + uri);
                         abdf.openTransaction();

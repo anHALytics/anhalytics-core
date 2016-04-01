@@ -77,8 +77,10 @@ public class Annotator {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
                             String anhalyticsId = mm.getCurrentAnhalyticsId();
-                            if(anhalyticsId.isEmpty())
+                            if(anhalyticsId.isEmpty()){
+                                logger.info("skipping "+id+" No anHALytics id provided");
                                 continue;
+                            }
                             // check if the document is already annotated
                             if (!AnnotateProperties.isReset()) {
                                 if (mm.isAnnotated(annotationsCollection)) {
@@ -136,8 +138,10 @@ public class Annotator {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
                             String anhalyticsId = mm.getCurrentAnhalyticsId();
-                            if(anhalyticsId.isEmpty())
+                            if(anhalyticsId.isEmpty()){
+                                logger.info("skipping "+id+" No anHALytics id provided");
                                 continue;
+                            }
                             // check if the document is already annotated
                             if (!AnnotateProperties.isReset()) {
                                 if (mm.isAnnotated(annotationsCollection)) {
