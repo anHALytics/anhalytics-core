@@ -48,6 +48,9 @@ public class GrobidProcess {
                                     if (mm.isGrobidified(id)) {
                                         continue;
                                     }
+                                    if (currentAnhalyticsId.isEmpty()) {
+                                        continue;
+                                    }
                                 }
                                 try {
                                     Runnable worker = new GrobidSimpleFulltextWorker(content, id, currentAnhalyticsId, date);

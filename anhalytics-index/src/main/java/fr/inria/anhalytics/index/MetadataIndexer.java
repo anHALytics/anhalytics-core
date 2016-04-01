@@ -129,7 +129,6 @@ public class MetadataIndexer {
             Conference_Event conf = ced.findByMonograph(pubs.get(0).getMonograph().getMonographID());
             if(conf != null){
                 monographDocument.put("conference", conf.getConference_EventDocument());
-                System.out.println(publicationDocument.toString());
             }
             documentDocument.put("publication", publicationDocument);
             List<Person> editors = pdao.getEditorsByPubId(pubs.get(0).getPublicationID());//suppose one-one relation..
