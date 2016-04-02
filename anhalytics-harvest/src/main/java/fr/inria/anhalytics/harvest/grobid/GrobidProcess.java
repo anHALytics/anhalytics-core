@@ -49,7 +49,7 @@ public class GrobidProcess {
                                         logger.info("skipping "+id+" Already grobidified");
                                         continue;
                                     }
-                                    if (currentAnhalyticsId.isEmpty()) {
+                                    if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
                                         logger.info("skipping "+id+" No anHALytics id provided");
                                         continue;
                                     }

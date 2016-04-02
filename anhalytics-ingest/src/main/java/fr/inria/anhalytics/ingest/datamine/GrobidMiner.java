@@ -75,7 +75,7 @@ public class GrobidMiner extends Miner {
                     String teiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
                     String anhalyticsId = mm.getCurrentAnhalyticsId();
-                    if(anhalyticsId.isEmpty()){
+                    if(anhalyticsId == null || anhalyticsId.isEmpty()){
                         logger.info("skipping "+uri+" No anHALytics id provided");
                         continue;
                     }

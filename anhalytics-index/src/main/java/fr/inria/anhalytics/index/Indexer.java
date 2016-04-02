@@ -236,7 +236,7 @@ public class Indexer {
                         String tei = mm.nextTeiDocument();
                         String id = mm.getCurrentRepositoryDocId();
                         String anhalyticsId = mm.getCurrentAnhalyticsId();
-                        if (anhalyticsId.isEmpty()) {
+                        if (anhalyticsId == null || anhalyticsId.isEmpty()) {
                             logger.info("skipping "+id+" No anHALytics id provided");
                             continue;
                         }
@@ -303,7 +303,7 @@ public class Indexer {
                         String json = mm.nextAnnotation();
                         String id = mm.getCurrentRepositoryDocId();
                         String anhalyticsId = mm.getCurrentAnhalyticsId();
-                        if (anhalyticsId.isEmpty()) {
+                        if (anhalyticsId == null || anhalyticsId.isEmpty()) {
                             logger.info("skipping "+id+" No anHALytics id provided");
                             continue;
                         }
