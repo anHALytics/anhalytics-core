@@ -81,6 +81,10 @@ public class Main {
             if (currArg.equals("-h")) {
                 System.out.println(getHelp());
                 continue;
+            } else if (currArg.equals("-nodates")) {
+                AnnotateProperties.setProcessByDate(false);
+                i++;
+                continue;
             } else if (currArg.equals("-dFromDate")) {
                 String stringDate = args[i + 1];
                 if (!stringDate.isEmpty()) {

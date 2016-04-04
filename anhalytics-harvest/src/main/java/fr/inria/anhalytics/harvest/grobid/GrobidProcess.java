@@ -36,7 +36,12 @@ public class GrobidProcess {
         try {
             if (GrobidService.isGrobidOk()) {
                 ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
+
                 for (String date : Utilities.getDates()) {
+
+                    if (!HarvestProperties.isProcessByDate()) {
+                        date = null;
+                    }
                     if (mm.initBinaries(date)) {
                         while (mm.hasMoreBinaryDocuments()) {
                             InputStream content = mm.nextBinaryDocument();
@@ -46,11 +51,11 @@ public class GrobidProcess {
                             if (toBeGrobidified.contains(type)) {
                                 if (!HarvestProperties.isReset()) {
                                     if (mm.isGrobidified(id)) {
-                                        logger.info("skipping "+id+" Already grobidified");
+                                        logger.info("skipping " + id + " Already grobidified");
                                         continue;
                                     }
                                     if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
-                                        logger.info("skipping "+id+" No anHALytics id provided");
+                                        logger.info("skipping " + id + " No anHALytics id provided");
                                         continue;
                                     }
                                 }
@@ -64,6 +69,9 @@ public class GrobidProcess {
                                 content.close();
                             }
                         }
+                    }
+                    if (!HarvestProperties.isProcessByDate()) {
+                        break;
                     }
                 }
                 executor.shutdown();

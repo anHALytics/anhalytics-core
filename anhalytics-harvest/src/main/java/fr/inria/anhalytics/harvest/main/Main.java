@@ -44,8 +44,10 @@ public class Main {
         }
 
         if (processArgs(args)) {
-            if (HarvestProperties.getFromDate() != null || HarvestProperties.getUntilDate() != null) {
-                Utilities.updateDates(HarvestProperties.getUntilDate(), HarvestProperties.getFromDate());
+            if(HarvestProperties.isProcessByDate()){
+                if (HarvestProperties.getFromDate() != null || HarvestProperties.getUntilDate() != null) {
+                    Utilities.updateDates(HarvestProperties.getUntilDate(), HarvestProperties.getFromDate());
+                }
             }
             Utilities.setTmpPath(HarvestProperties.getTmpPath());
             Main main = new Main();
@@ -103,6 +105,10 @@ public class Main {
                     System.out.println(getHelp());
                     result = false;
                     break;
+                } else if (currArg.equals("-nodates")) {
+                    HarvestProperties.setProcessByDate(false);
+                    i++;
+                    continue;
                 } else if (currArg.equals("-dFromDate")) {
                     String stringDate = pArgs[i + 1];
                     if (!stringDate.isEmpty()) {

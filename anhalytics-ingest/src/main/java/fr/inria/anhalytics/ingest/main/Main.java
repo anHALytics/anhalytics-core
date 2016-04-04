@@ -83,6 +83,10 @@ public class Main {
                     System.out.println(getHelp());
                     result = false;
                     break;
+                } else if (currArg.equals("-nodates")) {
+                    IngestProperties.setProcessByDate(false);
+                    i++;
+                    continue;
                 } else if (currArg.equals("-dFromDate")) {
                     String stringDate = pArgs[i + 1];
                     if (!stringDate.isEmpty()) {

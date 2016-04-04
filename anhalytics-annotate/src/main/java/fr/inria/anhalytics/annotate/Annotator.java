@@ -23,6 +23,7 @@ public class Annotator {
     private final MongoFileManager mm;
 
     public enum Annotator_Type {
+
         NERD("NERD"),
         KEYTERM("KeyTerm");
 
@@ -71,14 +72,18 @@ public class Annotator {
         try {
             if (NerdService.isNerdReady()) {
                 for (String date : Utilities.getDates()) {
+
+                    if (!AnnotateProperties.isProcessByDate()) {
+                        date = null;
+                    }
                     if (mm.initTeis(date)) {
                         logger.debug("processing teis for :" + date);
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
                             String anhalyticsId = mm.getCurrentAnhalyticsId();
-                            if(anhalyticsId == null || anhalyticsId.isEmpty()){
-                                logger.info("skipping "+id+" No anHALytics id provided");
+                            if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                                logger.info("skipping " + id + " No anHALytics id provided");
                                 continue;
                             }
                             // check if the document is already annotated
@@ -105,6 +110,9 @@ public class Annotator {
                             nb++;
                         }
                     }
+                    if (!AnnotateProperties.isProcessByDate()) {
+                        break;
+                    }
                 }
             }
             logger.debug("Total: " + nb + " documents annotated.");
@@ -128,18 +136,20 @@ public class Annotator {
             throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
         }
         try {
-            if (NerdService.isNerdReady()) 
-			{
+            if (NerdService.isNerdReady()) {
                 ThreadPoolExecutor executor = getThreadsExecutor(annotator_type);
                 for (String date : Utilities.getDates()) {
+                    if (!AnnotateProperties.isProcessByDate()) {
+                        date = null;
+                    }
                     if (mm.initTeis(date)) {
                         //logger.debug("processing teis for :" + date);
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
                             String anhalyticsId = mm.getCurrentAnhalyticsId();
-                            if(anhalyticsId == null || anhalyticsId.isEmpty()){
-                                logger.info("skipping "+id+" No anHALytics id provided");
+                            if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                                logger.info("skipping " + id + " No anHALytics id provided");
                                 continue;
                             }
                             // check if the document is already annotated
@@ -160,16 +170,18 @@ public class Annotator {
                             Runnable worker = null;
                             if (annotator_type == Annotator_Type.NERD) {
                                 worker = new NerdAnnotatorWorker(mm, id, anhalyticsId, tei, date);
-							}
-							else {
-								worker = new KeyTermAnnotatorWorker(mm, id, anhalyticsId, tei, date);    
-							}
-								
+                            } else {
+                                worker = new KeyTermAnnotatorWorker(mm, id, anhalyticsId, tei, date);
+                            }
+
                             executor.execute(worker);
                             nb++;
                         }
                     }
-				}
+                    if (!AnnotateProperties.isProcessByDate()) {
+                        break;
+                    }
+                }
                 executor.shutdown();
                 while (!executor.isTerminated()) {
                 }

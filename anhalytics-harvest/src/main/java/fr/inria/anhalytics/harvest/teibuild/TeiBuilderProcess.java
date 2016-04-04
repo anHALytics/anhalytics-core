@@ -2,6 +2,7 @@ package fr.inria.anhalytics.harvest.teibuild;
 
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -14,7 +15,7 @@ import org.w3c.dom.Document;
  *
  * @author Achraf
  */
-public class TeiBuilderProcess {
+public class TeiBuilderProcess{
 
     private static final Logger logger = LoggerFactory.getLogger(TeiBuilderProcess.class);
 
@@ -29,13 +30,15 @@ public class TeiBuilderProcess {
      */
     public void buildTei() {
         for (String date : Utilities.getDates()) {
+            if(!HarvestProperties.isProcessByDate())
+                date = null;
             if (mm.initGrobidTeis(date)) {
                 while (mm.hasMoreTeis()) {
                     String grobidTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
                     String anhalyticsId = mm.getCurrentAnhalyticsId();
                     Document generatedTeiDoc = null;
-                    if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                    if (anhalyticsId.isEmpty()) {
                         logger.info("skipping "+uri+" No anHALytics id provided");
                         continue;
                     }
@@ -49,6 +52,8 @@ public class TeiBuilderProcess {
 
                 }
             }
+            if(!HarvestProperties.isProcessByDate())
+                break;
         }
         logger.info("Done");
     }
@@ -60,7 +65,7 @@ public class TeiBuilderProcess {
         Document generatedTeiDoc = null;
         try {
             if (!mm.isWithFulltext(anhalyticsId)) {
-                String metadataTei = mm.findMetadataTeiById(anhalyticsId);
+                String metadataTei = getMetadataTei(anhalyticsId);
                 if (metadataTei != null) {
                     logger.info("\t\t Metadata found, Building tei for: " + mm.getCurrentRepositoryDocId());
                     InputStream metadataTeiStream = new ByteArrayInputStream(metadataTei.getBytes());
@@ -73,5 +78,13 @@ public class TeiBuilderProcess {
             xpe.printStackTrace();
         }
         return generatedTeiDoc;
+    }
+    
+    
+    /*
+    Get correponding Metadata to process..anhalyticsId is necessary for identification
+    */
+    private String getMetadataTei(String anhalyticsId){
+        return mm.findMetadataTeiById(anhalyticsId);
     }
 }

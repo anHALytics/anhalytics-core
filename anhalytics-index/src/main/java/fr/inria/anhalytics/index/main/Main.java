@@ -60,6 +60,10 @@ public class Main {
             if (currArg.equals("-h")) {
                 System.out.println(getHelp());
                 continue;
+            } else if (currArg.equals("-nodates")) {
+                IndexProperties.setProcessByDate(false);
+                i++;
+                continue;
             } else if (currArg.equals("-exe")) {
                 String command = args[i + 1];
                 if (availableCommands.contains(command)) {

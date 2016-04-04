@@ -36,6 +36,7 @@ import fr.inria.anhalytics.ingest.entities.Person_Identifier;
 import fr.inria.anhalytics.ingest.entities.Publication;
 import fr.inria.anhalytics.ingest.entities.Publisher;
 import fr.inria.anhalytics.ingest.entities.Serial_Identifier;
+import fr.inria.anhalytics.ingest.properties.IngestProperties;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -80,15 +81,19 @@ public class HALMiner extends Miner {
         DAOFactory.initConnection();
         PublicationDAO pd = (PublicationDAO) adf.getPublicationDAO();
         DocumentDAO dd = (DocumentDAO) adf.getDocumentDAO();
-        
+
         for (String date : Utilities.getDates()) {
+
+            if (!IngestProperties.isProcessByDate()) {
+                date = null;
+            }
             if (mm.initTeis(date)) {
                 while (mm.hasMoreTeis()) {
                     String metadataTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
                     String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
-                    if(currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()){
-                        logger.info("skipping "+uri+" No anHALytics id provided");
+                    if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
+                        logger.info("skipping " + uri + " No anHALytics id provided");
                         continue;
                     }
                     if (!dd.isMined(currentAnhalyticsId)) {
@@ -153,6 +158,9 @@ public class HALMiner extends Miner {
                         }
                     }
                 }
+            }
+            if (!IngestProperties.isProcessByDate()) {
+                break;
             }
 
         }

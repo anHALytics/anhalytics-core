@@ -26,6 +26,8 @@ public class IndexProperties {
 
     private static String untilDate;
 
+    private static boolean processByDate = true;
+
     public static void init(String properties_filename) {
         Properties props = new Properties();
         try {
@@ -176,6 +178,20 @@ public class IndexProperties {
      */
     public static void setUntilDate(String aUntilDate) {
         untilDate = aUntilDate;
+    }
+
+    /**
+     * @return the processByDate
+     */
+    public static boolean isProcessByDate() {
+        return processByDate;
+    }
+
+    /**
+     * @param aProcessByDate the processByDate to set
+     */
+    public static void setProcessByDate(boolean aProcessByDate) {
+        processByDate = aProcessByDate;
     }
     
 

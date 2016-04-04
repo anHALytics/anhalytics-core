@@ -227,6 +227,9 @@ public class Indexer {
         try {
             for (String date : Utilities.getDates()) {
 
+                if (!IndexProperties.isProcessByDate()) {
+                    date = null;
+                }
                 BulkRequestBuilder bulkRequest = client.prepareBulk();
                 bulkRequest.setRefresh(true);
                 if (mm.initTeis(date)) {
@@ -237,7 +240,7 @@ public class Indexer {
                         String id = mm.getCurrentRepositoryDocId();
                         String anhalyticsId = mm.getCurrentAnhalyticsId();
                         if (anhalyticsId == null || anhalyticsId.isEmpty()) {
-                            logger.info("skipping "+id+" No anHALytics id provided");
+                            logger.info("skipping " + id + " No anHALytics id provided");
                             continue;
                         }
 
@@ -280,6 +283,10 @@ public class Indexer {
                         logger.error(bulkResponse.buildFailureMessage());
                     }
                 }
+
+                if (!IndexProperties.isProcessByDate()) {
+                    break;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -295,6 +302,10 @@ public class Indexer {
         try {
             ObjectMapper mapper = new ObjectMapper();
             for (String date : Utilities.getDates()) {
+
+                if (!IndexProperties.isProcessByDate()) {
+                    date = null;
+                }
                 BulkRequestBuilder bulkRequest = client.prepareBulk();
                 bulkRequest.setRefresh(true);
                 if (mm.initAnnotations(date, MongoCollectionsInterface.NERD_ANNOTATIONS)) {
@@ -304,7 +315,7 @@ public class Indexer {
                         String id = mm.getCurrentRepositoryDocId();
                         String anhalyticsId = mm.getCurrentAnhalyticsId();
                         if (anhalyticsId == null || anhalyticsId.isEmpty()) {
-                            logger.info("skipping "+id+" No anHALytics id provided");
+                            logger.info("skipping " + id + " No anHALytics id provided");
                             continue;
                         }
                         // get the xml:id of the elements we want to index from the document
@@ -369,6 +380,10 @@ public class Indexer {
                         logger.error(bulkResponse.buildFailureMessage());
                     }
                     System.out.print("\n");
+                }
+
+                if (!IndexProperties.isProcessByDate()) {
+                    break;
                 }
             }
         } catch (Exception e) {
