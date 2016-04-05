@@ -4,13 +4,7 @@
 
 AnHALytics is a project aiming at creating an analytic platform for the [HAL research archive](https://hal.archives-ouvertes.fr) or other scientific Open Access repositories, exploring various analytic aspects such as search/discovery, activity and collaboration statistics, trend/technology maps, knowledge graph and data visualization. The project is supported by an [ADT Inria](http://www.inria.fr/en/research/research-teams/technological-development-at-inria) grant and good will :). 
 
-![View of anHALytics search and discovery front end](doc/screen1.png)
-
-*Above: View of anHALytics search and discovery front end*
-
-![Example of query disambiguation in the anHALytics search and discovery front end](doc/screen2.png)
-
-*Above: Example of query disambiguation in the anHALytics search and discovery front end*
+This module share the data ingestion chain and the core back-end functionalities of the system. 
 
 ## License
 
@@ -40,7 +34,7 @@ For building and running the project, you will need the following components.
 
 [Grobid](https://github.com/kermitt2/grobid) is used as entry point for document digestion, which means extracting metadata and structured full text in ([TEI](http://www.tei-c.org/Guidelines/)). [Grobid](https://github.com/kermitt2/grobid) is a machine learning library for extracting bibliographical information and structured full texts from technical and scientific documents, in particular from PDF. It is distributed under Apache 2 license.
 
-Clone the project from github:
+Clone the current project from github (as of March 2016, GROBID version 0.4.1-SNAPSHOT):
 
 	git clone https://github.com/kermitt2/grobid.git
 
@@ -72,6 +66,8 @@ The full NERD repo will be made publicly available on GitHub soon under Apache 2
     http.jsonp.enable: true
 
 don't forget to update ``anhalytics-frontend/src/main/webapp/js/resource/config.js`` and ``anhalytics-index/index.properties`` with the correct settings for your local installation of ElasticSearch and NERD service.
+
+AnHALytics supports currently (April 2016) a version __1.4__ of ElasticSearch, we plan to upgrade to a version 2.* in the next weeks. 
 
 ###### 6. MongoDB
 
@@ -156,6 +152,7 @@ The final TEI is built and has the following struture
 At least the GROBID TEI is necessary to produce the final TEI, you can do so with:
 
 > java -Xmx2048m -jar target/anhalytics-harvest-```<current version>```.one-jar.jar -exe generateTei
+
 > java -Xmx2048m -jar target/anhalytics-harvest-```<current version>```.one-jar.jar -exe appendGrobidFulltext	
 
 ###### Document storage and provision
@@ -201,16 +198,37 @@ Annotations are persistently stored in a MongoDB collection and available for in
 
 #### 3. Indexing
 
+###### Build all the indexes 
+
+For building all the indexes required by the different freontend applications using all the existing loaded documents, use the following command:
+
+>java -Xmx2048m -jar target/anhalytics-index-```<current version>```.one-jar.jar -exe indexAll
+
+For indexing only the data corresponding on a daily basis:
+
+>java -Xmx2048m -jar target/anhalytics-index-```<current version>```.one-jar.jar -exe indexDaily
+
+The following commands make possible to index separately only certain type of data. 
+
 ###### Indexing TEI
 
-To index the final TEI documents, in the main directory of the sub-project ``anhalytics-annotate/``:
->java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -index tei
+To index the final TEI documents, in the main directory of the sub-project ``anhalytics-index/``:
+
+>java -Xmx2048m -jar target/anhalytics-index-```<current version>```.one-jar.jar -exe indexTEI
+
 
 ###### Indexing annotations
 
-For indexing the produced annotations in ElasticSearch, in the main directory of the sub-project ``anhalytics-annotate/``:
+For indexing the annotations, in the main directory of the sub-project ``anhalytics-index/``:
 
->java -Xmx2048m -jar target/anhalytics-annotate-```<current version>```.one-jar.jar -index annotation
+>java -Xmx2048m -jar target/anhalytics-index-```<current version>```.one-jar.jar -exe indexAnnotations
+
+##### Indexing the Knowledge Base
+
+For indexing the content of the Knowlkedge Base, in the main directory of the sub-project ``anhalytics-index/``:
+
+>java -Xmx2048m -jar target/anhalytics-index-```<current version>```.one-jar.jar -exe indexKB
+
 
 #### 4. Frontends
 
