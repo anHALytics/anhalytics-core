@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.List;
+import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -184,20 +186,38 @@ public class Utilities {
     }
 
     /**
-     * Add random xml ids on the textual nodes of the document
+     * Add xml ids on the textual nodes of the document
      */
-    public static void generateIDs(Document doc) {
+    /*public static void generateIDs(Document doc) {
         NodeList titles = doc.getElementsByTagName("title");
         NodeList abstracts = doc.getElementsByTagName("abstract");
         NodeList terms = doc.getElementsByTagName("term");
         NodeList funders = doc.getElementsByTagName("funder");
         NodeList codes = doc.getElementsByTagName("classCode");
+		NodeList paragraphs = doc.getElementsByTagName("p");
+		NodeList heads = doc.getElementsByTagName("head");
+		NodeList figDescs = doc.getElementsByTagName("figDesc");
+		NodeList items = doc.getElementsByTagName("item");
         generateID(titles);
         generateID(abstracts);
         generateID(terms);
         generateID(funders);
         generateID(codes);
-    }
+		generateID(paragraphs);
+		generateID(heads);
+		generateID(figDescs);
+		generateID(items);
+    }*/
+	
+	private static List<String> fields = 
+		Arrays.asList("title", "abstract", "term", "funder", "classCode", "p", "head", "figDesc", "item");
+	
+	public static void generateIDs(Document doc) {
+		for(String field : fields) {
+	        NodeList nodes = doc.getElementsByTagName(field);
+	        generateID(nodes);
+		}
+	}
 
     private static void generateID(NodeList theNodes) {
         for (int i = 0; i < theNodes.getLength(); i++) {

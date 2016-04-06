@@ -17,10 +17,11 @@ public class IndexProperties {
     private static String elasticSearch_port;
 
     private static String elasticSearchClusterName;
-    private static String annotsIndexName;
 
-    private static String teisIndexName;
-    private static String metadataIndexName;
+    private static String nerdAnnotsIndexName = "annotations_nerd";
+	private static String keytermAnnotsIndexName = "annotations_keyterm";
+    private static String teisIndexName  = "anhalytics_teis";
+    private static String metadataIndexName = "anhalytics_metadata"; // to be rename, it's not metadata but KB
 
     public static void init(String properties_filename) {
         Properties props = new Properties();
@@ -33,10 +34,10 @@ public class IndexProperties {
         setElasticSearch_host(props.getProperty("index.elasticSearch_host"));
         setElasticSearch_port(props.getProperty("index.elasticSearch_port"));
         setElasticSearchClusterName(props.getProperty("index.elasticSearch_cluster"));
-        setAnnotsIndexName(props.getProperty("index.elasticSearch_annotsIndexName"));
-        setTeisIndexName(props.getProperty("index.elasticSearch_teisIndexName"));
-        setAnnotsIndexName(props.getProperty("index.elasticSearch_annotsIndexName"));
-        setMetadataIndexName(props.getProperty("index.elasticSearch_mtdsIndexName"));
+        /*setTeisIndexName(props.getProperty("index.elasticSearch_teisIndexName"));
+        setNerdAnnotsIndexName(props.getProperty("index.elasticSearch_nerdAnnotsIndexName"));
+		setKeytermAnnotsIndexName(props.getProperty("index.elasticSearch_keytermAnnotsIndexName"));
+        setMetadataIndexName(props.getProperty("index.elasticSearch_mtdsIndexName"));*/
     }
 
     private static void checkPath(String path) {
@@ -91,45 +92,59 @@ public class IndexProperties {
     }
 
     /**
-     * @return the elasticSearchClusterName
+     * @return the ElasticSearch cluster name
      */
     public static String getElasticSearchClusterName() {
         return elasticSearchClusterName;
     }
 
     /**
-     * @param aElasticSearchClusterName the elasticSearchClusterName to set
+     * @param aElasticSearchClusterName the ElasticSearch cluster name to set
      */
     public static void setElasticSearchClusterName(String aElasticSearchClusterName) {
         elasticSearchClusterName = aElasticSearchClusterName;
     }
 
     /**
-     * @return the annotsIndexName
+     * @return the NERD annotation index name
      */
-    public static String getAnnotsIndexName() {
-        return annotsIndexName;
+    public static String getNerdAnnotsIndexName() {
+        return nerdAnnotsIndexName;
     }
 
     /**
-     * @param aAnnotsIndexName the annotsIndexName to set
+     * @param aNerdAnnotsIndexName the NERD annotation index name to set
      */
-    public static void setAnnotsIndexName(String aAnnotsIndexName) {
-        annotsIndexName = aAnnotsIndexName;
+    public static void setNerdAnnotsIndexName(String aNerdAnnotsIndexName) {
+        nerdAnnotsIndexName = aNerdAnnotsIndexName;
+    }
+	
+    /**
+     * @return the keyterm annotation index name
+     */
+    public static String getKeytermAnnotsIndexName() {
+        return keytermAnnotsIndexName;
     }
 
     /**
-     * @return the workingIndexName
+     * @param aKeytermAnnotsIndexName the keyterm annotation index name to set
+     */
+    public static void setKeytermAnnotsIndexName(String aKeytermAnnotsIndexName) {
+        keytermAnnotsIndexName = aKeytermAnnotsIndexName;
+    }
+
+    /**
+     * @return the index name for TEI
      */
     public static String getTeisIndexName() {
         return teisIndexName;
     }
 
     /**
-     * @param aWorkingIndexName the workingIndexName to set
+     * @param aTeisIndexName the index name for TEI to set
      */
-    public static void setTeisIndexName(String ateisIndexName) {
-        teisIndexName = ateisIndexName;
+    public static void setTeisIndexName(String aTeisIndexName) {
+        teisIndexName = aTeisIndexName;
     }
 
     /**

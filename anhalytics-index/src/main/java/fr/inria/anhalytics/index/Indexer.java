@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.json.JsonTapasML;
 import org.json.JSONObject;
-import fr.inria.anhalytics.commons.utilities.IndexingPreprocess;
+import fr.inria.anhalytics.index.IndexingPreprocess;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.index.properties.IndexProperties;
 import java.util.logging.Level;
@@ -58,9 +58,10 @@ public class Indexer {
             // loading based on DocDB XML, with TEI conversion
             int nbDoc = indexTeiCollection();
             logger.info("Total: " + nbDoc + " documents indexed.");
-
-            int nbAnnotsIndexed = indexAnnotations();
-            logger.info("Total: " + nbAnnotsIndexed + " annotations indexed.");
+			int nbKeytermAnnotsIndexed = indexKeytermAnnotations();
+			logger.info("Total: " + nbKeytermAnnotsIndexed + " keyterm annotations indexed.");
+            int nbNerdAnnotsIndexed = indexNerdAnnotations();
+            logger.info("Total: " + nbNerdAnnotsIndexed + " NERD annotations indexed.");
         } catch (Exception e) {
             logger.error("Error when setting-up ElasticSeach cluster");
             e.printStackTrace();
@@ -69,8 +70,9 @@ public class Indexer {
 
     public boolean isIndexExists() {
         boolean teisIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getTeisIndexName()).execute().actionGet().isExists();
-        boolean annotsIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getAnnotsIndexName()).execute().actionGet().isExists();
-        return (teisIndexExists && annotsIndexExists);
+        boolean annotsNerdIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getNerdAnnotsIndexName()).execute().actionGet().isExists();
+		boolean annotsKeytermIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getKeytermAnnotsIndexName()).execute().actionGet().isExists();
+        return (teisIndexExists && annotsNerdIndexExists && annotsKeytermIndexExists);
     }
 
     /**
@@ -97,7 +99,8 @@ public class Indexer {
     private boolean deleteIndex(String indexName) throws Exception {
         boolean val = false;
         try {
-            String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + indexName;
+            String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + 
+				IndexProperties.getElasticSearch_port() + "/" + indexName;
             URL url = new URL(urlStr);
             HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
             httpCon.setDoOutput(true);
@@ -179,8 +182,10 @@ public class Indexer {
         boolean val = false;
 
         String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + indexName;
-        if (indexName.contains("annotation")) {
-            urlStr += "/annotation/_mapping";
+        if (indexName.equals(IndexProperties.getNerdAnnotsIndexName())) {
+            urlStr += "/annotation_nerd/_mapping";
+        } else if (indexName.equals(IndexProperties.getKeytermAnnotsIndexName())) {
+            urlStr += "/annotation_keyterm/_mapping";
         } else {
             urlStr += "/npl/_mapping";
         }
@@ -194,8 +199,10 @@ public class Indexer {
         String mappingStr = null;
         try {
             ClassLoader classLoader = Indexer.class.getClassLoader();
-            if (indexName.contains("annotation")) {
-                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation.json"));
+            if (indexName.contains(IndexProperties.getNerdAnnotsIndexName())) {
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_nerd.json"));
+            } else if (indexName.contains(IndexProperties.getKeytermAnnotsIndexName())) {
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_keyterm.json"));
             } else {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl.json"));
             }
@@ -220,7 +227,7 @@ public class Indexer {
     }
 
     /**
-     * Launch the indexing of the HAL collection in ElasticSearch
+     * Indexing of the document collection in ElasticSearch
      */
     public int indexTeiCollection() {
         int nb = 0;
@@ -235,10 +242,9 @@ public class Indexer {
                         String tei = mm.nextTeiDocument();
                         String id = mm.getCurrentRepositoryDocId();
                         String docId = mm.getCurrentDocId();
-                        
-                        
+                      
                         if (!mm.isWithFulltext(id)) {
-                            //No interest to index docs without fulltext.
+                            //No interest to index docs without fulltext
                             continue;
                         }
 
@@ -255,7 +261,8 @@ public class Indexer {
 
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
-                        bulkRequest.add(client.prepareIndex(IndexProperties.getTeisIndexName(), "npl", docId).setSource(jsonStr));
+                        bulkRequest.add(client.prepareIndex(
+							IndexProperties.getTeisIndexName(), "npl", docId).setSource(jsonStr));
 
                         if (i >= 100) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -288,9 +295,61 @@ public class Indexer {
     }
 
     /**
-     * Launch the indexing of the HAL annotations in ElasticSearch
+     * Indexing of the keyterm annotations in ElasticSearch
      */
-    public int indexAnnotations() {
+    public int indexKeytermAnnotations() {
+        int nb = 0;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            for (String date : Utilities.getDates()) {
+                if (mm.initAnnotations(date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS)) {
+                    int i = 0;
+                    BulkRequestBuilder bulkRequest = client.prepareBulk();
+                    bulkRequest.setRefresh(true);
+                    while (mm.hasMoreAnnotations()) {
+                        String json = mm.nextAnnotation();
+                        String id = mm.getCurrentRepositoryDocId();
+                        String docId = mm.getCurrentDocId();
+
+                        // index the json in ElasticSearch
+                        // beware the document type bellow and corresponding mapping!
+						bulkRequest.add(client.prepareIndex(
+							IndexProperties.getKeytermAnnotsIndexName(), "annotation_keyterm", id).setSource(json));
+
+                        if (i >= 200) {
+                            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                            if (bulkResponse.hasFailures()) {
+                                // process failures by iterating through each bulk response item	
+                                logger.error(bulkResponse.buildFailureMessage());
+                            }
+                            bulkRequest = client.prepareBulk();
+                            bulkRequest.setRefresh(true);
+                            i = 0;
+                            System.out.print(".");
+                            System.out.flush();
+                        }
+                        i++;
+                        nb++;
+					}
+                    // last bulk
+                    BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                    if (bulkResponse.hasFailures()) {
+                        // process failures by iterating through each bulk response item	
+                        logger.error(bulkResponse.buildFailureMessage());
+                    }
+                    System.out.print("\n");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return nb;
+    }
+	
+    /**
+     * Indexing of the NERD annotations in ElasticSearch
+     */
+    public int indexNerdAnnotations() {
         int nb = 0;
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -325,10 +384,10 @@ public class Indexer {
 
                             // we do not index the empty annotation results! 
                             // the nerd subdoc has no entites field
-                            JsonNode nerdNode = temp.findPath("nerd");
+                            JsonNode annotNode = temp.findPath("nerd");
                             JsonNode entitiesNode = null;
-                            if ((nerdNode != null) && (!nerdNode.isMissingNode())) {
-                                entitiesNode = nerdNode.findPath("entities");
+                            if ((annotNode != null) && (!annotNode.isMissingNode())) {
+                                entitiesNode = annotNode.findPath("entities");
                             }
 
                             if ((entitiesNode == null) || entitiesNode.isMissingNode()) {
@@ -338,9 +397,10 @@ public class Indexer {
 
                             // index the json in ElasticSearch
                             // beware the document type bellow and corresponding mapping!
-                            bulkRequest.add(client.prepareIndex(IndexProperties.getAnnotsIndexName(), "annotation", xmlID).setSource(annotJson));
+							bulkRequest.add(client.prepareIndex(
+								IndexProperties.getNerdAnnotsIndexName(), "annotation_nerd", xmlID).setSource(annotJson));
 
-                            if (i >= 100) {
+                            if (i >= 200) {
                                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                                 if (bulkResponse.hasFailures()) {
                                     // process failures by iterating through each bulk response item	
@@ -436,14 +496,12 @@ public class Indexer {
                             Iterator<JsonNode> ite2 = idNodes.getElements();
                             while (ite2.hasNext()) {
                                 JsonNode node = (JsonNode) ite2.next();
-
                                 results.add(node.getTextValue());
                             }
                         }
                     }
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

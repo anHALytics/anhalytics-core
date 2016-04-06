@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.index.main;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.index.Indexer;
 import fr.inria.anhalytics.index.MetadataIndexer;
 import fr.inria.anhalytics.index.properties.IndexProperties;
@@ -10,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Arrays;
 import java.util.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +26,8 @@ public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    private static List<String> availableCommands = new ArrayList<String>() {
-        {
-            add("index");
-            add("indexDaily");
-            add("indexMtds");
-        }
-    };
+    private static List<String> availableCommands =
+            Arrays.asList("indexAll", "indexDaily", "indexTEI", "indexAnnotations", "indexKB");
 
     public static void main(String[] args) throws UnknownHostException {
 
@@ -83,19 +80,29 @@ public class Main {
         char reponse = ' ';
         String process = IndexProperties.getProcessName();
         Indexer esm = new Indexer();
+        //MetadataIndexer mi = new MetadataIndexer(); // this is the KB in fact !
 
-        MetadataIndexer mi = new MetadataIndexer();
-        if (process.equals("index")) {
+        if (process.equals("indexAll")) {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);
-
             if (reponse != 'N') {
                 esm.setUpIndex(IndexProperties.getTeisIndexName());
-                esm.setUpIndex(IndexProperties.getAnnotsIndexName());
+                esm.setUpIndex(IndexProperties.getNerdAnnotsIndexName());
+				esm.setUpIndex(IndexProperties.getKeytermAnnotsIndexName());
+                //mi.setUpIndex(IndexProperties.getMetadataIndexName());
             }
-            esm.indexAnnotations();
-            esm.indexTeiCollection();
-            esm.close();
+            int nbDoc = esm.indexTeiCollection();
+            logger.info("Total: " + nbDoc + " TEI documents indexed.");
+            int nbNerdAnnot = esm.indexNerdAnnotations();
+			logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+			int nbKeytermAnnot = esm.indexKeytermAnnotations();
+			logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+            
+            // TBD: counters would be nice
+            //mi.indexAuthors();
+            //mi.indexPublications();
+            //mi.indexOrganisations();
+
         } else if (process.equals("indexDaily")) {
             if (esm.isIndexExists()) {
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -104,25 +111,51 @@ public class Main {
                 String todayDate = dateFormat.format(cal.getTime());
                 Utilities.updateDates(todayDate, todayDate);
             } else {
-                System.err.println("Make sure both Teis index or annotations index are configured, you can choose re-init option to configure indexes.");
+                System.err.println("Make sure both TEI index or annotations index are configured, you can choose re-init option to configure indexes.");
                 esm.close();
                 return;
             }
-            esm.indexAnnotations();
-            esm.indexTeiCollection();
-            esm.close();
-        } else if (process.equals("indexMtds")) {
+            int nbDoc = esm.indexTeiCollection();
+            logger.info("Total: " + nbDoc + " documents indexed.");
+            int nbNerdAnnot = esm.indexNerdAnnotations();
+            logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+            int nbKeytermAnnot = esm.indexKeytermAnnotations();
+            logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+            
+            // TBD: daily KB refresh and indexing ?
+
+        } else if (process.equals("indexTEI")) {
+            System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
+            reponse = sc.nextLine().charAt(0);
+            if (reponse != 'N') {
+                esm.setUpIndex(IndexProperties.getTeisIndexName());
+            }
+            int nbDoc = esm.indexTeiCollection();
+            logger.info("Total: " + nbDoc + " TEI documents indexed.");
+        } else if (process.equals("indexAnnotations")) {
+            System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
+            reponse = sc.nextLine().charAt(0);
+            if (reponse != 'N') {
+                esm.setUpIndex(IndexProperties.getNerdAnnotsIndexName());
+                esm.setUpIndex(IndexProperties.getKeytermAnnotsIndexName());
+            }
+            int nbNerdAnnot = esm.indexNerdAnnotations();
+            logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+            int nbKeytermAnnot = esm.indexKeytermAnnotations();
+            logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+        } else if (process.equals("indexKB")) {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);
 
             if (reponse != 'N') {
-                mi.setUpIndex(IndexProperties.getMetadataIndexName());
+                //mi.setUpIndex(IndexProperties.getMetadataIndexName());
             }
-            mi.indexAuthors();
-            mi.indexPublications();
-            mi.indexOrganisations();
-            mi.close();
-        }
+            //mi.indexAuthors();
+            //mi.indexPublications();
+            //mi.indexOrganisations();
+        } 
+        esm.close();
+        //mi.close();
         return;
     }
 

@@ -78,9 +78,10 @@ public class Main {
             oai.fetchAllDocuments();
         } else if (process.equals("generateTei")) {
              //xml_ids are updated, the annotation is time consuming process.      
-            System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
+            /*System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);
-            if (reponse != 'N') {
+            if (reponse != 'N') */
+			{
                 tb.buildTei();
             }
         } else if (process.equals("generateTeiDaily")) {
@@ -93,9 +94,10 @@ public class Main {
             gp.processFulltexts();
         } else if (process.equals("appendGrobidFulltext")) {
             //xml_ids are updated, the annotation is time consuming process.      
-            System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
+            /*System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);
-            if (reponse != 'N') {
+            if (reponse != 'N') */
+			{
                 tb.appendGrobidFulltext();
             }
         } else if (process.equals("appendGrobidFulltextDaily")) {

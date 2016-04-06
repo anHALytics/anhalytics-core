@@ -184,6 +184,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
             }
             cursor = gfs.getFileList(bdbo);
+            cursor.addOption(com.mongodb.Bytes.QUERYOPTION_NOTIMEOUT);
             indexFile = 0;
         } catch (ParseException e) {
             logger.error(e.getMessage(), e.getCause());

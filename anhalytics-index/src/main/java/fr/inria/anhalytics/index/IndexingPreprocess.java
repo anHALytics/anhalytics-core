@@ -1,10 +1,13 @@
-package fr.inria.anhalytics.commons.utilities;
+package fr.inria.anhalytics.index;
 
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import org.codehaus.jackson.*;
 import org.codehaus.jackson.node.*;
 import org.codehaus.jackson.map.ObjectMapper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +21,8 @@ import java.text.SimpleDateFormat;
  * @author PL
  */
 public class IndexingPreprocess {
+
+    private static final Logger logger = LoggerFactory.getLogger(IndexingPreprocess.class);
 
     // this is the list of elements for which the text nodes should be expanded with an additional json
     // node capturing the nesting xml:lang attribute name/value pair
@@ -48,10 +53,10 @@ public class IndexingPreprocess {
             JsonNode tei = jsonRoot.findPath("$TEI");
             //check if fulltext is there..
             if (tei.isNull()) {
-                System.out.println(tei.toString());
+                logger.info(repositoryDocId + ": <tei> element is null -> " + tei.toString());
                 return null;
             }
-            if ((teiRoot != null) && (!teiRoot.isMissingNode())) {
+            if ((teiRoot != null) && (!teiRoot.isMissingNode())) {               
                 JsonNode standoffNode = getStandoff(mapper, id);
                 ((ArrayNode) teiRoot).add(standoffNode);
                 
@@ -368,7 +373,7 @@ public class IndexingPreprocess {
 
     private JsonNode getStandoff(ObjectMapper mapper, String id) throws Exception {
         JsonNode standoffNode = null;
-        String annotation = mm.getAnnotations(id, MongoCollectionsInterface.NERD_ANNOTATIONS);
+        String annotation = mm.getAnnotations(id, MongoCollectionsInterface.NERD_ANNOTATIONS);    
         if ((annotation != null) && (annotation.trim().length() > 0)) {
             JsonNode jsonAnnotation = mapper.readTree(annotation);
             Iterator<JsonNode> iter0 = jsonAnnotation.getElements();
@@ -426,10 +431,13 @@ public class IndexingPreprocess {
             }
             standoffNode = mapper.createObjectNode();
             ((ObjectNode) standoffNode).put("$standoff", annotNode);
-        } else {
-            // if we don't have annotations for the file, we skip it!
-            standoffNode = null;
+        }         
+
+        annotation = mm.getAnnotations(id, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);    
+        if ((annotation != null) && (annotation.trim().length() > 0)) {
+            // TBD 
         }
+
         return standoffNode;
     }
 

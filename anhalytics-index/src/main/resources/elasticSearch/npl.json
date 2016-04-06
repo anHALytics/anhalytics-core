@@ -872,21 +872,45 @@
                         }
                     },
                     "$standoff": {
-                        "properties": {
-                            "freeBaseExternalRef": {
-                                "type": "string"
-                            },
-                            "nerd_score": {
-                                "type": "string"
-                            },
-                            "preferredTerm": {
-                                "index": "not_analyzed",
-                                "type": "string"
-                            },
-                            "wikipediaExternalRef": {
-                                "type": "string"
-                            }
-                        }
+						"properties": {
+							"nerd" : {
+		                        "properties": {
+		                            "freeBaseExternalRef": {
+		                                "type": "string"
+		                            },
+		                            "nerd_score": {
+		                                "type": "string"
+		                            },
+		                            "preferredTerm": {
+		                                "index": "not_analyzed",
+		                                "type": "string"
+		                            },
+		                            "wikipediaExternalRef": {
+		                                "type": "string"
+		                            }
+		                        }
+							},
+							"keyterms" : {
+								"properties": {
+									"keyterm" : {
+										"type": "string"
+									},
+									"score" : {
+										"type": "string"
+									},
+		                            "preferredTerm": {
+		                                "index": "not_analyzed",
+		                                "type": "string"
+		                            },
+		                            "wikipediaExternalRef": {
+		                                "type": "string"
+		                            },
+		                            "freeBaseExternalRef": {
+		                                "type": "string"
+		                            }
+								}
+							}
+						}	
                     }
                 }
             },
