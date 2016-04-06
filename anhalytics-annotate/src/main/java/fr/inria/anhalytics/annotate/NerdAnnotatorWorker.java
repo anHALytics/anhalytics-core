@@ -93,7 +93,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
                 +"\",\"docId\" : \"" + docId
                 +"\", \"date\" :\"" + date
                 +"\", \"nerd\" : [");
-        annotateNode(doc.getDocumentElement(), true, json);
+        annotateNode(doc.getDocumentElement(), true, json, null);
         json.append("] }");
         return json.toString();
     }
@@ -103,10 +103,14 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
      */
     private boolean annotateNode(Node node,
             boolean first,
-            StringBuffer json) {
+            StringBuffer json,
+			String language) {
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             Element e = (Element) (node);
             String id = e.getAttribute("xml:id");
+			String new_language = e.getAttribute("xml:lang");
+			if ( (new_language != null) && (new_language.length() > 0) )
+				language = new_language;
             if (id.startsWith("_") && (id.length() == 8)) {
                 // get the textual content of the element
                 // annotate
@@ -114,7 +118,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
 				if ( (text != null) && (text.trim().length() > 1)) {
 	                String jsonText = null;
 	                try {
-	                    NerdService nerdService = new NerdService(text);
+	                    NerdService nerdService = new NerdService(text, language);
 	                    jsonText = nerdService.runNerd();
 	                } catch (Exception ex) {
 	                    logger.error("Text could not be annotated by NERD: " + text);
@@ -135,7 +139,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
         NodeList nodeList = node.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node currentNode = nodeList.item(i);
-            first = annotateNode(currentNode, first, json);
+            first = annotateNode(currentNode, first, json, language);
         }
         return first;
     }

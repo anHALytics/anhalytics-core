@@ -164,7 +164,7 @@ public class AnnotateProperties {
      * @return the port of the keyterm extraction service
      */
     public static String getKeytermPort() {
-        return nerd_port;
+        return keyterm_port;
     }
 
     /**

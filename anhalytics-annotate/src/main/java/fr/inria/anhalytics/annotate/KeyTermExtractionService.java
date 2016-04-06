@@ -51,7 +51,7 @@ public class KeyTermExtractionService {
     public String runKeyTermExtraction() {
         StringBuffer output = new StringBuffer();
         try {
-            URL url = new URL("http://" + AnnotateProperties.getKeytermHost()  + ":" + AnnotateProperties.getKeytermPort()  + "/keyterm/" + RESOURCEPATH);
+            URL url = new URL("http://" + AnnotateProperties.getKeytermHost()  + ":" + AnnotateProperties.getKeytermPort()  + "/" + RESOURCEPATH);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();		
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");

@@ -24,11 +24,13 @@ public class NerdService {
     private static final Logger logger = LoggerFactory.getLogger(NerdService.class);
 
     private String input = null;
+	private String language = null;
 
     static private String REQUEST = "processERDQuery";
 
-    public NerdService(String input) {
+    public NerdService(String input, String language) {
         this.input = input;
+		this.language = language;
     }
 
     /**
@@ -39,7 +41,7 @@ public class NerdService {
     public String runNerd() {
         StringBuffer output = new StringBuffer();
         try {
-            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + AnnotateProperties.getNerdPort() + "/nerd/service/" + REQUEST);
+            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + AnnotateProperties.getNerdPort() + "/service/" + REQUEST);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
@@ -53,6 +55,11 @@ public class NerdService {
             dataTable.add("de");
             dataTable.add("en");
             node.put("resultLanguages", dataTable);
+			if (language != null) {
+	            ObjectNode dataNode = mapper.createObjectNode();
+	            dataNode.put("lang", language);
+				node.put("language", dataNode);
+			}
             byte[] postDataBytes = node.toString().getBytes("UTF-8");
 
             OutputStream os = conn.getOutputStream();
@@ -61,6 +68,7 @@ public class NerdService {
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 logger.error("Failed annotating text segment: HTTP error code : "
                         + conn.getResponseCode());
+				logger.error(input);
                 return null;
             }
             BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));

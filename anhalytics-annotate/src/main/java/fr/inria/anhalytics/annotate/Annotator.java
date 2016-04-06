@@ -138,6 +138,7 @@ public class Annotator {
                             if (!mm.isWithFulltext(id)) {
                                 continue;
                             }
+
                             // check if the document is already annotated
                             if (!AnnotateProperties.isReset()) {
                                 if (mm.isAnnotated(annotationsCollection)) {
@@ -160,7 +161,7 @@ public class Annotator {
 							else {
 								worker = new KeyTermAnnotatorWorker(mm, id, docID, tei, date);    
 							}
-								
+
                             worker.run();
                             nb++;
                         }
