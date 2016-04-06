@@ -38,7 +38,9 @@ public class Main {
             } catch (Exception e) {
                 logger.error(e.getMessage());
             }
-
+            if (IndexProperties.getFromDate() != null || IndexProperties.getUntilDate() != null) {
+                Utilities.updateDates(IndexProperties.getUntilDate(), IndexProperties.getFromDate());
+            }
             Main main = new Main();
             main.processCommand();
         } else {
@@ -55,6 +57,10 @@ public class Main {
             if (currArg.equals("-h")) {
                 System.out.println(getHelp());
                 continue;
+            } else if (currArg.equals("-nodates")) {
+                IndexProperties.setProcessByDate(false);
+                i++;
+                continue;
             } else if (currArg.equals("-exe")) {
                 String command = args[i + 1];
                 if (availableCommands.contains(command)) {
@@ -66,6 +72,30 @@ public class Main {
                     result = false;
                     break;
                 }
+            } else if (currArg.equals("-dFromDate")) {
+                String stringDate = args[i + 1];
+                if (!stringDate.isEmpty()) {
+                    if (Utilities.isValidDate(stringDate)) {
+                        IndexProperties.setFromDate(args[i + 1]);
+                    } else {
+                        System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
+                        result = false;
+                    }
+                }
+                i++;
+                continue;
+            } else if (currArg.equals("-dUntilDate")) {
+                String stringDate = args[i + 1];
+                if (!stringDate.isEmpty()) {
+                    if (Utilities.isValidDate(stringDate)) {
+                        IndexProperties.setUntilDate(stringDate);
+                    } else {
+                        System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
+                        result = false;
+                    }
+                }
+                i++;
+                continue;
             } else {
                 result = false;
             }

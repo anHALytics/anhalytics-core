@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  *
  * @author azhar
  */
-public class In_SerialDAO extends DAO<In_Serial> {
+public class In_SerialDAO extends DAO<In_Serial, Long> {
 
     private static final String SQL_INSERT
             = "INSERT INTO IN_SERIAL (monographID, collectionID, journalID, volume, number) VALUES (?, ?, ?, ?, ?)";
@@ -133,14 +133,14 @@ public class In_SerialDAO extends DAO<In_Serial> {
         try {
             ResultSet result = this.connect.createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM monograph, in_serial LEFT JOIN collection ON collection.collectionID = in_serial.collectionID LEFT JOIN journal ON journal.journalID = in_serial.journalID WHERE in_serial.monographID = "+id+" AND monograph.monographID = "+id);
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM MONOGRAPH, IN_SERIAL LEFT JOIN COLLECTION ON COLLECTION.collectionID = IN_SERIAL.collectionID LEFT JOIN JOURNAL ON JOURNAL.journalID = IN_SERIAL.journalID WHERE IN_SERIAL.monographID = "+id+" AND MONOGRAPH.monographID = "+id);
             if (result.first()) {
                 in_serial = new In_Serial(
-                        new Monograph(result.getLong("monograph.monographID"),result.getString("monograph.type"), result.getString("monograph.title"), result.getString("monograph.shortname") ),
-                        new Journal(result.getLong("journal.journalID"), result.getString("journal.title")),
-                        new Collection(result.getLong("collection.collectionID"), result.getString("collection.title")),
-                        result.getString("volume"),
-                        result.getString("number"));
+                        new Monograph(result.getLong("MONOGRAPH.monographID"),result.getString("MONOGRAPH.type"), result.getString("MONOGRAPH.title"), result.getString("MONOGRAPH.shortname") ),
+                        new Journal(result.getLong("JOURNAL.journalID"), result.getString("JOURNAL.title")),
+                        new Collection(result.getLong("COLLECTION.collectionID"), result.getString("COLLECTION.title")),
+                        result.getString("IN_SERIAL.volume"),
+                        result.getString("IN_SERIAL.number"));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

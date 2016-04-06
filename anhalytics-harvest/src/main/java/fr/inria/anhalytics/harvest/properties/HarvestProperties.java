@@ -18,6 +18,8 @@ public class HarvestProperties {
 
     private static String untilDate;
 
+    private static boolean processByDate = true;
+    
     private static String oaiUrl;
 
     private static String grobidHost;
@@ -219,6 +221,20 @@ public class HarvestProperties {
      */
     public static void setGrobidProperties(String aGrobidProperties) {
         grobidProperties = aGrobidProperties;
+    }
+
+    /**
+     * @return the processByDate
+     */
+    public static boolean isProcessByDate() {
+        return processByDate;
+    }
+
+    /**
+     * @param aProcessByDate the processByDate to set
+     */
+    public static void setProcessByDate(boolean aProcessByDate) {
+        processByDate = aProcessByDate;
     }
 
 }

@@ -18,6 +18,8 @@ public class AnnotateProperties {
 
     private static String untilDate;
 
+    private static boolean processByDate = true;
+
     private static String nerd_host = null;
 
     private static String nerd_port = null;
@@ -228,6 +230,20 @@ public class AnnotateProperties {
      */
     public static void setProcessName(String aProcessName) {
         processName = aProcessName;
+    }
+
+    /**
+     * @return the processByDate
+     */
+    public static boolean isProcessByDate() {
+        return processByDate;
+    }
+
+    /**
+     * @param aProcessByDate the processByDate to set
+     */
+    public static void setProcessByDate(boolean aProcessByDate) {
+        processByDate = aProcessByDate;
     }
 
 }

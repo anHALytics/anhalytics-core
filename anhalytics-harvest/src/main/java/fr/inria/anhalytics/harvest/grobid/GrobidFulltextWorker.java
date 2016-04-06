@@ -17,8 +17,8 @@ public class GrobidFulltextWorker extends GrobidWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(GrobidFulltextWorker.class);
     
-    public GrobidFulltextWorker(InputStream content, String id, String date) throws UnknownHostException {
-        super(content, id, date);
+    public GrobidFulltextWorker(InputStream content, String id, String anhalyticsId, String date) throws UnknownHostException {
+        super(content, id, anhalyticsId, date);
     }
     
     @Override
@@ -32,13 +32,14 @@ public class GrobidFulltextWorker extends GrobidWorker {
                     for (final File currFile : files) {
                         if (currFile.getName().toLowerCase().endsWith(".png")) {
                             InputStream targetStream = FileUtils.openInputStream(currFile);
-                            mm.insertGrobidAssetDocument(targetStream, id, currFile.getName(), date);
+                            mm.insertGrobidAssetDocument(targetStream, id, anhalyticsId,currFile.getName(), date);
                             targetStream.close();
                         } else if (currFile.getName().toLowerCase().endsWith(".xml")) {
                             tei = Utilities.readFile(currFile.getAbsolutePath());
                             tei = Utilities.trimEncodedCharaters(tei);
+                            tei = generateIdsTeiDoc(tei);
                             System.out.println(id);
-                            mm.insertGrobidTei(tei, id, date);
+                            mm.insertGrobidTei(tei, id, anhalyticsId, date);
                         }
                     }
                 }

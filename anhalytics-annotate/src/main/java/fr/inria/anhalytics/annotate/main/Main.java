@@ -41,7 +41,7 @@ public class Main {
 
         if (processArgs(args)) {
             if (AnnotateProperties.getFromDate() != null || AnnotateProperties.getUntilDate() != null) {
-                Utilities.updateDates(AnnotateProperties.getFromDate(), AnnotateProperties.getUntilDate());
+                Utilities.updateDates(AnnotateProperties.getUntilDate(), AnnotateProperties.getFromDate());
             }
             Main main = new Main();
             main.processCommand();
@@ -80,6 +80,10 @@ public class Main {
             currArg = args[i];
             if (currArg.equals("-h")) {
                 System.out.println(getHelp());
+                continue;
+            } else if (currArg.equals("-nodates")) {
+                AnnotateProperties.setProcessByDate(false);
+                i++;
                 continue;
             } else if (currArg.equals("-dFromDate")) {
                 String stringDate = args[i + 1];

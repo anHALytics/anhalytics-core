@@ -12,7 +12,7 @@ import java.sql.Statement;
  *
  * @author achraf
  */
-public class Document_OrganisationDAO extends DAO<Document_Organisation> {
+public class Document_OrganisationDAO extends DAO<Document_Organisation, Long> {
 
     private static final String SQL_INSERT
             = "INSERT INTO DOCUMENT_ORGANISATION (docID, organisationID, type) VALUES (?, ?, ?)";
@@ -32,7 +32,7 @@ public class Document_OrganisationDAO extends DAO<Document_Organisation> {
         try {
             statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
             for (Organisation org : obj.getOrgs()) {
-                statement.setLong(1, obj.getDoc().getDocID());
+                statement.setString(1, obj.getDoc().getDocID());
                 statement.setLong(2, org.getOrganisationId());
                 statement.setString(3, org.getType());
                 int code = statement.executeUpdate();

@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Main class that implements commands for harvesting, extracting, inserting in
@@ -32,8 +31,6 @@ public class Main {
             add("fetchEmbargoPublications");
             add("processGrobid");
             add("processGrobidDaily");
-            add("appendGrobidFulltext");
-            add("appendGrobidFulltextDaily");
             add("harvestIstex");
             add("assetLegend");
         }
@@ -47,8 +44,10 @@ public class Main {
         }
 
         if (processArgs(args)) {
-            if (HarvestProperties.getFromDate() != null || HarvestProperties.getUntilDate() != null) {
-                Utilities.updateDates(HarvestProperties.getUntilDate(), HarvestProperties.getFromDate());
+            if(HarvestProperties.isProcessByDate()){
+                if (HarvestProperties.getFromDate() != null || HarvestProperties.getUntilDate() != null) {
+                    Utilities.updateDates(HarvestProperties.getUntilDate(), HarvestProperties.getFromDate());
+                }
             }
             Utilities.setTmpPath(HarvestProperties.getTmpPath());
             Main main = new Main();
@@ -60,8 +59,6 @@ public class Main {
     }
 
     private void processCommand() throws UnknownHostException {
-        Scanner sc = new Scanner(System.in);
-        char reponse = ' ';
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
@@ -77,38 +74,20 @@ public class Main {
             Utilities.updateDates(todayDate, todayDate);
             oai.fetchAllDocuments();
         } else if (process.equals("generateTei")) {
-             //xml_ids are updated, the annotation is time consuming process.      
-            /*System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
-            reponse = sc.nextLine().charAt(0);
-            if (reponse != 'N') */
-			{
-                tb.buildTei();
-            }
+            tb.buildTei();
         } else if (process.equals("generateTeiDaily")) {
             Utilities.updateDates(todayDate, todayDate);
             tb.buildTei();
-        }else if (process.equals("processGrobid")) {
+        } else if (process.equals("processGrobid")) {
             gp.processFulltexts();
         } else if (process.equals("processGrobidDaily")) {
             Utilities.updateDates(todayDate, todayDate);
             gp.processFulltexts();
-        } else if (process.equals("appendGrobidFulltext")) {
-            //xml_ids are updated, the annotation is time consuming process.      
-            /*System.out.println("xml_ids used for the annotation purpose will be updated, the annotation is time consuming, continue ?(Y/N)");
-            reponse = sc.nextLine().charAt(0);
-            if (reponse != 'N') */
-			{
-                tb.appendGrobidFulltext();
-            }
-        } else if (process.equals("appendGrobidFulltextDaily")) {
-            //xml_ids are updated, the annotation is time consuming process.
-            Utilities.updateDates(todayDate, todayDate);
-            tb.appendGrobidFulltext();
         } else if (process.equals("fetchEmbargoPublications")) {
             oai.fetchEmbargoPublications();
         } else if (process.equals("harvestIstex")) {
             ih.harvest();
-        }else if (process.equals("assetLegend")) {
+        } else if (process.equals("assetLegend")) {
             gp.addAssetsLegend();
         }
         return;
@@ -126,6 +105,10 @@ public class Main {
                     System.out.println(getHelp());
                     result = false;
                     break;
+                } else if (currArg.equals("-nodates")) {
+                    HarvestProperties.setProcessByDate(false);
+                    i++;
+                    continue;
                 } else if (currArg.equals("-dFromDate")) {
                     String stringDate = pArgs[i + 1];
                     if (!stringDate.isEmpty()) {

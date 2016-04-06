@@ -17,6 +17,8 @@ public class IngestProperties {
 
     private static String untilDate;
 
+    private static boolean processByDate = true;
+
     private static String mysql_url;
     private static String mysql_db;
     private static String mysql_bibliodb;
@@ -167,5 +169,19 @@ public class IngestProperties {
      */
     public static void setMysql_pass(String aMysql_pass) {
         mysql_pass = aMysql_pass;
+    }
+
+    /**
+     * @return the processByDate
+     */
+    public static boolean isProcessByDate() {
+        return processByDate;
+    }
+
+    /**
+     * @param aProcessByDate the processByDate to set
+     */
+    public static void setProcessByDate(boolean aProcessByDate) {
+        processByDate = aProcessByDate;
     }
 }

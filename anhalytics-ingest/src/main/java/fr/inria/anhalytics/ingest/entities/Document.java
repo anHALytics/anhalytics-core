@@ -9,12 +9,12 @@ import java.util.Map;
  */
 public class Document {
 
-    private Long docID;
+    private String docID;
     private String version = "";
     private String tei_metadata = "";
     private String uri = "";
 
-    public Document(Long docID, String version, String tei_metadata, String uri) {
+    public Document(String docID, String version, String tei_metadata, String uri) {
         this.docID = docID;
         this.version = version;
         this.tei_metadata = tei_metadata;
@@ -27,14 +27,14 @@ public class Document {
     /**
      * @return the docID
      */
-    public Long getDocID() {
+    public String getDocID() {
         return docID;
     }
 
     /**
      * @param docID the docID to set
      */
-    public void setDocID(Long docID) {
+    public void setDocID(String docID) {
         this.docID = docID;
     }
 

@@ -36,6 +36,7 @@ import fr.inria.anhalytics.ingest.entities.Person_Identifier;
 import fr.inria.anhalytics.ingest.entities.Publication;
 import fr.inria.anhalytics.ingest.entities.Publisher;
 import fr.inria.anhalytics.ingest.entities.Serial_Identifier;
+import fr.inria.anhalytics.ingest.properties.IngestProperties;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -69,14 +70,8 @@ public class HALMiner extends Miner {
 
     private static XPath xPath = XPathFactory.newInstance().newXPath();
 
-    public static String docID = "";
-
     public HALMiner() throws UnknownHostException {
         super();
-    }
-
-    public static String getDocId() {
-        return docID;
     }
 
     /**
@@ -86,13 +81,22 @@ public class HALMiner extends Miner {
         DAOFactory.initConnection();
         PublicationDAO pd = (PublicationDAO) adf.getPublicationDAO();
         DocumentDAO dd = (DocumentDAO) adf.getDocumentDAO();
-        
+
         for (String date : Utilities.getDates()) {
+
+            if (!IngestProperties.isProcessByDate()) {
+                date = null;
+            }
             if (mm.initTeis(date)) {
                 while (mm.hasMoreTeis()) {
                     String metadataTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
-                    if (!dd.isMined(uri)) {
+                    String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
+                    if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
+                        logger.info("skipping " + uri + " No anHALytics id provided");
+                        continue;
+                    }
+                    if (!dd.isMined(currentAnhalyticsId)) {
                         adf.openTransaction();
                         Document generatedTeiDoc = null;
                         try {
@@ -122,10 +126,9 @@ public class HALMiner extends Miner {
                             NodeList monogr = (NodeList) xPath.compile(HALTEIMetadata.MonogrElement).evaluate(generatedTeiDoc, XPathConstants.NODESET);
                             NodeList ids = (NodeList) xPath.compile(HALTEIMetadata.IdnoElement).evaluate(generatedTeiDoc, XPathConstants.NODESET);
 
-                            fr.inria.anhalytics.ingest.entities.Document doc = new fr.inria.anhalytics.ingest.entities.Document(null, Utilities.getVersionFromURI(uri), Utilities.innerXmlToString(metadata), uri);
+                            fr.inria.anhalytics.ingest.entities.Document doc = new fr.inria.anhalytics.ingest.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(uri), Utilities.innerXmlToString(metadata), uri);
 
                             dd.create(doc);
-                            docID = Long.toString(doc.getDocID());
 
                             pub.setDocument(doc);
                             // for some pub types we just keep the submission date.
@@ -151,10 +154,13 @@ public class HALMiner extends Miner {
                         adf.endTransaction();
                         if (generatedTeiDoc != null) {
                             String generatedTeiString = Utilities.toString(generatedTeiDoc);
-                            mm.updateTei(generatedTeiString, uri, docID, true);
+                            mm.updateTei(generatedTeiString, uri, false);
                         }
                     }
                 }
+            }
+            if (!IngestProperties.isProcessByDate()) {
+                break;
             }
 
         }

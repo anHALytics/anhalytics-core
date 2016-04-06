@@ -2,10 +2,13 @@ package fr.inria.anhalytics.ingest.dao.anhalytics;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.DocumentDAO;
 import fr.inria.anhalytics.dao.DAO;
+import fr.inria.anhalytics.ingest.entities.Affiliation;
 import fr.inria.anhalytics.ingest.entities.Organisation;
 import fr.inria.anhalytics.ingest.entities.PART_OF;
+import fr.inria.anhalytics.ingest.entities.Person;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,7 +26,7 @@ import java.util.logging.Logger;
  *
  * @author azhar
  */
-public class OrganisationDAO extends DAO<Organisation> {
+public class OrganisationDAO extends DAO<Organisation, Long> {
 
     private static final String SQL_INSERT
             = "INSERT INTO ORGANISATION (type, url, structID) VALUES (?, ?, ?)";
@@ -35,6 +38,10 @@ public class OrganisationDAO extends DAO<Organisation> {
 
     private static final String SQL_UPDATE_END_DATE
             = "UPDATE PART_OF SET end_date = ? WHERE organisationID = ? AND organisation_motherID = ?";
+    
+    
+
+    private static final String SQL_SELECT_AFFILIATION_BY_PERSONID = "SELECT * FROM AFFILIATION WHERE personID = ?";
 
     private static final String SQL_SELECT_MOTHERID_BY_ORGID = "SELECT * FROM PART_OF WHERE organisationID = ?";
 
@@ -269,16 +276,7 @@ public class OrganisationDAO extends DAO<Organisation> {
             PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECTALL);
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
-
-                organisations.add(new Organisation(
-                        rs.getLong("org.organisationID"),
-                        rs.getString("org.type"),
-                        rs.getString("org.url"),
-                        rs.getString("org.structID"),
-                        new ArrayList<String>(),
-                        findMothers(rs.getLong("org.organisationID"))
-                ));
-
+                organisations.add(find(rs.getLong("org.organisationID")));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -321,6 +319,37 @@ public class OrganisationDAO extends DAO<Organisation> {
         }
 
         return orgId;
+    }
+    
+    public List<Affiliation> getAffiliationByPersonID(Person person) {
+        List<Affiliation> affiliations = new ArrayList<Affiliation>();
+
+        Affiliation affiliation = null;
+        Organisation organisation = null;
+        try {
+            PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_AFFILIATION_BY_PERSONID);
+            ps.setLong(1, person.getPersonId());
+            // process the results
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                try {
+                    affiliation = new Affiliation(
+                            rs.getLong("affiliationID"),
+                            new ArrayList<Organisation>(),
+                            person,
+                            Utilities.parseStringDate(rs.getString("begin_date")),
+                            Utilities.parseStringDate(rs.getString("end_date"))
+                    );
+                    affiliation.addOrganisation(find(rs.getLong("organisationID")));
+                } catch (ParseException ex) {
+                    Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                affiliations.add(affiliation);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return affiliations;
     }
 
 }

@@ -23,6 +23,7 @@ public class Annotator {
     private final MongoFileManager mm;
 
     public enum Annotator_Type {
+
         NERD("NERD"),
         KEYTERM("KeyTerm");
 
@@ -57,26 +58,32 @@ public class Annotator {
     /**
      * Annotates tei collection entries with fulltext.
      */
-    private void annotateTeiCollection(Annotator_Type annotator_type) 
-        throws UnreachableNerdServiceException, AnnotatorNotAvailableException {
+    private void annotateTeiCollection(Annotator_Type annotator_type)
+            throws UnreachableNerdServiceException, AnnotatorNotAvailableException {
         int nb = 0;
         String annotationsCollection = null;
-        if (annotator_type == Annotator_Type.NERD)
+        if (annotator_type == Annotator_Type.NERD) {
             annotationsCollection = MongoCollectionsInterface.NERD_ANNOTATIONS;
-        else if (annotator_type == Annotator_Type.KEYTERM)
+        } else if (annotator_type == Annotator_Type.KEYTERM) {
             annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
-        else
-            throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type); 
+        } else {
+            throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
+        }
         try {
             if (NerdService.isNerdReady()) {
                 for (String date : Utilities.getDates()) {
+
+                    if (!AnnotateProperties.isProcessByDate()) {
+                        date = null;
+                    }
                     if (mm.initTeis(date)) {
                         logger.debug("processing teis for :" + date);
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
-                            String docID = mm.getCurrentDocId();
-                            if (!mm.isWithFulltext(id)) {
+                            String anhalyticsId = mm.getCurrentAnhalyticsId();
+                            if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                                logger.info("skipping " + id + " No anHALytics id provided");
                                 continue;
                             }
                             // check if the document is already annotated
@@ -95,13 +102,16 @@ public class Annotator {
                             }
                             Runnable worker = null;
                             if (annotator_type == Annotator_Type.NERD) {
-                                worker = new NerdAnnotatorWorker(mm, id, docID, tei, date);
+                                worker = new NerdAnnotatorWorker(mm, id, anhalyticsId, tei, date);
                             } else if (annotator_type == Annotator_Type.KEYTERM) {
-                                worker = new KeyTermAnnotatorWorker(mm, id, docID, tei, date);    
+                                worker = new KeyTermAnnotatorWorker(mm, id, anhalyticsId, tei, date);
                             }
                             worker.run();
                             nb++;
                         }
+                    }
+                    if (!AnnotateProperties.isProcessByDate()) {
+                        break;
                     }
                 }
             }
@@ -114,28 +124,32 @@ public class Annotator {
     /**
      * Annotates tei collection entries with fulltext (multithread process).
      */
-    private void annotateTeiCollectionMultiThreaded(Annotator_Type annotator_type) 
-        throws UnreachableNerdServiceException, AnnotatorNotAvailableException {
+    private void annotateTeiCollectionMultiThreaded(Annotator_Type annotator_type)
+            throws UnreachableNerdServiceException, AnnotatorNotAvailableException {
         int nb = 0;
         String annotationsCollection = null;
-        if (annotator_type == Annotator_Type.NERD)
+        if (annotator_type == Annotator_Type.NERD) {
             annotationsCollection = MongoCollectionsInterface.NERD_ANNOTATIONS;
-        else if (annotator_type == Annotator_Type.KEYTERM)
+        } else if (annotator_type == Annotator_Type.KEYTERM) {
             annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
-        else
-            throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type); 
+        } else {
+            throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
+        }
         try {
-            //if (NerdService.isNerdReady()) 
-			{
+            if (NerdService.isNerdReady()) {
                 ThreadPoolExecutor executor = getThreadsExecutor(annotator_type);
                 for (String date : Utilities.getDates()) {
+                    if (!AnnotateProperties.isProcessByDate()) {
+                        date = null;
+                    }
                     if (mm.initTeis(date)) {
                         //logger.debug("processing teis for :" + date);
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
-                            String docID = mm.getCurrentDocId();
-                            if (!mm.isWithFulltext(id)) {
+                            String anhalyticsId = mm.getCurrentAnhalyticsId();
+                            if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                                logger.info("skipping " + id + " No anHALytics id provided");
                                 continue;
                             }
 
@@ -156,17 +170,19 @@ public class Annotator {
 
                             Runnable worker = null;
                             if (annotator_type == Annotator_Type.NERD) {
-                                worker = new NerdAnnotatorWorker(mm, id, docID, tei, date);
-							}
-							else {
-								worker = new KeyTermAnnotatorWorker(mm, id, docID, tei, date);    
-							}
+                                worker = new NerdAnnotatorWorker(mm, id, anhalyticsId, tei, date);
+                            } else {
+                                worker = new KeyTermAnnotatorWorker(mm, id, anhalyticsId, tei, date);
+                            }
 
-                            worker.run();
+                            executor.execute(worker);
                             nb++;
                         }
                     }
-				}
+                    if (!AnnotateProperties.isProcessByDate()) {
+                        break;
+                    }
+                }
                 executor.shutdown();
                 while (!executor.isTerminated()) {
                 }
@@ -182,10 +198,11 @@ public class Annotator {
         // max queue of tasks of 50 
         BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(50);
         int nbThreads = 1;
-        if (annotator_type == annotator_type.NERD)
+        if (annotator_type == annotator_type.NERD) {
             nbThreads = AnnotateProperties.getNerdNbThreads();
-        else if (annotator_type == annotator_type.KEYTERM)
+        } else if (annotator_type == annotator_type.KEYTERM) {
             nbThreads = AnnotateProperties.getKeytermNbThreads();
+        }
         ThreadPoolExecutor executor = new ThreadPoolExecutor(nbThreads, nbThreads, 60000,
                 TimeUnit.MILLISECONDS, blockingQueue);
 

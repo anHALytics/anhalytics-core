@@ -3,6 +3,7 @@ package fr.inria.anhalytics.dao;
 import fr.inria.anhalytics.ingest.entities.Address;
 import fr.inria.anhalytics.ingest.entities.Conference;
 import fr.inria.anhalytics.ingest.entities.Conference_Event;
+import fr.inria.anhalytics.ingest.entities.Country;
 import fr.inria.anhalytics.ingest.entities.Monograph;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,18 +11,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-
 /**
  *
  * @author azhar
  */
-public class Conference_EventDAO extends DAO<Conference_Event> {
+public class Conference_EventDAO extends DAO<Conference_Event, Long> {
 
     private static final String SQL_INSERT
             = "INSERT INTO CONFERENCE_EVENT (conferenceID, addressID, start_date, end_date, monographID) VALUES (?, ?, ?, ?, ?)";
 
     private static final String SQL_INSERT_CONFERENCE
             = "INSERT INTO CONFERENCE (title) VALUES (?)";
+    
+    private static final String SQL_SELECT_CONFERENCE
+            = "SELECT * FROM CONFERENCE_EVENT, CONFERENCE, ADDRESS WHERE conference_eventID = ? AND CONFERENCE_EVENT.conferenceID = CONFERENCE.conferenceID AND ADDRESS.addressID = CONFERENCE_EVENT.addressID";
+    
+    private static final String SQL_SELECT_CONFERENCE_BY_MONOGR
+            = "SELECT * FROM CONFERENCE_EVENT, CONFERENCE, ADDRESS  WHERE monographID = ? AND CONFERENCE_EVENT.conferenceID = CONFERENCE.conferenceID AND ADDRESS.addressID = CONFERENCE_EVENT.addressID";
 
     public Conference_EventDAO(Connection conn) {
         super(conn);
@@ -83,20 +89,43 @@ public class Conference_EventDAO extends DAO<Conference_Event> {
 
     @Override
     public Conference_Event find(Long id) throws SQLException {
-        Conference_Event conference_event = new Conference_Event();
+        Conference_Event conference_event = null;
 
         ResultSet result = this.connect.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM monograph WHERE monographID = " + id);
+                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM MONOGRAPH WHERE monographID = " + id);
         if (result.first()) {
             conference_event = new Conference_Event(
                     id,
                     result.getString("start_date"),
                     result.getString("end_date"),
                     new Monograph(),
-                    new Conference(),
+                    new Conference(result.getLong("conferenceID"), result.getString("title")),
                     new Address()
             );
+        }
+        return conference_event;
+    }
+
+    public Conference_Event findByMonograph(Long id) {
+        Conference_Event conference_event = null;
+        try {
+            PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_CONFERENCE_BY_MONOGR);
+            ps.setLong(1, id);
+            // process the results
+            ResultSet rs = ps.executeQuery();
+            if (rs.first()) {
+                conference_event = new Conference_Event(
+                        rs.getLong("conference_eventID"),
+                        rs.getString("start_date"),
+                        rs.getString("end_date"),
+                        new Monograph(),
+                        new Conference(rs.getLong("conferenceID"), rs.getString("title")),
+                        new Address(rs.getLong("addressID"), rs.getString("addrLine"), rs.getString("postBox"), rs.getString("postCode"), rs.getString("settlement"), rs.getString("region"), rs.getString("country"), new Country())
+                );
+            }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
         }
         return conference_event;
     }

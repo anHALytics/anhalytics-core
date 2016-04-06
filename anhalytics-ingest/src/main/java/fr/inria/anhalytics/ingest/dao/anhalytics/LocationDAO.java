@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  *
  * @author azhar
  */
-public class LocationDAO extends DAO<Location> {
+public class LocationDAO extends DAO<Location, Long> {
 
     private static final String SQL_INSERT
             = "INSERT INTO LOCATION (organisationID, addressID, begin_date, end_date) VALUES (?, ?, ?, ?)";
@@ -33,7 +33,8 @@ public class LocationDAO extends DAO<Location> {
         if (obj.getLocationId() != null) {
             throw new IllegalArgumentException("Location is already created, the Location ID is not null.");
         }
-
+        
+// check if location already exist and update dates if it is
         PreparedStatement statement;
         statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
         statement.setLong(1, obj.getOrganisation().getOrganisationId());
@@ -72,7 +73,7 @@ public class LocationDAO extends DAO<Location> {
 
         ResultSet result = this.connect.createStatement(
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM location WHERE locationID = " + id);
+                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM LOCATION WHERE locationID = " + id);
         if (result.first()) {
             try {
                 location = new Location(

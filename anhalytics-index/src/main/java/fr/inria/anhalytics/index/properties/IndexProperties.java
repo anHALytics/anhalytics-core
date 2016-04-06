@@ -23,6 +23,12 @@ public class IndexProperties {
     private static String teisIndexName  = "anhalytics_teis";
     private static String metadataIndexName = "anhalytics_metadata"; // to be rename, it's not metadata but KB
 
+    private static String fromDate;
+
+    private static String untilDate;
+
+    private static boolean processByDate = true;
+
     public static void init(String properties_filename) {
         Properties props = new Properties();
         try {
@@ -159,6 +165,48 @@ public class IndexProperties {
      */
     public static void setMetadataIndexName(String aMetadataIndexName) {
         metadataIndexName = aMetadataIndexName;
+    }
+
+    /**
+     * @return the fromDate
+     */
+    public static String getFromDate() {
+        return fromDate;
+    }
+
+    /**
+     * @param aFromDate the fromDate to set
+     */
+    public static void setFromDate(String aFromDate) {
+        fromDate = aFromDate;
+    }
+
+    /**
+     * @return the untilDate
+     */
+    public static String getUntilDate() {
+        return untilDate;
+    }
+
+    /**
+     * @param aUntilDate the untilDate to set
+     */
+    public static void setUntilDate(String aUntilDate) {
+        untilDate = aUntilDate;
+    }
+
+    /**
+     * @return the processByDate
+     */
+    public static boolean isProcessByDate() {
+        return processByDate;
+    }
+
+    /**
+     * @param aProcessByDate the processByDate to set
+     */
+    public static void setProcessByDate(boolean aProcessByDate) {
+        processByDate = aProcessByDate;
     }
     
 

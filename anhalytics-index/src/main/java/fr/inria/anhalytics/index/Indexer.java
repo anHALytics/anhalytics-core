@@ -233,18 +233,21 @@ public class Indexer {
         int nb = 0;
         try {
             for (String date : Utilities.getDates()) {
+
+                if (!IndexProperties.isProcessByDate()) {
+                    date = null;
+                }
+                BulkRequestBuilder bulkRequest = client.prepareBulk();
+                bulkRequest.setRefresh(true);
                 if (mm.initTeis(date)) {
                     int i = 0;
-                    BulkRequestBuilder bulkRequest = client.prepareBulk();
-                    bulkRequest.setRefresh(true);
-                    
+
                     while (mm.hasMoreTeis()) {
                         String tei = mm.nextTeiDocument();
                         String id = mm.getCurrentRepositoryDocId();
-                        String docId = mm.getCurrentDocId();
-                      
-                        if (!mm.isWithFulltext(id)) {
-                            //No interest to index docs without fulltext
+                        String anhalyticsId = mm.getCurrentAnhalyticsId();
+                        if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                            logger.info("skipping " + id + " No anHALytics id provided");
                             continue;
                         }
 
@@ -253,7 +256,7 @@ public class Indexer {
                         JSONObject json = JsonTapasML.toJSONObject(tei);
                         String jsonStr = json.toString();
 
-                        jsonStr = indexingPreprocess.process(jsonStr, id, docId);
+                        jsonStr = indexingPreprocess.process(jsonStr, id, anhalyticsId);
 
                         if (jsonStr == null) {
                             continue;
@@ -261,8 +264,7 @@ public class Indexer {
 
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
-                        bulkRequest.add(client.prepareIndex(
-							IndexProperties.getTeisIndexName(), "npl", docId).setSource(jsonStr));
+                        bulkRequest.add(client.prepareIndex(IndexProperties.getTeisIndexName(), "npl", anhalyticsId).setSource(jsonStr));
 
                         if (i >= 100) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -282,10 +284,15 @@ public class Indexer {
                     }
                     // last bulk
                     BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                    System.out.print(".");
                     if (bulkResponse.hasFailures()) {
                         // process failures by iterating through each bulk response item	
                         logger.error(bulkResponse.buildFailureMessage());
                     }
+                }
+
+                if (!IndexProperties.isProcessByDate()) {
+                    break;
                 }
             }
         } catch (Exception e) {
@@ -309,12 +316,17 @@ public class Indexer {
                     while (mm.hasMoreAnnotations()) {
                         String json = mm.nextAnnotation();
                         String id = mm.getCurrentRepositoryDocId();
-                        String docId = mm.getCurrentDocId();
+                        String anhalyticsId = mm.getCurrentAnhalyticsId();
+                        if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                            logger.info("skipping " + id + " No anHALytics id provided");
+                            continue;
+                        }
 
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
 						bulkRequest.add(client.prepareIndex(
-							IndexProperties.getKeytermAnnotsIndexName(), "annotation_keyterm", id).setSource(json));
+							IndexProperties.getKeytermAnnotsIndexName(), "annotation_keyterm", 
+								anhalyticsId).setSource(json));
 
                         if (i >= 200) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -354,17 +366,25 @@ public class Indexer {
         try {
             ObjectMapper mapper = new ObjectMapper();
             for (String date : Utilities.getDates()) {
+
+                if (!IndexProperties.isProcessByDate()) {
+                    date = null;
+                }
+                BulkRequestBuilder bulkRequest = client.prepareBulk();
+                bulkRequest.setRefresh(true);
                 if (mm.initAnnotations(date, MongoCollectionsInterface.NERD_ANNOTATIONS)) {
                     int i = 0;
-                    BulkRequestBuilder bulkRequest = client.prepareBulk();
-                    bulkRequest.setRefresh(true);
                     while (mm.hasMoreAnnotations()) {
                         String json = mm.nextAnnotation();
                         String id = mm.getCurrentRepositoryDocId();
-                        String docId = mm.getCurrentDocId();
+                        String anhalyticsId = mm.getCurrentAnhalyticsId();
+                        if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                            logger.info("skipping " + id + " No anHALytics id provided");
+                            continue;
+                        }
                         // get the xml:id of the elements we want to index from the document
                         // we only index title, abstract and keyphrase annotations !
-                        List<String> validIDs = validDocIDs(docId, mapper);
+                        List<String> validIDs = validDocIDs(anhalyticsId, mapper);
 
                         JsonNode jsonAnnotation = mapper.readTree(json);
                         JsonNode jn = jsonAnnotation.findPath("nerd");
@@ -419,11 +439,16 @@ public class Indexer {
                     }
                     // last bulk
                     BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                    System.out.print(".");
                     if (bulkResponse.hasFailures()) {
                         // process failures by iterating through each bulk response item	
                         logger.error(bulkResponse.buildFailureMessage());
                     }
                     System.out.print("\n");
+                }
+
+                if (!IndexProperties.isProcessByDate()) {
+                    break;
                 }
             }
         } catch (Exception e) {
@@ -432,9 +457,9 @@ public class Indexer {
         return nb;
     }
 
-    private List<String> validDocIDs(String id, ObjectMapper mapper) {
+    private List<String> validDocIDs(String anhalyticsId, ObjectMapper mapper) {
         List<String> results = new ArrayList<String>();
-        logger.debug("validDocIDs: " + id);
+        logger.debug("validDocIDs: " + anhalyticsId);
 
         String request = "{\"fields\": [ ";
         boolean first = true;
@@ -446,7 +471,7 @@ public class Indexer {
             }
             request += "\"" + path + "\"";
         }
-        request += "], \"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + id + "\"}}}}}";
+        request += "], \"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
         //System.out.println(request);
 
         String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + IndexProperties.getTeisIndexName() + "/_search";

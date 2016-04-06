@@ -188,27 +188,6 @@ public class Utilities {
     /**
      * Add xml ids on the textual nodes of the document
      */
-    /*public static void generateIDs(Document doc) {
-        NodeList titles = doc.getElementsByTagName("title");
-        NodeList abstracts = doc.getElementsByTagName("abstract");
-        NodeList terms = doc.getElementsByTagName("term");
-        NodeList funders = doc.getElementsByTagName("funder");
-        NodeList codes = doc.getElementsByTagName("classCode");
-		NodeList paragraphs = doc.getElementsByTagName("p");
-		NodeList heads = doc.getElementsByTagName("head");
-		NodeList figDescs = doc.getElementsByTagName("figDesc");
-		NodeList items = doc.getElementsByTagName("item");
-        generateID(titles);
-        generateID(abstracts);
-        generateID(terms);
-        generateID(funders);
-        generateID(codes);
-		generateID(paragraphs);
-		generateID(heads);
-		generateID(figDescs);
-		generateID(items);
-    }*/
-	
 	private static List<String> fields = 
 		Arrays.asList("title", "abstract", "term", "funder", "classCode", "p", "head", "figDesc", "item");
 	

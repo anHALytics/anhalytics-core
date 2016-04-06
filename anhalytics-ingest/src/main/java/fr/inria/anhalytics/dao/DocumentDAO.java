@@ -15,40 +15,37 @@ import org.slf4j.LoggerFactory;
  *
  * @author azhar
  */
-public class DocumentDAO extends DAO<Document> {
+public class DocumentDAO extends DAO<Document, String> {
 
     private static final Logger logger = LoggerFactory.getLogger(DocumentDAO.class);
 
     private static final String SQL_INSERT
-            = "INSERT INTO DOCUMENT (version, uri, TEImetadatas) VALUES (?, ?, ?)";
-    private static final String READ_QUERY_DOCUMENTS
-            = "SELECT * FROM DOCUMENT";
+            = "INSERT INTO DOCUMENT (docID, version, uri, TEImetadatas) VALUES (?, ?, ?, ?)";
+    
+    private static final String READ_QUERY_DOCUMENTS = "SELECT * FROM DOCUMENT";
+
+    private static final String READ_QUERY_DOCID_BY_AUTHORS = "SELECT docID FROM AUTHOR WHERE personID = ?";
 
     private static final String SQL_SELECT_DOCID_BY_ORGID = "SELECT * FROM DOCUMENT_ORGANISATION WHERE organisationID = ?";
 
     public DocumentDAO(Connection conn) {
         super(conn);
     }
-    private ResultSet rsDocuments = null;
 
     public boolean create(Document obj) throws SQLException {
         boolean result = false;
-        if (obj.getDocID() != null) {
-            throw new IllegalArgumentException("Document is already created, the document ID is not null.");
+        if (obj.getDocID() == null) {
+            throw new IllegalArgumentException("The document ID is null, an ID should be provided.");
         }
 
         PreparedStatement statement;
-        statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-        statement.setString(1, obj.getVersion());
+        statement = connect.prepareStatement(SQL_INSERT);
+        statement.setString(1, obj.getDocID());
+        statement.setString(2, obj.getVersion());
 
-        statement.setString(2, obj.getUri());
-        statement.setString(3, obj.getTei_metadata());
+        statement.setString(3, obj.getUri());
+        statement.setString(4, obj.getTei_metadata());
         int code = statement.executeUpdate();
-        ResultSet rs = statement.getGeneratedKeys();
-
-        if (rs.next()) {
-            obj.setDocID(rs.getLong(1));
-        }
 
         result = true;
         return result;
@@ -62,57 +59,39 @@ public class DocumentDAO extends DAO<Document> {
         return false;
     }
 
-    public Document find(Long doc_id) throws SQLException {
-        Document document = new Document();
-
-        ResultSet result = this.connect.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM document WHERE docID = " + doc_id);
-        if (result.first()) {
-            document = new Document(
-                    doc_id,
-                    result.getString("version"),
-                    result.getString("TEImetadatas"
-                    ),
-                    result.getString("uri"
-                    ));
-        }
-        return document;
-    }
-
-    public Document findByURI(String uri) {
+    public Document find(String doc_id) {
         Document document = null;
         try {
             ResultSet result = this.connect.createStatement(
                     ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM document WHERE uri = \"" + uri + "\"");
+                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM DOCUMENT WHERE docID = '" + doc_id + "'");
             if (result.first()) {
                 document = new Document(
-                        result.getLong("docID"),
+                        doc_id,
                         result.getString("version"),
                         result.getString("TEImetadatas"
                         ),
                         result.getString("uri"
                         ));
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
 
-        } catch (SQLException ex) {
-            logger.error(ex.getMessage());
         }
         return document;
     }
 
-    public boolean isMined(String uri) {
+    public boolean isMined(String docId) {
         boolean isMined = false;
-        Document document = findByURI(uri);
+        Document document = find(docId);
         if (document != null) {
             isMined = true;
         }
         return isMined;
     }
 
-    public boolean isCitationsMined(String uri) {
-        return isMined(uri);
+    public boolean isCitationsMined(String docId) {
+        return isMined(docId);
     }
 
     public List<Document> findAllDocuments() {
@@ -125,7 +104,7 @@ public class DocumentDAO extends DAO<Document> {
             while (rs.next()) {
                 documents.add(
                         new Document(
-                                rs.getLong("docID"),
+                                rs.getString("docID"),
                                 rs.getString("version"),
                                 rs.getString("TEImetadatas"),
                                 rs.getString("uri")
@@ -145,11 +124,27 @@ public class DocumentDAO extends DAO<Document> {
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
-                documents.add(find(rs.getLong("docID")));
+                documents.add(find(rs.getString("docID")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return documents;
+    }
+    
+    public List<Document> getDocumentsByAuthorId(Long personId) {
+        List<Document> docs = new ArrayList<Document>();
+        try {
+            PreparedStatement ps = this.connect.prepareStatement(READ_QUERY_DOCID_BY_AUTHORS);
+            ps.setLong(1, personId);
+            // process the results
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                docs.add(find(rs.getString("docID")));
+            }
+        } catch (SQLException ex) {
+            logger.error(ex.getMessage());
+        }
+        return docs;
     }
 }

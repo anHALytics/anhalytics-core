@@ -93,16 +93,18 @@ public class NerdService {
      * @return boolean
      */
     public static boolean isNerdReady() throws UnreachableNerdServiceException {
-        logger.info("Cheking NERD service...");
+        logger.info("Checking NERD service...");
         int responseCode = 0;
         HttpURLConnection conn = null;
         try {
             URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + 
-				AnnotateProperties.getNerdPort() + "/nerd/service/isalive");
+				AnnotateProperties.getNerdPort() + "/service/isalive");
             conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("GET");
             responseCode = conn.getResponseCode();
+            System.out.println(url.getHost());
+            System.out.println(responseCode);
         } catch (Exception e) {
             throw new UnreachableNerdServiceException("NERD service is not reachable, check host and port parameters.");
         }

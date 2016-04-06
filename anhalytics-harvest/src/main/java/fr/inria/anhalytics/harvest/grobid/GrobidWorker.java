@@ -3,13 +3,17 @@ package fr.inria.anhalytics.harvest.grobid;
 import fr.inria.anhalytics.commons.exceptions.GrobidTimeoutException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 /**
  *
@@ -22,12 +26,14 @@ abstract class GrobidWorker implements Runnable {
     protected MongoFileManager mm;
     protected String date;
     protected String id;
+    protected String anhalyticsId;
 
-    public GrobidWorker(InputStream content, String id, String date) throws UnknownHostException {
+    public GrobidWorker(InputStream content, String id, String anhalyticsId, String date) throws UnknownHostException {
         this.content = content;
         this.mm = MongoFileManager.getInstance(false);
         this.date = date;
-        this.id = mm.getCurrentRepositoryDocId();
+        this.id = id;
+        this.anhalyticsId = anhalyticsId;
     }
 
     @Override
@@ -72,6 +78,23 @@ abstract class GrobidWorker implements Runnable {
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex.getCause());
         }
+    }
+
+    protected String generateIdsTeiDoc(String tei) {
+
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setValidating(false);
+        Document teiDoc = null;
+        try {
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            teiDoc = docBuilder.parse(new ByteArrayInputStream(tei.getBytes()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Utilities.generateIDs(teiDoc);
+        tei = Utilities.toString(teiDoc);
+        return tei;
     }
 
     protected void saveExtractions(String resultPath) {

@@ -47,6 +47,7 @@ public class halTeiExtractor {
             NodeList authors = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/author").evaluate(docAdditionalTei, XPathConstants.NODESET);
             NodeList orgs = (NodeList) xPath.compile("/TEI/text/back/listOrg/org").evaluate(docAdditionalTei, XPathConstants.NODESET);
 
+            setPublicationDate(docAdditionalTei);
             parseOrgsAddress(docAdditionalTei, orgs);
             correctDataLocation(docAdditionalTei, authors);
             updateAffiliations(authors, orgs, docAdditionalTei);
@@ -60,6 +61,27 @@ public class halTeiExtractor {
 
         }
         return teiHeader;
+    }
+
+    private static void setPublicationDate(Document doc) {
+        try {
+            Node pubDate = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/imprint/date[@type=\"datePub\"] ").evaluate(doc, XPathConstants.NODE);
+            if (pubDate == null) {
+                Node biblStruct = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct").evaluate(doc, XPathConstants.NODE);
+                Node submitDate = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/editionStmt/edition[@type=\"current\"]/date[@type=\"whenSubmitted\"]").evaluate(doc, XPathConstants.NODE);
+                Element newPubDate = doc.createElement("date");
+                newPubDate.setAttribute("type", "datePub");
+                newPubDate.setTextContent(submitDate.getTextContent().split(" ")[0]);
+                Element eltMonogr = (Element) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr").evaluate(doc, XPathConstants.NODE);
+                Element eltImprint = (Element) eltMonogr.getElementsByTagName("imprint").item(0);
+                eltImprint = (eltImprint == null)? doc.createElement("imprint"): eltImprint;
+                eltImprint.appendChild(newPubDate);
+                eltMonogr.appendChild(eltImprint);
+            }
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+
+        }
     }
 
     private static void parseOrgsAddress(Document doc, NodeList orgs) {
@@ -90,7 +112,7 @@ public class halTeiExtractor {
                                 addrLineString += line2.item(y).getTextContent();
                             }
                             addrLine.setTextContent(addrLineString);
-                            
+
                             NodeList address = node.getElementsByTagName("address");
                             for (int n = address.getLength() - 1; n >= 0; n--) {
                                 NodeList addressChilds = address.item(n).getChildNodes();

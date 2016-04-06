@@ -3,6 +3,7 @@ package fr.inria.anhalytics.harvest;
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import java.io.ByteArrayInputStream;
 import java.net.URLEncoder;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -171,7 +172,20 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
                 renameNode(teiElement);
             }
         }
-        return sb.append(innerXmlToString(tei.item(0))).toString();
+        String teiString = sb.append(innerXmlToString(tei.item(0))).toString();
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setValidating(false);
+        Document teiDoc = null;
+        try {
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+            teiDoc = docBuilder.parse(new ByteArrayInputStream(teiString.getBytes()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Utilities.generateIDs(teiDoc);
+        teiString = Utilities.toString(teiDoc);
+        return teiString;
     }
 
     private void renameNode(Element teiElement) {

@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author azhar
  */
-public class PublicationDAO extends DAO<Publication> {
+public class PublicationDAO extends DAO<Publication, Long> {
     
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PublicationDAO.class);
 
@@ -29,10 +29,10 @@ public class PublicationDAO extends DAO<Publication> {
             = "INSERT INTO PUBLICATION (docID, monographID, publisherID, type, doc_title, date_printed, date_electronic, start_page, end_page, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_SELECT
-            = "SELECT * FROM document ,monograph ,publisher, publication WHERE publicationID = ? AND document.docID = publication.docID AND monograph.monographID = publication.monographID AND publisher.publisherID = publication.publisherID";
+            = "SELECT * FROM DOCUMENT ,MONOGRAPH ,PUBLISHER, PUBLICATION WHERE publicationID = ? AND DOCUMENT.docID = PUBLICATION.docID AND MONOGRAPH.monographID = PUBLICATION.monographID AND PUBLISHER.publisherID = PUBLICATION.publisherID";
 
     private static final String SQL_SELECT_BY_DOCID
-            = "SELECT * FROM document, publication LEFT JOIN publisher ON publisher.publisherID = publication.publisherID LEFT JOIN monograph  ON monograph.monographID = publication.monographID WHERE publication.docID = ? AND document.docID = ?";
+            = "SELECT * FROM DOCUMENT, PUBLICATION LEFT JOIN PUBLISHER ON PUBLISHER.publisherID = PUBLICATION.publisherID LEFT JOIN MONOGRAPH  ON MONOGRAPH.monographID = PUBLICATION.monographID WHERE PUBLICATION.docID = ? AND DOCUMENT.docID = ?";
 
     private static final String SQL_UPDATE
             = "UPDATE PUBLICATION SET type = ? ,doc_title = ? ,date_printed = ?,date_electronic = ?,start_page = ?,end_page = ? WHERE publicationID = ?";
@@ -52,7 +52,7 @@ public class PublicationDAO extends DAO<Publication> {
 
         PreparedStatement statement;
         statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-        statement.setLong(1, obj.getDocument().getDocID());
+        statement.setString(1, obj.getDocument().getDocID());
         statement.setLong(2, obj.getMonograph().getMonographID());
         if (obj.getPublisher().getPublisherID() == null) {
             statement.setNull(3, java.sql.Types.INTEGER);
@@ -111,10 +111,10 @@ public class PublicationDAO extends DAO<Publication> {
             try {
                 publication = new Publication(
                         publication_id,
-                        new Document(rs.getLong("docID"), rs.getString("version"), rs.getString("TEImetadatas"), rs.getString("URI")),
-                        new Monograph(rs.getLong("monographID"), rs.getString("monograph.type"), rs.getString("title"), rs.getString("shortname")),
+                        new Document(rs.getString("docID"), rs.getString("version"), rs.getString("TEImetadatas"), rs.getString("URI")),
+                        new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
                         new Publisher(rs.getLong("publisherID"), rs.getString("name")),
-                        rs.getString("publication.type"),
+                        rs.getString("PUBLICATION.type"),
                         rs.getString("doc_title"),
                         Utilities.parseStringDate(rs.getString("date_printed")),
                         rs.getString("date_eletronic"),
@@ -129,21 +129,21 @@ public class PublicationDAO extends DAO<Publication> {
         return publication;
     }
 
-    public List<Publication> findByDocId(Long doc_id) {
+    public List<Publication> findByDocId(String doc_id) {
         List<Publication> publications = new ArrayList<Publication>();
         try{
         PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_BY_DOCID);
-        preparedStatement.setLong(1, doc_id);
-        preparedStatement.setLong(2, doc_id);
+        preparedStatement.setString(1, doc_id);
+        preparedStatement.setString(2, doc_id);
         ResultSet rs = preparedStatement.executeQuery();
         while (rs.next()) {
             try {
                 publications.add(new Publication(
-                        rs.getLong("publication.publicationID"),
+                        rs.getLong("PUBLICATION.publicationID"),
                         new Document(doc_id, rs.getString("version"), rs.getString("TEImetadatas"), rs.getString("URI")),
-                        new Monograph(rs.getLong("monographID"), rs.getString("monograph.type"), rs.getString("title"), rs.getString("shortname")),
+                        new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
                         new Publisher(rs.getLong("publisherID"), rs.getString("name")),
-                        rs.getString("publication.type"),
+                        rs.getString("PUBLICATION.type"),
                         rs.getString("doc_title"),
                         Utilities.parseStringDate(rs.getString("date_printed")),
                         rs.getString("date_electronic"),
@@ -156,6 +156,8 @@ public class PublicationDAO extends DAO<Publication> {
                 Logger.getLogger(PublicationDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        preparedStatement.close();
+        rs.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         }
