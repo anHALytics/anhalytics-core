@@ -79,13 +79,13 @@ A web application server, such as Tomcat, JBoss or Jetty, is necessary to deploy
 
 ### Project design
 
-anHALytics-core has (so far) six components corresponding to six sub-projects:
+anHALytics-core performs the document ingestion, from external harvesting of documents to indexing. It has (so far) six components corresponding to six sub-projects:
 
 0. __common__ contains methods and resources shared by several other components. 
-1. __harvest__ performs the document acquisition and digestion: harvesting scientific documents and production of TEI representations combined with downloaded metadata. 
-2. __annotate__ realises document enrichment, more precisely it disambiguates and annotates entities into the extracted TEI structures.
-3. __index__ performs indexing in ElasticSearch for both the final TEIs and the annotations.
-4. __frontend__ contains all the demo views (search, author, document, analytics..).
+1. __harvest__ performs the document harvesting (PDF and metadata) and the transformations into common TEI representations. 
+2. __annotate__ realises document enrichment, more precisely it disambiguates and annotates entities and key-concepts into the TEI structures.
+3. __kb__ build and update the Knowledge Base (KB) of anHALytics.
+4. __index__ performs indexing in ElasticSearch for the final TEI, the annotations and the KB.
 5. __test__ is dedicated to integration tests.
 
 ### Compilation
@@ -161,7 +161,7 @@ We use MongoDD GridFS component for document file support. Each type of files ar
 
 <!-- documentation of the collections here !! -->
 
-#### 2. Annotate
+#### 2. Annotation
 
 The documents are enriched with semantic annotations. This is realized with the NERD service.
 
@@ -196,7 +196,11 @@ The annotation on the HAL collection can be launch with the command in the main 
 
 Annotations are persistently stored in a MongoDB collection and available for indexing in ElasticSearch. 
 
-#### 3. Indexing
+#### 3. KB
+
+...
+
+#### 4. Indexing
 
 ###### Build all the indexes 
 
