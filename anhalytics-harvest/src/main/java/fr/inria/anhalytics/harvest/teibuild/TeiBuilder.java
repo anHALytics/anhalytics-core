@@ -49,7 +49,6 @@ public class TeiBuilder {
                 Attr attr = grobidTeiElement.getAttributeNode("xmlns");
                 grobidTeiElement.removeAttributeNode(attr);
                 grobidTeiElement.setAttribute("type", "main");
-                updateGrobidTEI(doc);
             }
             resultTei = addNodeToTei(tei, grobidTeiElement);
         } catch (Exception e) {
@@ -119,17 +118,5 @@ public class TeiBuilder {
             teiCorpus.appendChild(newNode);
         }
         return doc;
-    }
-
-    /**
-     * Updates the extracted TEI with the authors data.
-     */
-    private static void updateGrobidTEI(Document doc) {
-        NodeList nl = doc.getElementsByTagName("teiHeader");
-        Node n = nl.item(0);
-
-        while (n.hasChildNodes()) {
-            n.removeChild(n.getFirstChild());
-        }
     }
 }
