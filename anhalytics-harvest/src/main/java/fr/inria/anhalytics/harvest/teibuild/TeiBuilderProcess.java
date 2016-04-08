@@ -15,7 +15,7 @@ import org.w3c.dom.Document;
  *
  * @author Achraf
  */
-public class TeiBuilderProcess{
+public class TeiBuilderProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(TeiBuilderProcess.class);
 
@@ -30,30 +30,36 @@ public class TeiBuilderProcess{
      */
     public void buildTei() {
         for (String date : Utilities.getDates()) {
-            if(!HarvestProperties.isProcessByDate())
+            if (!HarvestProperties.isProcessByDate()) {
                 date = null;
-            if (mm.initGrobidTeis(date)) {
+            }
+            if (mm.initMetadataTeis(date)) {
                 while (mm.hasMoreTeis()) {
-                    String grobidTeiString = mm.nextTeiDocument();
+                    String metadataTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
                     String anhalyticsId = mm.getCurrentAnhalyticsId();
+                    boolean fulltextAvailable = false;
                     Document generatedTeiDoc = null;
-                    if (anhalyticsId.isEmpty()) {
-                        logger.info("skipping "+uri+" No anHALytics id provided");
+                    if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                        logger.info("skipping " + uri + " No anHALytics id provided");
                         continue;
                     }
                     logger.info("\t Building tei for: " + uri);
-                    grobidTeiString = Utilities.trimEncodedCharaters(grobidTeiString);
-                    generatedTeiDoc = createTEI(anhalyticsId, grobidTeiString);
-                    if (generatedTeiDoc != null) {
-                        String tei = Utilities.toString(generatedTeiDoc);
-                        mm.insertTei(tei, uri, anhalyticsId, date);
-                    }
+                    metadataTeiString = Utilities.trimEncodedCharaters(metadataTeiString);
+                    generatedTeiDoc = createTEI(metadataTeiString);
 
+                    String grobidTei = getGrobidTei(anhalyticsId);
+                    if (grobidTei != null) {
+                        generatedTeiDoc = TeiBuilder.addGrobidTeiToTei(Utilities.toString(generatedTeiDoc), grobidTei);
+                        fulltextAvailable = true;
+                    }
+                    String tei = Utilities.toString(generatedTeiDoc);
+                    mm.insertTei(tei, uri, anhalyticsId, fulltextAvailable, date);
                 }
             }
-            if(!HarvestProperties.isProcessByDate())
+            if (!HarvestProperties.isProcessByDate()) {
                 break;
+            }
         }
         logger.info("Done");
     }
@@ -61,30 +67,24 @@ public class TeiBuilderProcess{
     /**
      * Adds data TEI extracted with grobid.
      */
-    private Document createTEI(String anhalyticsId, String grobidTei) {
+    private Document createTEI(String metadataTei) {
         Document generatedTeiDoc = null;
         try {
-            if (!mm.isWithFulltext(anhalyticsId)) {
-                String metadataTei = getMetadataTei(anhalyticsId);
-                if (metadataTei != null) {
-                    logger.info("\t\t Metadata found, Building tei for: " + mm.getCurrentRepositoryDocId());
-                    InputStream metadataTeiStream = new ByteArrayInputStream(metadataTei.getBytes());
-                    generatedTeiDoc = TeiBuilder.createTEICorpus(metadataTeiStream);
-                    metadataTeiStream.close();
-                    generatedTeiDoc = TeiBuilder.addGrobidTeiToTei(Utilities.toString(generatedTeiDoc), grobidTei);
-                }
+            if (metadataTei != null) {
+                InputStream metadataTeiStream = new ByteArrayInputStream(metadataTei.getBytes());
+                generatedTeiDoc = TeiBuilder.createTEICorpus(metadataTeiStream);
+                metadataTeiStream.close();
             }
         } catch (Exception xpe) {
             xpe.printStackTrace();
         }
         return generatedTeiDoc;
     }
-    
-    
+
     /*
-    Get correponding Metadata to process..anhalyticsId is necessary for identification
-    */
-    private String getMetadataTei(String anhalyticsId){
-        return mm.findMetadataTeiById(anhalyticsId);
+     Get correponding Metadata to process..anhalyticsId is necessary for identification
+     */
+    private String getGrobidTei(String anhalyticsId) {
+        return mm.findGrobidTeiById(anhalyticsId);
     }
 }

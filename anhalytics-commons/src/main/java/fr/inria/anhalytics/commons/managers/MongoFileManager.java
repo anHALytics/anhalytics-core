@@ -369,7 +369,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Inserts generated tei using GridFS.
      */
-    public void insertTei(String teiString, String repositoryDocId, String anhalyticsId, String date) {
+    public void insertTei(String teiString, String repositoryDocId, String anhalyticsId, boolean isWithFulltext, String date) {
         try {
             GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
             gfs.remove(repositoryDocId + ".tei.xml");
@@ -378,6 +378,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.setFilename(repositoryDocId + ".tei.xml");
             gfsFile.put("repositoryDocId", repositoryDocId);
             gfsFile.put("anhalyticsId", anhalyticsId);
+            gfsFile.put("isWithFulltext", isWithFulltext);
             gfsFile.save();
         } catch (ParseException e) {
             logger.error(e.getMessage(), e.getCause());
@@ -674,7 +675,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         GridFSDBFile fs = gfs.findOne(whereQuery);
         if(fs == null)
             return false;
-        Object o = fs.get("isFulltextAdded");
+        Object o = fs.get("isWithFulltext");
 
         if (o == null) {
             return false;
