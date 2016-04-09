@@ -620,10 +620,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      * Returns the annotation for a given repositoryDocId.
      */
     public String getAnnotations(String anhalyticsId, String annotationsCollection) {
-        DBCollection c = null;
-        c = db.getCollection(annotationsCollection);
+        DBCollection c = db.getCollection(annotationsCollection);
         c.ensureIndex(new BasicDBObject("repositoryDocId", 1));
-        c.ensureIndex(new BasicDBObject("xml:id", 1));
+        c.ensureIndex(new BasicDBObject("anhalyticsId", 1));
 
         String result = null;
         BasicDBObject query = new BasicDBObject("anhalyticsId", anhalyticsId);
@@ -631,10 +630,15 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             curs = c.find(query);
             if (curs.hasNext()) {
-                // we get now the sub-document corresponding to the given id
+                // we get now the sub-document corresponding to the annotations
                 DBObject annotations = curs.next();
-                BasicDBList nerd = (BasicDBList) annotations.get("nerd");
-                result = nerd.toString();
+                //int ind = annotationsCollection.indexOf("_"); // TBR: this is dirty !
+                //BasicDBList annot = (BasicDBList) annotations.get(annotationsCollection.substring(0, ind));
+                if (annotations != null)
+                   result = annotations.toString();
+            }
+            else {
+                logger.error("The annotations for doc " + anhalyticsId + " was not found in " + annotationsCollection);
             }
         } finally {
             if (curs != null) {

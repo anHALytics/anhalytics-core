@@ -70,7 +70,8 @@ public class Annotator {
             throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
         }
         try {
-            if (NerdService.isNerdReady()) {
+            //if (NerdService.isNerdReady()) 
+            {
                 for (String date : Utilities.getDates()) {
 
                     if (!AnnotateProperties.isProcessByDate()) {

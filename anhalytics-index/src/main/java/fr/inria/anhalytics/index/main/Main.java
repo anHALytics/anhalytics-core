@@ -120,13 +120,14 @@ public class Main {
                 esm.setUpIndex(IndexProperties.getNerdAnnotsIndexName());
 				esm.setUpIndex(IndexProperties.getKeytermAnnotsIndexName());
                 //mi.setUpIndex(IndexProperties.getMetadataIndexName());
+
+                int nbDoc = esm.indexTeiCollection();
+                logger.info("Total: " + nbDoc + " TEI documents indexed.");
+                int nbNerdAnnot = esm.indexNerdAnnotations();
+                logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+                int nbKeytermAnnot = esm.indexKeytermAnnotations();
+                logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
             }
-            int nbDoc = esm.indexTeiCollection();
-            logger.info("Total: " + nbDoc + " TEI documents indexed.");
-            int nbNerdAnnot = esm.indexNerdAnnotations();
-			logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
-			int nbKeytermAnnot = esm.indexKeytermAnnotations();
-			logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
             
             // TBD: counters would be nice
             //mi.indexAuthors();
@@ -159,20 +160,21 @@ public class Main {
             reponse = sc.nextLine().charAt(0);
             if (reponse != 'N') {
                 esm.setUpIndex(IndexProperties.getTeisIndexName());
+                int nbDoc = esm.indexTeiCollection();
+                logger.info("Total: " + nbDoc + " TEI documents indexed.");
             }
-            int nbDoc = esm.indexTeiCollection();
-            logger.info("Total: " + nbDoc + " TEI documents indexed.");
         } else if (process.equals("indexAnnotations")) {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);
             if (reponse != 'N') {
                 esm.setUpIndex(IndexProperties.getNerdAnnotsIndexName());
                 esm.setUpIndex(IndexProperties.getKeytermAnnotsIndexName());
+
+                int nbNerdAnnot = esm.indexNerdAnnotations();
+                logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+                int nbKeytermAnnot = esm.indexKeytermAnnotations();
+                logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
             }
-            int nbNerdAnnot = esm.indexNerdAnnotations();
-            logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
-            int nbKeytermAnnot = esm.indexKeytermAnnotations();
-            logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
         } else if (process.equals("indexKB")) {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);

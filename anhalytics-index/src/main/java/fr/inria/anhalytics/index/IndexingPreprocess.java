@@ -40,6 +40,8 @@ public class IndexingPreprocess {
         this.mm = mm;
     }
 
+    private static int MAX_INDEXED_PARAGRAPHS = 10;
+
     /**
      * Format jsonStr to fit with ES structure.
      */
@@ -57,8 +59,10 @@ public class IndexingPreprocess {
             return null;
         }
         if ((teiRoot != null) && (!teiRoot.isMissingNode())) {
-            JsonNode standoffNode = getStandoff(mapper, anhalyticsId);
-            ((ArrayNode) teiRoot).add(standoffNode);
+            JsonNode standoffNode = getStandoffNerd(mapper, anhalyticsId);
+            standoffNode = getStandoffKeyTerm(mapper, anhalyticsId, standoffNode); 
+            if (standoffNode != null)
+                ((ArrayNode) teiRoot).add(standoffNode);
         }
 
         // here recursive modification of the json document via Jackson
@@ -366,75 +370,174 @@ public class IndexingPreprocess {
         }
     }
 
-    private JsonNode getStandoff(ObjectMapper mapper, String anhalyticsId) throws Exception {
+    private JsonNode getStandoffNerd(ObjectMapper mapper, String anhalyticsId) throws Exception {
         JsonNode standoffNode = null;
         String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.NERD_ANNOTATIONS);
         if ((annotation != null) && (annotation.trim().length() > 0)) {
             JsonNode jsonAnnotation = mapper.readTree(annotation);
-            Iterator<JsonNode> iter0 = jsonAnnotation.getElements();
-            JsonNode annotNode = mapper.createArrayNode();
-            int n = 0;
-            while (iter0.hasNext() && (n < 3)) {
-                JsonNode jsonLocalAnnotation = (JsonNode) iter0.next();
+            if ((jsonAnnotation != null) && (!jsonAnnotation.isMissingNode())) {
+                Iterator<JsonNode> iter0 = jsonAnnotation.getElements();
+                JsonNode annotNode = mapper.createArrayNode();
+                int n = 0;
+                while (iter0.hasNext() && (n < MAX_INDEXED_PARAGRAPHS)) {
+                    JsonNode jsonLocalAnnotation = (JsonNode) iter0.next();
 
-                // we only get the concept IDs and the nerd confidence score
-                JsonNode nerd = jsonLocalAnnotation.findPath("nerd");
-                JsonNode entities = nerd.findPath("entities");
-                if ((entities != null) && (!entities.isMissingNode())) {
-                    Iterator<JsonNode> iter = entities.getElements();
+                    // we only get the concept IDs and the nerd confidence score
+                    JsonNode nerd = jsonLocalAnnotation.findPath("nerd");
+                    JsonNode entities = nerd.findPath("entities");
+                    if ((entities != null) && (!entities.isMissingNode())) {
+                        Iterator<JsonNode> iter = entities.getElements();
 
-                    while (iter.hasNext()) {
-                        JsonNode piece = (JsonNode) iter.next();
+                        while (iter.hasNext()) {
+                            JsonNode piece = (JsonNode) iter.next();
 
-                        JsonNode nerd_scoreN = piece.findValue("nerd_score");
-                        JsonNode preferredTermN = piece.findValue("preferredTerm");
-                        JsonNode wikipediaExternalRefN = piece.findValue("wikipediaExternalRef");
-                        JsonNode freeBaseExternalRefN = piece.findValue("freeBaseExternalRef");
+                            JsonNode nerd_scoreN = piece.findValue("nerd_score");
+                            JsonNode preferredTermN = piece.findValue("preferredTerm");
+                            JsonNode wikipediaExternalRefN = piece.findValue("wikipediaExternalRef");
+                            JsonNode freeBaseExternalRefN = piece.findValue("freeBaseExternalRef");
 
-                        String nerd_score = nerd_scoreN.getTextValue();
-                        String wikipediaExternalRef = wikipediaExternalRefN.getTextValue();
-                        String preferredTerm = preferredTermN.getTextValue();
-                        String freeBaseExternalRef = null;
-                        if ((freeBaseExternalRefN != null) && (!freeBaseExternalRefN.isMissingNode())) {
-                            freeBaseExternalRef = freeBaseExternalRefN.getTextValue();
+                            String nerd_score = nerd_scoreN.getTextValue();
+                            String wikipediaExternalRef = wikipediaExternalRefN.getTextValue();
+                            String preferredTerm = preferredTermN.getTextValue();
+                            String freeBaseExternalRef = null;
+                            if ((freeBaseExternalRefN != null) && (!freeBaseExternalRefN.isMissingNode())) {
+                                freeBaseExternalRef = freeBaseExternalRefN.getTextValue();
+                            }
+
+                            JsonNode newNode = mapper.createArrayNode();
+
+                            JsonNode nerdScoreNode = mapper.createObjectNode();
+                            ((ObjectNode) nerdScoreNode).put("nerd_score", nerd_score);
+                            ((ArrayNode) newNode).add(nerdScoreNode);
+
+                            JsonNode wikiNode = mapper.createObjectNode();
+                            ((ObjectNode) wikiNode).put("wikipediaExternalRef", wikipediaExternalRef);
+                            ((ArrayNode) newNode).add(wikiNode);
+
+                            JsonNode preferredTermNode = mapper.createObjectNode();
+                            ((ObjectNode) preferredTermNode).put("preferredTerm", preferredTerm);
+                            ((ArrayNode) newNode).add(preferredTermNode);
+
+                            if (freeBaseExternalRef != null) {
+                                JsonNode freeBaseNode = mapper.createObjectNode();
+                                ((ObjectNode) freeBaseNode).put("freeBaseExternalRef", freeBaseExternalRef);
+                                ((ArrayNode) newNode).add(freeBaseNode);
+                            }
+
+                            ((ArrayNode) annotNode).add(newNode);
                         }
+                    }
+                    n++;
+                }
+                JsonNode nerdStandoffNode = mapper.createObjectNode();
+                ((ObjectNode) nerdStandoffNode).put("$nerd", annotNode);
+
+                JsonNode annotationArrayNode = mapper.createArrayNode();
+                ((ArrayNode) annotationArrayNode).add(nerdStandoffNode);
+
+                standoffNode = mapper.createObjectNode();
+                ((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
+            }
+        }
+        return standoffNode;
+    }      
+
+
+    private JsonNode getStandoffKeyTerm(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
+        String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
+        if ((annotation != null) && (annotation.trim().length() > 0)) {
+            JsonNode jsonAnnotation = mapper.readTree(annotation);
+
+            JsonNode keytermNode = jsonAnnotation.findPath("keyterm");
+            if ((keytermNode != null) && (!keytermNode.isMissingNode())) {
+
+                JsonNode keytermsNode = keytermNode.findPath("keyterms");
+                if ((keytermsNode != null) && (!keytermsNode.isMissingNode())) {
+
+                    Iterator<JsonNode> iter0 = keytermsNode.getElements();
+                    JsonNode annotNode = mapper.createArrayNode();
+
+                    while (iter0.hasNext()) {
+                        JsonNode jsonLocalKeyterm = (JsonNode) iter0.next();
+                        JsonNode termNode = jsonLocalKeyterm.findPath("term");
+                        JsonNode scoreNode = jsonLocalKeyterm.findPath("score");
+
+                        String term = termNode.getTextValue();
+                        double score = scoreNode.getDoubleValue();
 
                         JsonNode newNode = mapper.createArrayNode();
 
-                        JsonNode nerdScoreNode = mapper.createObjectNode();
-                        ((ObjectNode) nerdScoreNode).put("nerd_score", nerd_score);
-                        ((ArrayNode) newNode).add(nerdScoreNode);
+                        JsonNode keytermScoreNode = mapper.createObjectNode();
+                        ((ObjectNode) keytermScoreNode).put("keyterm_score", score);
+                        ((ArrayNode) newNode).add(keytermScoreNode);
 
-                        JsonNode wikiNode = mapper.createObjectNode();
-                        ((ObjectNode) wikiNode).put("wikipediaExternalRef", wikipediaExternalRef);
-                        ((ArrayNode) newNode).add(wikiNode);
+                        JsonNode ktermNode = mapper.createObjectNode();
+                        ((ObjectNode) ktermNode).put("keyterm", term);
+                        ((ArrayNode) newNode).add(ktermNode);
 
-                        JsonNode preferredTermNode = mapper.createObjectNode();
-                        ((ObjectNode) preferredTermNode).put("preferredTerm", preferredTerm);
-                        ((ArrayNode) newNode).add(preferredTermNode);
+                        // do we have a concept (wikipedia/freebase id)
+                        JsonNode entitiesNode = jsonLocalKeyterm.findPath("entities");
+                        if ((entitiesNode != null) && (!entitiesNode.isMissingNode())) {
+                            Iterator<JsonNode> iter1 = entitiesNode.getElements();
+                            if (iter1.hasNext()) {
+                                JsonNode entityNode = (JsonNode) iter1.next();
 
-                        if (freeBaseExternalRef != null) {
-                            JsonNode freeBaseNode = mapper.createObjectNode();
-                            ((ObjectNode) freeBaseNode).put("freeBaseExternalRef", freeBaseExternalRef);
-                            ((ArrayNode) newNode).add(freeBaseNode);
+                                JsonNode nerd_scoreN = entityNode.findValue("nerd_score");
+                                JsonNode preferredTermN = entityNode.findValue("preferredTerm");
+                                JsonNode wikipediaExternalRefN = entityNode.findValue("wikipediaExternalRef");
+                                JsonNode freeBaseExternalRefN = entityNode.findValue("freeBaseExternalRef");
+
+                                String nerd_score = nerd_scoreN.getTextValue();
+                                String wikipediaExternalRef = wikipediaExternalRefN.getTextValue();
+                                String preferredTerm = preferredTermN.getTextValue();
+                                String freeBaseExternalRef = null;
+                                if ((freeBaseExternalRefN != null) && (!freeBaseExternalRefN.isMissingNode())) {
+                                    freeBaseExternalRef = freeBaseExternalRefN.getTextValue();
+                                }
+
+                                JsonNode nerdScoreNode = mapper.createObjectNode();
+                                ((ObjectNode) nerdScoreNode).put("nerd_score", nerd_score);
+                                ((ArrayNode) newNode).add(nerdScoreNode);
+
+                                JsonNode wikiNode = mapper.createObjectNode();
+                                ((ObjectNode) wikiNode).put("wikipediaExternalRef", wikipediaExternalRef);
+                                ((ArrayNode) newNode).add(wikiNode);
+
+                                JsonNode preferredTermNode = mapper.createObjectNode();
+                                ((ObjectNode) preferredTermNode).put("preferredTerm", preferredTerm);
+                                ((ArrayNode) newNode).add(preferredTermNode);
+
+                                if (freeBaseExternalRef != null) {
+                                    JsonNode freeBaseNode = mapper.createObjectNode();
+                                    ((ObjectNode) freeBaseNode).put("freeBaseExternalRef", freeBaseExternalRef);
+                                    ((ArrayNode) newNode).add(freeBaseNode);
+                                }
+                            }
                         }
-
                         ((ArrayNode) annotNode).add(newNode);
                     }
+
+                    JsonNode keytermStandoffNode = mapper.createObjectNode();
+                    ((ObjectNode) keytermStandoffNode).put("$keyterm", annotNode);
+
+                    if (standoffNode == null) {
+                        standoffNode = mapper.createArrayNode();
+
+                        JsonNode annotationArrayNode = mapper.createArrayNode();
+                        ((ArrayNode) annotationArrayNode).add(keytermStandoffNode);
+
+                        ((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
+                    }
+                    else {
+                        JsonNode annotationArrayNode = standoffNode.findValue("$standoff");
+                        ((ArrayNode) annotationArrayNode).add(keytermStandoffNode);
+                    }
                 }
-                n++;
             }
-            standoffNode = mapper.createObjectNode();
-            ((ObjectNode) standoffNode).put("$standoff", annotNode);
-        }         
-
-        annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);    
-        if ((annotation != null) && (annotation.trim().length() > 0)) {
-            // TBD 
         }
-
         return standoffNode;
-    }
+    }      
+
 
     private boolean filterDocuments(JsonNode jsonRoot) {
         // we want to filter out documents in the future...
