@@ -24,6 +24,8 @@ public class IndexingPreprocess {
 
     private static final Logger logger = LoggerFactory.getLogger(IndexingPreprocess.class);
 
+
+
     // this is the list of elements for which the text nodes should be expanded with an additional json
     // node capturing the nesting xml:lang attribute name/value pair
     static final public List<String> expandable
@@ -40,7 +42,11 @@ public class IndexingPreprocess {
         this.mm = mm;
     }
 
-    private static int MAX_INDEXED_PARAGRAPHS = 10;
+    // maximum number of keyterm to be indexed
+    private static final int MAX_INDEXED_KEYTERM = 20;
+    private static final int MAX_INDEXED_CONCEPT = 20;
+    private static final int MAX_INDEXED_NERD = 50;
+    private static int MAX_NERD_INDEXED_PARAGRAPHS = 10;
 
     /**
      * Format jsonStr to fit with ES structure.
@@ -379,7 +385,10 @@ public class IndexingPreprocess {
                 Iterator<JsonNode> iter0 = jsonAnnotation.getElements();
                 JsonNode annotNode = mapper.createArrayNode();
                 int n = 0;
-                while (iter0.hasNext() && (n < MAX_INDEXED_PARAGRAPHS)) {
+                int m =0;
+                while (iter0.hasNext() && 
+                    (n < MAX_NERD_INDEXED_PARAGRAPHS) && 
+                    (m < MAX_INDEXED_NERD)) {
                     JsonNode jsonLocalAnnotation = (JsonNode) iter0.next();
 
                     // we only get the concept IDs and the nerd confidence score
@@ -425,6 +434,7 @@ public class IndexingPreprocess {
                             }
 
                             ((ArrayNode) annotNode).add(newNode);
+                            m++;
                         }
                     }
                     n++;
@@ -451,13 +461,27 @@ public class IndexingPreprocess {
             JsonNode keytermNode = jsonAnnotation.findPath("keyterm");
             if ((keytermNode != null) && (!keytermNode.isMissingNode())) {
 
+                // check language - only english is valid here and indexed
+                JsonNode languageNode = keytermNode.findPath("language");
+                if ((languageNode != null) && (!languageNode.isMissingNode())) {
+                    JsonNode langNode = keytermNode.findPath("lang");
+                    if ((langNode != null) && (!langNode.isMissingNode())) {
+                        String lang = langNode.getTextValue();
+                        if (!lang.equals("en")) {
+                            return standoffNode;
+                        }
+                    }
+                }
+
+                // the keyterms
                 JsonNode keytermsNode = keytermNode.findPath("keyterms");
                 if ((keytermsNode != null) && (!keytermsNode.isMissingNode())) {
 
                     Iterator<JsonNode> iter0 = keytermsNode.getElements();
                     JsonNode annotNode = mapper.createArrayNode();
 
-                    while (iter0.hasNext()) {
+                    int n = 0;
+                    while (iter0.hasNext() && (n < MAX_INDEXED_KEYTERM)) {
                         JsonNode jsonLocalKeyterm = (JsonNode) iter0.next();
                         JsonNode termNode = jsonLocalKeyterm.findPath("term");
                         JsonNode scoreNode = jsonLocalKeyterm.findPath("score");
@@ -515,6 +539,7 @@ public class IndexingPreprocess {
                             }
                         }
                         ((ArrayNode) annotNode).add(newNode);
+                        n++;
                     }
 
                     JsonNode keytermStandoffNode = mapper.createObjectNode();
@@ -533,6 +558,72 @@ public class IndexingPreprocess {
                         ((ArrayNode) annotationArrayNode).add(keytermStandoffNode);
                     }
                 }
+
+                // document categories - the categorization is based on Wikipedia categories
+                JsonNode categoriesNode = keytermNode.findPath("global_categories");
+                if ((categoriesNode != null) && (!categoriesNode.isMissingNode())) {
+                    Iterator<JsonNode> iter0 = categoriesNode.getElements();
+                    JsonNode annotNode = mapper.createArrayNode();
+
+                    int n = 0;
+                    while (iter0.hasNext()) {
+                        JsonNode jsonLocalCategory = (JsonNode) iter0.next();
+                        String category = null;
+                        int pageId = -1;
+                        double weight = 0.0;
+
+                        JsonNode catNode = jsonLocalCategory.findPath("category");
+                        if ((catNode != null) && (!catNode.isMissingNode())) {
+                            category = catNode.getTextValue();
+                        }
+
+                        JsonNode pageNode = jsonLocalCategory.findPath("page_id");
+                        if ((pageNode != null) && (!pageNode.isMissingNode())) {
+                            pageId = pageNode.getIntValue();
+                        }
+
+                        JsonNode weightNode = jsonLocalCategory.findPath("weight");
+                        if ((weightNode != null) && (!weightNode.isMissingNode())) {
+                            weight = weightNode.getDoubleValue();
+                        }
+
+                        if ( (category != null) && (pageId != -1) && (weight != 0.0) ) {
+                            JsonNode newNode = mapper.createArrayNode();
+
+                            JsonNode categoryNode = mapper.createObjectNode();
+                            ((ObjectNode) categoryNode).put("category", category);
+                            ((ArrayNode) newNode).add(categoryNode);
+
+                            JsonNode wikiNode = mapper.createObjectNode();
+                            ((ObjectNode) wikiNode).put("wikipediaExternalRef", pageId);
+                            ((ArrayNode) newNode).add(wikiNode);
+
+                            JsonNode scoreNode = mapper.createObjectNode();
+                            ((ObjectNode) scoreNode).put("score", weight);
+                            ((ArrayNode) newNode).add(scoreNode);
+
+                            ((ArrayNode) annotNode).add(newNode);
+                            n++;
+                        }
+                    }
+
+                    JsonNode categoriesStandoffNode = mapper.createObjectNode();
+                    ((ObjectNode) categoriesStandoffNode).put("$category", annotNode);
+
+                    if (standoffNode == null) {
+                        standoffNode = mapper.createArrayNode();
+
+                        JsonNode annotationArrayNode = mapper.createArrayNode();
+                        ((ArrayNode) annotationArrayNode).add(categoriesStandoffNode);
+
+                        ((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
+                    }
+                    else {
+                        JsonNode annotationArrayNode = standoffNode.findValue("$standoff");
+                        ((ArrayNode) annotationArrayNode).add(categoriesStandoffNode);
+                    }
+                }
+
             }
         }
         return standoffNode;

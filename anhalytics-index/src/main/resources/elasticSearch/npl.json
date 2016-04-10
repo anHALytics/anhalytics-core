@@ -923,7 +923,20 @@
 		                                "type": "string"
 		                            }
 								}
-							}
+							},
+                            "categories" : {
+                                "properties": {
+                                    "category" : {
+                                        "type": "string"
+                                    },
+                                    "score" : {
+                                        "type": "string"
+                                    },
+                                    "wikipediaExternalRef": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
 						}	
                     }
                 }
