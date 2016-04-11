@@ -165,8 +165,8 @@ public class halTeiExtractor {
         analytic.getParentNode().removeChild(analytic);
         Node publicationStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/publicationStmt").evaluate(docAdditionalTei, XPathConstants.NODE);
         publicationStmt.getParentNode().removeChild(publicationStmt);
-        Node seriesStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/seriesStmt").evaluate(docAdditionalTei, XPathConstants.NODE);
-        seriesStmt.getParentNode().removeChild(seriesStmt);
+        //Node seriesStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/seriesStmt").evaluate(docAdditionalTei, XPathConstants.NODE);
+        //seriesStmt.getParentNode().removeChild(seriesStmt);
         Node notesStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/notesStmt").evaluate(docAdditionalTei, XPathConstants.NODE);
         notesStmt.getParentNode().removeChild(notesStmt);
         return docAdditionalTei;
