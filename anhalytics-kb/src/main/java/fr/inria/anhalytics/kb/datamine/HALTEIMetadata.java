@@ -1,5 +1,5 @@
 
-package fr.inria.anhalytics.ingest.datamine;
+package fr.inria.anhalytics.kb.datamine;
 
 /**
  *

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <name>anhalytics-ingest</name>
+    <name>anhalytics-kb</name>
     <parent>
         <groupId>fr.inria.anhalytics</groupId>
         <artifactId>anhalytics</artifactId>
@@ -14,8 +14,8 @@
         <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
     
-        <groupId>fr.inria.anhalytics.ingest</groupId>
-    <artifactId>anhalytics-ingest</artifactId>
+        <groupId>fr.inria.anhalytics.kb</groupId>
+    <artifactId>anhalytics-kb</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     
@@ -32,7 +32,7 @@
                 <executions>
                     <execution>
                         <configuration>
-                            <mainClass>fr.inria.anhalytics.ingest.main.Main</mainClass>
+                            <mainClass>fr.inria.anhalytics.kb.main.Main</mainClass>
                             <!-- Optional -->
                             <onejarVersion>0.97</onejarVersion>
                             <!-- Optional, default is false -->

@@ -1,8 +1,8 @@
 package fr.inria.anhalytics.dao;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
-import fr.inria.anhalytics.ingest.entities.Document_Organisation;
-import fr.inria.anhalytics.ingest.entities.Organisation;
+import fr.inria.anhalytics.kb.entities.Document_Organisation;
+import fr.inria.anhalytics.kb.entities.Organisation;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

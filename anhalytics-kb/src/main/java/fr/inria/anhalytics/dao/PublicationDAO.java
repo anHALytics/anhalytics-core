@@ -1,10 +1,10 @@
 package fr.inria.anhalytics.dao;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.ingest.entities.Document;
-import fr.inria.anhalytics.ingest.entities.Monograph;
-import fr.inria.anhalytics.ingest.entities.Publication;
-import fr.inria.anhalytics.ingest.entities.Publisher;
+import fr.inria.anhalytics.kb.entities.Document;
+import fr.inria.anhalytics.kb.entities.Monograph;
+import fr.inria.anhalytics.kb.entities.Publication;
+import fr.inria.anhalytics.kb.entities.Publisher;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

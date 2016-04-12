@@ -118,8 +118,8 @@
         </dependency>
         
         <dependency>
-            <groupId>fr.inria.anhalytics.ingest</groupId>
-            <artifactId>anhalytics-ingest</artifactId>
+            <groupId>fr.inria.anhalytics.kb</groupId>
+            <artifactId>anhalytics-kb</artifactId>
             <version>0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

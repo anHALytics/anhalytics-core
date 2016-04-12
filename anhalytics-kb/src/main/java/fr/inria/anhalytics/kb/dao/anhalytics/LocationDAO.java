@@ -1,10 +1,10 @@
-package fr.inria.anhalytics.ingest.dao.anhalytics;
+package fr.inria.anhalytics.kb.dao.anhalytics;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.DAO;
-import fr.inria.anhalytics.ingest.entities.Address;
-import fr.inria.anhalytics.ingest.entities.Location;
-import fr.inria.anhalytics.ingest.entities.Organisation;
+import fr.inria.anhalytics.kb.entities.Address;
+import fr.inria.anhalytics.kb.entities.Location;
+import fr.inria.anhalytics.kb.entities.Organisation;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

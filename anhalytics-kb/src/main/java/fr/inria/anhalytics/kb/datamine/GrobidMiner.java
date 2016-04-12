@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.ingest.datamine;
+package fr.inria.anhalytics.kb.datamine;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.AddressDAO;
@@ -8,23 +8,23 @@ import fr.inria.anhalytics.dao.In_SerialDAO;
 import fr.inria.anhalytics.dao.MonographDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.dao.PublicationDAO;
-import fr.inria.anhalytics.ingest.dao.biblio.AbstractBiblioDAOFactory;
-import fr.inria.anhalytics.ingest.dao.biblio.BiblioDAOFactory;
-import fr.inria.anhalytics.ingest.entities.Address;
-import fr.inria.anhalytics.ingest.entities.Collection;
-import fr.inria.anhalytics.ingest.entities.Conference;
-import fr.inria.anhalytics.ingest.entities.Conference_Event;
-import fr.inria.anhalytics.ingest.entities.Country;
-import fr.inria.anhalytics.ingest.entities.Editor;
-import fr.inria.anhalytics.ingest.entities.In_Serial;
-import fr.inria.anhalytics.ingest.entities.Journal;
-import fr.inria.anhalytics.ingest.entities.Monograph;
-import fr.inria.anhalytics.ingest.entities.Person;
-import fr.inria.anhalytics.ingest.entities.Person_Identifier;
-import fr.inria.anhalytics.ingest.entities.Publication;
-import fr.inria.anhalytics.ingest.entities.Publisher;
-import fr.inria.anhalytics.ingest.entities.Serial_Identifier;
-import fr.inria.anhalytics.ingest.properties.IngestProperties;
+import fr.inria.anhalytics.kb.dao.biblio.AbstractBiblioDAOFactory;
+import fr.inria.anhalytics.kb.dao.biblio.BiblioDAOFactory;
+import fr.inria.anhalytics.kb.entities.Address;
+import fr.inria.anhalytics.kb.entities.Collection;
+import fr.inria.anhalytics.kb.entities.Conference;
+import fr.inria.anhalytics.kb.entities.Conference_Event;
+import fr.inria.anhalytics.kb.entities.Country;
+import fr.inria.anhalytics.kb.entities.Editor;
+import fr.inria.anhalytics.kb.entities.In_Serial;
+import fr.inria.anhalytics.kb.entities.Journal;
+import fr.inria.anhalytics.kb.entities.Monograph;
+import fr.inria.anhalytics.kb.entities.Person;
+import fr.inria.anhalytics.kb.entities.Person_Identifier;
+import fr.inria.anhalytics.kb.entities.Publication;
+import fr.inria.anhalytics.kb.entities.Publisher;
+import fr.inria.anhalytics.kb.entities.Serial_Identifier;
+import fr.inria.anhalytics.kb.properties.IngestProperties;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,7 +93,7 @@ public class GrobidMiner extends Miner {
                             Node citations = (Node) xPath.compile("/teiCorpus/TEI/text/back/div[@type='references']/listBibl").evaluate(teiDoc, XPathConstants.NODE);
                             if (citations != null) {
                                 NodeList references = citations.getChildNodes();
-                                fr.inria.anhalytics.ingest.entities.Document doc = new fr.inria.anhalytics.ingest.entities.Document(anhalyticsId, Utilities.getVersionFromURI(uri), Utilities.innerXmlToString(citations), uri);
+                                fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(anhalyticsId, Utilities.getVersionFromURI(uri), Utilities.innerXmlToString(citations), uri);
                                 dd.create(doc);
 
                                 for (int j = 0; j < references.getLength() - 1; j++) {
@@ -118,7 +118,7 @@ public class GrobidMiner extends Miner {
         BiblioDAOFactory.closeConnection();
     }
 
-    private void processBiblStruct(Element reference, fr.inria.anhalytics.ingest.entities.Document doc) throws SQLException {
+    private void processBiblStruct(Element reference, fr.inria.anhalytics.kb.entities.Document doc) throws SQLException {
         PublicationDAO pd = (PublicationDAO) abdf.getPublicationDAO();
         MonographDAO md = (MonographDAO) abdf.getMonographDAO();
         In_SerialDAO isd = (In_SerialDAO) abdf.getIn_SerialDAO();

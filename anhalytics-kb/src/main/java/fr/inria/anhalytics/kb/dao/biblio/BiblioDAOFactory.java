@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.inria.anhalytics.ingest.dao.biblio;
+package fr.inria.anhalytics.kb.dao.biblio;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.dao.AddressDAO;
@@ -16,7 +16,7 @@ import fr.inria.anhalytics.dao.MonographDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.dao.PublicationDAO;
 import fr.inria.anhalytics.dao.PublisherDAO;
-import fr.inria.anhalytics.ingest.properties.IngestProperties;
+import fr.inria.anhalytics.kb.properties.IngestProperties;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.slf4j.Logger;

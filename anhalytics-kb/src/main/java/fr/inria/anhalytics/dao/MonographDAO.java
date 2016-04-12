@@ -6,7 +6,7 @@
 package fr.inria.anhalytics.dao;
 
 import fr.inria.anhalytics.dao.DAO;
-import fr.inria.anhalytics.ingest.entities.Monograph;
+import fr.inria.anhalytics.kb.entities.Monograph;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

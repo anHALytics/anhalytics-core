@@ -1,10 +1,10 @@
 package fr.inria.anhalytics.dao;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
-import fr.inria.anhalytics.ingest.entities.Author;
-import fr.inria.anhalytics.ingest.entities.Editor;
-import fr.inria.anhalytics.ingest.entities.Person;
-import fr.inria.anhalytics.ingest.entities.Person_Identifier;
+import fr.inria.anhalytics.kb.entities.Author;
+import fr.inria.anhalytics.kb.entities.Editor;
+import fr.inria.anhalytics.kb.entities.Person;
+import fr.inria.anhalytics.kb.entities.Person_Identifier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

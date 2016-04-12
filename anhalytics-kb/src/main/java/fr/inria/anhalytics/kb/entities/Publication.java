@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.ingest.entities;
+package fr.inria.anhalytics.kb.entities;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.ingest.entities;
+package fr.inria.anhalytics.kb.entities;
 
 import java.util.HashMap;
 import java.util.List;

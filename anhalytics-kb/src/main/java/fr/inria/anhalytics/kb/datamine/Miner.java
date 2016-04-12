@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.ingest.datamine;
+package fr.inria.anhalytics.kb.datamine;
 
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import java.net.UnknownHostException;

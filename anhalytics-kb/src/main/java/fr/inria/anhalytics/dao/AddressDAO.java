@@ -1,7 +1,7 @@
 package fr.inria.anhalytics.dao;
 
-import fr.inria.anhalytics.ingest.entities.Address;
-import fr.inria.anhalytics.ingest.entities.Country;
+import fr.inria.anhalytics.kb.entities.Address;
+import fr.inria.anhalytics.kb.entities.Country;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

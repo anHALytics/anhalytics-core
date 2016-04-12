@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.ingest.dao.biblio;
+package fr.inria.anhalytics.kb.dao.biblio;
 
 import fr.inria.anhalytics.dao.DAO;
 
@@ -38,7 +38,7 @@ public abstract class AbstractBiblioDAOFactory {
     public static AbstractBiblioDAOFactory getFactory(int type) {
         switch (type) {
             case DAO_FACTORY:
-                return new fr.inria.anhalytics.ingest.dao.biblio.BiblioDAOFactory();
+                return new fr.inria.anhalytics.kb.dao.biblio.BiblioDAOFactory();
             //case MONGO_DAO_FACTORY:
             //    return new BiblioMongoDAOFactory();
             default:

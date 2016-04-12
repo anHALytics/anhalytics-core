@@ -1,7 +1,7 @@
 package fr.inria.anhalytics.dao;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
-import fr.inria.anhalytics.ingest.properties.IngestProperties;
+import fr.inria.anhalytics.kb.properties.IngestProperties;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

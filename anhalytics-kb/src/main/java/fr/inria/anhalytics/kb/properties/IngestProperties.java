@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.ingest.properties;
+package fr.inria.anhalytics.kb.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import java.io.File;

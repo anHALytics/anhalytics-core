@@ -1,6 +1,6 @@
 package fr.inria.anhalytics.dao;
 
-import fr.inria.anhalytics.ingest.dao.anhalytics.DAOFactory;
+import fr.inria.anhalytics.kb.dao.anhalytics.DAOFactory;
 
 /**
  *

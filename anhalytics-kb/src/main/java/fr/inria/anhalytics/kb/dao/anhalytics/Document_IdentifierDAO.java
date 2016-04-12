@@ -1,8 +1,8 @@
-package fr.inria.anhalytics.ingest.dao.anhalytics;
+package fr.inria.anhalytics.kb.dao.anhalytics;
 
 import fr.inria.anhalytics.dao.DocumentDAO;
 import fr.inria.anhalytics.dao.DAO;
-import fr.inria.anhalytics.ingest.entities.Document_Identifier;
+import fr.inria.anhalytics.kb.entities.Document_Identifier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.inria.anhalytics.ingest.entities;
+package fr.inria.anhalytics.kb.entities;
 
 import java.util.Date;
 

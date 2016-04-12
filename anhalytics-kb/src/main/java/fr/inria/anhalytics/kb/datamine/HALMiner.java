@@ -1,42 +1,42 @@
-package fr.inria.anhalytics.ingest.datamine;
+package fr.inria.anhalytics.kb.datamine;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.AddressDAO;
-import fr.inria.anhalytics.ingest.dao.anhalytics.AffiliationDAO;
+import fr.inria.anhalytics.kb.dao.anhalytics.AffiliationDAO;
 import fr.inria.anhalytics.dao.Conference_EventDAO;
-import fr.inria.anhalytics.ingest.dao.anhalytics.LocationDAO;
+import fr.inria.anhalytics.kb.dao.anhalytics.LocationDAO;
 import fr.inria.anhalytics.dao.DocumentDAO;
 import fr.inria.anhalytics.dao.Document_OrganisationDAO;
-import fr.inria.anhalytics.ingest.dao.anhalytics.Document_IdentifierDAO;
+import fr.inria.anhalytics.kb.dao.anhalytics.Document_IdentifierDAO;
 import fr.inria.anhalytics.dao.In_SerialDAO;
 import fr.inria.anhalytics.dao.MonographDAO;
-import fr.inria.anhalytics.ingest.dao.anhalytics.OrganisationDAO;
+import fr.inria.anhalytics.kb.dao.anhalytics.OrganisationDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.dao.PublicationDAO;
 import fr.inria.anhalytics.dao.PublisherDAO;
-import fr.inria.anhalytics.ingest.dao.anhalytics.DAOFactory;
-import fr.inria.anhalytics.ingest.entities.Address;
-import fr.inria.anhalytics.ingest.entities.Affiliation;
-import fr.inria.anhalytics.ingest.entities.Author;
-import fr.inria.anhalytics.ingest.entities.Collection;
-import fr.inria.anhalytics.ingest.entities.Conference;
-import fr.inria.anhalytics.ingest.entities.Conference_Event;
-import fr.inria.anhalytics.ingest.entities.Country;
-import fr.inria.anhalytics.ingest.entities.Document_Organisation;
-import fr.inria.anhalytics.ingest.entities.Editor;
-import fr.inria.anhalytics.ingest.entities.In_Serial;
-import fr.inria.anhalytics.ingest.entities.Journal;
-import fr.inria.anhalytics.ingest.entities.Location;
-import fr.inria.anhalytics.ingest.entities.Monograph;
-import fr.inria.anhalytics.ingest.entities.Organisation;
-import fr.inria.anhalytics.ingest.entities.PART_OF;
-import fr.inria.anhalytics.ingest.entities.Person;
-import fr.inria.anhalytics.ingest.entities.Person_Identifier;
-import fr.inria.anhalytics.ingest.entities.Publication;
-import fr.inria.anhalytics.ingest.entities.Publisher;
-import fr.inria.anhalytics.ingest.entities.Serial_Identifier;
-import fr.inria.anhalytics.ingest.properties.IngestProperties;
+import fr.inria.anhalytics.kb.dao.anhalytics.DAOFactory;
+import fr.inria.anhalytics.kb.entities.Address;
+import fr.inria.anhalytics.kb.entities.Affiliation;
+import fr.inria.anhalytics.kb.entities.Author;
+import fr.inria.anhalytics.kb.entities.Collection;
+import fr.inria.anhalytics.kb.entities.Conference;
+import fr.inria.anhalytics.kb.entities.Conference_Event;
+import fr.inria.anhalytics.kb.entities.Country;
+import fr.inria.anhalytics.kb.entities.Document_Organisation;
+import fr.inria.anhalytics.kb.entities.Editor;
+import fr.inria.anhalytics.kb.entities.In_Serial;
+import fr.inria.anhalytics.kb.entities.Journal;
+import fr.inria.anhalytics.kb.entities.Location;
+import fr.inria.anhalytics.kb.entities.Monograph;
+import fr.inria.anhalytics.kb.entities.Organisation;
+import fr.inria.anhalytics.kb.entities.PART_OF;
+import fr.inria.anhalytics.kb.entities.Person;
+import fr.inria.anhalytics.kb.entities.Person_Identifier;
+import fr.inria.anhalytics.kb.entities.Publication;
+import fr.inria.anhalytics.kb.entities.Publisher;
+import fr.inria.anhalytics.kb.entities.Serial_Identifier;
+import fr.inria.anhalytics.kb.properties.IngestProperties;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -126,7 +126,7 @@ public class HALMiner extends Miner {
                             NodeList monogr = (NodeList) xPath.compile(HALTEIMetadata.MonogrElement).evaluate(generatedTeiDoc, XPathConstants.NODESET);
                             NodeList ids = (NodeList) xPath.compile(HALTEIMetadata.IdnoElement).evaluate(generatedTeiDoc, XPathConstants.NODESET);
 
-                            fr.inria.anhalytics.ingest.entities.Document doc = new fr.inria.anhalytics.ingest.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(uri), Utilities.innerXmlToString(metadata), uri);
+                            fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(uri), Utilities.innerXmlToString(metadata), uri);
 
                             dd.create(doc);
 
@@ -168,7 +168,7 @@ public class HALMiner extends Miner {
         logger.info("DONE.");
     }
 
-    private static void processIdentifiers(NodeList ids, fr.inria.anhalytics.ingest.entities.Document doc) throws SQLException {
+    private static void processIdentifiers(NodeList ids, fr.inria.anhalytics.kb.entities.Document doc) throws SQLException {
         String type = null;
         String id = null;
         Document_IdentifierDAO did = (Document_IdentifierDAO) adf.getDocument_IdentifierDAO();
@@ -179,10 +179,10 @@ public class HALMiner extends Miner {
                 type = identifierElt.getAttribute("type");
                 id = node.getTextContent();
             }
-            fr.inria.anhalytics.ingest.entities.Document_Identifier di = new fr.inria.anhalytics.ingest.entities.Document_Identifier(null, id, type, doc);
+            fr.inria.anhalytics.kb.entities.Document_Identifier di = new fr.inria.anhalytics.kb.entities.Document_Identifier(null, id, type, doc);
             did.create(di);
         }
-        fr.inria.anhalytics.ingest.entities.Document_Identifier dihal = new fr.inria.anhalytics.ingest.entities.Document_Identifier(null, doc.getUri(), "hal", doc);
+        fr.inria.anhalytics.kb.entities.Document_Identifier dihal = new fr.inria.anhalytics.kb.entities.Document_Identifier(null, doc.getUri(), "hal", doc);
         did.create(dihal);
     }
 

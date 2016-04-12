@@ -1,6 +1,6 @@
 package fr.inria.anhalytics.dao;
 
-import fr.inria.anhalytics.ingest.entities.Document;
+import fr.inria.anhalytics.kb.entities.Document;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

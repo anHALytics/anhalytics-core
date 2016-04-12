@@ -1,10 +1,10 @@
-package fr.inria.anhalytics.ingest.main;
+package fr.inria.anhalytics.kb.main;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.ingest.datamine.GrobidMiner;
-import fr.inria.anhalytics.ingest.datamine.HALMiner;
-import fr.inria.anhalytics.ingest.properties.IngestProperties;
+import fr.inria.anhalytics.kb.datamine.GrobidMiner;
+import fr.inria.anhalytics.kb.datamine.HALMiner;
+import fr.inria.anhalytics.kb.properties.IngestProperties;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

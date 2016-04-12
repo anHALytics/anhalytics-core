@@ -1,10 +1,10 @@
 package fr.inria.anhalytics.dao;
 
-import fr.inria.anhalytics.ingest.entities.Collection;
-import fr.inria.anhalytics.ingest.entities.In_Serial;
-import fr.inria.anhalytics.ingest.entities.Journal;
-import fr.inria.anhalytics.ingest.entities.Monograph;
-import fr.inria.anhalytics.ingest.entities.Serial_Identifier;
+import fr.inria.anhalytics.kb.entities.Collection;
+import fr.inria.anhalytics.kb.entities.In_Serial;
+import fr.inria.anhalytics.kb.entities.Journal;
+import fr.inria.anhalytics.kb.entities.Monograph;
+import fr.inria.anhalytics.kb.entities.Serial_Identifier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
