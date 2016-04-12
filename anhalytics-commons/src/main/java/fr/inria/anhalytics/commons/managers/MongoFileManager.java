@@ -49,6 +49,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     private String currentDocType = null;
     private String currentFileType = null;
     private String currentFileName = null;
+    private boolean currentIsWithFulltext = false;
 
     private DBCursor cursor = null;
     private DBCollection collection = null;
@@ -304,6 +305,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         currentRepositoryDocId = (String) obj.get("repositoryDocId");
         currentDocType = (String) obj.get("documentType");
         currentAnhalyticsId = (String) obj.get("anhalyticsId");
+        setCurrentIsWithFulltext((boolean) (Boolean) obj.get("isWithFulltext"));
         GridFSDBFile binaryfile = gfs.findOne(currentRepositoryDocId + ".tei.xml");
         indexFile++;
         teiStream = binaryfile.getInputStream();
@@ -914,5 +916,19 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         GridFSDBFile file = findAssetBasicDBFile(currentRepositoryDocId, currentFileName);
         file.put("legend", legend);
         file.save();
+    }
+
+    /**
+     * @return the currentIsWithFulltext
+     */
+    public boolean isCurrentIsWithFulltext() {
+        return currentIsWithFulltext;
+    }
+
+    /**
+     * @param currentIsWithFulltext the currentIsWithFulltext to set
+     */
+    public void setCurrentIsWithFulltext(boolean currentIsWithFulltext) {
+        this.currentIsWithFulltext = currentIsWithFulltext;
     }
 }
