@@ -111,7 +111,7 @@ public class PublicationDAO extends DAO<Publication, Long> {
             try {
                 publication = new Publication(
                         publication_id,
-                        new Document(rs.getString("docID"), rs.getString("version"), rs.getString("TEImetadatas"), rs.getString("URI")),
+                        new Document(rs.getString("docID"), rs.getString("version"), rs.getString("URI")),
                         new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
                         new Publisher(rs.getLong("publisherID"), rs.getString("name")),
                         rs.getString("PUBLICATION.type"),
@@ -140,7 +140,7 @@ public class PublicationDAO extends DAO<Publication, Long> {
             try {
                 publications.add(new Publication(
                         rs.getLong("PUBLICATION.publicationID"),
-                        new Document(doc_id, rs.getString("version"), rs.getString("TEImetadatas"), rs.getString("URI")),
+                        new Document(doc_id, rs.getString("version"), rs.getString("URI")),
                         new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
                         new Publisher(rs.getLong("publisherID"), rs.getString("name")),
                         rs.getString("PUBLICATION.type"),

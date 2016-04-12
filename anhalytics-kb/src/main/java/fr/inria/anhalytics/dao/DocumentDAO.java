@@ -44,7 +44,6 @@ public class DocumentDAO extends DAO<Document, String> {
         statement.setString(2, obj.getVersion());
 
         statement.setString(3, obj.getUri());
-        statement.setString(4, obj.getTei_metadata());
         int code = statement.executeUpdate();
 
         result = true;
@@ -69,8 +68,6 @@ public class DocumentDAO extends DAO<Document, String> {
                 document = new Document(
                         doc_id,
                         result.getString("version"),
-                        result.getString("TEImetadatas"
-                        ),
                         result.getString("uri"
                         ));
             }
@@ -106,7 +103,6 @@ public class DocumentDAO extends DAO<Document, String> {
                         new Document(
                                 rs.getString("docID"),
                                 rs.getString("version"),
-                                rs.getString("TEImetadatas"),
                                 rs.getString("uri")
                         ));
             }

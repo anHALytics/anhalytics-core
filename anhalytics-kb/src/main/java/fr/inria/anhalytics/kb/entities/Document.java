@@ -11,13 +11,11 @@ public class Document {
 
     private String docID;
     private String version = "";
-    private String tei_metadata = "";
     private String uri = "";
 
-    public Document(String docID, String version, String tei_metadata, String uri) {
+    public Document(String docID, String version, String uri) {
         this.docID = docID;
         this.version = version;
-        this.tei_metadata = tei_metadata;
         this.uri = uri;
     }
 
@@ -52,20 +50,6 @@ public class Document {
         if(version.length() > 45)
             version = version.substring(0, 44);
         this.version = version;
-    }
-
-    /**
-     * @return the tei_metadata
-     */
-    public String getTei_metadata() {
-        return tei_metadata;
-    }
-
-    /**
-     * @param tei_metadata the tei_metadata to set
-     */
-    public void setTei_metadata(String tei_metadata) {
-        this.tei_metadata = tei_metadata;
     }
 
     /**
@@ -118,15 +102,14 @@ public class Document {
      */
     @Override
     public String toString() {
-        return String.format("User[docID=%d,version=%s,uri=%s,tei_metadata=%s]",
-                docID, version, uri, tei_metadata);
+        return String.format("User[docID=%d,version=%s,uri=%s]",
+                docID, version, uri);
     }
 
     public Map<String, Object> getDocumentDocument() {
         Map<String, Object> documentDocument = new HashMap<String, Object>();
         documentDocument.put("docID", this.getDocID());
         documentDocument.put("version", this.getVersion());
-        //documentDocument.put("tei_metadata", this.getTei_metadata());
         documentDocument.put("uri", this.getUri());
         return documentDocument;
     }

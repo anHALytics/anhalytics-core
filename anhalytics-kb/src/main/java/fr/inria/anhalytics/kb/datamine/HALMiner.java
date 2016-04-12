@@ -126,7 +126,7 @@ public class HALMiner extends Miner {
                             NodeList monogr = (NodeList) xPath.compile(HALTEIMetadata.MonogrElement).evaluate(generatedTeiDoc, XPathConstants.NODESET);
                             NodeList ids = (NodeList) xPath.compile(HALTEIMetadata.IdnoElement).evaluate(generatedTeiDoc, XPathConstants.NODESET);
 
-                            fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(uri), Utilities.innerXmlToString(metadata), uri);
+                            fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(uri), uri);
 
                             dd.create(doc);
 

@@ -93,7 +93,7 @@ public class GrobidMiner extends Miner {
                             Node citations = (Node) xPath.compile("/teiCorpus/TEI/text/back/div[@type='references']/listBibl").evaluate(teiDoc, XPathConstants.NODE);
                             if (citations != null) {
                                 NodeList references = citations.getChildNodes();
-                                fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(anhalyticsId, Utilities.getVersionFromURI(uri), Utilities.innerXmlToString(citations), uri);
+                                fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(anhalyticsId, Utilities.getVersionFromURI(uri), uri);
                                 dd.create(doc);
 
                                 for (int j = 0; j < references.getLength() - 1; j++) {
