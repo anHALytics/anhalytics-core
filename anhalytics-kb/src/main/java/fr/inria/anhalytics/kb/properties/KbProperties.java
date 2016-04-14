@@ -9,7 +9,7 @@ import java.util.Properties;
  *
  * @author achraf
  */
-public class IngestProperties {
+public class KbProperties {
 
     private static String processName;
 

@@ -4,7 +4,7 @@ import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.kb.datamine.GrobidMiner;
 import fr.inria.anhalytics.kb.datamine.HALMiner;
-import fr.inria.anhalytics.kb.properties.IngestProperties;
+import fr.inria.anhalytics.kb.properties.KbProperties;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,14 +31,14 @@ public class Main {
 
     public static void main(String[] args) throws UnknownHostException {
         try {
-            IngestProperties.init("ingest.properties");
+            KbProperties.init("ingest.properties");
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file of harvest properties ingest.properties", exp);
         }
 
         if (processArgs(args)) {
-            if (IngestProperties.getFromDate() != null || IngestProperties.getUntilDate() != null) {
-                Utilities.updateDates(IngestProperties.getUntilDate(), IngestProperties.getFromDate());
+            if (KbProperties.getFromDate() != null || KbProperties.getUntilDate() != null) {
+                Utilities.updateDates(KbProperties.getUntilDate(), KbProperties.getFromDate());
             }
             Main main = new Main();
             main.processCommand();
@@ -55,7 +55,7 @@ public class Main {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
         String todayDate = dateFormat.format(cal.getTime());
-        String process = IngestProperties.getProcessName();
+        String process = KbProperties.getProcessName();
         GrobidMiner gm = new GrobidMiner();
         HALMiner hm = new HALMiner();
         if (process.equals("initKnowledgeBase")) {
@@ -84,14 +84,14 @@ public class Main {
                     result = false;
                     break;
                 } else if (currArg.equals("-nodates")) {
-                    IngestProperties.setProcessByDate(false);
+                    KbProperties.setProcessByDate(false);
                     i++;
                     continue;
                 } else if (currArg.equals("-dFromDate")) {
                     String stringDate = pArgs[i + 1];
                     if (!stringDate.isEmpty()) {
                         if (Utilities.isValidDate(stringDate)) {
-                            IngestProperties.setFromDate(pArgs[i + 1]);
+                            KbProperties.setFromDate(pArgs[i + 1]);
                         } else {
                             System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
                             result = false;
@@ -103,7 +103,7 @@ public class Main {
                     String stringDate = pArgs[i + 1];
                     if (!stringDate.isEmpty()) {
                         if (Utilities.isValidDate(stringDate)) {
-                            IngestProperties.setUntilDate(stringDate);
+                            KbProperties.setUntilDate(stringDate);
                         } else {
                             System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
                             result = false;
@@ -114,7 +114,7 @@ public class Main {
                 } else if (currArg.equals("-exe")) {
                     String command = pArgs[i + 1];
                     if (availableCommands.contains(command)) {
-                        IngestProperties.setProcessName(command);
+                        KbProperties.setProcessName(command);
                         i++;
                         continue;
                     } else {

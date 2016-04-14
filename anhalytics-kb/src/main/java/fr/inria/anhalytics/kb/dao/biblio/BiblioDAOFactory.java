@@ -16,7 +16,7 @@ import fr.inria.anhalytics.dao.MonographDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.dao.PublicationDAO;
 import fr.inria.anhalytics.dao.PublisherDAO;
-import fr.inria.anhalytics.kb.properties.IngestProperties;
+import fr.inria.anhalytics.kb.properties.KbProperties;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
     public static void initConnection() {
         if (conn == null) {
             try {
-                IngestProperties.init("ingest.properties");
+                KbProperties.init("kb.properties");
             } catch (Exception exp) {
                 throw new PropertyException("Cannot open file of harvest properties ingest.properties", exp);
             }

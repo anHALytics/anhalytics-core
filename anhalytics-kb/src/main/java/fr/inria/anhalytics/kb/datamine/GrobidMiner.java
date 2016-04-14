@@ -24,7 +24,7 @@ import fr.inria.anhalytics.kb.entities.Person_Identifier;
 import fr.inria.anhalytics.kb.entities.Publication;
 import fr.inria.anhalytics.kb.entities.Publisher;
 import fr.inria.anhalytics.kb.entities.Serial_Identifier;
-import fr.inria.anhalytics.kb.properties.IngestProperties;
+import fr.inria.anhalytics.kb.properties.KbProperties;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,7 +71,7 @@ public class GrobidMiner extends Miner {
         DocumentDAO dd = (DocumentDAO) abdf.getDocumentDAO();
 
         for (String date : Utilities.getDates()) {
-            if (!IngestProperties.isProcessByDate()) {
+            if (!KbProperties.isProcessByDate()) {
                 date = null;
             }
             if (mm.initTeis(date)) {
@@ -111,7 +111,7 @@ public class GrobidMiner extends Miner {
                     }
                 }
             }
-            if (!IngestProperties.isProcessByDate()) {
+            if (!KbProperties.isProcessByDate()) {
                 break;
             }
         }

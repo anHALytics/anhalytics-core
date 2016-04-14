@@ -58,8 +58,8 @@ public class Indexer {
             // loading based on DocDB XML, with TEI conversion
             int nbDoc = indexTeiCollection();
             logger.info("Total: " + nbDoc + " documents indexed.");
-			int nbKeytermAnnotsIndexed = indexKeytermAnnotations();
-			logger.info("Total: " + nbKeytermAnnotsIndexed + " keyterm annotations indexed.");
+            int nbKeytermAnnotsIndexed = indexKeytermAnnotations();
+            logger.info("Total: " + nbKeytermAnnotsIndexed + " keyterm annotations indexed.");
             int nbNerdAnnotsIndexed = indexNerdAnnotations();
             logger.info("Total: " + nbNerdAnnotsIndexed + " NERD annotations indexed.");
         } catch (Exception e) {
@@ -71,7 +71,7 @@ public class Indexer {
     public boolean isIndexExists() {
         boolean teisIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getTeisIndexName()).execute().actionGet().isExists();
         boolean annotsNerdIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getNerdAnnotsIndexName()).execute().actionGet().isExists();
-		boolean annotsKeytermIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getKeytermAnnotsIndexName()).execute().actionGet().isExists();
+        boolean annotsKeytermIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getKeytermAnnotsIndexName()).execute().actionGet().isExists();
         return (teisIndexExists && annotsNerdIndexExists && annotsKeytermIndexExists);
     }
 
@@ -99,8 +99,8 @@ public class Indexer {
     private boolean deleteIndex(String indexName) throws Exception {
         boolean val = false;
         try {
-            String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + 
-				IndexProperties.getElasticSearch_port() + "/" + indexName;
+            String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":"
+                    + IndexProperties.getElasticSearch_port() + "/" + indexName;
             URL url = new URL(urlStr);
             HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
             httpCon.setDoOutput(true);
@@ -231,30 +231,36 @@ public class Indexer {
      */
     public int indexTeiCollection() {
         int nb = 0;
-        try {
-            for (String date : Utilities.getDates()) {
 
-                if (!IndexProperties.isProcessByDate()) {
-                    date = null;
-                }
-                BulkRequestBuilder bulkRequest = client.prepareBulk();
-                bulkRequest.setRefresh(true);
-                if (mm.initTeis(date)) {
-                    int i = 0;
+        for (String date : Utilities.getDates()) {
 
-                    while (mm.hasMoreTeis()) {
-                        String tei = mm.nextTeiDocument();
-                        String id = mm.getCurrentRepositoryDocId();
-                        String anhalyticsId = mm.getCurrentAnhalyticsId();
-                        if (anhalyticsId == null || anhalyticsId.isEmpty()) {
-                            logger.info("skipping " + id + " No anHALytics id provided");
-                            continue;
-                        }
+            if (!IndexProperties.isProcessByDate()) {
+                date = null;
+            }
+            BulkRequestBuilder bulkRequest = client.prepareBulk();
+            bulkRequest.setRefresh(true);
+            if (mm.initTeis(date)) {
+                int i = 0;
 
+                while (mm.hasMoreTeis()) {
+                    String tei = mm.nextTeiDocument();
+                    String id = mm.getCurrentRepositoryDocId();
+                    String anhalyticsId = mm.getCurrentAnhalyticsId();
+                    boolean isWithFulltext = mm.isCurrentIsWithFulltext();
+                    if (!isWithFulltext) {
+                        logger.info("skipping " + id + " No fulltext found");
+                        continue;
+                    }
+                    if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                        logger.info("skipping " + id + " No anHALytics id provided");
+                        continue;
+                    }
+                    String jsonStr = null;
+                    try {
                         // convert the TEI document into JSON via JsonML
                         //System.out.println(halID);
                         JSONObject json = JsonTapasML.toJSONObject(tei);
-                        String jsonStr = json.toString();
+                        jsonStr = json.toString();
 
                         jsonStr = indexingPreprocess.process(jsonStr, id, anhalyticsId);
 
@@ -281,22 +287,24 @@ public class Indexer {
 
                         i++;
                         nb++;
-                    }
-                    // last bulk
-                    BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                    System.out.print(".");
-                    if (bulkResponse.hasFailures()) {
-                        // process failures by iterating through each bulk response item	
-                        logger.error(bulkResponse.buildFailureMessage());
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
-
-                if (!IndexProperties.isProcessByDate()) {
-                    break;
+                // last bulk
+                if(i != 0){
+                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                System.out.print(".");
+                if (bulkResponse.hasFailures()) {
+                    // process failures by iterating through each bulk response item	
+                    logger.error(bulkResponse.buildFailureMessage());
+                }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            if (!IndexProperties.isProcessByDate()) {
+                break;
+            }
         }
         return nb;
     }
@@ -306,27 +314,27 @@ public class Indexer {
      */
     public int indexKeytermAnnotations() {
         int nb = 0;
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            for (String date : Utilities.getDates()) {
-                if (mm.initAnnotations(date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS)) {
-                    int i = 0;
-                    BulkRequestBuilder bulkRequest = client.prepareBulk();
-                    bulkRequest.setRefresh(true);
-                    while (mm.hasMoreAnnotations()) {
-                        String json = mm.nextAnnotation();
-                        String id = mm.getCurrentRepositoryDocId();
-                        String anhalyticsId = mm.getCurrentAnhalyticsId();
-                        if (anhalyticsId == null || anhalyticsId.isEmpty()) {
-                            logger.info("skipping " + id + " No anHALytics id provided");
-                            continue;
-                        }
 
+        ObjectMapper mapper = new ObjectMapper();
+        for (String date : Utilities.getDates()) {
+            if (mm.initAnnotations(date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS)) {
+                int i = 0;
+                BulkRequestBuilder bulkRequest = client.prepareBulk();
+                bulkRequest.setRefresh(true);
+                while (mm.hasMoreAnnotations()) {
+                    String json = mm.nextAnnotation();
+                    String id = mm.getCurrentRepositoryDocId();
+                    String anhalyticsId = mm.getCurrentAnhalyticsId();
+                    if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                        logger.info("skipping " + id + " No anHALytics id provided");
+                        continue;
+                    }
+                    try {
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
-						bulkRequest.add(client.prepareIndex(
-							IndexProperties.getKeytermAnnotsIndexName(), "annotation_keyterm", 
-								anhalyticsId).setSource(json));
+                        bulkRequest.add(client.prepareIndex(
+                                IndexProperties.getKeytermAnnotsIndexName(), "annotation_keyterm",
+                                anhalyticsId).setSource(json));
 
                         if (i >= 200) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -342,46 +350,50 @@ public class Indexer {
                         }
                         i++;
                         nb++;
-					}
-                    // last bulk
-                    BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                    if (bulkResponse.hasFailures()) {
-                        // process failures by iterating through each bulk response item	
-                        logger.error(bulkResponse.buildFailureMessage());
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    System.out.print("\n");
                 }
+                if(i != 0){
+                // last bulk
+                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                if (bulkResponse.hasFailures()) {
+                    // process failures by iterating through each bulk response item	
+                    logger.error(bulkResponse.buildFailureMessage());
+                }
+                }
+                System.out.print("\n");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return nb;
     }
-	
+
     /**
      * Indexing of the NERD annotations in ElasticSearch
      */
     public int indexNerdAnnotations() {
         int nb = 0;
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            for (String date : Utilities.getDates()) {
+        ObjectMapper mapper = new ObjectMapper();
+        for (String date : Utilities.getDates()) {
 
-                if (!IndexProperties.isProcessByDate()) {
-                    date = null;
-                }
-                BulkRequestBuilder bulkRequest = client.prepareBulk();
-                bulkRequest.setRefresh(true);
-                if (mm.initAnnotations(date, MongoCollectionsInterface.NERD_ANNOTATIONS)) {
-                    int i = 0;
-                    while (mm.hasMoreAnnotations()) {
-                        String json = mm.nextAnnotation();
-                        String id = mm.getCurrentRepositoryDocId();
-                        String anhalyticsId = mm.getCurrentAnhalyticsId();
-                        if (anhalyticsId == null || anhalyticsId.isEmpty()) {
-                            logger.info("skipping " + id + " No anHALytics id provided");
-                            continue;
-                        }
+            if (!IndexProperties.isProcessByDate()) {
+                date = null;
+            }
+            BulkRequestBuilder bulkRequest = client.prepareBulk();
+            bulkRequest.setRefresh(true);
+            if (mm.initAnnotations(date, MongoCollectionsInterface.NERD_ANNOTATIONS)) {
+                int i = 0;
+                while (mm.hasMoreAnnotations()) {
+                    String json = mm.nextAnnotation();
+                    String id = mm.getCurrentRepositoryDocId();
+                    String anhalyticsId = mm.getCurrentAnhalyticsId();
+                    if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                        logger.info("skipping " + id + " No anHALytics id provided");
+                        continue;
+                    }
+
+                    try {
                         // get the xml:id of the elements we want to index from the document
                         // we only index title, abstract and keyphrase annotations !
                         List<String> validIDs = validDocIDs(anhalyticsId, mapper);
@@ -417,8 +429,8 @@ public class Indexer {
 
                             // index the json in ElasticSearch
                             // beware the document type bellow and corresponding mapping!
-							bulkRequest.add(client.prepareIndex(
-								IndexProperties.getNerdAnnotsIndexName(), "annotation_nerd", xmlID).setSource(annotJson));
+                            bulkRequest.add(client.prepareIndex(
+                                    IndexProperties.getNerdAnnotsIndexName(), "annotation_nerd", xmlID).setSource(annotJson));
 
                             if (i >= 200) {
                                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -435,25 +447,29 @@ public class Indexer {
 
                             i++;
                             nb++;
-                        }
-                    }
-                    // last bulk
-                    BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                    System.out.print(".");
-                    if (bulkResponse.hasFailures()) {
-                        // process failures by iterating through each bulk response item	
-                        logger.error(bulkResponse.buildFailureMessage());
-                    }
-                    System.out.print("\n");
-                }
 
-                if (!IndexProperties.isProcessByDate()) {
-                    break;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+                // last bulk
+                if(i != 0){
+                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                System.out.print(".");
+                if (bulkResponse.hasFailures()) {
+                    // process failures by iterating through each bulk response item	
+                    logger.error(bulkResponse.buildFailureMessage());
+                }
+                }
+                System.out.print("\n");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            if (!IndexProperties.isProcessByDate()) {
+                break;
+            }
         }
+
         return nb;
     }
 

@@ -5,9 +5,10 @@ package fr.inria.anhalytics.kb.datamine;
  *
  * @author achraf
  */
-public interface HALTEIMetadata {
+public interface TeiPaths {
     
     public final static String MetadataElement = "/teiCorpus/teiHeader";
+    public final static String FulltextTeiHeader = "/teiCorpus/TEI/teiHeader";
     public final static String MonogrElement = "/teiCorpus/teiHeader/sourceDesc/biblStruct/monogr";
     public final static String IdnoElement = "/teiCorpus/teiHeader/sourceDesc/biblStruct/idno";
     public final static String TitleElement = "/teiCorpus/teiHeader/titleStmt/title";

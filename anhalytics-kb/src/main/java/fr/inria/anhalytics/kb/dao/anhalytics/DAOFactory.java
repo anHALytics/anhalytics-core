@@ -17,7 +17,7 @@ import fr.inria.anhalytics.kb.dao.anhalytics.OrganisationDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.kb.dao.anhalytics.AffiliationDAO;
 import fr.inria.anhalytics.kb.dao.anhalytics.Document_IdentifierDAO;
-import fr.inria.anhalytics.kb.properties.IngestProperties;
+import fr.inria.anhalytics.kb.properties.KbProperties;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -37,7 +37,7 @@ public class DAOFactory extends AbstractDAOFactory {
     public static void initConnection() {
         if (conn == null) {
             try {
-                IngestProperties.init("ingest.properties");
+                KbProperties.init("kb.properties");
             } catch (Exception exp) {
                 throw new PropertyException("Cannot open file of harvest properties ingest.properties", exp);
             }

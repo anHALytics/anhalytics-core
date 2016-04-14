@@ -305,7 +305,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         currentRepositoryDocId = (String) obj.get("repositoryDocId");
         currentDocType = (String) obj.get("documentType");
         currentAnhalyticsId = (String) obj.get("anhalyticsId");
-        setCurrentIsWithFulltext((boolean) (Boolean) obj.get("isWithFulltext"));
+        currentIsWithFulltext = obj.get("isWithFulltext") != null ? (Boolean) obj.get("isWithFulltext"):false;
         GridFSDBFile binaryfile = gfs.findOne(currentRepositoryDocId + ".tei.xml");
         indexFile++;
         teiStream = binaryfile.getInputStream();

@@ -20,7 +20,7 @@ public class DocumentDAO extends DAO<Document, String> {
     private static final Logger logger = LoggerFactory.getLogger(DocumentDAO.class);
 
     private static final String SQL_INSERT
-            = "INSERT INTO DOCUMENT (docID, version, uri, TEImetadatas) VALUES (?, ?, ?, ?)";
+            = "INSERT INTO DOCUMENT (docID, version, uri) VALUES (?, ?, ?)";
     
     private static final String READ_QUERY_DOCUMENTS = "SELECT * FROM DOCUMENT";
 

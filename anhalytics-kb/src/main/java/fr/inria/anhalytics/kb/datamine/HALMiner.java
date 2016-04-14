@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.kb.datamine;
 
+import fr.inria.anhalytics.commons.exceptions.NumberOfCoAuthorsExceededException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.AddressDAO;
@@ -36,7 +37,7 @@ import fr.inria.anhalytics.kb.entities.Person_Identifier;
 import fr.inria.anhalytics.kb.entities.Publication;
 import fr.inria.anhalytics.kb.entities.Publisher;
 import fr.inria.anhalytics.kb.entities.Serial_Identifier;
-import fr.inria.anhalytics.kb.properties.IngestProperties;
+import fr.inria.anhalytics.kb.properties.KbProperties;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -84,7 +85,7 @@ public class HALMiner extends Miner {
 
         for (String date : Utilities.getDates()) {
 
-            if (!IngestProperties.isProcessByDate()) {
+            if (!KbProperties.isProcessByDate()) {
                 date = null;
             }
             if (mm.initTeis(date)) {
@@ -92,6 +93,7 @@ public class HALMiner extends Miner {
                     String metadataTeiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
                     String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
+                    boolean currentIsWithFullText = mm.isCurrentIsWithFulltext();
                     if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
                         logger.info("skipping " + uri + " No anHALytics id provided");
                         continue;
@@ -114,18 +116,27 @@ public class HALMiner extends Miner {
                             metadataTeiStream.close();
 
                             Publication pub = new Publication();
-                            Node title = (Node) xPath.compile(HALTEIMetadata.TitleElement).evaluate(generatedTeiDoc, XPathConstants.NODE);
-                            Node language = (Node) xPath.compile(HALTEIMetadata.LanguageElement).evaluate(generatedTeiDoc, XPathConstants.NODE);
-                            Node type = (Node) xPath.compile(HALTEIMetadata.TypologyElement).evaluate(generatedTeiDoc, XPathConstants.NODE);
-                            Node submission_date = (Node) xPath.compile(HALTEIMetadata.SubmissionDateElement).evaluate(generatedTeiDoc, XPathConstants.NODE);
-                            Node domain = (Node) xPath.compile(HALTEIMetadata.DomainElement).evaluate(generatedTeiDoc, XPathConstants.NODE);
+                            
+                            
+                            Element teiHeader = (Element) xPath.compile(TeiPaths.MetadataElement).evaluate(generatedTeiDoc, XPathConstants.NODE);
+                            Element fulltextTeiHeader = (Element) xPath.compile(TeiPaths.FulltextTeiHeader).evaluate(generatedTeiDoc, XPathConstants.NODE);
+                            
+                            
+                            Element title = (Element) teiHeader.getElementsByTagName("title").item(0);
+                            Node language = (Node) xPath.compile(TeiPaths.LanguageElement).evaluate(generatedTeiDoc, XPathConstants.NODE);
+                            Node type = (Node) xPath.compile(TeiPaths.TypologyElement).evaluate(generatedTeiDoc, XPathConstants.NODE);
+                            Node submission_date = (Node) xPath.compile(TeiPaths.SubmissionDateElement).evaluate(generatedTeiDoc, XPathConstants.NODE);
+                            Node domain = (Node) xPath.compile(TeiPaths.DomainElement).evaluate(generatedTeiDoc, XPathConstants.NODE);
                             //more than one domain / article
-                            NodeList editors = (NodeList) xPath.compile(HALTEIMetadata.EditorElement).evaluate(generatedTeiDoc, XPathConstants.NODESET);
-                            NodeList authors = (NodeList) xPath.compile(HALTEIMetadata.AuthorElement).evaluate(generatedTeiDoc, XPathConstants.NODESET);
-                            Node metadata = (Node) xPath.compile(HALTEIMetadata.MetadataElement).evaluate(generatedTeiDoc, XPathConstants.NODE);
-                            NodeList monogr = (NodeList) xPath.compile(HALTEIMetadata.MonogrElement).evaluate(generatedTeiDoc, XPathConstants.NODESET);
-                            NodeList ids = (NodeList) xPath.compile(HALTEIMetadata.IdnoElement).evaluate(generatedTeiDoc, XPathConstants.NODESET);
+                            NodeList editors = teiHeader.getElementsByTagName("editor");
+                            NodeList authors = teiHeader.getElementsByTagName("author");
+                            NodeList monogr = (NodeList) xPath.compile(TeiPaths.MonogrElement).evaluate(generatedTeiDoc, XPathConstants.NODESET);
+                            NodeList ids = (NodeList) xPath.compile(TeiPaths.IdnoElement).evaluate(generatedTeiDoc, XPathConstants.NODESET);
 
+                            if(authors.getLength() > 10)
+                            {
+                                throw new NumberOfCoAuthorsExceededException("Number of authors exceed 10 co-authors for this publication.");
+                            }
                             fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(uri), uri);
 
                             dd.create(doc);
@@ -143,8 +154,8 @@ public class HALMiner extends Miner {
                             processMonogr(monogr, pub);
 
                             pd.create(pub);
-                            processPersons(authors, "author", pub, generatedTeiDoc);
-                            processPersons(editors, "editor", pub, generatedTeiDoc);
+                            processPersons(authors, "author", pub, generatedTeiDoc, currentIsWithFullText);
+                            processPersons(editors, "editor", pub, generatedTeiDoc, currentIsWithFullText);
                             processIdentifiers(ids, doc);
                         } catch (Exception xpe) {
                             adf.rollback();
@@ -159,7 +170,7 @@ public class HALMiner extends Miner {
                     }
                 }
             }
-            if (!IngestProperties.isProcessByDate()) {
+            if (!KbProperties.isProcessByDate()) {
                 break;
             }
 
@@ -404,7 +415,7 @@ public class HALMiner extends Miner {
         return org;
     }
 
-    private static void processPersons(NodeList persons, String type, Publication pub, Document doc) throws SQLException {
+    private static void processPersons(NodeList persons, String type, Publication pub, Document doc, boolean isWithFullText) throws SQLException {
         Node person = null;
         PersonDAO pd = (PersonDAO) adf.getPersonDAO();
         Person prs = null;
