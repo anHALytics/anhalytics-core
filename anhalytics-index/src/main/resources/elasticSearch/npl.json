@@ -887,7 +887,7 @@
                     },
                     "$standoff": {
 						"properties": {
-							"nerd" : {
+							"$nerd" : {
 		                        "properties": {
 		                            "freeBaseExternalRef": {
 		                                "type": "string"
