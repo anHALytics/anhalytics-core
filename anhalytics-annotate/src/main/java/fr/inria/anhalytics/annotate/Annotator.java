@@ -1,8 +1,9 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
-import fr.inria.anhalytics.commons.exceptions.UnreachableNerdServiceException;
+import fr.inria.anhalytics.commons.exceptions.UnreachableAnnotateServiceException;
 import fr.inria.anhalytics.annotate.exceptions.AnnotatorNotAvailableException;
+import fr.inria.anhalytics.annotate.services.AnnotateService;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
@@ -59,7 +60,7 @@ public class Annotator {
      * Annotates tei collection entries with fulltext.
      */
     private void annotateTeiCollection(Annotator_Type annotator_type)
-            throws UnreachableNerdServiceException, AnnotatorNotAvailableException {
+            throws UnreachableAnnotateServiceException, AnnotatorNotAvailableException {
         int nb = 0;
         String annotationsCollection = null;
         if (annotator_type == Annotator_Type.NERD) {
@@ -70,14 +71,14 @@ public class Annotator {
             throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
         }
         try {
-            //if (NerdService.isNerdReady()) 
+            if (AnnotateService.isAnnotateServiceReady(annotator_type)) 
             {
                 for (String date : Utilities.getDates()) {
 
                     if (!AnnotateProperties.isProcessByDate()) {
                         date = null;
                     }
-                    if (mm.initTeis(date)) {
+                    if (mm.initTeis(date, true)) {
                         logger.debug("processing teis for :" + date);
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
@@ -131,7 +132,7 @@ public class Annotator {
      * Annotates tei collection entries with fulltext (multithread process).
      */
     private void annotateTeiCollectionMultiThreaded(Annotator_Type annotator_type)
-            throws UnreachableNerdServiceException, AnnotatorNotAvailableException {
+            throws UnreachableAnnotateServiceException, AnnotatorNotAvailableException {
         int nb = 0;
         String annotationsCollection = null;
         if (annotator_type == Annotator_Type.NERD) {
@@ -142,33 +143,32 @@ public class Annotator {
             throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
         }
         try {
-            if (NerdService.isNerdReady()) {
+            if (AnnotateService.isAnnotateServiceReady(annotator_type)) {
                 ThreadPoolExecutor executor = getThreadsExecutor(annotator_type);
                 for (String date : Utilities.getDates()) {
                     if (!AnnotateProperties.isProcessByDate()) {
                         date = null;
                     }
-                    if (mm.initTeis(date)) {
+                    if (mm.initTeis(date, true)) {
                         //logger.debug("processing teis for :" + date);
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
-                            String id = mm.getCurrentRepositoryDocId();
+                            String repositoryDocId = mm.getCurrentRepositoryDocId();
                             String anhalyticsId = mm.getCurrentAnhalyticsId();
                             boolean isWithFulltext = mm.isCurrentIsWithFulltext();
                             if (!isWithFulltext) {
-                                logger.info("skipping " + id + " No fulltext found");
+                                logger.info("skipping " + repositoryDocId + " No fulltext found");
                                 continue;
                             }
                             
                             if (anhalyticsId == null || anhalyticsId.isEmpty()) {
-                                logger.info("skipping " + id + " No anHALytics id provided");
+                                logger.info("skipping " + repositoryDocId + " No anHALytics id provided");
                                 continue;
                             }
-
                             // check if the document is already annotated
                             if (!AnnotateProperties.isReset()) {
                                 if (mm.isAnnotated(annotationsCollection)) {
-                                    logger.debug("skipping " + id + ": already annotated");
+                                    logger.debug("skipping " + repositoryDocId + ": already annotated");
                                     continue;
                                 }
                             }
@@ -176,15 +176,14 @@ public class Annotator {
                             // filter based on document size... we should actually annotate only 
                             // a given length and then stop
                             if (tei.length() > 300000) {
-                                logger.debug("skipping " + id + ": file too large");
+                                logger.debug("skipping " + repositoryDocId + ": file too large");
                                 continue;
                             }
-
                             Runnable worker = null;
                             if (annotator_type == Annotator_Type.NERD) {
-                                worker = new NerdAnnotatorWorker(mm, id, anhalyticsId, tei, date);
+                                worker = new NerdAnnotatorWorker(mm, repositoryDocId, anhalyticsId, tei, date);
                             } else {
-                                worker = new KeyTermAnnotatorWorker(mm, id, anhalyticsId, tei, date);
+                                worker = new KeyTermAnnotatorWorker(mm, repositoryDocId, anhalyticsId, tei, date);
                             }
 
                             executor.execute(worker);
@@ -224,7 +223,7 @@ public class Annotator {
             public void rejectedExecution(Runnable r,
                     ThreadPoolExecutor executor) {
                 logger.info("Task Rejected : "
-                        + ((AnnotatorWorker) r).getdocumentId());
+                        + ((AnnotatorWorker) r).getRepositoryDocId());
                 logger.info("Waiting for 60 second !!");
                 try {
                     Thread.sleep(60000);
@@ -232,7 +231,7 @@ public class Annotator {
                     e.printStackTrace();
                 }
                 logger.info("Lets add another time : "
-                        + ((AnnotatorWorker) r).getdocumentId());
+                        + ((AnnotatorWorker) r).getRepositoryDocId());
                 executor.execute(r);
             }
         });

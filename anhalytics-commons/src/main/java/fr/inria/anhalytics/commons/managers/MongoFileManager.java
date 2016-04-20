@@ -182,13 +182,14 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * This initializes cursor for tei generated collection.
      */
-    public boolean initTeis(String date) throws MongoException {
+    public boolean initTeis(String date, boolean withFulltext) throws MongoException {
         try {
             setGridFSCollection(MongoCollectionsInterface.FINAL_TEIS);
             BasicDBObject bdbo = new BasicDBObject();
             if (date != null) {
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
             }
+            bdbo.append("isWithFulltext", withFulltext);
             cursor = gfs.getFileList(bdbo);
             cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT);
             indexFile = 0;
@@ -715,10 +716,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public boolean isAnnotated(String annotationsCollection) {
         DBCollection c = null;
         c = db.getCollection(annotationsCollection);
-        c.ensureIndex(new BasicDBObject("repositoryDocId", 1));
+        c.ensureIndex(new BasicDBObject("anhalyticsId", 1));
         c.ensureIndex(new BasicDBObject("xml:id", 1));
         boolean result = false;
-        BasicDBObject query = new BasicDBObject("repositoryDocId", currentRepositoryDocId);
+        BasicDBObject query = new BasicDBObject("anhalyticsId", currentAnhalyticsId);
 
         DBCursor cursor = null;
         try {

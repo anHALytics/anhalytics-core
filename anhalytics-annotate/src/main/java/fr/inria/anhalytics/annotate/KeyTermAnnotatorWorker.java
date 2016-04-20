@@ -1,49 +1,55 @@
 package fr.inria.anhalytics.annotate;
 
+import fr.inria.anhalytics.annotate.services.KeyTermExtractionService;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.*;
-import java.util.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 
 /**
  * Runnable that uses the NERD REST service for annotating HAL TEI
  * documents.Resulting JSON annotations are then stored in MongoDB as persistent
  * storage.
  *
- * The content of every TEI elements having an attribute @xml:id randomly generated 
- * will be annotated. The annotations follow a stand-off representation that is using 
-*  the @xml:id as base and offsets to identified the annotated chunk of text. 
- * 
+ * The content of every TEI elements having an attribute @xml:id randomly
+ * generated will be annotated. The annotations follow a stand-off
+ * representation that is using the @xml:id as base and offsets to identified
+ * the annotated chunk of text.
+ *
  * @author Achraf, Patrice
  */
 public class KeyTermAnnotatorWorker extends AnnotatorWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(KeyTermAnnotatorWorker.class);
-    private String tei = null;
 
     public KeyTermAnnotatorWorker(MongoFileManager mongoManager,
-            String documentId,
+            String repositoryDocId,
             String anhalyticsId,
             String tei,
             String date) {
-        super(mongoManager, documentId, anhalyticsId, date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
+        super(mongoManager, repositoryDocId, anhalyticsId, date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
         this.tei = tei;
     }
 
     @Override
-    protected void processCommand() {        
+    protected void processCommand() {
+        try {
+            mm.insertAnnotation(annotateDocument(), annotationsCollection);
+            logger.debug("\t\t " + Thread.currentThread().getName() + ": "+ repositoryDocId + " annotated by the KeyTerm extraction and disambiguation service.");
+        } catch (Exception ex) {
+            logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + repositoryDocId);
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Annotation of a complete document with extracted disambiguated key terms
+     */
+    @Override
+    protected String annotateDocument() {
         // NOTE: the part bellow should be used in the future for improving the keyterm disambiguation 
         // by setting a custom domain context which helps the disambiguation (so don't remove it ;)
-        
+
         /*List<String> halDomainTexts = new ArrayList<String>();
         List<String> halDomains = new ArrayList<String>();
         List<String> meSHDescriptors = new ArrayList<String>();
@@ -65,34 +71,19 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
                 }
             }
         }*/
-
-        mm.insertAnnotation(annotateDocument(tei, documentId, anhalyticsId), annotationsCollection);
-        logger.debug("\t\t " + documentId + " annotated by the KeyTerm extraction and disambiguation service.");
-    }
-
-    /**
-     * Annotation of a complete document with extacted disambiguated key terms
-     */
-    private String annotateDocument(String tei,
-            String documentId, String docId) {
         StringBuffer json = new StringBuffer();
-        json.append("{ \"repositoryDocId\" : \"" + documentId
-                +"\",\"anhalyticsId\" : \"" + anhalyticsId
-                +"\", \"date\" :\"" + date
-                +"\", \"keyterm\" : ");
+        json.append("{ \"repositoryDocId\" : \"" + repositoryDocId
+                + "\",\"anhalyticsId\" : \"" + anhalyticsId
+                + "\", \"date\" :\"" + date
+                + "\", \"keyterm\" : ");
         String jsonText = null;
-        try {
-            KeyTermExtractionService keyTermService = new KeyTermExtractionService(documentId, tei);
-            jsonText = keyTermService.runKeyTermExtraction();
-        } catch (Exception ex) {
-            logger.error("TEI could not be processed by the keyterm extractor: " + documentId);
-            ex.printStackTrace();
-        }
+        KeyTermExtractionService keyTermService = new KeyTermExtractionService(repositoryDocId, tei);
+        jsonText = keyTermService.runKeyTermExtraction();
         if (jsonText != null) {
             json.append(jsonText).append("}");
-        }
-        else
+        } else {
             json.append("{} }");
+        }
         return json.toString();
     }
 }

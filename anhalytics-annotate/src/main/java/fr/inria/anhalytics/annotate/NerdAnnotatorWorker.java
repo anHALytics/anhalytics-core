@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.annotate;
 
+import fr.inria.anhalytics.annotate.services.NerdService;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import org.slf4j.Logger;
@@ -18,28 +19,38 @@ import org.xml.sax.InputSource;
  * documents.Resulting JSON annotations are then stored in MongoDB as persistent
  * storage.
  *
- * The content of every TEI elements having an attribute @xml:id randomly generated 
- * will be annotated. The annotations follow a stand-off representation that is using 
-*  the @xml:id as base and offsets to identified the annotated chunk of text. 
- * 
+ * The content of every TEI elements having an attribute @xml:id randomly
+ * generated will be annotated. The annotations follow a stand-off
+ * representation that is using the @xml:id as base and offsets to identified
+ * the annotated chunk of text.
+ *
  * @author Achraf, Patrice
  */
 public class NerdAnnotatorWorker extends AnnotatorWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(NerdAnnotatorWorker.class);
-    private String tei = null;
 
     public NerdAnnotatorWorker(MongoFileManager mongoManager,
-            String documentId,
+            String repositoryDocId,
             String anhalyticsId,
             String tei,
             String date) {
-        super(mongoManager, documentId, anhalyticsId, date, MongoCollectionsInterface.NERD_ANNOTATIONS);
+        super(mongoManager, repositoryDocId, anhalyticsId, date, MongoCollectionsInterface.NERD_ANNOTATIONS);
         this.tei = tei;
     }
 
     @Override
     protected void processCommand() {
+        // get all the elements having an attribute id and annotate their text content
+        mm.insertAnnotation(annotateDocument(), annotationsCollection);
+        logger.debug("\t\t " + Thread.currentThread().getName() + ": " + repositoryDocId + " annotated by the NERD service.");
+    }
+
+    /**
+     * Annotation of a complete document.
+     */
+    @Override
+    protected String annotateDocument() {
         // DocumentBuilderFactory and DocumentBuilder are not thread safe, 
         // so one per task
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -52,10 +63,9 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
         // NOTE: the part bellow should be used in the future for improving the NERD by setting a custom 
         // domain context which helps the disambiguation
-        
         /*List<String> halDomainTexts = new ArrayList<String>();
         List<String> halDomains = new ArrayList<String>();
         List<String> meSHDescriptors = new ArrayList<String>();
@@ -77,22 +87,13 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
                 }
             }
         }*/
-        // get all the elements having an attribute id and annotate their text content
-        mm.insertAnnotation(annotateDocument(docTei, documentId, anhalyticsId), annotationsCollection);
-        logger.debug("\t\t " + documentId + " annotated by the NERD service.");
-    }
-
-    /**
-     * Annotation of a complete document.
-     */
-    private String annotateDocument(Document doc,
-            String documentId, String docId) {
         StringBuffer json = new StringBuffer();
-        json.append("{ \"repositoryDocId\" : \"" + documentId
-                +"\",\"anhalyticsId\" : \"" + anhalyticsId
-                +"\", \"date\" :\"" + date
-                +"\", \"nerd\" : [");
-        annotateNode(doc.getDocumentElement(), true, json, null);
+        json.append("{ \"repositoryDocId\" : \"" + repositoryDocId
+                + "\",\"anhalyticsId\" : \"" + anhalyticsId
+                + "\", \"date\" :\"" + date
+                + "\", \"nerd\" : [");
+        //check if any thing was added, throw exception if not (not insert entry)
+        annotateNode(docTei.getDocumentElement(), true, json, null);
         json.append("] }");
         return json.toString();
     }
@@ -103,36 +104,40 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
     private boolean annotateNode(Node node,
             boolean first,
             StringBuffer json,
-			String language) {
+            String language) {
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             Element e = (Element) (node);
             String id = e.getAttribute("xml:id");
-			String new_language = e.getAttribute("xml:lang");
-			if ( (new_language != null) && (new_language.length() > 0) )
-				language = new_language;
+            String new_language = e.getAttribute("xml:lang");
+            if ((new_language != null) && (new_language.length() > 0)) {
+                language = new_language;
+            }
             if (id.startsWith("_") && (id.length() == 8)) {
                 // get the textual content of the element
                 // annotate
                 String text = e.getTextContent();
-				if ( (text != null) && (text.trim().length() > 1)) {
-	                String jsonText = null;
-	                try {
-	                    NerdService nerdService = new NerdService(text, language);
-	                    jsonText = nerdService.runNerd();
-	                } catch (Exception ex) {
-	                    logger.error("Text could not be annotated by NERD: " + text);
-	                    ex.printStackTrace();
-	                }
-	                if (jsonText != null) {
-	                    // resulting annotations, with the corresponding id
-	                    if (first) {
-	                        first = false;
-	                    } else {
-	                        json.append(", ");
-	                    }
-	                    json.append("{ \"xml:id\" : \"" + id + "\", \"nerd\" : " + jsonText + " }");
-	                }
-				}
+                if ((text != null) && (text.trim().length() > 1)) {
+                    String jsonText = null;
+                    try {
+                        NerdService nerdService = new NerdService(text, language);
+                        jsonText = nerdService.runNerd();
+                    } catch (Exception ex) {
+                        logger.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by NERD: " + text);
+                        ex.printStackTrace();
+                    }
+                    if (jsonText == null) {
+                        logger.error("\t\t " + Thread.currentThread().getName() + ": NERD failed annotating text : " + text);
+                    }
+                    if (jsonText != null) {
+                        // resulting annotations, with the corresponding id
+                        if (first) {
+                            first = false;
+                        } else {
+                            json.append(", ");
+                        }
+                        json.append("{ \"xml:id\" : \"" + id + "\", \"nerd\" : " + jsonText + " }");
+                    }
+                }
             }
         }
         NodeList nodeList = node.getChildNodes();

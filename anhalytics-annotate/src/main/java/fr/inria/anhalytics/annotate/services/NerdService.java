@@ -1,7 +1,8 @@
-package fr.inria.anhalytics.annotate;
+package fr.inria.anhalytics.annotate.services;
 
+import fr.inria.anhalytics.annotate.Annotator;
 import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
-import fr.inria.anhalytics.commons.exceptions.UnreachableNerdServiceException;
+import fr.inria.anhalytics.commons.exceptions.UnreachableAnnotateServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
@@ -19,18 +20,17 @@ import org.codehaus.jackson.map.ObjectMapper;
  *
  * @author Patrice Lopez
  */
-public class NerdService {
+public class NerdService extends AnnotateService {
 
     private static final Logger logger = LoggerFactory.getLogger(NerdService.class);
 
-    private String input = null;
 	private String language = null;
 
     static private String REQUEST = "processERDQuery";
 
     public NerdService(String input, String language) {
-        this.input = input;
-		this.language = language;
+        super(input);
+	this.language = language;
     }
 
     /**
@@ -41,7 +41,8 @@ public class NerdService {
     public String runNerd() {
         StringBuffer output = new StringBuffer();
         try {
-            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + AnnotateProperties.getNerdPort() + "/service/" + REQUEST);
+            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + 
+                    (AnnotateProperties.getNerdPort().isEmpty() ? "":":" + AnnotateProperties.getNerdPort()) + "/service/" + REQUEST);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
@@ -68,7 +69,6 @@ public class NerdService {
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 logger.error("Failed annotating text segment: HTTP error code : "
                         + conn.getResponseCode());
-				logger.error(input);
                 return null;
             }
             BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
@@ -86,35 +86,6 @@ public class NerdService {
             e.printStackTrace();
         } 
         return output.toString().trim();
-    }
-
-    /**
-     * Checks if Nerd service is responding and available.
-     * @return boolean
-     */
-    public static boolean isNerdReady() throws UnreachableNerdServiceException {
-        logger.info("Checking NERD service...");
-        int responseCode = 0;
-        HttpURLConnection conn = null;
-        try {
-            URL url = new URL("http://" + AnnotateProperties.getNerdHost() + ":" + 
-				AnnotateProperties.getNerdPort() + "/service/isalive");
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(true);
-            conn.setRequestMethod("GET");
-            responseCode = conn.getResponseCode();
-            System.out.println(url.getHost());
-            System.out.println(responseCode);
-        } catch (Exception e) {
-            throw new UnreachableNerdServiceException("NERD service is not reachable, check host and port parameters.");
-        }
-        if (responseCode != 200) {
-            logger.error("NERD service is not alive.");
-            throw new UnreachableNerdServiceException("NERD service is not alive.");
-        }
-        conn.disconnect();
-        logger.info("NERD service is ok and can be used.");
-        return true;
     }
 
 }
