@@ -53,26 +53,11 @@ public class Indexer {
                 .addTransportAddress(new InetSocketTransportAddress(IndexProperties.getElasticSearch_host(), 9300));
     }
 
-    public void index() {
-        try {
-            // loading based on DocDB XML, with TEI conversion
-            int nbDoc = indexTeiCollection();
-            logger.info("Total: " + nbDoc + " documents indexed.");
-            int nbKeytermAnnotsIndexed = indexKeytermAnnotations();
-            logger.info("Total: " + nbKeytermAnnotsIndexed + " keyterm annotations indexed.");
-            int nbNerdAnnotsIndexed = indexNerdAnnotations();
-            logger.info("Total: " + nbNerdAnnotsIndexed + " NERD annotations indexed.");
-        } catch (Exception e) {
-            logger.error("Error when setting-up ElasticSeach cluster");
-            e.printStackTrace();
-        }
-    }
-
     public boolean isIndexExists() {
-        boolean teisIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getTeisIndexName()).execute().actionGet().isExists();
+        boolean fulltextTeisIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getFulltextTeisIndexName()).execute().actionGet().isExists();
         boolean annotsNerdIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getNerdAnnotsIndexName()).execute().actionGet().isExists();
         boolean annotsKeytermIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getKeytermAnnotsIndexName()).execute().actionGet().isExists();
-        return (teisIndexExists && annotsNerdIndexExists && annotsKeytermIndexExists);
+        return (fulltextTeisIndexExists && annotsNerdIndexExists && annotsKeytermIndexExists);
     }
 
     /**
@@ -203,8 +188,10 @@ public class Indexer {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_nerd.json"));
             } else if (indexName.contains(IndexProperties.getKeytermAnnotsIndexName())) {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_keyterm.json"));
+            } else if (indexName.contains(IndexProperties.getMetadataTeisIndexName())) {
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl_halheader.json"));
             } else {
-                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl.json"));
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl_fulltext.json"));
             }
         } catch (Exception e) {
             throw new ElasticSearchConfigurationException("Cannot read mapping for " + indexName);
@@ -225,11 +212,11 @@ public class Indexer {
         }
         return val;
     }
-
+    
     /**
      * Indexing of the document collection in ElasticSearch
      */
-    public int indexTeiCollection() {
+    public int indexTeiMetadataCollection() {
         int nb = 0;
 
         for (String date : Utilities.getDates()) {
@@ -239,7 +226,7 @@ public class Indexer {
             }
             BulkRequestBuilder bulkRequest = client.prepareBulk();
             bulkRequest.setRefresh(true);
-            if (mm.initTeis(date)) {
+            if (mm.initTeis(date, true)) {
                 int i = 0;
 
                 while (mm.hasMoreTeis()) {
@@ -270,7 +257,90 @@ public class Indexer {
 
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
-                        bulkRequest.add(client.prepareIndex(IndexProperties.getTeisIndexName(), "npl", anhalyticsId).setSource(jsonStr));
+                        bulkRequest.add(client.prepareIndex(IndexProperties.getMetadataTeisIndexName(), "npl", anhalyticsId).setSource(jsonStr));
+
+                        if (i >= 100) {
+                            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                            if (bulkResponse.hasFailures()) {
+                                // process failures by iterating through each bulk response item	
+                                logger.error(bulkResponse.buildFailureMessage());
+                            }
+                            bulkRequest = client.prepareBulk();
+                            bulkRequest.setRefresh(true);
+                            i = 0;
+                            System.out.print(".");
+                            System.out.flush();
+                        }
+
+                        i++;
+                        nb++;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                // last bulk
+                if(i != 0){
+                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                System.out.print(".");
+                if (bulkResponse.hasFailures()) {
+                    // process failures by iterating through each bulk response item	
+                    logger.error(bulkResponse.buildFailureMessage());
+                }
+                }
+            }
+
+            if (!IndexProperties.isProcessByDate()) {
+                break;
+            }
+        }
+        return nb;
+    }
+
+    /**
+     * Indexing of the document collection in ElasticSearch
+     */
+    public int indexTeiFulltextCollection() {
+        int nb = 0;
+
+        for (String date : Utilities.getDates()) {
+
+            if (!IndexProperties.isProcessByDate()) {
+                date = null;
+            }
+            BulkRequestBuilder bulkRequest = client.prepareBulk();
+            bulkRequest.setRefresh(true);
+            if (mm.initTeis(date, true)) {
+                int i = 0;
+
+                while (mm.hasMoreTeis()) {
+                    String tei = mm.nextTeiDocument();
+                    String id = mm.getCurrentRepositoryDocId();
+                    String anhalyticsId = mm.getCurrentAnhalyticsId();
+                    boolean isWithFulltext = mm.isCurrentIsWithFulltext();
+                    if (!isWithFulltext) {
+                        logger.info("skipping " + id + " No fulltext found");
+                        continue;
+                    }
+                    if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                        logger.info("skipping " + id + " No anHALytics id provided");
+                        continue;
+                    }
+                    String jsonStr = null;
+                    try {
+                        // convert the TEI document into JSON via JsonML
+                        //System.out.println(halID);
+                        JSONObject json = JsonTapasML.toJSONObject(tei);
+                        jsonStr = json.toString();
+
+                        jsonStr = indexingPreprocess.process(jsonStr, id, anhalyticsId);
+
+                        if (jsonStr == null) {
+                            continue;
+                        }
+
+                        // index the json in ElasticSearch
+                        // beware the document type bellow and corresponding mapping!
+                        bulkRequest.add(client.prepareIndex(IndexProperties.getFulltextTeisIndexName(), "npl", anhalyticsId).setSource(jsonStr));
 
                         if (i >= 100) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -490,7 +560,7 @@ public class Indexer {
         request += "], \"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
         //System.out.println(request);
 
-        String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + IndexProperties.getTeisIndexName() + "/_search";
+        String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + IndexProperties.getFulltextTeisIndexName()+ "/_search";
         StringBuffer json = new StringBuffer();
         try {
             URL url = new URL(urlStr);

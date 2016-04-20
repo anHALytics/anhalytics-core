@@ -19,9 +19,10 @@ public class IndexProperties {
     private static String elasticSearchClusterName;
 
     private static String nerdAnnotsIndexName = "annotations_nerd";
-	private static String keytermAnnotsIndexName = "annotations_keyterm";
-    private static String teisIndexName  = "anhalytics_teis";
-    private static String metadataIndexName = "anhalytics_metadata"; // to be rename, it's not metadata but KB
+    private static String keytermAnnotsIndexName = "annotations_keyterm";
+    private static String fulltextTeisIndexName  = "anhalytics_fulltextteis";
+    private static String metadataTeisIndexName  = "anhalytics_metadatateis";
+    private static String kbIndexName = "anhalytics_kb"; // to be rename, it's not metadata but KB
 
     private static String fromDate;
 
@@ -139,33 +140,6 @@ public class IndexProperties {
         keytermAnnotsIndexName = aKeytermAnnotsIndexName;
     }
 
-    /**
-     * @return the index name for TEI
-     */
-    public static String getTeisIndexName() {
-        return teisIndexName;
-    }
-
-    /**
-     * @param aTeisIndexName the index name for TEI to set
-     */
-    public static void setTeisIndexName(String aTeisIndexName) {
-        teisIndexName = aTeisIndexName;
-    }
-
-    /**
-     * @return the metadataIndexName
-     */
-    public static String getMetadataIndexName() {
-        return metadataIndexName;
-    }
-
-    /**
-     * @param aMetadataIndexName the metadataIndexName to set
-     */
-    public static void setMetadataIndexName(String aMetadataIndexName) {
-        metadataIndexName = aMetadataIndexName;
-    }
 
     /**
      * @return the fromDate
@@ -207,6 +181,48 @@ public class IndexProperties {
      */
     public static void setProcessByDate(boolean aProcessByDate) {
         processByDate = aProcessByDate;
+    }
+
+    /**
+     * @return the fulltextTeisIndexName
+     */
+    public static String getFulltextTeisIndexName() {
+        return fulltextTeisIndexName;
+    }
+
+    /**
+     * @param aFulltextTeisIndexName the fulltextTeisIndexName to set
+     */
+    public static void setFulltextTeisIndexName(String aFulltextTeisIndexName) {
+        fulltextTeisIndexName = aFulltextTeisIndexName;
+    }
+
+    /**
+     * @return the metadataTeisIndexName
+     */
+    public static String getMetadataTeisIndexName() {
+        return metadataTeisIndexName;
+    }
+
+    /**
+     * @param aMetadataTeisIndexName the metadataTeisIndexName to set
+     */
+    public static void setMetadataTeisIndexName(String aMetadataTeisIndexName) {
+        metadataTeisIndexName = aMetadataTeisIndexName;
+    }
+
+    /**
+     * @return the kbIndexName
+     */
+    public static String getKbIndexName() {
+        return kbIndexName;
+    }
+
+    /**
+     * @param aKbIndexName the kbIndexName to set
+     */
+    public static void setKbIndexName(String aKbIndexName) {
+        kbIndexName = aKbIndexName;
     }
     
 

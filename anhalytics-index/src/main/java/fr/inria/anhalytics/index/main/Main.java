@@ -27,7 +27,7 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands =
-            Arrays.asList("indexAll", "indexDaily", "indexTEI", "indexAnnotations", "indexKB");
+            Arrays.asList("indexAll", "indexDaily", "indexMetadata", "indexFulltext", "indexAnnotations", "indexKB");
 
     public static void main(String[] args) throws UnknownHostException {
 
@@ -116,12 +116,12 @@ public class Main {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);
             if (reponse != 'N') {
-                esm.setUpIndex(IndexProperties.getTeisIndexName());
+                esm.setUpIndex(IndexProperties.getFulltextTeisIndexName());
                 esm.setUpIndex(IndexProperties.getNerdAnnotsIndexName());
 				esm.setUpIndex(IndexProperties.getKeytermAnnotsIndexName());
                 //mi.setUpIndex(IndexProperties.getMetadataIndexName());
 
-                int nbDoc = esm.indexTeiCollection();
+                int nbDoc = esm.indexTeiFulltextCollection();
                 logger.info("Total: " + nbDoc + " TEI documents indexed.");
                 int nbNerdAnnot = esm.indexNerdAnnotations();
                 logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
@@ -146,8 +146,10 @@ public class Main {
                 esm.close();
                 return;
             }
-            int nbDoc = esm.indexTeiCollection();
-            logger.info("Total: " + nbDoc + " documents indexed.");
+            int nbDoc = esm.indexTeiFulltextCollection();
+            logger.info("Total: " + nbDoc + " fulltext documents indexed.");
+            int nbDoc1 = esm.indexTeiMetadataCollection();
+            logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
             int nbNerdAnnot = esm.indexNerdAnnotations();
             logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
             int nbKeytermAnnot = esm.indexKeytermAnnotations();
@@ -155,12 +157,20 @@ public class Main {
             
             // TBD: daily KB refresh and indexing ?
 
-        } else if (process.equals("indexTEI")) {
+        } else if (process.equals("indexFulltext")) {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);
             if (reponse != 'N') {
-                esm.setUpIndex(IndexProperties.getTeisIndexName());
-                int nbDoc = esm.indexTeiCollection();
+                esm.setUpIndex(IndexProperties.getFulltextTeisIndexName());
+                int nbDoc = esm.indexTeiFulltextCollection();
+                logger.info("Total: " + nbDoc + " TEI documents indexed.");
+            }
+        } else if (process.equals("indexMetadata")) {
+            System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
+            reponse = sc.nextLine().charAt(0);
+            if (reponse != 'N') {
+                esm.setUpIndex(IndexProperties.getMetadataTeisIndexName());
+                int nbDoc = esm.indexTeiMetadataCollection();
                 logger.info("Total: " + nbDoc + " TEI documents indexed.");
             }
         } else if (process.equals("indexAnnotations")) {

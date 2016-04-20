@@ -97,7 +97,7 @@ public class MetadataIndexer {
             }
             jsonDocument.put("publications", publications);
             jsonDocument.put("affiliations", organisations);
-            client.prepareIndex(IndexProperties.getMetadataIndexName(), "authors", "" + person.getPersonId())
+            client.prepareIndex(IndexProperties.getKbIndexName(), "authors", "" + person.getPersonId())
                     .setSource(jsonDocument).execute().actionGet();
         }
     }
@@ -163,7 +163,7 @@ public class MetadataIndexer {
                 }
             }
             documentDocument.put("references", referencesPubDocument);
-            client.prepareIndex(IndexProperties.getMetadataIndexName(), "publications", "" + doc.getDocID())
+            client.prepareIndex(IndexProperties.getKbIndexName(), "publications", "" + doc.getDocID())
                     .setSource(documentDocument).execute().actionGet();
         }
     }
@@ -208,7 +208,7 @@ public class MetadataIndexer {
                 authorsDocument.add(author.getPersonDocument());
             }
             organisationDocument.put("authors", authorsDocument);
-            client.prepareIndex(IndexProperties.getMetadataIndexName(), "organisations", "" + org.getOrganisationId())
+            client.prepareIndex(IndexProperties.getKbIndexName(), "organisations", "" + org.getOrganisationId())
                     .setSource(organisationDocument).execute().actionGet();
         }
 
