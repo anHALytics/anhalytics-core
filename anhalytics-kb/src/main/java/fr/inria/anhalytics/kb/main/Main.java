@@ -31,7 +31,7 @@ public class Main {
 
     public static void main(String[] args) throws UnknownHostException {
         try {
-            KbProperties.init("ingest.properties");
+            KbProperties.init("kb.properties");
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file of harvest properties ingest.properties", exp);
         }
