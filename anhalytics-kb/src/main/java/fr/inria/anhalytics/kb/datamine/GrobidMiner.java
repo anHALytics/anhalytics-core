@@ -74,7 +74,7 @@ public class GrobidMiner extends Miner {
             if (!KbProperties.isProcessByDate()) {
                 date = null;
             }
-            if (mm.initTeis(date)) {
+            if (mm.initTeis(date, true)) {
                 while (mm.hasMoreTeis()) {
                     String teiString = mm.nextTeiDocument();
                     String uri = mm.getCurrentRepositoryDocId();
