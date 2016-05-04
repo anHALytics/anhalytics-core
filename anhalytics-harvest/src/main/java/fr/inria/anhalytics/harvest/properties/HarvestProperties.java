@@ -20,8 +20,10 @@ public class HarvestProperties {
 
     private static boolean processByDate = true;
     
-    private static String oaiUrl;
+    private static String apiUrl;
 
+    private static String source;
+    
     private static String grobidHost;
     private static String grobidPort;
     
@@ -42,7 +44,8 @@ public class HarvestProperties {
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file "+properties_filename, exp);
         }
-        setOaiUrl(props.getProperty("harvest.oaipmhurl"));
+        setSource(props.getProperty("harvest.source"));
+        setApiUrl(props.getProperty("harvest.api_url"));
         setGrobidHost(props.getProperty("harvest.grobid_host"));
         setGrobidPort(props.getProperty("harvest.grobid_port"));
         setGrobidHome(props.getProperty("harvest.grobid_home"));
@@ -112,17 +115,17 @@ public class HarvestProperties {
     }
 
     /**
-     * @return the oaiUrl
+     * @return the apiUrl
      */
-    public static String getOaiUrl() {
-        return oaiUrl;
+    public static String getApiUrl() {
+        return apiUrl;
     }
 
     /**
      * @param oaiUrl the oaiUrl to set
      */
-    public static void setOaiUrl(String oaiurl) {
-        oaiUrl = oaiurl;
+    public static void setApiUrl(String apiUrl) {
+        apiUrl = apiUrl;
     }
 
     /**
@@ -235,6 +238,20 @@ public class HarvestProperties {
      */
     public static void setProcessByDate(boolean aProcessByDate) {
         processByDate = aProcessByDate;
+    }
+
+    /**
+     * @return the source
+     */
+    public static String getSource() {
+        return source;
+    }
+
+    /**
+     * @param aSource the source to set
+     */
+    public static void setSource(String aSource) {
+        source = aSource;
     }
 
 }

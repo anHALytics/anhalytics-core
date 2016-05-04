@@ -44,6 +44,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     // index to iterate through files.
     private int indexFile = 0;
 
+    private String currentDocSource = null;
     private String currentRepositoryDocId = null;
     private String currentAnhalyticsId = null;
     private String currentDocType = null;
@@ -306,7 +307,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         currentRepositoryDocId = (String) obj.get("repositoryDocId");
         currentDocType = (String) obj.get("documentType");
         currentAnhalyticsId = (String) obj.get("anhalyticsId");
-        currentIsWithFulltext = obj.get("isWithFulltext") != null ? (Boolean) obj.get("isWithFulltext"):false;
+        currentDocSource = (String) obj.get("source");
+        currentIsWithFulltext = obj.get("isWithFulltext") != null ? (Boolean) obj.get("isWithFulltext") : false;
         GridFSDBFile binaryfile = gfs.findOne(currentRepositoryDocId + ".tei.xml");
         indexFile++;
         teiStream = binaryfile.getInputStream();
@@ -324,6 +326,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         DBObject obj = cursor.next();
         currentRepositoryDocId = (String) obj.get("repositoryDocId");
         currentAnhalyticsId = (String) obj.get("anhalyticsId");
+        currentDocSource = (String) obj.get("source");
         GridFSDBFile binaryfile = gfs.findOne(currentRepositoryDocId + ".pdf");
         currentDocType = (String) binaryfile.get("documentType");
         currentFileType = (String) binaryfile.getContentType();
@@ -338,6 +341,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         currentRepositoryDocId = (String) obj.get("repositoryDocId");
         currentFileType = (String) obj.get("contentType");
         currentFileName = (String) obj.get("filename");
+        currentDocSource = (String) obj.get("source");
         currentAnhalyticsId = (String) obj.get("anhalyticsId");
         indexFile++;
         return currentFileName;
@@ -381,6 +385,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.setFilename(repositoryDocId + ".tei.xml");
             gfsFile.put("repositoryDocId", repositoryDocId);
             gfsFile.put("anhalyticsId", anhalyticsId);
+            gfsFile.put("source", currentDocSource);
             gfsFile.put("isWithFulltext", isWithFulltext);
             gfsFile.save();
         } catch (ParseException e) {
@@ -400,6 +405,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.setFilename(repositoryDocId + ".tei.xml");
             gfsFile.put("repositoryDocId", repositoryDocId);
             gfsFile.put("anhalyticsId", anhalyticsId);
+            gfsFile.put("source", currentDocSource);
             gfsFile.save();
         } catch (ParseException e) {
             logger.error(e.getMessage(), e.getCause());
@@ -409,7 +415,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Inserts TEI metadata document in the GridFS.
      */
-    public void insertMetadataTei(String tei, String repositoryDocId, String type, String date) {
+    public void insertMetadataTei(String tei, String source, String repositoryDocId, String type, String date) {
         try {
             GridFS gfs = new GridFS(db, MongoCollectionsInterface.ADDITIONAL_TEIS);
             gfs.remove(repositoryDocId + ".tei.xml");
@@ -418,6 +424,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.setFilename(repositoryDocId + ".tei.xml");
             gfsFile.put("repositoryDocId", repositoryDocId);
             gfsFile.put("anhalyticsId", generateAnhalyticsId(repositoryDocId));
+            gfsFile.put("source", source);
             gfsFile.put("documentType", type);
             gfsFile.save();
         } catch (ParseException e) {
@@ -437,7 +444,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Inserts PDF binary document in the GridFS.
      */
-    public void insertBinaryDocument(InputStream file, String repositoryDocId, String type, String date) {
+    public void insertBinaryDocument(InputStream file, String source, String repositoryDocId, String type, String date) {
         try {
             GridFS gfs = new GridFS(db, MongoCollectionsInterface.BINARIES);
             gfs.remove(repositoryDocId + ".pdf");
@@ -446,6 +453,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.setFilename(repositoryDocId + ".pdf");
             gfsFile.put("repositoryDocId", repositoryDocId);
             gfsFile.put("anhalyticsId", currentAnhalyticsId);
+            gfsFile.put("source", source);
             gfsFile.put("documentType", type);
             gfsFile.setContentType("application/pdf");
             gfsFile.save();
@@ -468,7 +476,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsNew.put("repositoryDocId", gdf.get("repositoryDocId"));
             gfsNew.put("documentType", gdf.get("documentType"));
             gfsNew.put("anhalyticsId", gdf.get("anhalyticsId"));
-
+            gfsNew.put("source", gdf.get("source"));
             Object o = gdf.get("isFulltextAdded");
 
             if (o == null) {
@@ -520,6 +528,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.setFilename(fileName);
             gfsFile.put("repositoryDocId", repositoryDocId);
             gfsFile.put("anhalyticsId", anhalyticsId);
+            gfsFile.put("source", currentDocSource);
             gfsFile.setContentType("image/png");
             gfsFile.save();
         } catch (ParseException e) {
@@ -530,7 +539,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Inserts publication annex document.
      */
-    public void insertAnnexDocument(InputStream file, String repositoryDocId, String fileName, String dateString) throws ParseException {
+    public void insertAnnexDocument(InputStream file, String source, String repositoryDocId, String fileName, String dateString) throws ParseException {
         try {
             GridFS gfs = new GridFS(db, MongoCollectionsInterface.PUB_ANNEXES);
             BasicDBObject whereQuery = new BasicDBObject();
@@ -637,10 +646,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 DBObject annotations = curs.next();
                 //int ind = annotationsCollection.indexOf("_"); // TBR: this is dirty !
                 //BasicDBList annot = (BasicDBList) annotations.get(annotationsCollection.substring(0, ind));
-                if (annotations != null)
-                   result = annotations.toString();
-            }
-            else {
+                if (annotations != null) {
+                    result = annotations.toString();
+                }
+            } else {
                 logger.error("The annotations for doc " + anhalyticsId + " was not found in " + annotationsCollection);
             }
         } finally {
@@ -680,8 +689,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
         Boolean result = false;
         GridFSDBFile fs = gfs.findOne(whereQuery);
-        if(fs == null)
+        if (fs == null) {
             return false;
+        }
         Object o = fs.get("isWithFulltext");
 
         if (o == null) {
@@ -931,5 +941,19 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      */
     public void setCurrentIsWithFulltext(boolean currentIsWithFulltext) {
         this.currentIsWithFulltext = currentIsWithFulltext;
+    }
+
+    /**
+     * @return the currentDocSource
+     */
+    public String getCurrentDocSource() {
+        return currentDocSource;
+    }
+
+    /**
+     * @param currentDocSource the currentDocSource to set
+     */
+    public void setCurrentDocSource(String currentDocSource) {
+        this.currentDocSource = currentDocSource;
     }
 }
