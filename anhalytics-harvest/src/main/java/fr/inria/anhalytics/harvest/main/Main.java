@@ -2,7 +2,7 @@ package fr.inria.anhalytics.harvest.main;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.HALOAIHarvester;
+import fr.inria.anhalytics.harvest.oaipmh.HALOAIPMHHarvester;
 import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
@@ -66,7 +66,7 @@ public class Main {
         String process = HarvestProperties.getProcessName();
         GrobidProcess gp = new GrobidProcess();
         TeiBuilderProcess tb = new TeiBuilderProcess();
-        HALOAIHarvester oai = new HALOAIHarvester();
+        HALOAIPMHHarvester oai = new HALOAIPMHHarvester();
         IstexHarvester ih = new IstexHarvester();
         if (process.equals("harvestAll")) {
             oai.fetchAllDocuments();
