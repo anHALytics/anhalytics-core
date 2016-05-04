@@ -33,7 +33,7 @@ public abstract class AnnotateService {
         try {
             String urlString = "";
             if (annotator_type == Annotator.Annotator_Type.NERD) {
-                urlString = "http://" + AnnotateProperties.getNerdHost() + ":" + 
+                urlString = "http://" + AnnotateProperties.getNerdHost() +
                 (AnnotateProperties.getNerdPort().isEmpty() ? "":":" + AnnotateProperties.getNerdPort()) + "/service/isalive";
             } else {
                 // keyterm isalive checking not implemented yet.
