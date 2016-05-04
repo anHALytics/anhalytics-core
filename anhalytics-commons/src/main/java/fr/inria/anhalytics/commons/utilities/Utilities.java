@@ -50,8 +50,9 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 
 /**
- * All utilities are grouped here for managing dates, id generations, files DOM nodes..
- * 
+ * All utilities are grouped here for managing dates, id generations, files DOM
+ * nodes..
+ *
  * @author Achraf
  */
 public class Utilities {
@@ -73,10 +74,10 @@ public class Utilities {
         Calendar toDay = Calendar.getInstance();
         int todayYear = toDay.get(Calendar.YEAR);
         int todayMonth = toDay.get(Calendar.MONTH) + 1;
-        for (int year = 1960; year <= todayYear ; year++) {
+        for (int year = 1960; year <= todayYear; year++) {
             int monthYear = (year == todayYear) ? todayMonth : 12;
             for (int month = 1; month <= monthYear; month++) {
-                for (int day = 1; day <=daysInMonth(year, month); day++) {
+                for (int day = 1; day <= daysInMonth(year, month); day++) {
                     StringBuilder date = new StringBuilder();
                     date.append(String.format("%04d", year));
                     date.append("-");
@@ -141,6 +142,52 @@ public class Utilities {
         return dates.contains(dateString);
     }
 
+    public static String completeDate(String date) {
+        String val = null;
+        if (date.length() == 4) {
+            val = date + "-12-31";
+        } else if ((date.length() == 7) || (date.length() == 6)) {
+            int ind = date.indexOf("-");
+            String month = date.substring(ind + 1, date.length());
+            if (month.length() == 1) {
+                month = "0" + month;
+            }
+            if (month.equals("02")) {
+                val = date.substring(0, 4) + "-" + month + "-28";
+            } else if ((month.equals("04")) || (month.equals("06")) || (month.equals("09"))
+                    || (month.equals("11"))) {
+                val = date.substring(0, 4) + "-" + month + "-30";
+            } else {
+                val = date.substring(0, 4) + "-" + month + "-31";
+            }
+        } else {
+
+            int ind = date.indexOf("-");
+            int ind2 = date.lastIndexOf("-");
+            String monthStr = date.substring(ind + 1, ind + 3);
+            try {
+                int month = Integer.parseInt(monthStr);
+                if (month > 12 || month < 1) {
+                    val = date.substring(0, 4) + "-12" + date.substring(ind+3, date.length());
+                }
+                String dayStr = date.substring(ind2 + 1, ind2 + 3);
+                int day = Integer.parseInt(dayStr);
+                if (day > 31 || day < 1) {
+                    val = date.substring(0, 8) + "28";// so naif i know
+                }
+            } catch (Exception e) {
+            }
+            val = date.trim();
+            // we have the "lazy programmer" case where the month is 00, e.g. 2012-00-31
+            // which means the month is unknown
+
+            ///val = val.replace("-00-", "-12-");
+        }
+        val = val.replace(" ", "T"); // this is for the dateOptionalTime elasticSearch format 
+
+        return val;
+    }
+
     public static String toString(Document doc) {
         try {
             StringWriter sw = new StringWriter();
@@ -188,15 +235,15 @@ public class Utilities {
     /**
      * Add xml ids on the textual nodes of the document
      */
-	private static List<String> fields = 
-		Arrays.asList("title", "abstract", "term", "funder", "classCode", "p", "head", "figDesc", "item");
-	
-	public static void generateIDs(Document doc) {
-		for(String field : fields) {
-	        NodeList nodes = doc.getElementsByTagName(field);
-	        generateID(nodes);
-		}
-	}
+    private static List<String> fields
+            = Arrays.asList("title", "abstract", "term", "funder", "classCode", "p", "head", "figDesc", "item");
+
+    public static void generateIDs(Document doc) {
+        for (String field : fields) {
+            NodeList nodes = doc.getElementsByTagName(field);
+            generateID(nodes);
+        }
+    }
 
     private static void generateID(NodeList theNodes) {
         for (int i = 0; i < theNodes.getLength(); i++) {

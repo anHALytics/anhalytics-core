@@ -2,6 +2,7 @@ package fr.inria.anhalytics.index;
 
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
+import fr.inria.anhalytics.commons.utilities.Utilities;
 import org.codehaus.jackson.*;
 import org.codehaus.jackson.node.*;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -23,8 +24,6 @@ import java.text.SimpleDateFormat;
 public class IndexingPreprocess {
 
     private static final Logger logger = LoggerFactory.getLogger(IndexingPreprocess.class);
-
-
 
     // this is the list of elements for which the text nodes should be expanded with an additional json
     // node capturing the nesting xml:lang attribute name/value pair
@@ -66,9 +65,10 @@ public class IndexingPreprocess {
         }
         if ((teiRoot != null) && (!teiRoot.isMissingNode())) {
             JsonNode standoffNode = getStandoffNerd(mapper, anhalyticsId);
-            standoffNode = getStandoffKeyTerm(mapper, anhalyticsId, standoffNode); 
-            if (standoffNode != null)
+            standoffNode = getStandoffKeyTerm(mapper, anhalyticsId, standoffNode);
+            if (standoffNode != null) {
                 ((ArrayNode) teiRoot).add(standoffNode);
+            }
         }
 
         // here recursive modification of the json document via Jackson
@@ -173,22 +173,28 @@ public class IndexingPreprocess {
                         if (isDepositorKeywords) {
                             theDepositorKeywordsNode = theKeywordsNode;
                         }
+
+                        //raw
                         Iterator<JsonNode> ite2 = theKeywordsNode.getElements();
+                        /*if(theKeywordsNode.get(0).isTextual()){
+                            System.out.println(theKeywordsNode.toString());
+                        }*/
                         while (ite2.hasNext()) {
                             JsonNode temp2 = ite2.next();
                             if (temp2.isTextual()) {
                                 // To avoid ambiguity, we wrap the text directy contained into keywords in a text element (otherwise ES doesnt like it)
                                 keywords += temp2.getTextValue();
-                                String xml_id = fields.next();
+                                /*String xml_id = fields.next();
                                 JsonNode xml_idNode = subJson.path(xml_id);
+                                 */
                                 ((ArrayNode) theKeywordsNode).remove(0);
                                 JsonNode newNode = mapper.createObjectNode();
                                 JsonNode textNode = mapper.createArrayNode();
                                 JsonNode tnode = new TextNode(keywords);
                                 ((ArrayNode) textNode).add(tnode);
-                                ((ObjectNode) newNode).put("$text", textNode);
+                                ((ObjectNode) newNode).put("$raw", textNode);
+
                                 theKeywordsNode = subJson.path("$keywords");
-                                ((ObjectNode) newNode).put(xml_id, xml_idNode.getTextValue());
                                 ((ArrayNode) theKeywordsNode).add(newNode);
                             }
                             break;
@@ -200,7 +206,8 @@ public class IndexingPreprocess {
                     } else if (field.equals("scheme")) {
                         theSchemeNode = subJson.path("scheme");
 
-                        if (theSchemeNode.getTextValue().equals("author")) {
+                        if (theSchemeNode.getTextValue().equals("author") && theKeywordsNode != null) {
+                            theDepositorKeywordsNode = theKeywordsNode;
                             isDepositorKeywords = true;
                         }
                     } else if (field.equals("type")) {
@@ -249,22 +256,6 @@ public class IndexingPreprocess {
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$item", arrayNode); // update value
                     return subJson;
-                } else if ((theTypeNode != null) && (theKeywordsNode != null)) {
-                    JsonNode typeNode = mapper.createObjectNode();
-                    ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(theKeywordsNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
-                    JsonNode arrayNode = mapper.createArrayNode();
-                    ((ArrayNode) arrayNode).add(typeNode);
-                    ((ObjectNode) subJson).put("$keywords", arrayNode); // update value
-                    return subJson;
-                } else if ((theTypeNode != null) && (theKeywordsNode != null)) {
-                    JsonNode typeNode = mapper.createObjectNode();
-                    ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(theKeywordsNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
-                    JsonNode arrayNode = mapper.createArrayNode();
-                    ((ArrayNode) arrayNode).add(typeNode);
-                    ((ObjectNode) subJson).put("$keywords", arrayNode); // update value
-                    return subJson;
                 } else if ((theTypeNode != null) && (divNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
@@ -292,8 +283,32 @@ public class IndexingPreprocess {
                     return subJson;
                 } else if ((theTypeNode != null) && (theDateNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
-                    ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
-                            process(theDateNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
+                    if (theWhenNode != null) {
+                        JsonNode theWhenNode2 = mapper.createArrayNode();
+                        
+                        ((ArrayNode) theWhenNode2).add(theWhenNode);
+                        ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(), process(theWhenNode2, mapper, currentLang, false, expandLang, true, anhalyticsId));
+                        ((ObjectNode) subJson).remove("when");
+                    } else {
+                        ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(),
+                                process(theDateNode, mapper, currentLang, false, expandLang, true, anhalyticsId));
+                    }
+                    JsonNode arrayNode = mapper.createArrayNode();
+                    ((ArrayNode) arrayNode).add(typeNode);
+                    ((ObjectNode) subJson).put("$date", arrayNode); // update value
+                    return subJson;
+                } else if ((theTypeNode == null) && (theDateNode != null)) {
+                    JsonNode typeNode = mapper.createObjectNode();
+                    if (theWhenNode != null) {
+
+                        JsonNode theWhenNode2 = mapper.createArrayNode();
+                        ((ArrayNode) theWhenNode2).add(theWhenNode);
+                        ((ObjectNode) typeNode).put("$type_unknown", process(theWhenNode2, mapper, currentLang, false, expandLang, true, anhalyticsId));
+                        ((ObjectNode) subJson).remove("when");
+                    } else {
+                        ((ObjectNode) typeNode).put("$type_unknown",
+                                process(theDateNode, mapper, currentLang, false, expandLang, true, anhalyticsId));
+                    }
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$date", arrayNode); // update value
@@ -321,13 +336,16 @@ public class IndexingPreprocess {
                 Iterator<String> fields = subJson.getFieldNames();
                 while (fields.hasNext()) {
                     String field = fields.next();
-                    if (field.equals("$date") || field.equals("when")) {
+                    /*if (field.equals("when")) {
                         ((ObjectNode) newNode).put(field, process(subJson.path(field), mapper,
                                 currentLang, false, expandLang, true, anhalyticsId));
+                        if(anhalyticsId.equals("57140e99a8267aefa7851325"))
+                            System.out.println(newNode.toString());
                     } else {
-                        ((ObjectNode) newNode).put(field, process(subJson.path(field), mapper,
-                                currentLang, false, expandLang, false, anhalyticsId));
-                    }
+                     */
+                    ((ObjectNode) newNode).put(field, process(subJson.path(field), mapper,
+                            currentLang, false, expandLang, false, anhalyticsId));
+                    //}
                 }
             }
             return newNode;
@@ -346,29 +364,32 @@ public class IndexingPreprocess {
             return langNode;
         } else if (subJson.isTextual() && isDate) {
             String val = null;
-            if (subJson.getTextValue().length() == 4) {
-                val = subJson.getTextValue() + "-12-31";
-            } else if ((subJson.getTextValue().length() == 7) || (subJson.getTextValue().length() == 6)) {
-                int ind = subJson.getTextValue().indexOf("-");
-                String month = subJson.getTextValue().substring(ind + 1, subJson.getTextValue().length());
+            String date = subJson.getTextValue();
+
+            if (date.length() == 4) {
+                val = date + "-12-31";
+            } else if ((date.length() == 7) || (date.length() == 6)) {
+                int ind = date.indexOf("-");
+                String month = date.substring(ind + 1, date.length());
                 if (month.length() == 1) {
                     month = "0" + month;
                 }
                 if (month.equals("02")) {
-                    val = subJson.getTextValue().substring(0, 4) + "-" + month + "-28";
+                    val = date.substring(0, 4) + "-" + month + "-28";
                 } else if ((month.equals("04")) || (month.equals("06")) || (month.equals("09"))
                         || (month.equals("11"))) {
-                    val = subJson.getTextValue().substring(0, 4) + "-" + month + "-30";
+                    val = date.substring(0, 4) + "-" + month + "-30";
                 } else {
-                    val = subJson.getTextValue().substring(0, 4) + "-" + month + "-31";
+                    val = date.substring(0, 4) + "-" + month + "-31";
                 }
             } else {
-                val = subJson.getTextValue().trim();
+                val = date.trim();
+                val = Utilities.completeDate(val);
                 // we have the "lazy programmer" case where the month is 00, e.g. 2012-00-31
                 // which means the month is unknown
-                val = val.replace("-00-", "-12-");
+                ///val = val.replace("-00-", "-12-");
             }
-            val = val.replace(" ", "T"); // this is for the dateOptionalTime elasticSearch format 
+            val = val.replace(" ", "T"); // this is for the dateOptionalTime elasticSearch format
             JsonNode tnode = new TextNode(val);
             return tnode;
         } else {
@@ -385,10 +406,10 @@ public class IndexingPreprocess {
                 Iterator<JsonNode> iter0 = jsonAnnotation.getElements();
                 JsonNode annotNode = mapper.createArrayNode();
                 int n = 0;
-                int m =0;
-                while (iter0.hasNext() && 
-                    (n < MAX_NERD_INDEXED_PARAGRAPHS) && 
-                    (m < MAX_INDEXED_NERD)) {
+                int m = 0;
+                while (iter0.hasNext()
+                        && (n < MAX_NERD_INDEXED_PARAGRAPHS)
+                        && (m < MAX_INDEXED_NERD)) {
                     JsonNode jsonLocalAnnotation = (JsonNode) iter0.next();
 
                     // we only get the concept IDs and the nerd confidence score
@@ -450,8 +471,7 @@ public class IndexingPreprocess {
             }
         }
         return standoffNode;
-    }      
-
+    }
 
     private JsonNode getStandoffKeyTerm(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
         String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
@@ -546,14 +566,13 @@ public class IndexingPreprocess {
                     ((ObjectNode) keytermStandoffNode).put("$keyterm", annotNode);
 
                     if (standoffNode == null) {
-                        standoffNode = mapper.createArrayNode();
+                        standoffNode = mapper.createObjectNode();
 
                         JsonNode annotationArrayNode = mapper.createArrayNode();
                         ((ArrayNode) annotationArrayNode).add(keytermStandoffNode);
 
                         ((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
-                    }
-                    else {
+                    } else {
                         JsonNode annotationArrayNode = standoffNode.findValue("$standoff");
                         ((ArrayNode) annotationArrayNode).add(keytermStandoffNode);
                     }
@@ -587,7 +606,7 @@ public class IndexingPreprocess {
                             weight = weightNode.getDoubleValue();
                         }
 
-                        if ( (category != null) && (pageId != -1) && (weight != 0.0) ) {
+                        if ((category != null) && (pageId != -1) && (weight != 0.0)) {
                             JsonNode newNode = mapper.createArrayNode();
 
                             JsonNode categoryNode = mapper.createObjectNode();
@@ -617,8 +636,7 @@ public class IndexingPreprocess {
                         ((ArrayNode) annotationArrayNode).add(categoriesStandoffNode);
 
                         ((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
-                    }
-                    else {
+                    } else {
                         JsonNode annotationArrayNode = standoffNode.findValue("$standoff");
                         ((ArrayNode) annotationArrayNode).add(categoriesStandoffNode);
                     }
@@ -627,8 +645,7 @@ public class IndexingPreprocess {
             }
         }
         return standoffNode;
-    }      
-
+    }
 
     private boolean filterDocuments(JsonNode jsonRoot) {
         // we want to filter out documents in the future...
