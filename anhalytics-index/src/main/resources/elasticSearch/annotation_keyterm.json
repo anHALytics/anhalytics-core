@@ -1,0 +1,142 @@
+{
+    "annotation_keyterm": {
+        "_all": {
+            "enabled": false,
+            "store": true,
+            "dynamic": "false"
+        },
+        "properties": {
+            "repositoryDocId": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "anhalyticsId": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "date": {
+                "format": "dateOptionalTime",
+                "type": "date"
+            },
+            "keyterm": {
+                "properties": {
+                    "keyterms": {
+                        "properties": {
+                            "entities": {
+                                "properties": {
+                                    "rawName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },"preferredTerm": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "nerd_score": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "prob": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },"wikipediaExternalRef": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },"freeBaseExternalRef": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "definitions": {
+                                        "properties": {
+                                            "definition": {
+                                                "type": "string"
+                                            },
+                                            "source": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "lang": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            }
+                                        }
+                                    },
+                                    "categories": {
+                                        "properties": {
+                                            "category": {
+                                                "type": "string"
+                                            },
+                                            "source": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "page_id": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    },
+                                    "multilingual": {
+                                        "properties": {
+                                            "term": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "lang": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "page_id": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "term": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        },
+                        "score": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        }
+
+                    },
+                    "language": {
+                        "properties": {
+                            "lang": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "conf": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "global_categories": {
+                        "properties": {
+                            "category": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "source": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "weight": {
+                                "type": "integer"
+                            },
+                            "page_id": {
+                                "type": "integer"
+                            }
+
+
+                        }
+
+                    }
+                }
+            }
+        }
+
+    }
+}

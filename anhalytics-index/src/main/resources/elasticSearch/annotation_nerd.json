@@ -2,29 +2,104 @@
     "annotation_nerd": {
         "_all": {
             "enabled": false,
-            "store": true
+            "store": true,
+            "dynamic": "false"
         },
         "properties": {
             "annotation": {
-                "dynamic": "false",
                 "properties": {
-                    "filename": {
+                    "repositoryDocId": {
                         "type": "string",
                         "index": "not_analyzed"
                     },
+                    "anhalyticsId": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "date": {
+                        "format": "dateOptionalTime",
+                        "type": "date"
+                    },
+                    "text": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "language": {
+                        "properties": {
+                            "lang": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "conf": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "global_categories": {
+                        "properties": {
+                            "category": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "source": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "weight": {
+                                "type": "integer"
+                            },
+                            "page_id": {
+                                "type": "integer"
+                            }
+
+
+                        }
+
+                    },
                     "nerd": {
-                        "dynamic": "false",
                         "properties": {
                             "entities": {
-                                "dynamic": "false",
                                 "properties": {
+                                    "rawName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "preferredTerm": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "offsetStart": {
+                                        "type": "integer"
+                                    },
+                                    "offsetEnd": {
+                                        "type": "integer"
+                                    },
+                                    "nerd_score": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "nerd_conf": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "prob": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "wikipediaExternalRef": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "freeBaseExternalRef": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
                                     "definitions": {
-                                        "dynamic": "false",
                                         "properties": {
-                                            "$definition": {
+                                            "definition": {
                                                 "type": "string"
                                             },
-                                            "$source": {
+                                            "source": {
                                                 "type": "string",
                                                 "index": "not_analyzed"
                                             },
@@ -34,30 +109,34 @@
                                             }
                                         }
                                     },
-                                    "domains": {
-                                        "type": "string",
-                                        "index": "not_analyzed"
+                                    "categories": {
+                                        "properties": {
+                                            "category": {
+                                                "type": "string"
+                                            },
+                                            "source": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "page_id": {
+                                                "type": "integer"
+                                            }
+                                        }
                                     },
-                                    "freeBaseExternalRef": {
-                                        "type": "string",
-                                        "index": "not_analyzed"
-                                    },
-                                    "nerd_score": {
-                                        "type": "string",
-                                        "index": "not_analyzed"
-                                    },
-                                    "offsetEnd": {
-                                        "type": "integer"
-                                    },
-                                    "offsetStart": {
-                                        "type": "integer"
-                                    },
-                                    "rawName": {
-                                        "type": "string"
-                                    },
-                                    "wikipediaExternalRef": {
-                                        "type": "string",
-                                        "index": "not_analyzed"
+                                    "multilingual": {
+                                        "properties": {
+                                            "term": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "lang": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "page_id": {
+                                                "type": "integer"
+                                            }
+                                        }
                                     }
                                 }
                             }
