@@ -1,10 +1,12 @@
-package fr.inria.anhalytics.harvest;
+package fr.inria.anhalytics.harvest.oaipmh;
 
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
 import fr.inria.anhalytics.commons.exceptions.BinaryNotAvailableException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.harvest.HarvesterItf;
+import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -22,12 +24,15 @@ import org.xml.sax.SAXException;
  * 
  * @author Achraf
  */
-abstract class Harvester {
+abstract class OAIPMHHarvester implements HarvesterItf {
 
-    protected static final Logger logger = LoggerFactory.getLogger(Harvester.class);
+    protected static final Logger logger = LoggerFactory.getLogger(OAIPMHHarvester.class);
 
-    public Harvester() throws UnknownHostException {
+    protected String oai_url = null;
+    
+    public OAIPMHHarvester() throws UnknownHostException {
         this.mm = MongoFileManager.getInstance(false);
+        this.oai_url = HarvestProperties.getApiUrl();
     }
 
     protected MongoFileManager mm;
@@ -36,12 +41,6 @@ abstract class Harvester {
      * Harvests the documents submitted on the given date.
      */
     protected void fetchDocumentsByDate(String date) throws IOException, SAXException, ParserConfigurationException, ParseException {
-    }
-
-    /**
-     * Harvests all the repository.
-     */
-    public void fetchAllDocuments() throws IOException, SAXException, ParserConfigurationException, ParseException {
     }
 
     /**
@@ -55,7 +54,7 @@ abstract class Harvester {
                 String teiString = tei.getTei();
                 if (teiString.length() > 0) {
                     logger.info("\t\t\t\t Storing tei " + tei.getId());
-                    mm.insertMetadataTei(teiString, tei.getId(), tei.getDocumentType(), date);
+                    mm.insertMetadataTei(teiString, HarvestProperties.getSource(), tei.getId(), tei.getDocumentType(), date);
 
                     if (tei.getPdfdocument() != null) {
                         logger.info("\t\t\t\t downloading PDF file.");
@@ -106,12 +105,12 @@ abstract class Harvester {
                 mm.saveForLater(id, file.getUrl(), type, file.isAnnexFile(), "nostream", date);
             } else {
                 if (!file.isAnnexFile()) {
-                    mm.insertBinaryDocument(inBinary, id, type, date);
+                    mm.insertBinaryDocument(inBinary, HarvestProperties.getSource(), id, type, date);
                 } else {
                     int n = file.getUrl().lastIndexOf("/");
                     String filename = file.getUrl().substring(n + 1);
                     logger.debug("\t\t\t\t Getting annex file " + filename + " for pub Id :" + id);
-                    mm.insertAnnexDocument(inBinary, id, filename, date);
+                    mm.insertAnnexDocument(inBinary, HarvestProperties.getSource(), id, filename, date);
                 }
             }
             inBinary.close();

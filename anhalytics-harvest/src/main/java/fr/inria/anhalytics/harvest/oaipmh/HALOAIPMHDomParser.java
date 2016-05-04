@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.harvest;
+package fr.inria.anhalytics.harvest.oaipmh;
 
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
@@ -27,7 +27,7 @@ import org.w3c.dom.ls.LSSerializer;
  * 
  * @author Achraf
  */
-public class HALOAIPMHDomParser implements OAIPMHMetadata {
+public class HALOAIPMHDomParser {
 
     protected static final Logger logger = LoggerFactory.getLogger(HALOAIPMHDomParser.class);
     
@@ -55,11 +55,11 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
             for (int i = listRecords.getLength() - 1; i >= 0; i--) {
                 if ((listRecords.item(i) instanceof Element)) {
                     Element record = (Element) listRecords.item(i);
-                    String type = getDocumentType(record.getElementsByTagName(TypeElement));
+                    String type = getDocumentType(record.getElementsByTagName(OAIPMHPathsItf.TypeElement));
                     if (isConsideredType(type)) {
-                        String tei = getTei(record.getElementsByTagName(TeiElement));
+                        String tei = getTei(record.getElementsByTagName(OAIPMHPathsItf.TeiElement));
                         String doi = getDoi(record);
-                        String id = getId(record.getElementsByTagName(IdElement));
+                        String id = getId(record.getElementsByTagName(OAIPMHPathsItf.IdElement));
 
                         PublicationFile file = getFile(record);
                         List<PublicationFile> annexes = getAnnexes(record);
@@ -79,7 +79,7 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
         String reference = null;
         Node node = null;
         try {
-            node = (Node) xPath.compile(RefPATH).evaluate(ref, XPathConstants.NODE);
+            node = (Node) xPath.compile(OAIPMHPathsItf.RefPATH).evaluate(ref, XPathConstants.NODE);
             reference = node.getTextContent();
         } catch (Exception ex) {
             logger.debug("\t \t \t \t hal ref not found");
@@ -90,7 +90,7 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
     public String getDoi(Node ref) {
         String doi = null;
         try {
-            Node node = (Node) xPath.compile(DoiPATH).evaluate(ref, XPathConstants.NODE);
+            Node node = (Node) xPath.compile(OAIPMHPathsItf.DoiPATH).evaluate(ref, XPathConstants.NODE);
             doi = node.getTextContent();
         } catch (Exception ex) {
             logger.debug("\t \t \t \t doi not found");
@@ -104,7 +104,7 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
 
     private void setToken(Element rootElement) {
         try {
-            this.token = URLEncoder.encode(rootElement.getElementsByTagName(ResumptionToken).item(0).getTextContent());
+            this.token = URLEncoder.encode(rootElement.getElementsByTagName(OAIPMHPathsItf.ResumptionToken).item(0).getTextContent());
         } catch (Exception ex) {
             this.token = null;
         }
@@ -125,12 +125,11 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
         }
         return null;
     }
-
-    @Override
+    
     public PublicationFile getFile(Node record) {
         PublicationFile file = null;
         try {
-            Element node = (Element) xPath.compile(FileElement).evaluate(record, XPathConstants.NODE);
+            Element node = (Element) xPath.compile(OAIPMHPathsItf.FileElement).evaluate(record, XPathConstants.NODE);
             //REMOVE version extension....
             String url = node.getAttribute("target");
             String embargoDate = ((Element) node.getChildNodes().item(1)).getAttribute("notBefore");
@@ -145,7 +144,7 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
         List<PublicationFile> annexes = new ArrayList<PublicationFile>();
         NodeList nodes = null;
         try {
-            nodes = (NodeList) xPath.compile(AnnexesUrlsElement).evaluate(record, XPathConstants.NODESET);
+            nodes = (NodeList) xPath.compile(OAIPMHPathsItf.AnnexesUrlsElement).evaluate(record, XPathConstants.NODESET);
         } catch (Exception ex) {
             logger.debug("\t \t \t \t No annex files attached .");
         }
@@ -160,7 +159,6 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
         return annexes;
     }
 
-    @Override
     public String getTei(NodeList tei) {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -199,12 +197,10 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
         }
     }
 
-    @Override
     public String getId(NodeList identifier) {
         return identifier.item(0).getTextContent().split(":")[2];
     }
 
-    @Override
     public String getDocumentType(NodeList sets) {
         String type = null;
         for (int i = sets.getLength() - 1; i >= 0; i--) {
@@ -219,7 +215,7 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
     }
 
     private NodeList getRecords(Element rootElement) {
-        return rootElement.getElementsByTagName(RecordElement);
+        return rootElement.getElementsByTagName(OAIPMHPathsItf.RecordElement);
     }
 
     private static String innerXmlToString(Node node) {
@@ -237,7 +233,7 @@ public class HALOAIPMHDomParser implements OAIPMHMetadata {
 
     private boolean isConsideredType(String setSpec) {
         try {
-            ConsideredTypes.valueOf(setSpec);
+            OAIPMHPathsItf.ConsideredTypes.valueOf(setSpec);
             return true;
         } catch (IllegalArgumentException ex) {
             return false;

@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.harvest;
+package fr.inria.anhalytics.harvest.oaipmh;
 
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
@@ -15,18 +15,15 @@ import java.util.*;
  *
  * @author Achraf
  */
-public class HALOAIHarvester extends Harvester {
+public class HALOAIPMHHarvester extends OAIPMHHarvester {
 
     private static String OAI_FORMAT = "xml-tei";
 
-    private final HALOAIPMHDomParser oaiDom;
-
-    private String oai_url = null;
-
-    public HALOAIHarvester() throws UnknownHostException {
+    protected HALOAIPMHDomParser oaiDom;
+    
+    public HALOAIPMHHarvester() throws UnknownHostException {
         super();
-        this.oai_url = HarvestProperties.getOaiUrl();
-        oaiDom = new HALOAIPMHDomParser();
+        this.oaiDom = new HALOAIPMHDomParser();
     }
 
     @Override
@@ -34,15 +31,15 @@ public class HALOAIHarvester extends Harvester {
         boolean stop = false;
         String tokenn = null;
         while (!stop) {
-            String request = oai_url + "/?verb=ListRecords&metadataPrefix=" + OAI_FORMAT + "&from=" + date + "&until=" + date;
+            String request = this.oai_url + "/?verb=ListRecords&metadataPrefix=" + OAI_FORMAT + "&from=" + date + "&until=" + date;
 
             if (tokenn != null) {
-                request = oai_url + "/?verb=ListRecords&resumptionToken=" + tokenn;
+                request = this.oai_url + "/?verb=ListRecords&resumptionToken=" + tokenn;
             }
             logger.info("\t Sending: " + request);
 
             InputStream in = Utilities.request(request, true);
-            List<TEI> teis = oaiDom.getTeis(in);
+            List<TEI> teis = this.oaiDom.getTeis(in);
             processTeis(teis, date, true);
 
             // token if any:

@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.harvest;
+package fr.inria.anhalytics.harvest.oaipmh;
 
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import org.w3c.dom.Node;
@@ -8,7 +8,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Achraf
  */
-public interface OAIPMHMetadata {
+public interface OAIPMHPathsItf {
     public final static String ListRecordsElement = "ListRecords";
     public final static String RecordElement = "record";
     public final static String TeiElement = "metadata";
@@ -24,9 +24,4 @@ public interface OAIPMHMetadata {
 
         ART, COMM, OUV, POSTER, DOUV, PATENT, REPORT, THESE, HDR, LECTURE, COUV, OTHER, UNDEFINED  //IMG, VIDEO, AUDIOS, SON, MAP
     };
-    
-    public String getTei(NodeList tei);
-    public String getId(NodeList tei);
-    public String getDocumentType(NodeList tei);
-     public PublicationFile getFile(Node record);
 }
