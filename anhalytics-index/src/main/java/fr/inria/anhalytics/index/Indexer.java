@@ -188,10 +188,8 @@ public class Indexer {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_nerd.json"));
             } else if (indexName.contains(IndexProperties.getKeytermAnnotsIndexName())) {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_keyterm.json"));
-            } else if (indexName.contains(IndexProperties.getMetadataTeisIndexName())) {
-                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl_halheader.json"));
             } else {
-                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl_fulltext.json"));
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl.json"));
             }
         } catch (Exception e) {
             throw new ElasticSearchConfigurationException("Cannot read mapping for " + indexName);
@@ -212,7 +210,7 @@ public class Indexer {
         }
         return val;
     }
-    
+
     /**
      * Indexing of the document collection in ElasticSearch
      */
@@ -226,7 +224,7 @@ public class Indexer {
             }
             BulkRequestBuilder bulkRequest = client.prepareBulk();
             bulkRequest.setRefresh(true);
-            if (mm.initTeis(date, true)) {
+            if (mm.initTeis(date, false)) {
                 int i = 0;
 
                 while (mm.hasMoreTeis()) {
@@ -279,13 +277,13 @@ public class Indexer {
                     }
                 }
                 // last bulk
-                if(i != 0){
-                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                System.out.print(".");
-                if (bulkResponse.hasFailures()) {
-                    // process failures by iterating through each bulk response item	
-                    logger.error(bulkResponse.buildFailureMessage());
-                }
+                if (i != 0) {
+                    BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                    System.out.print(".");
+                    if (bulkResponse.hasFailures()) {
+                        // process failures by iterating through each bulk response item	
+                        logger.error(bulkResponse.buildFailureMessage());
+                    }
                 }
             }
 
@@ -333,7 +331,6 @@ public class Indexer {
                         jsonStr = json.toString();
 
                         jsonStr = indexingPreprocess.process(jsonStr, id, anhalyticsId);
-
                         if (jsonStr == null) {
                             continue;
                         }
@@ -345,7 +342,7 @@ public class Indexer {
                         if (i >= 100) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                             if (bulkResponse.hasFailures()) {
-                                // process failures by iterating through each bulk response item	
+                                // process failures by iterating through each bulk response item
                                 logger.error(bulkResponse.buildFailureMessage());
                             }
                             bulkRequest = client.prepareBulk();
@@ -362,13 +359,13 @@ public class Indexer {
                     }
                 }
                 // last bulk
-                if(i != 0){
-                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                System.out.print(".");
-                if (bulkResponse.hasFailures()) {
-                    // process failures by iterating through each bulk response item	
-                    logger.error(bulkResponse.buildFailureMessage());
-                }
+                if (i != 0) {
+                    BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                    System.out.print(".");
+                    if (bulkResponse.hasFailures()) {
+                        // process failures by iterating through each bulk response item
+                        logger.error(bulkResponse.buildFailureMessage());
+                    }
                 }
             }
 
@@ -384,8 +381,6 @@ public class Indexer {
      */
     public int indexKeytermAnnotations() {
         int nb = 0;
-
-        ObjectMapper mapper = new ObjectMapper();
         for (String date : Utilities.getDates()) {
             if (mm.initAnnotations(date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS)) {
                 int i = 0;
@@ -425,15 +420,14 @@ public class Indexer {
                         e.printStackTrace();
                     }
                 }
-                if(i != 0){
-                // last bulk
-                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                if (bulkResponse.hasFailures()) {
-                    // process failures by iterating through each bulk response item	
-                    logger.error(bulkResponse.buildFailureMessage());
+                if (i != 0) {
+                    // last bulk
+                    BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                    if (bulkResponse.hasFailures()) {
+                        // process failures by iterating through each bulk response item	
+                        logger.error(bulkResponse.buildFailureMessage());
+                    }
                 }
-                }
-                System.out.print("\n");
             }
         }
         return nb;
@@ -524,15 +518,14 @@ public class Indexer {
                     }
                 }
                 // last bulk
-                if(i != 0){
-                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                System.out.print(".");
-                if (bulkResponse.hasFailures()) {
-                    // process failures by iterating through each bulk response item	
-                    logger.error(bulkResponse.buildFailureMessage());
+                if (i != 0) {
+                    BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                    System.out.print(".");
+                    if (bulkResponse.hasFailures()) {
+                        // process failures by iterating through each bulk response item	
+                        logger.error(bulkResponse.buildFailureMessage());
+                    }
                 }
-                }
-                System.out.print("\n");
             }
 
             if (!IndexProperties.isProcessByDate()) {
@@ -560,7 +553,7 @@ public class Indexer {
         request += "], \"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
         //System.out.println(request);
 
-        String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + IndexProperties.getFulltextTeisIndexName()+ "/_search";
+        String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + IndexProperties.getFulltextTeisIndexName() + "/_search";
         StringBuffer json = new StringBuffer();
         try {
             URL url = new URL(urlStr);
