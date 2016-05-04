@@ -74,16 +74,13 @@ abstract class MongoManager {
     }
 
     public DBCollection getCollection(String collectionName) {
-        boolean collectionFound = false;
-        Set<String> collections = db.getCollectionNames();
-        for (String collection : collections) {
-            if (collection.equals(collectionName)) {
-                collectionFound = true;
-            }
-        }
+        /* can t check with gridfs collection !
+        boolean collectionFound = db.collectionExists(collectionName);
+        
         if (!collectionFound) {
             LOGGER.debug("MongoDB collection " + collectionName + " does not exist and will be created");
         }
+*/
         return db.getCollection(collectionName);
     }
 
