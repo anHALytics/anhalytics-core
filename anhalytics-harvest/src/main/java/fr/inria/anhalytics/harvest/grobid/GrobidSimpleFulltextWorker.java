@@ -17,8 +17,8 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(GrobidSimpleFulltextWorker.class);
     
-    public GrobidSimpleFulltextWorker(InputStream content, String id, String anhalyticsId, String date) throws UnknownHostException {
-        super(content, id, anhalyticsId, date);
+    public GrobidSimpleFulltextWorker(InputStream content, String currentRepositoryDocId, String currentAnhalyticsId, String date) throws UnknownHostException {
+        super(content, currentRepositoryDocId, currentAnhalyticsId, date);
     }
 
     @Override
@@ -33,22 +33,22 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
 
             // for now we extract just files with less size (avoid thesis..which may take long time)
             if (mb <= 15) {
-                logger.info("\t\t TEI extraction for : " + id + " sizing :" + mb + "mb");
+                logger.info("\t\t TEI extraction for : " + repositoryDocId + " sizing :" + mb + "mb");
                 String tei = grobidService.runFullTextGrobid(filepath).trim();
                 tei = generateIdsTeiDoc(tei);
-                mm.insertGrobidTei(tei, id, anhalyticsId, date);
+                mm.insertGrobidTei(tei, repositoryDocId, anhalyticsId, date);
 
-                logger.debug("\t\t " + id + " processed.");
+                logger.debug("\t\t " + repositoryDocId + " processed.");
             } else {
-                logger.info("\t\t can't extract TEI for : " + id + "size too large : " + mb + "mb");
+                logger.info("\t\t can't extract TEI for : " + repositoryDocId + "size too large : " + mb + "mb");
             }
             file.delete();
         } catch (GrobidTimeoutException e) {
-            mm.save(id, "processGrobid", "timed out", date);
-            logger.warn("Processing of " + id + " timed out");
+            mm.save(repositoryDocId, "processGrobid", "timed out", date);
+            logger.warn("Processing of " + repositoryDocId + " timed out");
         } catch (RuntimeException e) {
-            logger.error("\t\t error occurred while processing " + id);
-                mm.save(id, "processGrobid", e.getMessage(), date);
+            logger.error("\t\t error occurred while processing " + repositoryDocId);
+                mm.save(repositoryDocId, "processGrobid", e.getMessage(), date);
             logger.error(e.getMessage(), e.getCause());
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex.getCause());

@@ -32,14 +32,14 @@ public class GrobidFulltextWorker extends GrobidWorker {
                     for (final File currFile : files) {
                         if (currFile.getName().toLowerCase().endsWith(".png")) {
                             InputStream targetStream = FileUtils.openInputStream(currFile);
-                            mm.insertGrobidAssetDocument(targetStream, id, anhalyticsId,currFile.getName(), date);
+                            mm.insertGrobidAssetDocument(targetStream, repositoryDocId, anhalyticsId,currFile.getName(), date);
                             targetStream.close();
                         } else if (currFile.getName().toLowerCase().endsWith(".xml")) {
                             tei = Utilities.readFile(currFile.getAbsolutePath());
                             tei = Utilities.trimEncodedCharaters(tei);
                             tei = generateIdsTeiDoc(tei);
-                            System.out.println(id);
-                            mm.insertGrobidTei(tei, id, anhalyticsId, date);
+                            System.out.println(repositoryDocId);
+                            mm.insertGrobidTei(tei, repositoryDocId, anhalyticsId, date);
                         }
                     }
                 }

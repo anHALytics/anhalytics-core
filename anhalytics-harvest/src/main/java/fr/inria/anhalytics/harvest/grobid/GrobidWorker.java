@@ -25,21 +25,21 @@ abstract class GrobidWorker implements Runnable {
     protected InputStream content;
     protected MongoFileManager mm;
     protected String date;
-    protected String id;
+    protected String repositoryDocId;
     protected String anhalyticsId;
 
-    public GrobidWorker(InputStream content, String id, String anhalyticsId, String date) throws UnknownHostException {
+    public GrobidWorker(InputStream content, String currentRepositoryDocId, String currentAnhalyticsId, String date) throws UnknownHostException {
         this.content = content;
         this.mm = MongoFileManager.getInstance(false);
         this.date = date;
-        this.id = id;
-        this.anhalyticsId = anhalyticsId;
+        this.repositoryDocId = currentRepositoryDocId;
+        this.anhalyticsId = currentAnhalyticsId;
     }
 
     @Override
     public void run() {
         long startTime = System.nanoTime();
-        logger.info(Thread.currentThread().getName() + " Start. Processing = " + id);
+        logger.info(Thread.currentThread().getName() + " Start. Processing = " + repositoryDocId);
         processCommand();
         long endTime = System.nanoTime();
         logger.info(Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
@@ -54,25 +54,25 @@ abstract class GrobidWorker implements Runnable {
             double mb = file.length() / (1024 * 1024);
 
             if (mb <= 15) { // for now we extract just files with less size (avoid thesis..which may take long time)
-                logger.info("\t\t Tei extraction for : " + id + " sizing :" + mb + "mb");
+                logger.info("\t\t Tei extraction for : " + repositoryDocId + " sizing :" + mb + "mb");
                 String resultPath = grobidService.runFullTextAssetGrobid(filepath);
                 saveExtractions(resultPath);
 
                 FileUtils.deleteDirectory(new File(resultPath));
-                logger.debug("\t\t " + id + " processed.");
+                logger.debug("\t\t " + repositoryDocId + " processed.");
             } else {
-                logger.info("\t\t can't extract tei for : " + id + "size too large : " + mb + "mb");
+                logger.info("\t\t can't extract tei for : " + repositoryDocId + "size too large : " + mb + "mb");
             }
             file.delete();
         } catch (GrobidTimeoutException e) {
-            mm.save(id, "processGrobid", "timed out", date);
-            logger.warn("Processing of " + id + " timed out");
+            mm.save(repositoryDocId, "processGrobid", "timed out", date);
+            logger.warn("Processing of " + repositoryDocId + " timed out");
         } catch (RuntimeException e) {
-            logger.error("\t\t error occurred while processing " + id);
+            logger.error("\t\t error occurred while processing " + repositoryDocId);
             if (e.getMessage().contains("timed out")) {
-                mm.save(id, "processGrobid", "timed out", date);
+                mm.save(repositoryDocId, "processGrobid", "timed out", date);
             } else if (e.getMessage().contains("failed")) {
-                mm.save(id, "processGrobid", "failed", date);
+                mm.save(repositoryDocId, "processGrobid", "failed", date);
             }
             logger.error(e.getMessage(), e.getCause());
         } catch (IOException ex) {
@@ -104,6 +104,6 @@ abstract class GrobidWorker implements Runnable {
 
     @Override
     public String toString() {
-        return this.id;
+        return this.repositoryDocId;
     }
 }

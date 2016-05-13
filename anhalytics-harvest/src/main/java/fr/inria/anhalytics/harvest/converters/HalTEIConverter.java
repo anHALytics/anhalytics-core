@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.harvest.teibuild;
+package fr.inria.anhalytics.harvest.converters;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.grobid.MyGrobid;
@@ -20,15 +20,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * Function for extracting data from Hal stored metadata.
- *
+ * Function for converting metadata from Hal stored to Standard Tei format close to the one used for Grobid.
+ * https://github.com/kermitt2/Pub2TEIPrivate
  * @author achraf
  */
-public class halTeiExtractor {
+public class HalTEIConverter implements MetadataConverter {
 
     private static XPath xPath = XPathFactory.newInstance().newXPath();
 
     /**
+     * Converts metadata to standard TEI format.
      * Reorganizes some nodes especially authors/editors that are misplaced,
      * puts them under biblFull node and returns the result( some data is
      * redundant).
@@ -36,43 +37,59 @@ public class halTeiExtractor {
      * @param docAdditionalTei
      * @return
      */
-    public static NodeList extractHalMetadata(Document docAdditionalTei) {
+    public Element convertMetadataToTEIHeader(Document metadata, Document newTEICorpus) {
         /////////////// Hal specific : To be done as a harvesting post process before storing tei ////////////////////
         // remove ugly end-of-line in starting and ending text as it is
         // a problem for stand-off annotations
         //read an xml node using xpath
-        NodeList teiHeader = null;
+        Element teiHeader = null;
         try {
-            NodeList editors = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/editor").evaluate(docAdditionalTei, XPathConstants.NODESET);
-            NodeList authors = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/author").evaluate(docAdditionalTei, XPathConstants.NODESET);
-            NodeList orgs = (NodeList) xPath.compile("/TEI/text/back/listOrg/org").evaluate(docAdditionalTei, XPathConstants.NODESET);
-
-            setPublicationDate(docAdditionalTei);
-            parseOrgsAddress(docAdditionalTei, orgs);
-            correctDataLocation(docAdditionalTei, authors);
-            updateAffiliations(authors, orgs, docAdditionalTei);
-            correctDataLocation(docAdditionalTei, editors);
-            updateAffiliations(editors, orgs, docAdditionalTei);
-            docAdditionalTei = removeUnneededParts(docAdditionalTei);
-            Utilities.trimEOL(docAdditionalTei.getDocumentElement(), docAdditionalTei);
-            teiHeader = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull").evaluate(docAdditionalTei, XPathConstants.NODESET);
+            
+            metadata = transformMetadata(metadata);
+            
+            setPublicationDate(metadata);
+            
+            NodeList editors = (NodeList) xPath.compile("/TEI/text/body/listBibl/fileDesc/sourceDesc/biblStruct/analytic/editor").evaluate(metadata, XPathConstants.NODESET);
+            NodeList authors = (NodeList) xPath.compile("/TEI/text/body/listBibl/fileDesc/sourceDesc/biblStruct/analytic/author").evaluate(metadata, XPathConstants.NODESET);
+            NodeList orgs = (NodeList) xPath.compile("/TEI/text/back/listOrg/org").evaluate(metadata, XPathConstants.NODESET);
+            parseOrgsAddress(metadata, orgs);
+            updateAffiliations(authors, orgs, metadata);
+            updateAffiliations(editors, orgs, metadata);
+            Utilities.trimEOL(metadata.getDocumentElement(), metadata);
+            NodeList stuffToTake = (NodeList) xPath.compile("/TEI/text/body/listBibl").evaluate(metadata, XPathConstants.NODESET);
+            
+            teiHeader = createMetadataTEIHeader(stuffToTake, newTEICorpus);
         } catch (XPathExpressionException e) {
             e.printStackTrace();
 
         }
         return teiHeader;
     }
+    
+    private Element createMetadataTEIHeader(NodeList stuffToTake, Document doc) {
+        Element teiHeader = doc.createElement("teiHeader");
+        if (stuffToTake.getLength() == 0) {
+            return teiHeader;
+        }
+        Node biblFullRoot = stuffToTake.item(0);
+        for (int i = 0; i < biblFullRoot.getChildNodes().getLength(); i++) {
+            Node localNode = doc.importNode(biblFullRoot.getChildNodes().item(i), true);
+            teiHeader.appendChild(localNode);
+            
+        }
+        return teiHeader;
+    }
 
-    private static void setPublicationDate(Document doc) {
+    private void setPublicationDate(Document doc) {
         try {
-            Node pubDate = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/imprint/date[@type=\"datePub\"] ").evaluate(doc, XPathConstants.NODE);
+            Node pubDate = (Node) xPath.compile("/TEI/text/body/listBibl/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"datePub\"] ").evaluate(doc, XPathConstants.NODE);
             if (pubDate == null) {
-                Node biblStruct = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct").evaluate(doc, XPathConstants.NODE);
-                Node submitDate = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/editionStmt/edition[@type=\"current\"]/date[@type=\"whenSubmitted\"]").evaluate(doc, XPathConstants.NODE);
+                Node biblStruct = (Node) xPath.compile("/TEI/text/body/listBibl/fileDesc/sourceDesc/biblStruct").evaluate(doc, XPathConstants.NODE);
+                Node submitDate = (Node) xPath.compile("/TEI/text/body/listBibl/fileDesc/editionStmt/edition[@type=\"current\"]/date[@type=\"whenSubmitted\"]").evaluate(doc, XPathConstants.NODE);
                 Element newPubDate = doc.createElement("date");
                 newPubDate.setAttribute("type", "datePub");
                 newPubDate.setTextContent(submitDate.getTextContent().split(" ")[0]);
-                Element eltMonogr = (Element) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr").evaluate(doc, XPathConstants.NODE);
+                Element eltMonogr = (Element) xPath.compile("/TEI/text/body/listBibl/fileDesc/sourceDesc/biblStruct/monogr").evaluate(doc, XPathConstants.NODE);
                 Element eltImprint = (Element) eltMonogr.getElementsByTagName("imprint").item(0);
                 eltImprint = (eltImprint == null)? doc.createElement("imprint"): eltImprint;
                 eltImprint.appendChild(newPubDate);
@@ -84,7 +101,7 @@ public class halTeiExtractor {
         }
     }
 
-    private static void parseOrgsAddress(Document doc, NodeList orgs) {
+    private void parseOrgsAddress(Document doc, NodeList orgs) {
         Node org = null;
         for (int i = orgs.getLength() - 1; i >= 0; i--) {
             org = orgs.item(i);
@@ -128,11 +145,11 @@ public class halTeiExtractor {
                                 }
                             }
                         } catch (ParserConfigurationException ex) {
-                            Logger.getLogger(halTeiExtractor.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(HalTEIConverter.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (SAXException ex) {
-                            Logger.getLogger(halTeiExtractor.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(HalTEIConverter.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (IOException ex) {
-                            Logger.getLogger(halTeiExtractor.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(HalTEIConverter.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 }
@@ -147,7 +164,7 @@ public class halTeiExtractor {
      * @param docAdditionalTei
      * @param entities
      */
-    private static void correctDataLocation(Document docAdditionalTei, NodeList entities) throws XPathExpressionException {
+    private void correctDataLocation(Document docAdditionalTei, NodeList entities) throws XPathExpressionException {
         Node person = null;
         for (int i = entities.getLength() - 1; i >= 0; i--) {
             person = entities.item(i);
@@ -160,19 +177,38 @@ public class halTeiExtractor {
 
     }
 
-    private static Document removeUnneededParts(Document docAdditionalTei) throws XPathExpressionException {
-        Node analytic = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/analytic").evaluate(docAdditionalTei, XPathConstants.NODE);
-        analytic.getParentNode().removeChild(analytic);
-        Node publicationStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/publicationStmt").evaluate(docAdditionalTei, XPathConstants.NODE);
+    /**
+    * Remove duplicated parts and update.
+    */
+    private Document transformMetadata(Document metadata) throws XPathExpressionException {
+        Node title = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/analytic/title").evaluate(metadata, XPathConstants.NODE);
+        title.getParentNode().removeChild(title);
+        
+        NodeList authorsDuplicate = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/author").evaluate(metadata, XPathConstants.NODESET);
+        for(int j = authorsDuplicate.getLength() - 1; j >= 0; j--){
+            authorsDuplicate.item(j).getParentNode().removeChild(authorsDuplicate.item(j));
+        }
+        NodeList editorsDuplicate = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/editor").evaluate(metadata, XPathConstants.NODESET);
+        for(int j = editorsDuplicate.getLength() - 1; j >= 0; j--){
+            editorsDuplicate.item(j).getParentNode().removeChild(editorsDuplicate.item(j));
+        }
+        Node publicationStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/publicationStmt").evaluate(metadata, XPathConstants.NODE);
         publicationStmt.getParentNode().removeChild(publicationStmt);
         //Node seriesStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/seriesStmt").evaluate(docAdditionalTei, XPathConstants.NODE);
         //seriesStmt.getParentNode().removeChild(seriesStmt);
-        Node notesStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/notesStmt").evaluate(docAdditionalTei, XPathConstants.NODE);
+        Node notesStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/notesStmt").evaluate(metadata, XPathConstants.NODE);
         notesStmt.getParentNode().removeChild(notesStmt);
-        return docAdditionalTei;
+        
+        Node profileDesc = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/profileDesc").evaluate(metadata, XPathConstants.NODE);
+        profileDesc.getParentNode().removeChild(profileDesc);
+        Node listBibl = (Node) xPath.compile("/TEI/text/body/listBibl").evaluate(metadata, XPathConstants.NODE);
+        listBibl.appendChild(profileDesc);
+        Node biblFull = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull").evaluate(metadata, XPathConstants.NODE);
+        metadata.renameNode(biblFull, biblFull.getNamespaceURI(), "fileDesc");
+        return metadata;
     }
 
-    private static void updateOrgType(Element org, NodeList orgs) {
+    private void updateOrgType(Element org, NodeList orgs) {
 
         NodeList relations = org.getElementsByTagName("relation");
         for (int j = relations.getLength() - 1; j >= 0; j--) {
@@ -192,7 +228,7 @@ public class halTeiExtractor {
         }
     }
 
-    private static void updateAffiliations(NodeList persons, NodeList orgs, Document docAdditionalTei) {
+    private void updateAffiliations(NodeList persons, NodeList orgs, Document docAdditionalTei) {
         Node person = null;
         NodeList theNodes = null;
         for (int i = 0; i < persons.getLength(); i++) {

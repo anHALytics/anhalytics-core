@@ -74,10 +74,10 @@ public class Main {
             Utilities.updateDates(todayDate, todayDate);
             oai.fetchAllDocuments();
         } else if (process.equals("generateTei")) {
-            tb.buildTei();
+            tb.buildTEICorpus();
         } else if (process.equals("generateTeiDaily")) {
             Utilities.updateDates(todayDate, todayDate);
-            tb.buildTei();
+            tb.buildTEICorpus();
         } else if (process.equals("processGrobid")) {
             gp.processFulltexts();
         } else if (process.equals("processGrobidDaily")) {

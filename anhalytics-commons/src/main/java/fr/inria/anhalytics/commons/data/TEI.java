@@ -11,8 +11,8 @@ import java.util.List;
 public class TEI {
     
     public TEI(){}
-    public TEI(String id, PublicationFile pdfdocument, List<PublicationFile> annexes, String doi, String documentType, String tei, String ref){
-        this.id = id;
+    public TEI(String repositoryDocId, PublicationFile pdfdocument, List<PublicationFile> annexes, String doi, String documentType, String tei, String ref){
+        this.repositoryDocId = repositoryDocId;
         this.tei = tei;
         this.documentType = documentType;
         this.pdfdocument = pdfdocument;
@@ -21,7 +21,7 @@ public class TEI {
         this.ref = ref;
     }
     
-    private String id;
+    private String repositoryDocId;
     private String doi;
     private String tei;
     private String documentType;
@@ -33,15 +33,15 @@ public class TEI {
     /**
      * @return the id
      */
-    public String getId() {
-        return id;
+    public String getRepositoryDocId() {
+        return repositoryDocId;
     }
 
     /**
      * @param id the id to set
      */
-    public void setId(String id) {
-        this.id = id;
+    public void setRepositoryDocId(String repositoryDocId) {
+        this.repositoryDocId = repositoryDocId;
     }
 
     /**

@@ -59,14 +59,14 @@ public class HALOAIPMHDomParser {
                     if (isConsideredType(type)) {
                         String tei = getTei(record.getElementsByTagName(OAIPMHPathsItf.TeiElement));
                         String doi = getDoi(record);
-                        String id = getId(record.getElementsByTagName(OAIPMHPathsItf.IdElement));
+                        String repositoryDocId = getRepositoryDocId(record.getElementsByTagName(OAIPMHPathsItf.IdElement));
 
                         PublicationFile file = getFile(record);
                         List<PublicationFile> annexes = getAnnexes(record);
 
                         String ref = getRef(record);
-                        teis.add(new TEI(Utilities.getHalIDFromHalDocID(id), file, annexes, doi, type, tei, ref));
-                        logger.debug("\t \t \t tei of "+id+" extracted.");
+                        teis.add(new TEI(Utilities.getHalIDFromHalDocID(repositoryDocId), file, annexes, doi, type, tei, ref));
+                        logger.debug("\t \t \t tei of "+repositoryDocId+" extracted.");
                     }
                 }
             }
@@ -197,7 +197,7 @@ public class HALOAIPMHDomParser {
         }
     }
 
-    public String getId(NodeList identifier) {
+    public String getRepositoryDocId(NodeList identifier) {
         return identifier.item(0).getTextContent().split(":")[2];
     }
 

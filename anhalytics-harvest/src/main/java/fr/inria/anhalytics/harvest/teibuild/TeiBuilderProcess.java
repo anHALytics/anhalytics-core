@@ -28,33 +28,32 @@ public class TeiBuilderProcess {
     /**
      * Clean up metadatas , add grobid TEI and build a corpus tei.
      */
-    public void buildTei() {
+    public void buildTEICorpus() {
         for (String date : Utilities.getDates()) {
             if (!HarvestProperties.isProcessByDate()) {
                 date = null;
             }
             if (mm.initMetadataTeis(date)) {
                 while (mm.hasMoreTeis()) {
-                    String metadataTeiString = mm.nextTeiDocument();
-                    String uri = mm.getCurrentRepositoryDocId();
-                    String anhalyticsId = mm.getCurrentAnhalyticsId();
+                    String metadataString = mm.nextTeiDocument();
+                    String currentRepositoryDocId = mm.getCurrentRepositoryDocId();
+                    String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
                     boolean fulltextAvailable = false;
-                    Document generatedTeiDoc = null;
-                    if (anhalyticsId == null || anhalyticsId.isEmpty()) {
-                        logger.info("skipping " + uri + " No anHALytics id provided");
+                    Document generatedTEIcorpus = null;
+                    if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
+                        logger.info("skipping " + currentRepositoryDocId + " No anHALytics id provided");
                         continue;
                     }
-                    logger.info("\t Building tei for: " + uri);
-                    metadataTeiString = Utilities.trimEncodedCharaters(metadataTeiString);
-                    generatedTeiDoc = createTEI(metadataTeiString);
-
-                    String grobidTei = getGrobidTei(anhalyticsId);
+                    logger.info("\t Building TEI for: " + currentRepositoryDocId);
+                    metadataString = Utilities.trimEncodedCharaters(metadataString);
+                    generatedTEIcorpus = createTEICorpus(metadataString);
+                    String grobidTei = getGrobidTei(currentAnhalyticsId);
                     if (grobidTei != null) {
-                        generatedTeiDoc = TeiBuilder.addGrobidTeiToTei(Utilities.toString(generatedTeiDoc), grobidTei);
+                        generatedTEIcorpus = TeiBuilder.addGrobidTEIToTEICorpus(Utilities.toString(generatedTEIcorpus), grobidTei);
                         fulltextAvailable = true;
                     }
-                    String tei = Utilities.toString(generatedTeiDoc);
-                    mm.insertTei(tei, uri, anhalyticsId, fulltextAvailable, date);
+                    String teiCorpus = Utilities.toString(generatedTEIcorpus);
+                    mm.insertTei(teiCorpus, currentRepositoryDocId, currentAnhalyticsId, fulltextAvailable, date);
                 }
             }
             if (!HarvestProperties.isProcessByDate()) {
@@ -67,13 +66,13 @@ public class TeiBuilderProcess {
     /**
      * Adds data TEI extracted with grobid.
      */
-    private Document createTEI(String metadataTei) {
+    private Document createTEICorpus(String metadata) {
         Document generatedTeiDoc = null;
         try {
-            if (metadataTei != null) {
-                InputStream metadataTeiStream = new ByteArrayInputStream(metadataTei.getBytes());
-                generatedTeiDoc = TeiBuilder.createTEICorpus(metadataTeiStream);
-                metadataTeiStream.close();
+            if (metadata != null) {
+                InputStream metadataStream = new ByteArrayInputStream(metadata.getBytes());
+                generatedTeiDoc = TeiBuilder.createTEICorpus(metadataStream);
+                metadataStream.close();
             }
         } catch (Exception xpe) {
             xpe.printStackTrace();

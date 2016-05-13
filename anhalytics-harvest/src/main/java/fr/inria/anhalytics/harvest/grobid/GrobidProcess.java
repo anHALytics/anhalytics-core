@@ -45,25 +45,25 @@ public class GrobidProcess {
                     if (mm.initBinaries(date)) {
                         while (mm.hasMoreBinaryDocuments()) {
                             InputStream content = mm.nextBinaryDocument();
-                            String id = mm.getCurrentRepositoryDocId();
+                            String currentRepositoryDocId = mm.getCurrentRepositoryDocId();
                             String type = mm.getCurrentDocType();
                             String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
                             if (toBeGrobidified.contains(type)) {
                                 if (!HarvestProperties.isReset()) {
-                                    if (mm.isGrobidified(id)) {
-                                        logger.info("skipping " + id + " Already grobidified");
+                                    if (mm.isGrobidified(currentRepositoryDocId)) {
+                                        logger.info("skipping " + currentRepositoryDocId + " Already grobidified");
                                         continue;
                                     }
                                     if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
-                                        logger.info("skipping " + id + " No anHALytics id provided");
+                                        logger.info("skipping " + currentRepositoryDocId + " No anHALytics id provided");
                                         continue;
                                     }
                                 }
                                 try {
-                                    Runnable worker = new GrobidSimpleFulltextWorker(content, id, currentAnhalyticsId, date);
+                                    Runnable worker = new GrobidSimpleFulltextWorker(content, currentRepositoryDocId, currentAnhalyticsId, date);
                                     executor.execute(worker);
                                 } catch (final Exception exp) {
-                                    logger.error("An error occured while processing the file " + id
+                                    logger.error("An error occured while processing the file " + currentRepositoryDocId
                                             + ". Continuing the process for the other files" + exp.getMessage());
                                 }
                                 content.close();

@@ -834,7 +834,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Saves the resource to be requested later (embargo).
      */
-    public void saveForLater(String repositoryDocId, String url, String type, boolean isAnnex, String desc, String date) {
+    public void log(String repositoryDocId, String url, String type, boolean isAnnex, String desc, String date) {
         try {
             DBCollection collection = db.getCollection(MongoCollectionsInterface.TO_REQUEST_LATER);
             BasicDBObject index = new BasicDBObject();
