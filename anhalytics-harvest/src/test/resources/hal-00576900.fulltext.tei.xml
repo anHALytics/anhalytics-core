@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" 
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+     xsi:schemaLocation="http://www.tei-c.org/ns/1.0 /home/guests/azhar/grobid/grobid-home/schemas/xsd/Grobid.xsd"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+    <teiHeader xml:lang="en">
+        <encodingDesc>
+            <appInfo>
+                <application version="0.4.1" ident="GROBID" when="2016-05-13T13:11+0000">
+                    <ref target="https://github.com/kermitt2/grobid">GROBID - A machine learning software for extracting information from scholarly documents</ref>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <fileDesc>
+            <titleStmt>
+                <title level="a" type="main">Uncertainties of cultivated landscape drainage network mapping and its consequences on hydrological fluxes estimations</title>
+            </titleStmt>
+            <publicationStmt>
+                <publisher/>
+                <availability status="unknown">
+                    <licence/>
+                </availability>
+            </publicationStmt>
+            <sourceDesc>
+                <biblStruct>
+                    <analytic>
+                        <author role="corresp">
+                            <persName>
+                                <forename type="first">Levavasseur</forename>
+                                <forename type="middle">F</forename>
+                            </persName>
+                            <email>levavass@supagro.inra.fr, lagache@supagro.inra.fr, rabotin@supagro.inra.fr</email>
+                            <affiliation>
+                                <orgName type="laboratory" key="lab1">UMR 1221</orgName>
+                                <orgName type="laboratory" key="lab2">LISAH Bailly J.S. UMR 1221 LISAH, F-34035</orgName>
+                                <orgName type="laboratory" key="lab3">UMR TETIS</orgName>
+                                <address>
+                                    <postCode>F-34035 INRA, F-34093</postCode>
+                                    <settlement>Montpellier, AgroParisTech Montpellier</settlement>
+                                    <country>France, France</country>
+                                </address>
+                            </affiliation>
+                        </author>
+                        <author>
+                            <persName>
+                                <forename type="first">Lagacherie</forename>
+                                <forename type="middle">P</forename>
+                            </persName>
+                            <affiliation>
+                                <orgName type="laboratory" key="lab1">UMR 1221</orgName>
+                                <orgName type="laboratory" key="lab2">LISAH Bailly J.S. UMR 1221 LISAH, F-34035</orgName>
+                                <orgName type="laboratory" key="lab3">UMR TETIS</orgName>
+                                <address>
+                                    <postCode>F-34035 INRA, F-34093</postCode>
+                                    <settlement>Montpellier, AgroParisTech Montpellier</settlement>
+                                    <country>France, France</country>
+                                </address>
+                            </affiliation>
+                        </author>
+                        <author>
+                            <persName>
+                                <forename type="first">Rabotin</forename>
+                                <forename type="middle">M</forename>
+                            </persName>
+                            <affiliation>
+                                <orgName type="laboratory" key="lab1">UMR 1221</orgName>
+                                <orgName type="laboratory" key="lab2">LISAH Bailly J.S. UMR 1221 LISAH, F-34035</orgName>
+                                <orgName type="laboratory" key="lab3">UMR TETIS</orgName>
+                                <address>
+                                    <postCode>F-34035 INRA, F-34093</postCode>
+                                    <settlement>Montpellier, AgroParisTech Montpellier</settlement>
+                                    <country>France, France</country>
+                                </address>
+                            </affiliation>
+                        </author>
+                        <author>
+                            <persName>
+                                <forename type="first">Colin</forename>
+                                <forename type="middle">F</forename>
+                            </persName>
+                            <affiliation>
+                                <orgName type="laboratory">UMR 1221 LISAH</orgName>
+                                <address>
+                                    <postCode>F-34035</postCode>
+                                    <settlement>Montpellier SupAgro Montpellier</settlement>
+                                    <country key="FR">France</country>
+                                </address>
+                            </affiliation>
+                        </author>
+                        <title level="a" type="main">Uncertainties of cultivated landscape drainage network mapping and its consequences on hydrological fluxes estimations</title>
+                    </analytic>
+                    <monogr>
+                        <imprint>
+                            <date/>
+                        </imprint>
+                    </monogr>
+                </biblStruct>
+            </sourceDesc>
+        </fileDesc>
+        <profileDesc>
+            <textClass>
+                <keywords>
+                    <term>artificial drainage network, directed tree,</term>
+                    <term>uncertainties, mapping, error propagation, hydrological</term>
+                    <term>response</term>
+                </keywords>
+            </textClass>
+            <abstract>
+                <p>— In this study, we use a network generation method to simulate equi-probable artificial drainage networks on a small Mediterranean cultivated catchment. The method consists in a stochastic algorithm assimilating sampled observations on the network that generates a ditch network based on the map of field boundaries. A set of one hundred simulations is used to represent the uncertainty on the ditch network. With regards to geometrical (lengths indices), topological (Shreve indices) and topographical metrics (slope indices), simulations similarities compared to the real network are computed. Secondly, uncertainty on the network is propagated through the hydrological model MHYDAS. The induced hydrological responses in hydrographs present a variability that can be linked to previous networks metrics. At this stage of the network generation process, this uncertainty propagation study allows to drive the choice of criteria for future network generation process improvement.</p>
+            </abstract>
+        </profileDesc>
+    </teiHeader>
+    <text xml:lang="en">
+        <body>
+            <div xmlns="http://www.tei-c.org/ns/1.0">
+                <head>INTRODUCTION</head>
+                <p> The linear elements of cultivated landscapes such as hedgerows, bench terraces, ditches, condition ecological or hydrological fluxes within landscape by creating barriers, vectors and discontinuities (<ref type="bibr" coords="1,150.46,567.39,97.14,11.07" target="#b5">Forman &amp;amp; Baudry 1984;</ref>
+                    <ref type="bibr" coords="1,250.41,567.39,29.20,11.07;1,36.80,577.79,83.25,11.07" target="#b7">Herzon &amp;amp; Helenius 2008</ref>). Spatially distributed landscape functioning models are increasingly including explicitly these linear structures as arc-nodes inputs (<ref type="bibr" coords="1,219.02,598.59,52.16,11.07" target="#b2">Branger 2007</ref>). This is particularly the case of ditch networks (artificial drainage networks) that strongly impact the inner topology of distributed models (<ref type="bibr" coords="1,119.32,629.79,101.27,11.07" target="#b3">Carluer &amp;amp; Marsily 2004;</ref>
+                    <ref type="bibr" coords="1,224.40,629.79,55.23,11.07;1,36.80,640.19,17.00,11.07" target="#b11">Moussa et al. 2002</ref>). It is therefore necessary to map these networks with enough accuracy for getting confidence in model outputs. However, the costs of exhaustive ground survey and accurate remote sensing to map the artificial drainage network are very large (<ref type="bibr" coords="1,87.48,681.79,71.38,11.07" target="#b1">Bailly et al. 2008</ref>). Mapping methods able to reach an acceptable cost-accuracy compromise must therefore be proposed. These methods have to be assessed with regard to hydrological models outputs, taking into account the error propagation in the models. Error propagation in hydrological models based on conditional geostatistical simulation can achieve this goal for 2 or 3D random field inputs (<ref type="bibr" coords="1,401.81,337.19,54.73,11.07">Grayson et al.</ref>). For drainage networks, equivalent conditional random simulation methods are still to be proposed. The aim of this study is (i) to measure consequences of mapping uncertainties in landscape fluxes simulation and (ii) to investigate which network criteria should be optimized in order to improve network generation from a set of a priori criteria based on geometry, topology or topography of networks. For this, we map the artificial drainage networks of cultivated landscapes, simulate the associated spatial uncertainties and propagate these spatial uncertainties up to hydrological estimations. This short paper first introduces (i) the method to generate artificial drainage networks, (ii) the way the networks are introduced into catchment segmentation and topology for hydrological modeling and (iii) the hydrological modeling itself. Then, ditch networks are evaluated thanks to descriptive metrics. The hydrological responses of these networks are described before being analyzed in relation with geometrical, topographical and topological metrics. METHODS</p>
+            </div>
+            <div xmlns="http://www.tei-c.org/ns/1.0">
+                <head> A. Study area</head>
+                <p> The study area is a small Mediterranean catchment of 2 km² with vineyards, located in the south of France. The altitude varies between 71 and 128m. In the southern and western parts of the catchment, steep slopes occur whereas the northeastern part is relatively flat. The real artificial drainage network is 23995m long and is developed almost all over the catchment (A).</p>
+            </div>
+            <div xmlns="http://www.tei-c.org/ns/1.0">
+                <head> B. Simulations of artificial drainage networks</head>
+                <p> This short paper focuses on the analysis of the simulated networks and on the hydrological consequences of the uncertainty of drainage network. The network generation method is widely described in (<ref type="bibr" coords="2,161.68,311.89,42.95,11.07" target="#b0">Bailly 2007</ref>). Input data consist in (i) a map of the plot boundaries on the study area and (ii) a set of observed but unconnected reaches of the network. Each segment of the plot boundaries representing a potential ditch (A) is bounded with two nodes on which altitude is attributed. Some segments are added to this lattice in order to allow the ditch network to crossover the roads (culverts in the field). Consequently, the plot boundaries lattice is directed with a unique direction if nodes altitude difference is greater than a parameter dZ and both direction if not. The network generation method consists in a stochastic drainage-like algorithm which generates directed tree network structures corresponding to connected subgraph of the agricultural plot boundaries directed lattice (<ref type="bibr" coords="2,256.25,453.59,23.55,11.07;2,36.80,463.99,17.00,11.07" target="#b0">Bailly 2007</ref>). The method is a simulated annealing process based on (i) directed random walks within the directed plot lattice connecting the parts of the networks and (ii) a branchingpruning random process. Simulated annealing process allows simulation network to converge on a target metric on network: total length of network connected to a given outlet, spatialized drainage densities, etc. The target must integrate the most relevant parameter with regards to the purpose of the simulation (hydrological modeling, habitat connectivity modeling, etc.). This choice can also depend on the available data on the study area.</p>
+                <p> On the case study, the observed reaches come from results of a remote sensing process (<ref type="bibr" coords="2,187.56,595.39,69.59,11.07" target="#b1">Bailly et al. 2008</ref>) and from a French national database on hydrography, representing in total 5km long reaches. The dZ parameter is fixed to 1 meter according to the used 5m resolution DEM noise on altimetry. The target metric used for simulation is total length of network connected to the catchment outlet, 23995m more or less one percent, considering, for generalization, that drainage densities can be locally estimated in space through explicative variables (<ref type="bibr" coords="2,236.67,678.59,42.85,11.07;2,36.80,688.99,38.59,11.07" target="#b8">Lagacherie et al. 2006</ref>). Uncertainties in networks mapping using this network generation process are simulated through the generation of one hundred equi-probable networks.</p>
+            </div>
+            <div xmlns="http://www.tei-c.org/ns/1.0">
+                <head> C. Catchment surface network topological relationships</head>
+                <p> In order to use the simulated networks as inputs of the selected hydrological model, the topological relationships are defined for each set of hydrological units: linear units (ditches) and surface units (plots). To achieve this task, the Geo-MHYDAS tool, running under GRASS GIS is used. Geo-Mhydas builds an oriented topology between irregularly shaped areal units and linear units that allows the routing of the simulated water flows across the landscape (Lagacherie et al. in press). Geo-MHYDAS uses as input a DEM and the GIS layers of the ditch network and of the fields. For each unit, the neighbor with the steepest slope is defined as its downstream unit. Both topologies of cases with simulated networks and of the case with the real network are computed with this tool.</p>
+            </div>
+            <div xmlns="http://www.tei-c.org/ns/1.0">
+                <head> D. Hydrological modeling</head>
+                <p> The hydrological model used is the physically based rainfall-runoff model MHYDAS (<ref type="bibr" coords="2,453.36,283.89,73.26,11.07" target="#b11">Moussa et al. 2002</ref>) which is available within the modeling platform Openfluid ® (<ref type="bibr" coords="2,319.79,304.69,68.24,11.07" target="#b4">Fabre et al. 2010</ref>). MHYDAS is a distributed model that considers the catchment as a series of interconnected geographical units. A Green and Ampt-like ponding time formula determines infiltration rate on fields (areal unit). The rainfall excess is converted in runoff, which is routed to the outlet of the unit (another field or a ditch). Then, the diffusive wave equation is used to route the discharge through the network. In order to limit the number of variables tested when comparing the simulated ditch networks, a simplified case is studied here. Rainfall is spatially homogeneous on the basin and a simple uniform rainfall of 50 mm in 4 hours is used. A homogeneous land cover on the basin is used which implies identical surface units parameters (hydraulic conductivity for instance). Concerning the ditch networks, the parameters are set to the same value for every simulations (ditch height and width, manning coefficient). No interaction between surface and groundwater is set. At the end, what is really tested are changes in surface / linear units topology and in topographic parameters.</p>
+            </div>
+            <div xmlns="http://www.tei-c.org/ns/1.0">
+                <head> E. Descriptive network and hydrological metrics</head>
+                <p> To compare the simulated networks and the real network, both aggregated and distributed metrics are computed. Aggregated metrics are the total ditch network length, the Shreve order (<ref type="bibr" coords="2,379.25,571.49,50.29,11.07" target="#b12">Shreve 1966</ref>) weighted average slope, the number of sources and the average distance to outlet. The Shreve order weighted average slope is a global indicator of slope that gives more importance to downstream ditches (which have more hydrological impact on transfer time). The average distance to outlet corresponds to the average distance from the upstream point of ditches to the outlet of the catchment. In parallel, four distributed metrics are also computed: distribution of the number of ditches in function of ditch length and average distance to outlet, distribution of ditch slope in function of Shreve order and distribution of network length in function of Shreve order. Distribution of ditch slope in function of Shreve order gives an average slope profile, from upstream to downstream part of the catchment. Concerning the hydrological variables, the hydrographs, the peak discharge and the lag time at the catchment outlet are studied. The produced volume isn't considered since it doesn't vary: infiltration occurs only on fields of which parameters don't vary between simulations. RESULTS</p>
+            </div>
+            <div xmlns="http://www.tei-c.org/ns/1.0">
+                <head> F. Ditch network analysis</head>
+                <p> Fshows the representations of the real network and three on the hundred simulations with the ditch width depending on the Shreve order while FA) and B) show respectively global and distributed views of descriptive metrics characterizing these simulations. Globally, the spatial structure of the simulated networks looks close to the actual network. Total length of the networks and the Shreve order weighted average slope are well simulated but with a light bias. The average slope profile of the simulations looks like the real one, but the very fine variations aren't well simulated. For Shreve order and average distance to outlet, the distribution of the real network is contained between the minimum and maximum distribution of the simulations but the global metrics don't tally. Indeed, the aspect more branched of the simulations observed on Fcorresponds to a greater number of sources: 120 in the mean against 104. The real network favors main streams in comparison with the simulations (more low orders and brutal augmentation in the higher orders). The distribution of the ditch distance to outlet shows that the simulations are closer to outlet. Nevertheless, the distribution of slope, length, Shreve order and distance to outlet are globally well simulated without specific constraint in the simulation algorithm. That reveals that the choices are limited: more ditches are simulated on the downstream areas and where the density of field boundaries is higher which correspond to the reality. Then, by respecting approximately the distribution in space, the distribution of slopes is also respected.</p>
+            </div>
+            <div xmlns="http://www.tei-c.org/ns/1.0">
+                <head> G. Hydrological response of simulated networks</head>
+                <p> Each simulated network is used to perform a run of MHYDAS. All the simulated networks have the same outlet and consequently, drain the same area. It allows comparing the hydrographs where differences are only due to transfer function (G). The hydrographs corresponding to the simulations seem well centered on the real one and the variability looks rather low. Indeed the peak discharge is comprised between 0.71 and 0.92 m 3 /s with a mean of 0.81 m 3 /s, which represents some variations of -9% and +17 % compared to the real network (0.79 m 3 /s). The conclusion is the same for the lag time with a minimum at 202 min, a maximum at 253 min (variations of -13% and +10% compared to the real value of 231 min) and an average of 228 min. Simulations produce a satisfying hydrological response at the outlet with a rather low variability. A simple catchment hydrology has been explored in this study (homogeneous rain and land cover, ditch height, width and manning…), in order to facilitate the link between the hydrological response of each network with its descriptors and then, to explain the observed variability. In fact, in order to propagate the diffusive wave, MHYDAS calculates celerity for each ditch thanks to Manning Strickler formula. Thus, celerity increases when the ditch slope increases. Besides, if we assume that time for the transfer on the surface units is relatively low comparing to the transfer time in the network (dense network with low downstream slope), the lag time is closely related with the average distance from ditch to outlet. These statements are confirmed when looking at the correlation coefficients between average distance to outlet or Shreve weighted average slope and lag time: 0.69 and -0.49. For the peak discharge, the correlation is less strong with only 0.30 in both cases. By contrast, the number of sources doesn't seem at all to be correlated with hydrologic variables (0.16 with lag time and 0.02 with peak discharge). A similar result is observed for the total length, which is expected since the simulations algorithm is parameterized for allowing only slight variations of this parameter.</p>
+            </div>
+            <div xmlns="http://www.tei-c.org/ns/1.0">
+                <head> DISCUSSION AND CONCLUSION</head>
+                <p> The network generation method succeeds to simulate some ditch networks that look comparable to the actual one. Without any more constraint than total network length, the network generation method produces satisfying results with regards to a few geometrical and topographical metrics.</p>
+                <p> Concerning the hydrological response, the variability of the simulated hydrographs at the outlet is similar to the error on the measurement of a discharge (more or less 15 % for the ten year floods, <ref type="bibr" coords="4,102.82,599.59,63.93,11.07" target="#b10">Lang et al. 2006</ref>). Then, this uncertainty on the outlet discharge due to the uncertainty on the network mapping seems reasonable. In addition, slopes distributions and average distance to outlet induce this uncertainty. To minimize it, constraining locally an artificial drainage density could be interesting in order to refine the distribution of the network in space and its resulting distribution of slopes.</p>
+                <p> As a first study, the hydrological response has been studied only at the outlet of the catchment and in a very simplified case so that it remains questions regarding scale issues, acceptable incertitude on the drainage density and complexity on real catchment hydrology. A scale change should be realized in order to study the hydrological response per subcatchment. Variability will be certainly more important owing to the difference in drained area for a given ditch. The second point to investigate is on the drainage density criterion. If its real value isn't known contrary to our case study, how accurate should be its estimation? Lastly, the case of a complex real situation has to be studied. Land cover, rain and ditches parameters (height, manning., etc.) would be distributed in space and would result in the variation of lots of parameters at the same time. A more global sensitivity analysis should be performed.</p>
+            </div>
+            <figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_0" coords="2,67.50,246.87,181.94,8.86">
+                <head> Figure.</head>
+                <figDesc>Figure 1. Topography and field limits on the study area </figDesc>
+            </figure>
+            <figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_1" coords="3,36.70,232.60,242.50,212.10">
+                <head> Figure.</head>
+                <figDesc>Figure 2. The real ditch network and three examples of simulations </figDesc>
+                <graphic url="image-2.ppm" coords="3,36.70,232.60,242.50,212.10" type="bitmap" />
+            </figure>
+            <figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_2" coords="3,369.20,420.37,135.62,8.86">
+                <head> Figure.</head>
+                <figDesc>Figure 3. Metrics describing the network </figDesc>
+            </figure>
+            <figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_3" coords="4,66.00,50.20,184.70,184.70">
+                <head> Figure.</head>
+                <figDesc>Figure 4. Hydrographs at the outlets </figDesc>
+                <graphic url="image-4.ppm" coords="4,66.00,50.20,184.70,184.70" type="bitmap" />
+            </figure>
+        </body>
+        <back>
+            <div type="references">
+
+                <listBibl>
+
+                    <biblStruct coords="4,315.50,223.77,243.12,8.86;4,329.70,232.77,228.62,8.86;4,329.70,241.77,228.77,8.86;4,329.70,250.77,43.77,8.86"  xml:id="b0">
+                        <monogr>
+                            <title level="m" type="main">Méthodes de spatialisation de réseaux arborescents et orientés par simulations conditionnelles : Application aux réseaux de fossés de paysages viticoles</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">J</forename>
+                                    <forename type="middle">S</forename>
+                                    <surname>Bailly</surname>
+                                </persName>
+                            </author>
+                            <imprint>
+                                <date type="published" when="2007" />
+                                <biblScope unit="page">204</biblScope>
+                            </imprint>
+                        </monogr>
+                    </biblStruct>
+
+                    <biblStruct coords="4,315.50,262.27,242.90,8.86;4,329.70,271.27,228.78,8.86;4,329.70,280.27,133.71,8.86"  xml:id="b1">
+                        <analytic>
+                            <title level="a" type="main">Agrarian landscapes linear features detection from LiDAR: application to artificial drainage networks</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">J</forename>
+                                    <forename type="middle">S</forename>
+                                    <surname>Bailly</surname>
+                                </persName>
+                            </author>
+                        </analytic>
+                        <monogr>
+                            <title level="j">International Journal of Remote Sensing</title>
+                            <imprint>
+                                <biblScope unit="issue">12</biblScope>
+                                <biblScope unit="page" from="29" to="3489" />
+                                <date type="published" when="2008" />
+                            </imprint>
+                        </monogr>
+                    </biblStruct>
+
+                    <biblStruct coords="4,315.50,291.77,242.70,8.86;4,329.70,300.77,228.52,8.86;4,329.70,309.77,228.40,8.86;4,329.70,318.77,228.97,8.86;4,329.70,327.77,121.90,8.86"  xml:id="b2">
+                        <monogr>
+                            <title level="m" type="main">Utilisation d&apos;une plate-forme de modélisation environnementale pour représenter le rôle d&apos;aménagements hydroagricoles sur les flux d&apos;eau et de pesticides</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">F</forename>
+                                    <surname>Branger</surname>
+                                </persName>
+                            </author>
+                            <imprint>
+                                <date type="published" when="2007" />
+                                <biblScope unit="page">238</biblScope>
+                                <pubPlace>France</pubPlace>
+                            </imprint>
+                        </monogr>
+                        <note>Application. au bassin versant de la Fontaine du Theil (Ille et Vilaine</note>
+                    </biblStruct>
+
+                    <biblStruct coords="4,315.50,339.27,243.11,8.86;4,329.70,348.27,228.79,8.86;4,329.70,357.27,228.56,8.86;4,329.70,366.27,203.84,8.86"  xml:id="b3">
+                        <analytic>
+                            <title level="a" type="main">Assessment and modelling of the influence of man-made networks on the hydrology of a small watershed: implications for fast flow components, water quality and landscape management</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">N</forename>
+                                    <surname>Carluer</surname>
+                                </persName>
+                            </author>
+                            <author>
+                                <persName>
+                                    <forename type="first">G</forename>
+                                    <forename type="middle">D</forename>
+                                    <surname>Marsily</surname>
+                                </persName>
+                            </author>
+                        </analytic>
+                        <monogr>
+                            <title level="j">Journal of Hydrology</title>
+                            <imprint>
+                                <biblScope unit="volume">285</biblScope>
+                                <biblScope unit="page" from="1" to="4" />
+                                <date type="published" when="2004" />
+                            </imprint>
+                        </monogr>
+                    </biblStruct>
+
+                    <biblStruct coords="4,315.50,377.77,243.05,8.86;4,329.70,386.77,205.44,8.86"  xml:id="b4">
+                        <analytic>
+                            <title level="a" type="main">OpenFluid: a software environment for modelling fluxes in landscapes</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">J</forename>
+                                    <surname>Fabre</surname>
+                                </persName>
+                            </author>
+                        </analytic>
+                        <monogr>
+                            <title level="m">LANDMOD2010</title>
+                            <meeting>
+                                <address>
+                                    <addrLine>Montpellier, France</addrLine>
+                                </address>
+                            </meeting>
+                            <imprint>
+                                <date type="published" when="2010" />
+                            </imprint>
+                        </monogr>
+                    </biblStruct>
+
+                    <biblStruct coords="4,315.50,398.27,242.72,8.86;4,329.70,407.27,204.05,8.86"  xml:id="b5">
+                        <analytic>
+                            <title level="a" type="main">Hedgerows and hedgerow networks in landscape ecology</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">R</forename>
+                                    <forename type="middle">T T</forename>
+                                    <surname>Forman</surname>
+                                </persName>
+                            </author>
+                            <author>
+                                <persName>
+                                    <forename type="first">J</forename>
+                                    <surname>Baudry</surname>
+                                </persName>
+                            </author>
+                        </analytic>
+                        <monogr>
+                            <title level="j">Environmental Management</title>
+                            <imprint>
+                                <biblScope unit="volume">8</biblScope>
+                                <biblScope unit="issue">6</biblScope>
+                                <biblScope unit="page" from="495" to="510" />
+                                <date type="published" when="1984" />
+                            </imprint>
+                        </monogr>
+                    </biblStruct>
+
+                    <biblStruct coords="4,315.50,418.77,242.79,8.86;4,329.70,427.77,228.68,8.86;4,329.70,436.77,51.39,8.86"  xml:id="b6">
+                        <analytic>
+                            <title level="a" type="main">Advances in the use of observed spatial patterns of catchment hydrological response</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">R</forename>
+                                    <forename type="middle">B</forename>
+                                    <surname>Grayson</surname>
+                                </persName>
+                            </author>
+                        </analytic>
+                        <monogr>
+                            <title level="j">Advances in Water Resources</title>
+                            <imprint>
+                                <biblScope unit="volume">25</biblScope>
+                                <biblScope unit="page" from="8" to="12" />
+                            </imprint>
+                        </monogr>
+                    </biblStruct>
+
+                    <biblStruct coords="4,315.50,448.27,242.73,8.86;4,329.70,457.27,228.72,8.86;4,329.70,466.27,61.99,8.86"  xml:id="b7">
+                        <analytic>
+                            <title level="a" type="main">Agricultural drainage ditches, their biological importance and functioning</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">I</forename>
+                                    <surname>Herzon</surname>
+                                </persName>
+                            </author>
+                            <author>
+                                <persName>
+                                    <forename type="first">J</forename>
+                                    <surname>Helenius</surname>
+                                </persName>
+                            </author>
+                        </analytic>
+                        <monogr>
+                            <title level="j">Biological Conservation</title>
+                            <imprint>
+                                <biblScope unit="volume">141</biblScope>
+                                <biblScope unit="issue">5</biblScope>
+                                <biblScope unit="page" from="1171" to="1183" />
+                                <date type="published" when="2008" />
+                            </imprint>
+                        </monogr>
+                    </biblStruct>
+
+                    <biblStruct coords="4,315.50,477.77,242.94,8.86;4,329.70,486.77,228.47,8.86;4,329.70,495.77,228.83,8.86;4,329.70,504.77,14.00,8.86"  xml:id="b8">
+                        <analytic>
+                            <title level="a" type="main">An indicator approach for describing the spatial variability of artificial stream networks with regard to herbicide pollution in cultivated watersheds</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">P</forename>
+                                    <surname>Lagacherie</surname>
+                                </persName>
+                            </author>
+                        </analytic>
+                        <monogr>
+                            <title level="j">Ecological Indicators</title>
+                            <imprint>
+                                <biblScope unit="volume">6</biblScope>
+                                <biblScope unit="issue">2</biblScope>
+                                <biblScope unit="page" from="265" to="279" />
+                                <date type="published" when="2006" />
+                            </imprint>
+                        </monogr>
+                    </biblStruct>
+
+                    <biblStruct coords="4,315.50,516.27,242.84,8.86;4,329.70,525.27,228.67,8.86;4,329.70,534.27,104.61,8.86"  xml:id="b9">
+                        <analytic>
+                            <title level="a" type="main">in press. Geo-MHYDAS: A landscape discretization tool for distributed hydrological modeling of cultivated areas</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">P</forename>
+                                    <surname>Lagacherie</surname>
+                                </persName>
+                            </author>
+                        </analytic>
+                        <monogr>
+                            <title level="j">Computers &amp; Geosciences</title>
+                            <imprint>
+                                <biblScope unit="issue">36</biblScope>
+                            </imprint>
+                        </monogr>
+                    </biblStruct>
+
+                    <biblStruct coords="4,315.50,545.77,243.27,8.86;4,329.70,554.77,228.81,8.86;4,329.70,563.77,28.70,8.86"  xml:id="b10">
+                        <monogr>
+                            <title level="m" type="main">Incertitudes sur les débits de crue Available at: HAL:http://hal.archives-ouvertes.fr/hal-00453772</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">M</forename>
+                                    <surname>Lang</surname>
+                                </persName>
+                            </author>
+                            <imprint>
+                                <date type="published" when="2006-04-06" />
+                            </imprint>
+                        </monogr>
+                    </biblStruct>
+
+                    <biblStruct coords="4,315.50,575.27,242.92,8.86;4,329.70,584.27,228.63,8.86;4,329.70,593.27,228.62,8.86;4,329.70,602.27,49.99,8.86"  xml:id="b11">
+                        <analytic>
+                            <title level="a" type="main">Effects of the spatial organization of agricultural management on the hydrological behaviour of a farmed catchment during flood events</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">R</forename>
+                                    <surname>Moussa</surname>
+                                </persName>
+                            </author>
+                            <author>
+                                <persName>
+                                    <forename type="first">M</forename>
+                                    <surname>Voltz</surname>
+                                </persName>
+                            </author>
+                            <author>
+                                <persName>
+                                    <forename type="first">P</forename>
+                                    <surname>Andrieux</surname>
+                                </persName>
+                            </author>
+                        </analytic>
+                        <monogr>
+                            <title level="j">Hydrological Processes</title>
+                            <imprint>
+                                <biblScope unit="volume">16</biblScope>
+                                <biblScope unit="issue">2</biblScope>
+                                <biblScope unit="page" from="393" to="412" />
+                                <date type="published" when="2002" />
+                            </imprint>
+                        </monogr>
+                    </biblStruct>
+
+                    <biblStruct coords="4,315.50,613.77,242.65,8.86;4,329.70,622.77,73.55,8.86"  xml:id="b12">
+                        <analytic>
+                            <title level="a" type="main">Statistical Law of Stream Numbers</title>
+                            <author>
+                                <persName>
+                                    <forename type="first">R</forename>
+                                    <forename type="middle">L</forename>
+                                    <surname>Shreve</surname>
+                                </persName>
+                            </author>
+                        </analytic>
+                        <monogr>
+                            <title level="j">The Journal of Geology</title>
+                            <imprint>
+                                <biblScope unit="volume">74</biblScope>
+                                <biblScope unit="issue">1</biblScope>
+                                <biblScope unit="page" from="17" to="37" />
+                                <date type="published" when="1966" />
+                            </imprint>
+                        </monogr>
+                    </biblStruct>
+
+                </listBibl>
+            </div>
+        </back>
+    </text>
+</TEI>
