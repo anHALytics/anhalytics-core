@@ -836,227 +836,119 @@
                     },
                     "$teiHeader": {
                         "properties": {
-                            "$titleStmt": {
+                            "$fileDesc": {
                                 "properties": {
-                                    "$title": {
+                                    "$titleStmt": {
                                         "properties": {
-                                            "$title-first": {
-                                                "index": "not_analyzed",
-                                                "type": "string"
+                                            "$title": {
+                                                "properties": {
+                                                    "$title-first": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string"
+                                                    },
+                                                    "$lang_en": {
+                                                        "type": "string",
+                                                        "index": "analyzed",
+                                                        "analyzer": "english",
+                                                        "store": "yes",
+                                                        "term_vector": "with_positions_offsets"
+                                                    },
+                                                    "$lang_fr": {
+                                                        "type": "string",
+                                                        "index": "analyzed",
+                                                        "analyzer": "french",
+                                                        "store": "yes",
+                                                        "term_vector": "with_positions_offsets"
+                                                    },
+                                                    "$lang_de": {
+                                                        "type": "string",
+                                                        "index": "analyzed",
+                                                        "analyzer": "german",
+                                                        "store": "yes",
+                                                        "term_vector": "with_positions_offsets"
+                                                    }
+                                                }
                                             },
-                                            "$lang_en": {
-                                                "type": "string",
-                                                "index": "analyzed",
-                                                "analyzer": "english",
-                                                "store": "yes",
-                                                "term_vector": "with_positions_offsets"
-                                            },
-                                            "$lang_fr": {
-                                                "type": "string",
-                                                "index": "analyzed",
-                                                "analyzer": "french",
-                                                "store": "yes",
-                                                "term_vector": "with_positions_offsets"
-                                            },
-                                            "$lang_de": {
-                                                "type": "string",
-                                                "index": "analyzed",
-                                                "analyzer": "german",
-                                                "store": "yes",
-                                                "term_vector": "with_positions_offsets"
-                                            }
-                                        }
-                                    },
-                                    "$title-nerd": {
-                                        "dynamic": "false",
-                                        "properties": {
-                                            "xml:id": {
-                                                "index": "not_analyzed",
-                                                "type": "string"
-                                            },
-                                            "nerd": {
+                                            "$title-nerd": {
                                                 "dynamic": "false",
                                                 "properties": {
-                                                    "entities": {
+                                                    "xml:id": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string"
+                                                    },
+                                                    "nerd": {
                                                         "dynamic": "false",
                                                         "properties": {
-                                                            "rawName": {
-                                                                "type": "string"
-                                                            },
-                                                            "offsetStart": {
-                                                                "type": "integer"
-                                                            },
-                                                            "offsetEnd": {
-                                                                "type": "integer"
-                                                            },
-                                                            "nerd_score": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            },
-                                                            "wikipediaExternalRef": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            },
-                                                            "freeBaseExternalRef": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            },
-                                                            "definitions": {
+                                                            "entities": {
                                                                 "dynamic": "false",
                                                                 "properties": {
-                                                                    "$definition": {
+                                                                    "rawName": {
                                                                         "type": "string"
                                                                     },
-                                                                    "$source": {
+                                                                    "offsetStart": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "offsetEnd": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "nerd_score": {
                                                                         "index": "not_analyzed",
                                                                         "type": "string"
                                                                     },
-                                                                    "lang": {
+                                                                    "wikipediaExternalRef": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string"
+                                                                    },
+                                                                    "freeBaseExternalRef": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string"
+                                                                    },
+                                                                    "definitions": {
+                                                                        "dynamic": "false",
+                                                                        "properties": {
+                                                                            "$definition": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "$source": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            },
+                                                                            "lang": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "domains": {
                                                                         "index": "not_analyzed",
                                                                         "type": "string"
                                                                     }
                                                                 }
-                                                            },
-                                                            "domains": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
                                                             }
                                                         }
                                                     }
                                                 }
+                                            },
+                                            "xml:id": {
+                                                "index": "not_analyzed",
+                                                "type": "string"
+                                            },
+                                            "xml:lang": {
+                                                "index": "not_analyzed",
+                                                "type": "string"
                                             }
                                         }
                                     },
-                                    "xml:id": {
-                                        "index": "not_analyzed",
-                                        "type": "string"
-                                    },
-                                    "xml:lang": {
-                                        "index": "not_analyzed",
-                                        "type": "string"
-                                    }
-                                }
-                            },
-                            "$sourceDesc": {
-                                "properties": {
-                                    "$biblStruct": {
+                                    "$sourceDesc": {
                                         "properties": {
-                                            "$author": {
+                                            "$biblStruct": {
                                                 "properties": {
-                                                    "$affiliation": {
+                                                    "$analytic": {
                                                         "properties": {
-                                                            "$org": {
+                                                            "$author": {
                                                                 "properties": {
-                                                                    "$desc": {
+                                                                    "$affiliation": {
                                                                         "properties": {
-                                                                            "$address": {
-                                                                                "properties": {
-                                                                                    "$addrLine": {
-                                                                                        "type": "string"
-                                                                                    },
-                                                                                    "key": {
-                                                                                        "index": "not_analyzed",
-                                                                                        "type": "string"
-                                                                                    },
-                                                                                    "tagName": {
-                                                                                        "index": "not_analyzed",
-                                                                                        "type": "string"
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            "$ref": {
-                                                                                "index": "not_analyzed",
-                                                                                "type": "string"
-                                                                            },
-                                                                            "type": {
-                                                                                "index": "not_analyzed",
-                                                                                "type": "string"
-                                                                            }
-                                                                        }
-                                                                    },
-                                                                    "$orgName": {
-                                                                        "index": "not_analyzed",
-                                                                        "type": "string"
-                                                                    },
-                                                                    "type": {
-                                                                        "index": "not_analyzed",
-                                                                        "type": "string"
-                                                                    },
-                                                                    "$date": {
-                                                                        "properties": {
-                                                                            "$type_start": {
-                                                                                "format": "dateOptionalTime",
-                                                                                "type": "date"
-                                                                            },
-                                                                            "$type_end": {
-                                                                                "format": "dateOptionalTime",
-                                                                                "type": "date"
-                                                                            }
-                                                                        }
-                                                                    },
-                                                                    "$idno": {
-                                                                        "properties": {
-                                                                            "$type_RNSR": {
-                                                                                "type": "string"
-                                                                            }
-                                                                        }
-                                                                    },
-                                                                    "$org": {
-                                                                        "properties": {
-                                                                            "$desc": {
-                                                                                "properties": {
-                                                                                    "$address": {
-                                                                                        "properties": {
-                                                                                            "$addrLine": {
-                                                                                                "type": "string"
-                                                                                            },
-                                                                                            "key": {
-                                                                                                "index": "not_analyzed",
-                                                                                                "type": "string"
-                                                                                            },
-                                                                                            "tagName": {
-                                                                                                "index": "not_analyzed",
-                                                                                                "type": "string"
-                                                                                            }
-                                                                                        }
-                                                                                    },
-                                                                                    "$ref": {
-                                                                                        "index": "not_analyzed",
-                                                                                        "type": "string"
-                                                                                    },
-                                                                                    "type": {
-                                                                                        "index": "not_analyzed",
-                                                                                        "type": "string"
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            "$orgName": {
-                                                                                "index": "not_analyzed",
-                                                                                "type": "string"
-                                                                            },
-                                                                            "type": {
-                                                                                "index": "not_analyzed",
-                                                                                "type": "string"
-                                                                            },
-                                                                            "$date": {
-                                                                                "properties": {
-                                                                                    "$type_start": {
-                                                                                        "format": "dateOptionalTime",
-                                                                                        "type": "date"
-                                                                                    },
-                                                                                    "$type_end": {
-                                                                                        "format": "dateOptionalTime",
-                                                                                        "type": "date"
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            "$idno": {
-                                                                                "properties": {
-                                                                                    "$type_RNSR": {
-                                                                                        "type": "string"
-                                                                                    }
-                                                                                }
-                                                                            },
                                                                             "$org": {
                                                                                 "properties": {
                                                                                     "$desc": {
@@ -1224,188 +1116,272 @@
                                                                                                                 "type": "string"
                                                                                                             }
                                                                                                         }
+                                                                                                    },
+                                                                                                    "$org": {
+                                                                                                        "properties": {
+                                                                                                            "$desc": {
+                                                                                                                "properties": {
+                                                                                                                    "$address": {
+                                                                                                                        "properties": {
+                                                                                                                            "$addrLine": {
+                                                                                                                                "type": "string"
+                                                                                                                            },
+                                                                                                                            "key": {
+                                                                                                                                "index": "not_analyzed",
+                                                                                                                                "type": "string"
+                                                                                                                            },
+                                                                                                                            "tagName": {
+                                                                                                                                "index": "not_analyzed",
+                                                                                                                                "type": "string"
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    },
+                                                                                                                    "$ref": {
+                                                                                                                        "index": "not_analyzed",
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": {
+                                                                                                                        "index": "not_analyzed",
+                                                                                                                        "type": "string"
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "$orgName": {
+                                                                                                                "index": "not_analyzed",
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "type": {
+                                                                                                                "index": "not_analyzed",
+                                                                                                                "type": "string"
+                                                                                                            },
+                                                                                                            "$date": {
+                                                                                                                "properties": {
+                                                                                                                    "$type_start": {
+                                                                                                                        "format": "dateOptionalTime",
+                                                                                                                        "type": "date"
+                                                                                                                    },
+                                                                                                                    "$type_end": {
+                                                                                                                        "format": "dateOptionalTime",
+                                                                                                                        "type": "date"
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "$idno": {
+                                                                                                                "properties": {
+                                                                                                                    "$type_RNSR": {
+                                                                                                                        "type": "string"
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            },
+                                                                                                            "$org": {
+                                                                                                                "properties": {
+                                                                                                                    "$desc": {
+                                                                                                                        "properties": {
+                                                                                                                            "$address": {
+                                                                                                                                "properties": {
+                                                                                                                                    "$addrLine": {
+                                                                                                                                        "type": "string"
+                                                                                                                                    },
+                                                                                                                                    "key": {
+                                                                                                                                        "index": "not_analyzed",
+                                                                                                                                        "type": "string"
+                                                                                                                                    },
+                                                                                                                                    "tagName": {
+                                                                                                                                        "index": "not_analyzed",
+                                                                                                                                        "type": "string"
+                                                                                                                                    }
+                                                                                                                                }
+                                                                                                                            },
+                                                                                                                            "$ref": {
+                                                                                                                                "index": "not_analyzed",
+                                                                                                                                "type": "string"
+                                                                                                                            },
+                                                                                                                            "type": {
+                                                                                                                                "index": "not_analyzed",
+                                                                                                                                "type": "string"
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    },
+                                                                                                                    "$orgName": {
+                                                                                                                        "index": "not_analyzed",
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "type": {
+                                                                                                                        "index": "not_analyzed",
+                                                                                                                        "type": "string"
+                                                                                                                    },
+                                                                                                                    "$date": {
+                                                                                                                        "properties": {
+                                                                                                                            "$type_start": {
+                                                                                                                                "format": "dateOptionalTime",
+                                                                                                                                "type": "date"
+                                                                                                                            },
+                                                                                                                            "$type_end": {
+                                                                                                                                "format": "dateOptionalTime",
+                                                                                                                                "type": "date"
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    },
+                                                                                                                    "$idno": {
+                                                                                                                        "properties": {
+                                                                                                                            "$type_RNSR": {
+                                                                                                                                "type": "string"
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
                                                                                                     }
                                                                                                 }
                                                                                             }
                                                                                         }
                                                                                     }
                                                                                 }
+                                                                            },
+                                                                            "ref": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            },
+                                                                            "type": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            },
+                                                                            "status": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
                                                                             }
                                                                         }
+                                                                    },
+                                                                    "$email": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string"
+                                                                    },
+                                                                    "$idno": {
+                                                                        "properties": {
+                                                                            "$type_halAuthorId": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            },
+                                                                            "$type_anhalyticsID": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "$persName": {
+                                                                        "properties": {
+                                                                            "$forename": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            },
+                                                                            "$fullName": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            },
+                                                                            "$surname": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            },
+                                                                            "type": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "type": {
+                                                                        "type": "string"
                                                                     }
                                                                 }
                                                             },
-                                                            "ref": {
-                                                                "index": "not_analyzed",
+                                                            "role": {
                                                                 "type": "string"
                                                             },
-                                                            "type": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            },
-                                                            "status": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            }
-                                                        }
-                                                    },
-                                                    "$email": {
-                                                        "index": "not_analyzed",
-                                                        "type": "string"
-                                                    },
-                                                    "$idno": {
-                                                        "properties": {
-                                                            "$type_halAuthorId": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            },
-                                                            "$type_anhalyticsID": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            }
-                                                        }
-                                                    },
-                                                    "$persName": {
-                                                        "properties": {
-                                                            "$forename": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            },
-                                                            "$fullName": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            },
-                                                            "$surname": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            },
-                                                            "type": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            }
-                                                        }
-                                                    },
-                                                    "type": {
-                                                        "type": "string"
-                                                    }
-                                                }
-                                            },
-                                            "role": {
-                                                "type": "string"
-                                            },
-                                            "$idno": {
-                                                "properties": {
-                                                    "$type_doi": {
-                                                        "index": "not_analyzed",
-                                                        "type": "string"
-                                                    },
-                                                    "$type_pubmed": {
-                                                        "index": "not_analyzed",
-                                                        "type": "string"
-                                                    }
-                                                }
-                                            },
-                                            "$monogr": {
-                                                "properties": {
-                                                    "$idno": {
-                                                        "properties": {
-                                                            "$type_halJournalId": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            },
-                                                            "$type_issn": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            }
-                                                        }
-                                                    },
-                                                    "$imprint": {
-                                                        "properties": {
-                                                            "$biblScope": {
+                                                            "$idno": {
                                                                 "properties": {
-                                                                    "$unit_serie": {
+                                                                    "$type_doi": {
                                                                         "index": "not_analyzed",
                                                                         "type": "string"
                                                                     },
-                                                                    "$unit_volume": {
-                                                                        "index": "not_analyzed",
-                                                                        "type": "string"
-                                                                    },
-                                                                    "$unit_issue": {
-                                                                        "index": "not_analyzed",
-                                                                        "type": "string"
-                                                                    },
-                                                                    "$unit_pp": {
+                                                                    "$type_pubmed": {
                                                                         "index": "not_analyzed",
                                                                         "type": "string"
                                                                     }
                                                                 }
-                                                            },
-                                                            "$date": {
+                                                            }
+                                                        }
+
+                                                    },
+                                                    "$monogr": {
+                                                        "properties": {
+                                                            "$idno": {
                                                                 "properties": {
-                                                                    "$type_datePub": {
-                                                                        "format": "dateOptionalTime",
-                                                                        "type": "date"
+                                                                    "$type_halJournalId": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string"
                                                                     },
-                                                                    "$type_dateDefended": {
-                                                                        "format": "dateOptionalTime",
-                                                                        "type": "date"
-                                                                    },
-                                                                    "$type_dateEpub": {
-                                                                        "format": "dateOptionalTime",
-                                                                        "type": "date"
+                                                                    "$type_issn": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string"
                                                                     }
                                                                 }
                                                             },
-                                                            "$publisher": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
+                                                            "$imprint": {
+                                                                "properties": {
+                                                                    "$biblScope": {
+                                                                        "properties": {
+                                                                            "$unit_serie": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            },
+                                                                            "$unit_volume": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            },
+                                                                            "$unit_issue": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            },
+                                                                            "$unit_pp": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "$date": {
+                                                                        "properties": {
+                                                                            "$type_datePub": {
+                                                                                "format": "dateOptionalTime",
+                                                                                "type": "date"
+                                                                            },
+                                                                            "$type_dateDefended": {
+                                                                                "format": "dateOptionalTime",
+                                                                                "type": "date"
+                                                                            },
+                                                                            "$type_dateEpub": {
+                                                                                "format": "dateOptionalTime",
+                                                                                "type": "date"
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "$publisher": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string"
+                                                                    },
+                                                                    "type": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string"
+                                                                    },
+                                                                    "unit": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string"
+                                                                    },
+                                                                    "$pubPlace": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string"
+                                                                    }
+                                                                }
                                                             },
-                                                            "type": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            },
-                                                            "unit": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            },
-                                                            "$pubPlace": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            }
-                                                        }
-                                                    },
-                                                    "$title": {
-                                                        "properties": {
-                                                            "$title-first": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string"
-                                                            },
-                                                            "$lang_en": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
-                                                                "analyzer": "english",
-                                                                "store": "yes",
-                                                                "term_vector": "with_positions_offsets"
-                                                            },
-                                                            "$lang_de": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
-                                                                "analyzer": "german",
-                                                                "store": "yes",
-                                                                "term_vector": "with_positions_offsets"
-                                                            },
-                                                            "$lang_fr": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
-                                                                "analyzer": "french",
-                                                                "store": "yes",
-                                                                "term_vector": "with_positions_offsets"
-                                                            }
-                                                        }
-                                                    },
-                                                    "$meeting": {
-                                                        "properties": {
                                                             "$title": {
                                                                 "properties": {
                                                                     "$title-first": {
@@ -1419,79 +1395,113 @@
                                                                         "store": "yes",
                                                                         "term_vector": "with_positions_offsets"
                                                                     },
-                                                                    "$lang_fr": {
-                                                                        "type": "string",
-                                                                        "index": "analyzed",
-                                                                        "analyzer": "french",
-                                                                        "store": "yes",
-                                                                        "term_vector": "with_positions_offsets"
-                                                                    },
                                                                     "$lang_de": {
                                                                         "type": "string",
                                                                         "index": "analyzed",
                                                                         "analyzer": "german",
                                                                         "store": "yes",
                                                                         "term_vector": "with_positions_offsets"
-                                                                    }
-                                                                }
-                                                            },
-                                                            "$date": {
-                                                                "properties": {
-                                                                    "$type_start": {
-                                                                        "format": "dateOptionalTime",
-                                                                        "type": "date"
                                                                     },
-                                                                    "$type_end": {
-                                                                        "format": "dateOptionalTime",
-                                                                        "type": "date"
+                                                                    "$lang_fr": {
+                                                                        "type": "string",
+                                                                        "index": "analyzed",
+                                                                        "analyzer": "french",
+                                                                        "store": "yes",
+                                                                        "term_vector": "with_positions_offsets"
                                                                     }
                                                                 }
                                                             },
-                                                            "$settlement": {
+                                                            "$meeting": {
+                                                                "properties": {
+                                                                    "$title": {
+                                                                        "properties": {
+                                                                            "$title-first": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
+                                                                            },
+                                                                            "$lang_en": {
+                                                                                "type": "string",
+                                                                                "index": "analyzed",
+                                                                                "analyzer": "english",
+                                                                                "store": "yes",
+                                                                                "term_vector": "with_positions_offsets"
+                                                                            },
+                                                                            "$lang_fr": {
+                                                                                "type": "string",
+                                                                                "index": "analyzed",
+                                                                                "analyzer": "french",
+                                                                                "store": "yes",
+                                                                                "term_vector": "with_positions_offsets"
+                                                                            },
+                                                                            "$lang_de": {
+                                                                                "type": "string",
+                                                                                "index": "analyzed",
+                                                                                "analyzer": "german",
+                                                                                "store": "yes",
+                                                                                "term_vector": "with_positions_offsets"
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "$date": {
+                                                                        "properties": {
+                                                                            "$type_start": {
+                                                                                "format": "dateOptionalTime",
+                                                                                "type": "date"
+                                                                            },
+                                                                            "$type_end": {
+                                                                                "format": "dateOptionalTime",
+                                                                                "type": "date"
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    "$settlement": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string"
+                                                                    },
+                                                                    "$country": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string"
+                                                                    }
+
+                                                                }
+                                                            },
+                                                            "level": {
                                                                 "index": "not_analyzed",
                                                                 "type": "string"
                                                             },
-                                                            "$country": {
+                                                            "type": {
                                                                 "index": "not_analyzed",
                                                                 "type": "string"
                                                             }
-
                                                         }
-                                                    },
-                                                    "level": {
-                                                        "index": "not_analyzed",
-                                                        "type": "string"
                                                     },
                                                     "type": {
                                                         "index": "not_analyzed",
                                                         "type": "string"
                                                     }
                                                 }
-                                            },
-                                            "type": {
-                                                "index": "not_analyzed",
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            "$seriesStmt": {
-                                "properties": {
-                                    "$idno": {
-                                        "properties": {
-                                            "$type_stamp": {
-                                                "index": "not_analyzed",
-                                                "type": "string"
                                             }
                                         }
                                     },
-                                    "n": {
-                                        "index": "not_analyzed",
-                                        "type": "string"
+                                    "$seriesStmt": {
+                                        "properties": {
+                                            "$idno": {
+                                                "properties": {
+                                                    "$type_stamp": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "n": {
+                                                "index": "not_analyzed",
+                                                "type": "string"
+                                            }
+                                        }
                                     }
                                 }
-                            },
+                            }
+                            ,
                             "$profileDesc": {
                                 "properties": {
                                     "$abstract": {
@@ -1593,6 +1603,7 @@
                                     }
                                 }
                             }
+
                         }
                     },
                     "$standoff": {
