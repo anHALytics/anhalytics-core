@@ -44,6 +44,7 @@ public class HarvestProperties {
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file "+properties_filename, exp);
         }
+        
         setSource(props.getProperty("harvest.source"));
         setApiUrl(props.getProperty("harvest.api_url"));
         setGrobidHost(props.getProperty("harvest.grobid_host"));
@@ -124,8 +125,8 @@ public class HarvestProperties {
     /**
      * @param oaiUrl the oaiUrl to set
      */
-    public static void setApiUrl(String apiUrl) {
-        apiUrl = apiUrl;
+    public static void setApiUrl(String apiurl) {
+        apiUrl = apiurl;
     }
 
     /**
