@@ -144,6 +144,14 @@ public class Main {
                         result = false;
                         break;
                     }
+                } else if (currArg.equals("-set")) {
+                    String command = pArgs[i + 1];
+                    
+                    //check collection exists
+                    
+                    HarvestProperties.setCollection(command);
+                    i++;
+                        continue;
                 } else {
                     result = false;
                     break;

@@ -3,6 +3,7 @@ package fr.inria.anhalytics.harvest.oaipmh;
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.*;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
@@ -31,7 +32,9 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
         String tokenn = null;
         while (!stop) {
             String request = this.oai_url + "/?verb=ListRecords&metadataPrefix=" + OAI_FORMAT + "&from=" + date + "&until=" + date;
-
+            if(HarvestProperties.getCollection() != null)
+                request += "&set=collection:"+HarvestProperties.getCollection();
+            
             if (tokenn != null) {
                 request = this.oai_url + "/?verb=ListRecords&resumptionToken=" + tokenn;
             }

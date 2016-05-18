@@ -13,6 +13,8 @@ import java.util.Properties;
 public class HarvestProperties {
 
     private static String processName;
+    
+    private static String collection;
 
     private static String fromDate;
 
@@ -253,6 +255,20 @@ public class HarvestProperties {
      */
     public static void setSource(String aSource) {
         source = aSource;
+    }
+
+    /**
+     * @return the collection
+     */
+    public static String getCollection() {
+        return collection;
+    }
+
+    /**
+     * @param aCollection the collection to set
+     */
+    public static void setCollection(String aCollection) {
+        collection = aCollection;
     }
 
 }
