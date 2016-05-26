@@ -20,11 +20,16 @@ AnHALytics is a work at early stage and a work in progress. It is evolving rapid
 - [Patrice Lopez](https://github.com/kermitt2) 
 
 If you are interested in contributing to the project, please contact <patrice.lopez@inria.fr>. 
-
 ### Prerequisites:
 
-For building and running the project, you will need the following components. 
+For building and running the project, you will need the following components.	
 
+
+After cloning the project you need to generate configuration files:
+
+    cd config
+    ./reverse_config.sh
+now, the configuartion files are generated under ``config/local``.
 ###### 1. Java/Maven
 
 [JAVA](https://java.com/en/download/manual_java7.jsp) +
@@ -38,7 +43,7 @@ Clone the current project from github (as of March 2016, GROBID version 0.4.1-SN
 
 	git clone https://github.com/kermitt2/grobid.git
 
-AnHALytics uses GROBID as a service so that we can use distribution and multithreaded process easily. See the [GROBID documentation](http://grobid.readthedocs.org) on how to start the RESTful service. Once the service is ready, update the ``anhalytics-harvest/src/main/resources/harvest.properties`` file.
+AnHALytics uses GROBID as a service so that we can use distribution and multithreaded process easily. See the [GROBID documentation](http://grobid.readthedocs.org) on how to start the RESTful service. Once the service is ready, update the ``config/local/harvest.properties`` file.
 
 ###### 3. (N)ERD - Entity Recognition and Disambiguisation
 
@@ -65,15 +70,19 @@ The full NERD repo will be made publicly available on GitHub soon under Apache 2
     cluster.routing.allocation.disk.watermark.high: 99
     http.jsonp.enable: true
 
-don't forget to update ``anhalytics-frontend/src/main/webapp/js/resource/config.js`` and ``anhalytics-index/index.properties`` with the correct settings for your local installation of ElasticSearch and NERD service.
+don't forget to update ``anhalytics-frontend/src/main/webapp/js/resource/config.js`` and ``config/local/index.properties`` with the correct settings (host, port, indices, cluster name) for your local installation of ElasticSearch and NERD service.
 
 AnHALytics supports currently (April 2016) a version __1.4__ of ElasticSearch, we plan to upgrade to a version 2.* in the next weeks. 
 
 ###### 6. MongoDB
 
-A running instance of [MongoDB](https://www.mongodb.org) is required for document persistence and document provision. Once installed, add an admin user and update the sub-project property file ``anhalytics-commons/commons.properties``.
+A running instance of [MongoDB](https://www.mongodb.org) is required for document persistence and document provision. Once installed, add an admin user and update the sub-project property file ``config/local/commons.properties``.
 
-###### 7. Web server
+###### 7. Mysql
+
+A running instance of [Mysql](https://www.mysql.fr/) is required for building the knowledge base. Once installed, import the schema from ``doc/anhalyticsDB.sql`` and update the property file ``config/local/kb.properties``.
+
+###### 8. Web server
 
 A web application server, such as Tomcat, JBoss or Jetty, is necessary to deploy the complementary front demos which are packaged in a war file.
 
@@ -90,18 +99,17 @@ anHALytics-core performs the document ingestion, from external harvesting of doc
 
 ### Compilation
 
-Clone the git repo with:
-
-    git clone https://github.com/kermitt2/anHALytics
-    
 Compile and build using maven:
 
-    cd anHALytics
+    cd anHALytics-core
     mvn clean install
-	
+After the compilation you'll find the jar produced for each module under ``MODULE/target``.
+
 ### Components:
 
 #### 1. Harvesting
+
+> cd anhalytics-harvest
 
 Currently only OAI-PMH is used as harvesting protocol. 
 
@@ -116,7 +124,6 @@ For a large harvesting task, use -Xmx2048m to set the JVM memory to avoid OutOfM
 ###### HarvestAll / HarvestDaily
 
 To start harvesting all the documents of HAL based on [OAI-PMH](http://www.openarchives.org/pmh) v2, use:
-
 > java -Xmx2048m -jar target/anhalytics-harvest-```<current version>```.one-jar.jar -exe harvestAll
 
 Harvesting is done through a reverse chronological order, here is a sample of the OAI-PMH request:
@@ -153,8 +160,6 @@ At least the GROBID TEI is necessary to produce the final TEI, you can do so wit
 
 > java -Xmx2048m -jar target/anhalytics-harvest-```<current version>```.one-jar.jar -exe generateTei
 
-> java -Xmx2048m -jar target/anhalytics-harvest-```<current version>```.one-jar.jar -exe appendGrobidFulltext	
-
 ###### Document storage and provision
 
 We use MongoDD GridFS component for document file support. Each type of files are stored in a different collection. hal tei => hal-tei-collection , binaries => binaries-collection,..., 
@@ -162,6 +167,8 @@ We use MongoDD GridFS component for document file support. Each type of files ar
 <!-- documentation of the collections here !! -->
 
 #### 2. Annotation
+
+> cd anhalytics-annotate
 
 The documents are enriched with semantic annotations. This is realized with the NERD service.
 
@@ -197,11 +204,11 @@ The annotation on the HAL collection can be launch with the command in the main 
 Annotations are persistently stored in a MongoDB collection and available for indexing in ElasticSearch. 
 
 #### 3. KB
-
+> cd anhalytics-kb
 ...
 
 #### 4. Indexing
-
+> cd anhalytics-index
 ###### Build all the indexes 
 
 For building all the indexes required by the different freontend applications using all the existing loaded documents, use the following command:
@@ -235,7 +242,7 @@ For indexing the content of the Knowlkedge Base, in the main directory of the su
 
 
 #### 5. Test
-
+> cd anhalytics-test
 This subproject is dedicated to integration and end-to-end tests - in contrast to unit tests which come with each specific sub-project.
 
 Work in progress...
