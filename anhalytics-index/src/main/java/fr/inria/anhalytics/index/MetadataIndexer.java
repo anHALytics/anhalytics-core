@@ -68,12 +68,13 @@ public class MetadataIndexer {
                 .addTransportAddress(new InetSocketTransportAddress(IndexProperties.getElasticSearch_host(), 9300));
     }
 
-    public void indexAuthors() {
+    public int indexAuthors() {
         PersonDAO pdao = (PersonDAO) adf.getPersonDAO();
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
         AddressDAO adao = (AddressDAO) adf.getAddressDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
         Map<Long, List<Person>> persons = pdao.findAllAuthors();
+        int p = 0;
         Iterator it = persons.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
@@ -112,10 +113,13 @@ public class MetadataIndexer {
             jsonDocument.put("affiliations", organisations);
             client.prepareIndex(IndexProperties.getKbIndexName(), "authors", "" + personId)
                     .setSource(jsonDocument).execute().actionGet();
+            p++;
         }
+        return p;
     }
 
-    public void indexPublications() {
+    public int indexPublications() {
+        int p = 0;
         DAOFactory.initConnection();
         PublicationDAO pubdao = (PublicationDAO) adf.getPublicationDAO();
         PublicationDAO bibliopubdao = (PublicationDAO) biblioadf.getPublicationDAO();
@@ -219,10 +223,13 @@ public class MetadataIndexer {
             documentDocument.put("references", referencesPubDocument);
             client.prepareIndex(IndexProperties.getKbIndexName(), "publications", "" + doc.getDocID())
                     .setSource(documentDocument).execute().actionGet();
+            p++;
         }
+        return p;
     }
 
-    public void indexOrganisations() {
+    public int indexOrganisations() {
+        int p = 0;
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
         List<Organisation> organisations = odao.findAllOrganisations();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
@@ -279,8 +286,9 @@ public class MetadataIndexer {
             organisationDocument.put("authors", authorsDocument);
             client.prepareIndex(IndexProperties.getKbIndexName(), "organisations", "" + org.getOrganisationId())
                     .setSource(organisationDocument).execute().actionGet();
+            p++;
         }
-
+        return p;
     }
 
     /**

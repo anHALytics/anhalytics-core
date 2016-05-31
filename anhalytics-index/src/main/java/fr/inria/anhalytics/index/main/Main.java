@@ -1,7 +1,6 @@
 package fr.inria.anhalytics.index.main;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.index.Indexer;
 import fr.inria.anhalytics.index.MetadataIndexer;
 import fr.inria.anhalytics.index.properties.IndexProperties;
@@ -192,12 +191,15 @@ public class Main {
             if (reponse != 'N') {
                 mi.setUpIndex(IndexProperties.getKbIndexName());
             }
-            mi.indexAuthors();
-            mi.indexPublications();
-            mi.indexOrganisations();
+            int nbAuthtors = mi.indexAuthors();
+            logger.info("Total: " + nbAuthtors + " authors indexed.");
+            int nbPubs = mi.indexPublications();
+            logger.info("Total: " + nbPubs + " publications indexed.");
+            int nbOrgs = mi.indexOrganisations();
+            logger.info("Total: " + nbOrgs + " organisations indexed.");
         } 
         esm.close();
-        //mi.close();
+        mi.close();
         return;
     }
 
