@@ -11,8 +11,8 @@ import java.net.UnknownHostException;
  */
 public class GrobidAnnexWorker extends GrobidWorker {
 
-    public GrobidAnnexWorker(InputStream content, String id, String anhalyticsId, String date) throws UnknownHostException {
-        super(content, id, anhalyticsId, date);
+    public GrobidAnnexWorker(InputStream content, String id, String anhalyticsId, String date, int start, int end) throws UnknownHostException {
+        super(content, id, anhalyticsId, date, start, end);
     }
 
     @Override

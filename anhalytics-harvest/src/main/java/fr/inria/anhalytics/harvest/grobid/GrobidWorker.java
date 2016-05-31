@@ -27,13 +27,17 @@ abstract class GrobidWorker implements Runnable {
     protected String date;
     protected String repositoryDocId;
     protected String anhalyticsId;
+    protected int start = 2;
+    protected int end = -1;
 
-    public GrobidWorker(InputStream content, String currentRepositoryDocId, String currentAnhalyticsId, String date) throws UnknownHostException {
+    public GrobidWorker(InputStream content, String currentRepositoryDocId, String currentAnhalyticsId, String date, int start, int end) throws UnknownHostException {
         this.content = content;
         this.mm = MongoFileManager.getInstance(false);
         this.date = date;
         this.repositoryDocId = currentRepositoryDocId;
         this.anhalyticsId = currentAnhalyticsId;
+        this.start = start;
+        this.end = end;
     }
 
     @Override
@@ -47,7 +51,7 @@ abstract class GrobidWorker implements Runnable {
 
     protected void processCommand() {
         try {
-            GrobidService grobidService = new GrobidService(2, -1, true, date);//configured for HAL, first page is added to the document
+            GrobidService grobidService = new GrobidService(this.start, this.end, true, date);//configured for HAL, first page is added to the document
 
             String filepath = Utilities.storeTmpFile(content);
             File file = new File(filepath);

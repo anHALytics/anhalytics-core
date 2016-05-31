@@ -36,7 +36,8 @@ public class GrobidProcess {
         try {
             if (GrobidService.isGrobidOk()) {
                 ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
-
+                int start = -1;
+                int end = -1;
                 for (String date : Utilities.getDates()) {
 
                     if (!HarvestProperties.isProcessByDate()) {
@@ -48,6 +49,7 @@ public class GrobidProcess {
                             String currentRepositoryDocId = mm.getCurrentRepositoryDocId();
                             String type = mm.getCurrentDocType();
                             String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
+                            String source = mm.getCurrentDocSource();
                             if (toBeGrobidified.contains(type)) {
                                 if (!HarvestProperties.isReset()) {
                                     if (mm.isGrobidified(currentRepositoryDocId)) {
@@ -60,7 +62,10 @@ public class GrobidProcess {
                                     }
                                 }
                                 try {
-                                    Runnable worker = new GrobidSimpleFulltextWorker(content, currentRepositoryDocId, currentAnhalyticsId, date);
+                                    if (source.equalsIgnoreCase("hal")) {
+                                        start = 2;
+                                    }
+                                    Runnable worker = new GrobidSimpleFulltextWorker(content, currentRepositoryDocId, currentAnhalyticsId, date, start, end);
                                     executor.execute(worker);
                                 } catch (final Exception exp) {
                                     logger.error("An error occured while processing the file " + currentRepositoryDocId
@@ -96,7 +101,7 @@ public class GrobidProcess {
                         if (mm.getCurrentFileType().contains(".pdf")) {
                             String id = mm.getCurrentRepositoryDocId();
                             try {
-                                Runnable worker = new GrobidAnnexWorker(content, id, anhalyticsId, date);
+                                Runnable worker = new GrobidAnnexWorker(content, id, anhalyticsId, date, -1, -1);
                                 executor.execute(worker);
                             } catch (final Exception exp) {
                                 logger.error("An error occured while processing the file " + id

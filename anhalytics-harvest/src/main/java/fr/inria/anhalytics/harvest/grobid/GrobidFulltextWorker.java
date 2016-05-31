@@ -17,8 +17,8 @@ public class GrobidFulltextWorker extends GrobidWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(GrobidFulltextWorker.class);
     
-    public GrobidFulltextWorker(InputStream content, String id, String anhalyticsId, String date) throws UnknownHostException {
-        super(content, id, anhalyticsId, date);
+    public GrobidFulltextWorker(InputStream content, String id, String anhalyticsId, String date, int start, int end) throws UnknownHostException {
+        super(content, id, anhalyticsId, date, start, end);
     }
     
     @Override

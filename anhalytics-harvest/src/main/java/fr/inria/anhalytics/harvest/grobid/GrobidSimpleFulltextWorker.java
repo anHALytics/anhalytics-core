@@ -17,14 +17,14 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(GrobidSimpleFulltextWorker.class);
     
-    public GrobidSimpleFulltextWorker(InputStream content, String currentRepositoryDocId, String currentAnhalyticsId, String date) throws UnknownHostException {
-        super(content, currentRepositoryDocId, currentAnhalyticsId, date);
+    public GrobidSimpleFulltextWorker(InputStream content, String currentRepositoryDocId, String currentAnhalyticsId, String date, int start, int end) throws UnknownHostException {
+        super(content, currentRepositoryDocId, currentAnhalyticsId, date, start, end);
     }
 
     @Override
     protected void processCommand() {
         try {
-            GrobidService grobidService = new GrobidService(2, -1, true, date); 
+            GrobidService grobidService = new GrobidService(this.start, this.end, true, date); 
             // configured for HAL, first page is added to the document
 
             String filepath = Utilities.storeTmpFile(content);
