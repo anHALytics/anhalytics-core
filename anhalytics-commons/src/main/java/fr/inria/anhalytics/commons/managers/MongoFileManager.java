@@ -8,6 +8,7 @@ import com.mongodb.util.JSON;
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
 import fr.inria.anhalytics.commons.exceptions.FileNotFoundException;
+import fr.inria.anhalytics.commons.properties.CommonsProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -57,7 +58,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     public MongoFileManager(boolean isTest) {
         super(isTest);
-        initDatabase(mongodbDb);
+        initDatabase();
     }
 
     /**

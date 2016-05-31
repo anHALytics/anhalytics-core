@@ -4,6 +4,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import fr.inria.anhalytics.commons.properties.CommonsProperties;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,33 +22,22 @@ abstract class MongoManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoManager.class);
 
-    private String mongodbServer = null;
-    private int mongodbPort;
-
-    protected String mongodbDb = null;
-    private String mongodbUser = null;
-    private String mongodbPass = null;
-
     private MongoClient mongo = null;
 
     protected DB db = null;
 
     public MongoManager(boolean isTest) {
         try {
-            if (!isTest) {
-                Properties prop = new Properties();
-                File file = new File(System.getProperty("user.dir"));
-                prop.load(new FileInputStream(file.getParent() + File.separator + "config" + File.separator + "local" + File.separator + "commons.properties"));
-                mongodbServer = prop.getProperty("commons.mongodb_host");
-                mongodbPort = Integer.parseInt(prop.getProperty("commons.mongodb_port"));
-                mongodbDb = prop.getProperty("commons.mongodb_db");
-                mongodbUser = prop.getProperty("commons.mongodb_user");
-                mongodbPass = prop.getProperty("commons.mongodb_pass");
-                mongo = new MongoClient(mongodbServer, mongodbPort);
-                if (!mongo.getDatabaseNames().contains(mongodbDb)) {
-                    LOGGER.debug("MongoDB database " + mongodbDb + " does not exist and will be created");
-                }
+            try {
+                CommonsProperties.init("commons.properties", isTest);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage());
             }
+            mongo = new MongoClient(CommonsProperties.getMongodbServer(), CommonsProperties.getMongodbPort());
+            if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
+                LOGGER.debug("MongoDB database " + CommonsProperties.getMongodbDb() + " does not exist and will be created");
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,19 +48,19 @@ abstract class MongoManager {
      *
      * @param dbName
      */
-    protected void initDatabase(String dbName) {
-        db = mongo.getDB(dbName);
-        if (!mongo.getDatabaseNames().contains(dbName)) {
+    protected void initDatabase() {
+        db = mongo.getDB(CommonsProperties.getMongodbDb());
+        if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
             BasicDBObject commandArguments = new BasicDBObject();
-            commandArguments.put("user", mongodbUser);
-            commandArguments.put("pwd", mongodbPass);
+            commandArguments.put("user", CommonsProperties.getMongodbUser());
+            commandArguments.put("pwd", CommonsProperties.getMongodbPass());
             String[] roles = {"readWrite"};
             commandArguments.put("roles", roles);
             BasicDBObject command = new BasicDBObject("createUser",
                     commandArguments);
             db.command(command);
         }
-        boolean auth = db.authenticate(mongodbUser, mongodbPass.toCharArray());
+        boolean auth = db.authenticate(CommonsProperties.getMongodbUser(), CommonsProperties.getMongodbPass().toCharArray());
     }
 
     public DBCollection getCollection(String collectionName) {
@@ -80,7 +70,7 @@ abstract class MongoManager {
         if (!collectionFound) {
             LOGGER.debug("MongoDB collection " + collectionName + " does not exist and will be created");
         }
-*/
+         */
         return db.getCollection(collectionName);
     }
 

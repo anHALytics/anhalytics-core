@@ -16,7 +16,7 @@ public class MongoDataManager extends MongoManager {
 
     public MongoDataManager(boolean isTest) throws UnknownHostException {
         super(isTest);
-        initDatabase(mongodbDb);
+        initDatabase();
     }
     
     /**
