@@ -110,7 +110,7 @@ public class Main {
         char reponse = ' ';
         String process = IndexProperties.getProcessName();
         Indexer esm = new Indexer();
-        //MetadataIndexer mi = new MetadataIndexer(); // this is the KB in fact !
+        MetadataIndexer mi = new MetadataIndexer(); // this is the KB in fact !
 
         if (process.equals("indexAll")) {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
@@ -190,11 +190,11 @@ public class Main {
             reponse = sc.nextLine().charAt(0);
 
             if (reponse != 'N') {
-                //mi.setUpIndex(IndexProperties.getMetadataIndexName());
+                mi.setUpIndex(IndexProperties.getKbIndexName());
             }
-            //mi.indexAuthors();
-            //mi.indexPublications();
-            //mi.indexOrganisations();
+            mi.indexAuthors();
+            mi.indexPublications();
+            mi.indexOrganisations();
         } 
         esm.close();
         //mi.close();

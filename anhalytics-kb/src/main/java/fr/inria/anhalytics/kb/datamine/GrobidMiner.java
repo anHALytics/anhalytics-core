@@ -77,14 +77,14 @@ public class GrobidMiner extends Miner {
             if (mm.initTeis(date, true)) {
                 while (mm.hasMoreTeis()) {
                     String teiString = mm.nextTeiDocument();
-                    String uri = mm.getCurrentRepositoryDocId();
+                    String repositoryDocId = mm.getCurrentRepositoryDocId();
                     String anhalyticsId = mm.getCurrentAnhalyticsId();
                     if(anhalyticsId == null || anhalyticsId.isEmpty()){
-                        logger.info("skipping "+uri+" No anHALytics id provided");
+                        logger.info("skipping "+repositoryDocId+" No anHALytics id provided");
                         continue;
                     }
                     if (!dd.isCitationsMined(anhalyticsId)) {
-                        logger.info("Extracting :" + uri);
+                        logger.info("Extracting :" + repositoryDocId);
                         abdf.openTransaction();
                         try {
                             InputStream teiStream = new ByteArrayInputStream(teiString.getBytes());
@@ -93,7 +93,7 @@ public class GrobidMiner extends Miner {
                             Node citations = (Node) xPath.compile("/teiCorpus/TEI/text/back/div[@type='references']/listBibl").evaluate(teiDoc, XPathConstants.NODE);
                             if (citations != null) {
                                 NodeList references = citations.getChildNodes();
-                                fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(anhalyticsId, Utilities.getVersionFromURI(uri), uri);
+                                fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(anhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId);
                                 dd.create(doc);
 
                                 for (int j = 0; j < references.getLength() - 1; j++) {
@@ -327,6 +327,7 @@ public class GrobidMiner extends Miner {
 
         pd.create(pub);
         for (Person p : prss) {
+            p.setPublication_date(pub.getDate_printed());
             persd.createEditor(new Editor(0, p, pub));
         }
     }

@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.kb.entities;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,12 +21,13 @@ public class Person {
     private String url = "";
     private String email = "";
     private String phone = "";
+    private Date publication_date;
     private List<Person_Identifier> person_identifiers = null;
 
     public Person() {
     }
 
-    public Person(Long personId, String title, String photo, String fullname, String forename, String middlename, String surname, String url, String email, String phone, List<Person_Identifier> person_identifiers) {
+    public Person(Long personId, String title, String photo, String fullname, String forename, String middlename, String surname, String url, String email, String phone, List<Person_Identifier> person_identifiers, Date publication_date) {
         this.personId = personId;
         this.title = title;
         this.photo = photo;
@@ -37,6 +39,7 @@ public class Person {
         this.email = email;
         this.person_identifiers = person_identifiers;
         this.phone = phone;
+        this.publication_date = publication_date;
     }
 
     /**
@@ -217,7 +220,6 @@ public class Person {
         Map<String, Object> personDocument = new HashMap<String, Object>();
         Map<String, Object> personIdentifierDocument = new HashMap<String, Object>();
         personDocument.put("personId", this.getPersonId());
-        personDocument.put("fullname", this.getFullname());
         personDocument.put("email", this.getEmail());
         personDocument.put("title", this.getTitle());
         personDocument.put("photo", this.getPhoto());
@@ -228,5 +230,19 @@ public class Person {
         }
         personDocument.put("identifers", personIdentifierDocument);
         return personDocument;
+    }
+
+    /**
+     * @return the publication_date
+     */
+    public Date getPublication_date() {
+        return publication_date;
+    }
+
+    /**
+     * @param publication_date the publication_date to set
+     */
+    public void setPublication_date(Date publication_date) {
+        this.publication_date = publication_date;
     }
 }

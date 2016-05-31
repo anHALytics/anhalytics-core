@@ -1,8 +1,10 @@
 package fr.inria.anhalytics.kb.entities;
 
+import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -16,19 +18,21 @@ public class Organisation {
     private String type = "";
     private String url = "";
     private String structure = "";
-    private List<String> names = null;
+    private Map<Date, String> names = null;
+    private Date publication_date;
     private List<PART_OF> rels = null;
 
     public Organisation() {
     }
 
-    public Organisation(Long organisationId, String type, String url, String structure, List<String> names, List<PART_OF> rels) {
+    public Organisation(Long organisationId, String type, String url, String structure, Map<Date, String> names, List<PART_OF> rels, Date publication_date) {
         this.organisationId = organisationId;
         this.type = type;
         this.url = url;
         this.structure = structure;
         this.names = names;
         this.rels = rels;
+        this.publication_date = publication_date;
     }
 
     /**
@@ -96,9 +100,9 @@ public class Organisation {
     /**
      * @return the name
      */
-    public List<String> getNames() {
+    public Map<Date, String> getNames() {
         if (this.names == null) {
-            this.names = new ArrayList<String>();
+            this.names = new HashMap<Date, String>();
         }
         return names;
     }
@@ -106,13 +110,13 @@ public class Organisation {
     /**
      * @param name the name to set
      */
-    public void addName(String name) {
+    public void addName(Date date, String name) {
         if (this.names == null) {
-            this.names = new ArrayList<String>();
+            this.names = new HashMap<Date, String>();
         }
         if(name.length() > 150)
             name = name.substring(0, 149);
-        this.names.add(name);
+        this.names.put(date, name);
     }
 
     /**
@@ -139,13 +143,35 @@ public class Organisation {
         Map<String, Object> organisationDocument = new HashMap<String, Object>();
         Map<String, Object> organisationNamesDocument = new HashMap<String, Object>();
         organisationDocument.put("organisationId", this.getOrganisationId());
-        organisationDocument.put("names", this.getNames());
+        Iterator it = this.getNames().entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            Date date = (Date) pair.getKey();
+            String name = (String) pair.getValue();
+        organisationNamesDocument.put(Utilities.formatDate(date), name);
+        
+        }
+        organisationDocument.put("names", organisationNamesDocument);
         organisationDocument.put("type", this.getType());
         organisationDocument.put("structId", this.getStructure());
         organisationDocument.put("url", this.getUrl());
         //organisationDocument.put("orgs", this.getRels());
         return organisationDocument;
 
+    }
+
+    /**
+     * @return the publication_date
+     */
+    public Date getPublication_date() {
+        return publication_date;
+    }
+
+    /**
+     * @param publication_date the publication_date to set
+     */
+    public void setPublication_date(Date publication_date) {
+        this.publication_date = publication_date;
     }
 
 }

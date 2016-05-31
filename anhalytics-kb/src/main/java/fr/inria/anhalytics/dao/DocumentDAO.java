@@ -24,7 +24,7 @@ public class DocumentDAO extends DAO<Document, String> {
     
     private static final String READ_QUERY_DOCUMENTS = "SELECT * FROM DOCUMENT";
 
-    private static final String READ_QUERY_DOCID_BY_AUTHORS = "SELECT docID FROM AUTHOR WHERE personID = ?";
+    private static final String READ_QUERY_DOCID_BY_AUTHORS = "SELECT docID FROM AUTHORSHIP WHERE personID = ?";
 
     private static final String SQL_SELECT_DOCID_BY_ORGID = "SELECT * FROM DOCUMENT_ORGANISATION WHERE organisationID = ?";
 

@@ -32,6 +32,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -72,10 +73,22 @@ public class MetadataIndexer {
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
         AddressDAO adao = (AddressDAO) adf.getAddressDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
-        List<Person> persons = pdao.findAllAuthors();
-        for (Person person : persons) {
-            Map<String, Object> jsonDocument = person.getPersonDocument();
-            List<Affiliation> affs = odao.getAffiliationByPersonID(person);
+        Map<Long, List<Person>> persons = pdao.findAllAuthors();
+        Iterator it = persons.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            Long personId = (Long) pair.getKey();
+            List<Person> pers = (List<Person>) pair.getValue();
+            Map<String, Object> jsonDocument = pers.get(0).getPersonDocument();
+            List<Map<String, Object>> fullnames = new ArrayList<Map<String, Object>>();
+            for (int i = 0; i <= pers.size() - 1; i++) {
+                Map<String, Object> fullname = new HashMap<String, Object>();
+                fullname.put("fullname", pers.get(i).getFullname());
+                fullname.put("date", Utilities.formatDate(pers.get(i).getPublication_date()));
+                fullnames.add(fullname);
+            }
+            jsonDocument.put("fullnames", fullnames);
+            List<Affiliation> affs = odao.getAffiliationByPersonID(pers.get(0));
             List<Map<String, Object>> organisations = new ArrayList<Map<String, Object>>();
             for (Affiliation aff : affs) {
 
@@ -92,12 +105,12 @@ public class MetadataIndexer {
                 organisations.add(orgDocument);
             }
             List<Map<String, Object>> publications = new ArrayList<Map<String, Object>>();
-            for (Document doc : ddao.getDocumentsByAuthorId(person.getPersonId())) {
+            for (Document doc : ddao.getDocumentsByAuthorId(personId)) {
                 publications.add(doc.getDocumentDocument());
             }
             jsonDocument.put("publications", publications);
             jsonDocument.put("affiliations", organisations);
-            client.prepareIndex(IndexProperties.getKbIndexName(), "authors", "" + person.getPersonId())
+            client.prepareIndex(IndexProperties.getKbIndexName(), "authors", "" + personId)
                     .setSource(jsonDocument).execute().actionGet();
         }
     }
@@ -117,24 +130,50 @@ public class MetadataIndexer {
         for (Document doc : documents) {
             Map<String, Object> documentDocument = doc.getDocumentDocument();
 
-            List<Person> authors = pdao.getAuthorsByDocId(doc.getDocID());
+            Map<Long, List<Person>> authors = pdao.getAuthorsByDocId(doc.getDocID());
             List<Map<String, Object>> authorsDocument = new ArrayList<Map<String, Object>>();
-            for (Person author : authors) {
-                authorsDocument.add(author.getPersonDocument());
+            Iterator it = authors.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                Long personId = (Long) pair.getKey();
+                List<Person> pers = (List<Person>) pair.getValue();
+                Map<String, Object> jsonDocument = pers.get(0).getPersonDocument();
+                List<Map<String, Object>> fullnames = new ArrayList<Map<String, Object>>();
+                for (int i = 0; i <= pers.size() - 1; i++) {
+                    Map<String, Object> fullname = new HashMap<String, Object>();
+                    fullname.put("fullname", pers.get(i).getFullname());
+                    fullname.put("date", Utilities.formatDate(pers.get(i).getPublication_date()));
+                    fullnames.add(fullname);
+                }
+                jsonDocument.put("fullnames", fullnames);
+                authorsDocument.add(jsonDocument);
             }
             documentDocument.put("authors", authorsDocument);
             List<Publication> pubs = pubdao.findByDocId(doc.getDocID());
             Map<String, Object> publicationDocument = pubs.get(0).getPublicationDocument();
-            Map<String, Object> monographDocument = (HashMap<String, Object>)publicationDocument.get("monograph");
+            Map<String, Object> monographDocument = (HashMap<String, Object>) publicationDocument.get("monograph");
             Conference_Event conf = ced.findByMonograph(pubs.get(0).getMonograph().getMonographID());
-            if(conf != null){
+            if (conf != null) {
                 monographDocument.put("conference", conf.getConference_EventDocument());
             }
             documentDocument.put("publication", publicationDocument);
-            List<Person> editors = pdao.getEditorsByPubId(pubs.get(0).getPublicationID());//suppose one-one relation..
+            Map<Long, List<Person>> editors = pdao.getEditorsByPubId(pubs.get(0).getPublicationID());//suppose one-one relation..
             List<Map<String, Object>> editorsDocument = new ArrayList<Map<String, Object>>();
-            for (Person editor : editors) {
-                editorsDocument.add(editor.getPersonDocument());
+            Iterator it1 = editors.entrySet().iterator();
+            while (it1.hasNext()) {
+                Map.Entry pair = (Map.Entry) it1.next();
+                Long personId = (Long) pair.getKey();
+                List<Person> pers = (List<Person>) pair.getValue();
+                Map<String, Object> jsonDocument = pers.get(0).getPersonDocument();
+                List<Map<String, Object>> fullnames = new ArrayList<Map<String, Object>>();
+                for (int i = 0; i <= pers.size() - 1; i++) {
+                    Map<String, Object> fullname = new HashMap<String, Object>();
+                    fullname.put("fullname", pers.get(i).getFullname());
+                    fullname.put("date", Utilities.formatDate(pers.get(i).getPublication_date()));
+                    fullnames.add(fullname);
+                }
+                jsonDocument.put("fullnames", fullnames);
+                editorsDocument.add(jsonDocument);
             }
             documentDocument.put("editors", editorsDocument);
 
@@ -153,11 +192,26 @@ public class MetadataIndexer {
                     referencePubDocument.put("collection", in.getC().getCollectionDocument());
                     referencePubDocument.put("issue", in.getIssue());
                     referencePubDocument.put("volume", in.getVolume());
-                    List<Person> referenceAuthors = bibliopdao.getEditorsByPubId(referencePub.getPublicationID());
+                    Map<Long, List<Person>> referenceAuthors = bibliopdao.getEditorsByPubId(referencePub.getPublicationID());
+
                     List<Map<String, Object>> referenceAuthorsDocument = new ArrayList<Map<String, Object>>();
-                    for (Person author : referenceAuthors) {
-                        referenceAuthorsDocument.add(author.getPersonDocument());
+                    Iterator it2 = referenceAuthors.entrySet().iterator();
+                    while (it2.hasNext()) {
+                        Map.Entry pair = (Map.Entry) it2.next();
+                        Long personId = (Long) pair.getKey();
+                        List<Person> pers = (List<Person>) pair.getValue();
+                        Map<String, Object> jsonDocument = pers.get(0).getPersonDocument();
+                        List<Map<String, Object>> fullnames = new ArrayList<Map<String, Object>>();
+                        for (int i = 0; i <= pers.size() - 1; i++) {
+                            Map<String, Object> fullname = new HashMap<String, Object>();
+                            fullname.put("fullname", pers.get(i).getFullname());
+                            fullname.put("date", Utilities.formatDate(pers.get(i).getPublication_date()));
+                            fullnames.add(fullname);
+                        }
+                        jsonDocument.put("fullnames", fullnames);
+                        referenceAuthorsDocument.add(jsonDocument);
                     }
+
                     referencePubDocument.put("authors", referenceAuthorsDocument);
                     referencesPubDocument.add(referencePubDocument);
                 }
@@ -202,10 +256,25 @@ public class MetadataIndexer {
             }
             organisationDocument.put("publications", orgDocumentsDocument);
 
-            List<Person> authors = pdao.getPersonsByOrgID(org.getOrganisationId());
+            Map<Long, List<Person>> authors = pdao.getPersonsByOrgID(org.getOrganisationId());
             List<Map<String, Object>> authorsDocument = new ArrayList<Map<String, Object>>();
-            for (Person author : authors) {
-                authorsDocument.add(author.getPersonDocument());
+
+            Iterator it2 = authors.entrySet().iterator();
+            while (it2.hasNext()) {
+                Map.Entry pair = (Map.Entry) it2.next();
+                Long personId = (Long) pair.getKey();
+                List<Person> pers = (List<Person>) pair.getValue();
+                Map<String, Object> jsonDocument = pers.get(0).getPersonDocument();
+                List<Map<String, Object>> fullnames = new ArrayList<Map<String, Object>>();
+                for (int i = 0; i <= pers.size() - 1; i++) {
+                    Map<String, Object> fullname = new HashMap<String, Object>();
+                    fullname.put("fullname", pers.get(i).getFullname());
+                    fullname.put("date", Utilities.formatDate(pers.get(i).getPublication_date()));
+                    fullnames.add(fullname);
+                }
+                jsonDocument.put("fullnames", fullnames);
+
+                authorsDocument.add(jsonDocument);
             }
             organisationDocument.put("authors", authorsDocument);
             client.prepareIndex(IndexProperties.getKbIndexName(), "organisations", "" + org.getOrganisationId())

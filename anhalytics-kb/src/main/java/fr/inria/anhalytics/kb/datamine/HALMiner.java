@@ -347,7 +347,7 @@ public class HALMiner extends Miner {
                 if (ndorg.getNodeType() == Node.ELEMENT_NODE) {
                     Element orgChildElt = (Element) ndorg;
                     if (orgChildElt.getNodeName().equals("orgName")) {
-                        organisationParent.addName(orgChildElt.getTextContent());
+                        organisationParent.addName(pubDate, orgChildElt.getTextContent());
                     } else if (orgChildElt.getNodeName().equals("desc")) {
                         NodeList descorgChilds = ndorg.getChildNodes();
                         for (int l = descorgChilds.getLength() - 1; l >= 0; l--) {
@@ -389,6 +389,7 @@ public class HALMiner extends Miner {
                 }
             }
             part_of.setBeginDate(pubDate);
+            organisationParent.setPublication_date(pubDate);
             od.create(organisationParent);
             document_organisation.addOrg(organisationParent);
             part_of.setOrganisation_mother(organisationParent);
@@ -406,10 +407,11 @@ public class HALMiner extends Miner {
         return org;
     }
 
-    private static void curateAffiliation(Affiliation affiliation, Publication pub, Element affiliationElt) throws SQLException {
+    private static void curateAffiliation(Affiliation affiliation, Publication pub, Element affiliationElt, boolean isGrobid) throws SQLException {
         Document_Organisation document_organisation = new Document_Organisation();
         Document_OrganisationDAO d_o = (Document_OrganisationDAO) adf.getDocument_OrganisationDAO();
         document_organisation.setDoc(pub.getDocument());
+        List<Organisation> organisations = new ArrayList<Organisation>();
         Organisation organisation = new Organisation();
         OrganisationDAO od = (OrganisationDAO) adf.getOrganisationDAO();
         Location location = null;
@@ -420,13 +422,6 @@ public class HALMiner extends Miner {
             Element orgElt = (Element) orgs.item(0);
             organisation.setType(orgElt.getAttribute("type"));
             organisation.setStructure(orgElt.getAttribute("xml:id"));
-        }
-        NodeList orgNamesElt = affiliationElt.getElementsByTagName("orgName");
-        if (orgNamesElt != null && (orgNamesElt.getLength() != 0)) {
-            for (int m = orgNamesElt.getLength() - 1; m >= 0; m--) {
-                Element orgnameChildElt = (Element) orgNamesElt.item(m);
-                organisation.addName(orgnameChildElt.getTextContent());
-            }
         }
         if (orgs != null && orgs.getLength() > 1) {
             Element org1Elt = (Element) affiliationElt.getElementsByTagName("org").item(1);
@@ -446,19 +441,47 @@ public class HALMiner extends Miner {
 
             }
         }
-        od.create(organisation);
 
-        document_organisation.addOrg(organisation);
-        d_o.create(document_organisation);
-        affiliation.addOrganisation(organisation);
-        affiliation.setBegin_date(pub.getDate_printed());
-        if (location.getAddress() != null) {
-            ad.create(location.getAddress());
-            location.setBegin_date(pub.getDate_printed());
-            location.setOrganisation(organisation);
-            ld.create(location);
+        NodeList orgNamesElt = affiliationElt.getElementsByTagName("orgName");
+
+        if (orgNamesElt != null && (orgNamesElt.getLength() != 0)) {
+
+            for (int m = orgNamesElt.getLength() - 1; m >= 0; m--) {
+                Element orgnameChildElt = (Element) orgNamesElt.item(m);
+                if (isGrobid) {
+                    Organisation organisation1 = new Organisation();
+                    if (organisation.getType().isEmpty() && orgnameChildElt.hasAttribute("type")) {
+                        organisation1.setUrl(organisation.getUrl());
+                        organisation1.setType(orgnameChildElt.getAttribute("type"));
+                        organisation1.addName(pub.getDate_printed(), orgnameChildElt.getTextContent());
+                        organisation1.setPublication_date(pub.getDate_printed());
+                    }
+                    organisations.add(organisation1);
+                } else {
+                    organisation.addName(pub.getDate_printed(), orgnameChildElt.getTextContent());
+                    organisation.setPublication_date(pub.getDate_printed());
+                }
+            }
         }
+        if (!isGrobid) {
+            organisations.add(organisation);
+        }
+        for (int l = 0; l <= organisations.size() - 1; l++) {
+            od.create(organisations.get(l));
 
+            document_organisation.addOrg(organisations.get(l));
+            d_o.create(document_organisation);
+            affiliation.addOrganisation(organisations.get(l));
+            affiliation.setBegin_date(pub.getDate_printed());
+            if (location != null && location.getAddress() != null) {
+                if (location.getAddress().getAddressId() == null) {
+                    ad.create(location.getAddress());
+                }
+                location.setBegin_date(pub.getDate_printed());
+                location.setOrganisation(organisations.get(l));
+                ld.create(location);
+            }
+        }
     }
 
     private static void processPersons(NodeList persons, String type, Publication pub, Document doc, NodeList authorsFromfulltextTeiHeader) throws SQLException {
@@ -471,6 +494,7 @@ public class HALMiner extends Miner {
         for (int i = persons.getLength() - 1; i >= 0; i--) {
             person = persons.item(i);
             prs = new Person();
+            prs.setPublication_date(pubDate);
             affiliation = new Affiliation();
             List<Person_Identifier> pis = new ArrayList<Person_Identifier>();
 
@@ -498,7 +522,7 @@ public class HALMiner extends Miner {
                                 prs.setUrl(personChildElt.getAttribute("target"));
                             }
                         } else if (personChildElt.getNodeName().equals("affiliation")) {
-                            curateAffiliation(affiliation, pub, personChildElt);
+                            curateAffiliation(affiliation, pub, personChildElt, false);
                             isAffiliated = true;
                         } else if (personChildElt.getNodeName().equals("idno")) {
                             Person_Identifier pi = new Person_Identifier();
@@ -525,8 +549,20 @@ public class HALMiner extends Miner {
                 prs.setFullname(fullname);
 
                 if (!isAffiliated && type.equals("author")) {
+                    NodeList affs = null;
                     Element authorElt = matchAuthor(prs, authorsFromfulltextTeiHeader);
-                    System.out.println(Utilities.innerXmlToString(authorElt));
+                    if (authorElt != null) {
+                        affs = authorElt.getElementsByTagName("affiliation");
+                        if (affs != null) {
+                            for (int y = affs.getLength() - 1; y >= 0; y--) {
+                                if (affs.item(y).getNodeType() == Node.ELEMENT_NODE) {
+                                    curateAffiliation(affiliation, pub, (Element) affs.item(y), true);
+                                }
+                            }
+                        }
+                    }
+                    //email
+                    //ptr//
                 }
 
                 prs.setPerson_identifiers(pis);
@@ -580,7 +616,6 @@ public class HALMiner extends Miner {
                         }
                     }
                 }
-                System.out.println(fullname + " vs " + forename + " " + lastname);
                 if (jw.similarity(fullname, forename + " " + lastname) > 0.7) {
                     author = (Element) personChildElt;
                     break;

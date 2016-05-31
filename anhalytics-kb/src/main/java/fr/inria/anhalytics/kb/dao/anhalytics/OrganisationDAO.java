@@ -17,8 +17,10 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,14 +34,12 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             = "INSERT INTO ORGANISATION (type, url, structID) VALUES (?, ?, ?)";
 
     private static final String SQL_INSERT_NAMES
-            = "INSERT INTO ORGANISATION_NAME (organisationID, name) VALUES (?, ?)";
+            = "INSERT INTO ORGANISATION_NAME (organisationID, name, publication_date) VALUES (?, ?, ?)";
     private static final String SQL_INSERT_MOTHERS
             = "INSERT INTO PART_OF (organisation_motherID, organisationID, begin_date, end_date) VALUES (?, ?, ?, ?)";
 
     private static final String SQL_UPDATE_END_DATE
             = "UPDATE PART_OF SET end_date = ? WHERE organisationID = ? AND organisation_motherID = ?";
-    
-    
 
     private static final String SQL_SELECT_AFFILIATION_BY_PERSONID = "SELECT * FROM AFFILIATION WHERE personID = ?";
 
@@ -56,8 +56,6 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
     private static final String READ_QUERY_ORG_BY_STRUCTID = "SELECT org.organisationID FROM ORGANISATION org WHERE org.structID = ? ";
 
     private static final String UPDATE_ORGANISATION = "UPDATE ORGANISATION SET type = ? ,structID = ? ,url = ? WHERE organisationID = ?";
-
-    private static final String UPDATE_ORGANISATION_NAMES = "UPDATE ORGANISATION_NAME SET name = ? WHERE organisationID = ?";
 
     public OrganisationDAO(Connection conn) {
         super(conn);
@@ -96,11 +94,20 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 obj.setOrganisationId(rs.getLong(1));
             }
 
-            for (String name : obj.getNames()) {
+            Iterator it = obj.getNames().entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                Date date = (Date) pair.getKey();
+                String name = (String) pair.getValue();
 
                 statement1 = connect.prepareStatement(SQL_INSERT_NAMES);
                 statement1.setLong(1, obj.getOrganisationId());
                 statement1.setString(2, name);
+                if (date == null) {
+                    statement1.setDate(3, new java.sql.Date(00000000L));
+                } else {
+                    statement1.setDate(3, new java.sql.Date(date.getTime()));
+                }
                 int code1 = statement1.executeUpdate();
             }
 
@@ -144,21 +151,21 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             preparedStatement.setString(3, obj.getUrl());
             preparedStatement.setLong(4, obj.getOrganisationId());
             int code1 = preparedStatement.executeUpdate();
-            Organisation oldOrg = find(obj.getOrganisationId());
-            Iterator<String> iter = obj.getNames().iterator();
-            while (iter.hasNext()) {
-                String str = iter.next();
-                for (String str1 : oldOrg.getNames()) {
-                    if (str.equals(str1)) {
-                        iter.remove();
-                        break;
-                    }
-                }
-            }
-            for (String orgName : obj.getNames()) {
-                PreparedStatement statement1 = connect.prepareStatement(SQL_INSERT_NAMES);
+            PreparedStatement statement1 = connect.prepareStatement(SQL_INSERT_NAMES);
+            Iterator it = obj.getNames().entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                Date date = (Date) pair.getKey();
+                String name = (String) pair.getValue();
+
+                statement1 = connect.prepareStatement(SQL_INSERT_NAMES);
                 statement1.setLong(1, obj.getOrganisationId());
-                statement1.setString(2, orgName);
+                statement1.setString(2, name);
+                if (date == null) {
+                    statement1.setDate(3, new java.sql.Date(00000000L));
+                } else {
+                    statement1.setDate(3, new java.sql.Date(date.getTime()));
+                }
                 int code2 = statement1.executeUpdate();
             }
 
@@ -227,28 +234,31 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
         preparedStatement.setLong(1, id);
         preparedStatement.setLong(2, id);
         ResultSet rs = preparedStatement.executeQuery();
+        try {
         if (rs.first()) {
-            //try {
-            organisation = new Organisation(
-                    id,
-                    rs.getString("org.type"),
-                    rs.getString("org.url"),
-                    rs.getString("org.structID"),
-                    (new ArrayList<String>()),
-                    findMothers(id)
-            );
-            if (rs.getString("orgname.name") != null) {
-                organisation.getNames().add(rs.getString("orgname.name"));
-            }
-            /*} catch (ParseException ex) {
-             Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
-             }*/
+            
+                organisation = new Organisation(
+                        id,
+                        rs.getString("org.type"),
+                        rs.getString("org.url"),
+                        rs.getString("org.structID"),
+                        (new HashMap<Date, String>()),
+                        findMothers(id),
+                        Utilities.parseStringDate(rs.getString("orgname.publication_date"))
+                );
+                if (rs.getString("orgname.name") != null) {
+                    organisation.getNames().put(Utilities.parseStringDate(rs.getString("orgname.publication_date")), rs.getString("orgname.name"));
+                }
+            
         }
         while (rs.next()) {
             if (rs.getString("orgname.name") != null) {
-                organisation.getNames().add(rs.getString("orgname.name"));
+                organisation.getNames().put(Utilities.parseStringDate(rs.getString("orgname.publication_date")), rs.getString("orgname.name"));
             }
         }
+        } catch (ParseException ex) {
+                Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
         return organisation;
     }
 
@@ -310,17 +320,18 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
 
     private Long getOrgEntityIfAlreadyStored(Organisation obj) throws SQLException {
         Long orgId = null;
-        PreparedStatement statement;
-        statement = connect.prepareStatement(READ_QUERY_ORG_BY_STRUCTID);
-        statement.setString(1, obj.getStructure());
-        ResultSet rs = statement.executeQuery();
-        if (rs.first()) {
-            orgId = rs.getLong("org.organisationID");
+        if (!obj.getStructure().isEmpty()) {
+            PreparedStatement statement;
+            statement = connect.prepareStatement(READ_QUERY_ORG_BY_STRUCTID);
+            statement.setString(1, obj.getStructure());
+            ResultSet rs = statement.executeQuery();
+            if (rs.first()) {
+                orgId = rs.getLong("org.organisationID");
+            }
         }
-
         return orgId;
     }
-    
+
     public List<Affiliation> getAffiliationByPersonID(Person person) {
         List<Affiliation> affiliations = new ArrayList<Affiliation>();
 

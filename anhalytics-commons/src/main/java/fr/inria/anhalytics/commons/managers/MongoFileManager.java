@@ -137,7 +137,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      */
     public boolean initMetadataTeis(String date) throws MongoException {
         try {
-            setGridFSCollection(MongoCollectionsInterface.ADDITIONAL_TEIS);
+            setGridFSCollection(MongoCollectionsInterface.METADATAS_TEIS);
+            
+            
             BasicDBObject bdbo = new BasicDBObject();
             if (date != null) {
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
@@ -417,7 +419,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      */
     public void insertMetadataTei(String tei, String source, String repositoryDocId, String type, String date) {
         try {
-            GridFS gfs = new GridFS(db, MongoCollectionsInterface.ADDITIONAL_TEIS);
+            GridFS gfs = new GridFS(db, MongoCollectionsInterface.METADATAS_TEIS);
             gfs.remove(repositoryDocId + ".tei.xml");
             GridFSInputFile gfsFile = gfs.createFile(new ByteArrayInputStream(tei.getBytes()), true);
             gfsFile.put("uploadDate", Utilities.parseStringDate(date));
@@ -779,7 +781,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     public String findMetadataTeiById(String anhalyticsId) {
-        return findTeiById(anhalyticsId, MongoCollectionsInterface.ADDITIONAL_TEIS);
+        return findTeiById(anhalyticsId, MongoCollectionsInterface.METADATAS_TEIS);
     }
 
     private String findTeiById(String anhalyticsId, String collection) {
