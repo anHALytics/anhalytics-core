@@ -15,8 +15,8 @@ public interface MongoCollectionsInterface {
     public static final String HARVEST_DIAGNOSTIC = "diagnostic";
     // files that can't be donwloaded and will be processed later
     public static final String TO_REQUEST_LATER = "to_request_later";
-    // source metadata tei
-    public static final String ADDITIONAL_TEIS = "metadata_teis";
+    // source metadata tei to be renamed to METADATAS_TEIS
+    public static final String METADATAS_TEIS = "metadata_teis";
     // binary files , pdf
     public static final String BINARIES = "binaries";
     // publications annexes

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,8 +140,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public boolean initMetadataTeis(String date) throws MongoException {
         try {
             setGridFSCollection(MongoCollectionsInterface.METADATAS_TEIS);
-            
-            
+
             BasicDBObject bdbo = new BasicDBObject();
             if (date != null) {
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
@@ -418,7 +418,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Inserts TEI metadata document in the GridFS.
      */
-    public void insertMetadataTei(String tei, String source, String repositoryDocId, String type, String date) {
+    public void insertMetadataTei(String tei, String doi, String pdfUrl, String source, String repositoryDocId, String type, String date) {
         try {
             GridFS gfs = new GridFS(db, MongoCollectionsInterface.METADATAS_TEIS);
             gfs.remove(repositoryDocId + ".tei.xml");
@@ -426,7 +426,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsFile.put("uploadDate", Utilities.parseStringDate(date));
             gfsFile.setFilename(repositoryDocId + ".tei.xml");
             gfsFile.put("repositoryDocId", repositoryDocId);
-            gfsFile.put("anhalyticsId", generateAnhalyticsId(repositoryDocId));
+            gfsFile.put("anhalyticsId", generateAnhalyticsId(repositoryDocId, doi, pdfUrl));
             gfsFile.put("source", source);
             gfsFile.put("documentType", type);
             gfsFile.save();
@@ -435,10 +435,16 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
     }
 
-    private String generateAnhalyticsId(String repositoryDocId) {
+    private String generateAnhalyticsId(String repositoryDocId, String doi, String pdfUrl) {
         DBCollection collection = db.getCollection(MongoCollectionsInterface.IDENTIFIERS);
         BasicDBObject document = new BasicDBObject();
+        /*BasicDBObject index = new BasicDBObject();
+            index.put("repositoryDocId", 1);
+            collection.ensureIndex(index, "index", true);
+         */
         document.put("repositoryDocId", repositoryDocId);
+        document.put("doi", doi);
+        document.put("pdfUrl", pdfUrl);
         collection.insert(document);
         currentAnhalyticsId = document.getObjectId("_id").toString();
         return currentAnhalyticsId;

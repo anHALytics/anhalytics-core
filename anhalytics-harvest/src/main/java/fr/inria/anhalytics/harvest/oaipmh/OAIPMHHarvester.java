@@ -51,11 +51,15 @@ abstract class OAIPMHHarvester implements HarvesterItf {
         for (TEI tei : teis) {
             try {
                 String teiString = tei.getTei();
+                String doi = tei.getDoi();
+                String pdfUrl = "";
+                if(tei.getPdfdocument() != null)
+                    pdfUrl = tei.getPdfdocument().getUrl();
                 String repositoryDocId = tei.getRepositoryDocId();
                 logger.info("\t\t Processing TEI for " + repositoryDocId);
                 if (teiString.length() > 0) {
                     logger.info("\t\t\t\t Storing TEI " + repositoryDocId);
-                    mm.insertMetadataTei(teiString, HarvestProperties.getSource(), repositoryDocId, tei.getDocumentType(), date);
+                    mm.insertMetadataTei(teiString, doi, pdfUrl, HarvestProperties.getSource(), repositoryDocId, tei.getDocumentType(), date);
 
                     if (tei.getPdfdocument() != null) {
                         logger.info("\t\t\t\t downloading PDF file.");
