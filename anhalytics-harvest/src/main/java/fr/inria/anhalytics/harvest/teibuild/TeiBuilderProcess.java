@@ -21,8 +21,10 @@ public class TeiBuilderProcess {
 
     private MongoFileManager mm;
 
+    private TeiBuilder tb;
     public TeiBuilderProcess() throws UnknownHostException {
         this.mm = MongoFileManager.getInstance(false);
+        this.tb = new TeiBuilder();
     }
 
     /**
@@ -49,7 +51,7 @@ public class TeiBuilderProcess {
                     generatedTEIcorpus = createTEICorpus(metadataString);
                     String grobidTei = getGrobidTei(currentAnhalyticsId);
                     if (grobidTei != null) {
-                        generatedTEIcorpus = TeiBuilder.addGrobidTEIToTEICorpus(Utilities.toString(generatedTEIcorpus), grobidTei);
+                        generatedTEIcorpus = tb.addGrobidTEIToTEICorpus(Utilities.toString(generatedTEIcorpus), grobidTei);
                         fulltextAvailable = true;
                     }
                     String teiCorpus = Utilities.toString(generatedTEIcorpus);
@@ -71,7 +73,7 @@ public class TeiBuilderProcess {
         try {
             if (metadata != null) {
                 InputStream metadataStream = new ByteArrayInputStream(metadata.getBytes());
-                generatedTeiDoc = TeiBuilder.createTEICorpus(metadataStream);
+                generatedTeiDoc = tb.createTEICorpus(metadataStream);
                 metadataStream.close();
             }
         } catch (Exception xpe) {

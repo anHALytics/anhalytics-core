@@ -59,9 +59,10 @@ public class TestTeiBuild extends XMLTestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Document corpusTei = TeiBuilder.createTEICorpus(new FileInputStream(metadata));
+        TeiBuilder teiBuilder = new TeiBuilder(); 
+        Document corpusTei = teiBuilder.createTEICorpus(new FileInputStream(metadata));
         String corpusTeiString = Utilities.toString(corpusTei);
-        String result = Utilities.toString(TeiBuilder.addGrobidTEIToTEICorpus(corpusTeiString, FileUtils.readFileToString(fullTextFile)));
+        String result = Utilities.toString(teiBuilder.addGrobidTEIToTEICorpus(corpusTeiString, FileUtils.readFileToString(fullTextFile)));
         // some test here...
         try {
             String expected = FileUtils.readFileToString(new File(this.getResourceDir("src/test/resources/").getAbsoluteFile()
@@ -100,9 +101,9 @@ public class TestTeiBuild extends XMLTestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        corpusTei = TeiBuilder.createTEICorpus(new FileInputStream(metadata));
+        corpusTei = teiBuilder.createTEICorpus(new FileInputStream(metadata));
         String corpusTeiStream1 = (Utilities.toString(corpusTei));
-        result = Utilities.toString(TeiBuilder.addGrobidTEIToTEICorpus(corpusTeiStream1, FileUtils.readFileToString(fullTextFile)));
+        result = Utilities.toString(teiBuilder.addGrobidTEIToTEICorpus(corpusTeiStream1, FileUtils.readFileToString(fullTextFile)));
 
         try {
             docBuilder = docFactory.newDocumentBuilder();

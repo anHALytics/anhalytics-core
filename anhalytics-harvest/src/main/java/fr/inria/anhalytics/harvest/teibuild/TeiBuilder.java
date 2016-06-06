@@ -4,6 +4,7 @@ import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.converters.HalTEIConverter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -13,27 +14,35 @@ import org.w3c.dom.Attr;
 import org.xml.sax.InputSource;
 
 /**
- * Functions that builds TEICorpus. 
- * 1. Creates Tei corpus (we use this format to append other extracted metadata from annexes, annotation standoffs..) 
- * 2. Appends Extracted Grobid Tei to TEI Corpus
+ * Functions that builds TEICorpus. 1. Creates Tei corpus (we use this format to
+ * append other extracted metadata from annexes, annotation standoffs..) 2.
+ * Appends Extracted Grobid Tei to TEI Corpus
  *
  * @author Achraf
  */
 public class TeiBuilder {
-    
+
+    private DocumentBuilder docBuilder;
+
+    public TeiBuilder() {
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setValidating(false);
+        //docFactory.setNamespaceAware(true);
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * returns new Document representing TEICorpus with harvested metadata in
      * TEI header.
      */
-    public static Document createTEICorpus(InputStream metadataStream) {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+    public Document createTEICorpus(InputStream metadataStream) {
         HalTEIConverter htc = new HalTEIConverter();//
-        docFactory.setValidating(false);
-        //docFactory.setNamespaceAware(true);
         Document metadata = null;
-        DocumentBuilder docBuilder = null;
         try {
-            docBuilder = docFactory.newDocumentBuilder();
             metadata = docBuilder.parse(metadataStream);
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,16 +60,10 @@ public class TeiBuilder {
     /**
      * appends fulltext grobid tei to existing TEICorpus.
      */
-    public static Document addGrobidTEIToTEICorpus(String teiCorpus, String grobidTei) {
+    public Document addGrobidTEIToTEICorpus(String teiCorpus, String grobidTei) {
         Document resultTei = null;
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        docFactory.setValidating(false);
-        //docFactory.setNamespaceAware(true);
-
-        DocumentBuilder docBuilder = null;
         Document teiCorpusDoc = null;
         try {
-            docBuilder = docFactory.newDocumentBuilder();
             teiCorpusDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(teiCorpus.getBytes("utf-8"))));
         } catch (Exception e) {
             e.printStackTrace();
