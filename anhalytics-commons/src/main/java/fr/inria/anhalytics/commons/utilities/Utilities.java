@@ -139,6 +139,7 @@ public class Utilities {
     }
 
     public static boolean isValidDate(String dateString) {
+        //consider other options (YY, YY-MM)?
         return dates.contains(dateString);
     }
 
@@ -168,7 +169,7 @@ public class Utilities {
             try {
                 int month = Integer.parseInt(monthStr);
                 if (month > 12 || month < 1) {
-                    val = date.substring(0, 4) + "-12" + date.substring(ind+3, date.length());
+                    val = date.substring(0, 4) + "-12" + date.substring(ind + 3, date.length());
                 }
                 String dayStr = date.substring(ind2 + 1, ind2 + 3);
                 int day = Integer.parseInt(dayStr);
@@ -513,5 +514,164 @@ public class Utilities {
             is.close();
         }
         return sb.toString();
+    }
+
+    /**
+     * To replace accented characters in a unicode string by unaccented
+     * equivalents: é -> e, ü -> ue, ß -> ss, etc. following the standard
+     * transcription conventions
+     *
+     * @param input the string to be processed.
+     * @return Returns the string without accent.
+     */
+    public final static String removeAccents(String input) {
+        if (input == null) {
+            return null;
+        }
+        final StringBuffer output = new StringBuffer();
+        for (int i = 0; i < input.length(); i++) {
+            switch (input.charAt(i)) {
+                case '\u00C0': // Ã€
+                case '\u00C1': // Ã
+                case '\u00C2': // Ã‚
+                case '\u00C3': // Ãƒ
+                case '\u00C5': // Ã…
+                    output.append("A");
+                    break;
+                case '\u00C4': // Ã„
+                case '\u00C6': // Ã†
+                    output.append("AE");
+                    break;
+                case '\u00C7': // Ã‡
+                    output.append("C");
+                    break;
+                case '\u00C8': // Ãˆ
+                case '\u00C9': // Ã‰
+                case '\u00CA': // ÃŠ
+                case '\u00CB': // Ã‹
+                    output.append("E");
+                    break;
+                case '\u00CC': // ÃŒ
+                case '\u00CD': // Ã
+                case '\u00CE': // ÃŽ
+                case '\u00CF': // Ã
+                    output.append("I");
+                    break;
+                case '\u00D0': // Ã
+                    output.append("D");
+                    break;
+                case '\u00D1': // Ã‘
+                    output.append("N");
+                    break;
+                case '\u00D2': // Ã’
+                case '\u00D3': // Ã“
+                case '\u00D4': // Ã”
+                case '\u00D5': // Ã•
+                case '\u00D8': // Ã˜
+                    output.append("O");
+                    break;
+                case '\u00D6': // Ã–
+                case '\u0152': // Å’
+                    output.append("OE");
+                    break;
+                case '\u00DE': // Ãž
+                    output.append("TH");
+                    break;
+                case '\u00D9': // Ã™
+                case '\u00DA': // Ãš
+                case '\u00DB': // Ã›
+                    output.append("U");
+                    break;
+                case '\u00DC': // Ãœ
+                    output.append("UE");
+                    break;
+                case '\u00DD': // Ã
+                case '\u0178': // Å¸
+                    output.append("Y");
+                    break;
+                case '\u00E0': // Ã
+                case '\u00E1': // Ã¡
+                case '\u00E2': // Ã¢
+                case '\u00E3': // Ã£
+                case '\u00E5': // Ã¥
+                    output.append("a");
+                    break;
+                case '\u00E4': // Ã¤
+                case '\u00E6': // Ã¦
+                    output.append("ae");
+                    break;
+                case '\u00E7': // Ã§
+                    output.append("c");
+                    break;
+                case '\u00E8': // Ã¨
+                case '\u00E9': // Ã©
+                case '\u00EA': // Ãª
+                case '\u00EB': // Ã«
+                    output.append("e");
+                    break;
+                case '\u00EC': // Ã¬
+                case '\u00ED': // Ã
+                case '\u00EE': // Ã®
+                case '\u00EF': // Ã¯
+                    output.append("i");
+                    break;
+                case '\u00F0': // Ã°
+                    output.append("d");
+                    break;
+                case '\u00F1': // Ã±
+                    output.append("n");
+                    break;
+                case '\u00F2': // Ã²
+                case '\u00F3': // Ã³
+                case '\u00F4': // Ã´
+                case '\u00F5': // Ãµ
+                case '\u00F8': // Ã¸
+                    output.append("o");
+                    break;
+                case '\u00F6': // Ã¶
+                case '\u0153': // Å“
+                    output.append("oe");
+                    break;
+                case '\u00DF': // ÃŸ
+                    output.append("ss");
+                    break;
+                case '\u00FE': // Ã¾
+                    output.append("th");
+                    break;
+                case '\u00F9': // Ã¹
+                case '\u00FA': // Ãº
+                case '\u00FB': // Ã»
+                    output.append("u");
+                    break;
+                case '\u00FC': // Ã¼
+                    output.append("ue");
+                    break;
+                case '\u00FD': // Ã½
+                case '\u00FF': // Ã¿
+                    output.append("y");
+                    break;
+                default:
+                    output.append(input.charAt(i));
+                    break;
+            }
+        }
+        return output.toString();
+    }
+
+    public final static Element getElementByAttribute(String attr, String value, Element root) {
+        Element found = null;
+        if (root.hasAttribute(attr) && root.getAttribute(attr).equals(value)) {
+            return root;
+        }
+        NodeList nl = root.getChildNodes();
+        for (int i = nl.getLength() - 1; i >= 0; i--) {
+            if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                found = getElementByAttribute(attr, value, (Element) nl.item(i));
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 }

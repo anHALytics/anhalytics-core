@@ -37,6 +37,11 @@ public class HarvestProperties {
     private static boolean reset;
 
     private static int nbThreads = 1;
+    
+        
+    private static String crossrefId;
+    private static String crossrefPwd;
+    private static String crossrefHost;
 
     public static void init(String properties_filename) {
         Properties props = new Properties();
@@ -59,6 +64,10 @@ public class HarvestProperties {
         setReset(Boolean.valueOf(props.getProperty("harvest.reset")));
         setTmpPath(props.getProperty("harvest.tmpPath"));
         String threads = props.getProperty("harvest.nbThreads");
+        
+                setCrossrefId(props.getProperty("harvest.crossref_id"));
+                setCrossrefPwd(props.getProperty("harvest.crossref_pw"));
+                setCrossrefHost(props.getProperty("harvest.crossref_host"));
         try {
             setNbThreads(Integer.parseInt(threads));
         } catch (java.lang.NumberFormatException e) {
@@ -271,4 +280,45 @@ public class HarvestProperties {
         collection = aCollection;
     }
 
+        /**
+     * @return the crossrefId
+     */
+    public static String getCrossrefId() {
+        return crossrefId;
+    }
+
+    /**
+     * @param aCrossrefId the crossrefId to set
+     */
+    public static void setCrossrefId(String aCrossrefId) {
+        crossrefId = aCrossrefId;
+    }
+
+    /**
+     * @return the crossrefPwd
+     */
+    public static String getCrossrefPwd() {
+        return crossrefPwd;
+    }
+
+    /**
+     * @param aCrossrefPwd the crossrefPwd to set
+     */
+    public static void setCrossrefPwd(String aCrossrefPwd) {
+        crossrefPwd = aCrossrefPwd;
+    }
+
+    /**
+     * @return the crossrefHost
+     */
+    public static String getCrossrefHost() {
+        return crossrefHost;
+    }
+
+    /**
+     * @param aCrossrefHost the crossrefHost to set
+     */
+    public static void setCrossrefHost(String aCrossrefHost) {
+        crossrefHost = aCrossrefHost;
+    }
 }

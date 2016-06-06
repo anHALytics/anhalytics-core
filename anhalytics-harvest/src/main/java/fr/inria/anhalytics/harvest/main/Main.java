@@ -4,6 +4,8 @@ import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.oaipmh.HALOAIPMHHarvester;
 import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
+import fr.inria.anhalytics.harvest.crossref.CrossRef;
+import fr.inria.anhalytics.harvest.crossref.OpenUrl;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import fr.inria.anhalytics.harvest.teibuild.TeiBuilderProcess;
@@ -33,6 +35,8 @@ public class Main {
             add("processGrobidDaily");
             add("harvestIstex");
             add("assetLegend");
+            add("crossRef");
+            add("openUrl");
         }
     };
 
@@ -68,6 +72,7 @@ public class Main {
         TeiBuilderProcess tb = new TeiBuilderProcess();
         HALOAIPMHHarvester oai = new HALOAIPMHHarvester();
         IstexHarvester ih = new IstexHarvester();
+        CrossRef cr = new CrossRef();
         if (process.equals("harvestAll")) {
             oai.fetchAllDocuments();
         } else if (process.equals("harvestDaily")) {
@@ -85,8 +90,11 @@ public class Main {
             gp.processFulltexts();
         } else if (process.equals("fetchEmbargoPublications")) {
             oai.fetchEmbargoPublications();
-        } else if (process.equals("harvestIstex")) {
-            ih.harvest();
+        } else if (process.equals("crossRef")) {
+            cr.findDois();
+        } else if (process.equals("crossRefDaily")) {
+            Utilities.updateDates(todayDate, todayDate);
+            cr.findDois();
         } else if (process.equals("assetLegend")) {
             gp.addAssetsLegend();
         }

@@ -54,6 +54,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     private String currentFileName = null;
     private boolean currentIsWithFulltext = false;
 
+    private DBObject temp = null;
     private DBCursor cursor = null;
     private DBCollection collection = null;
 
@@ -289,7 +290,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             return false;
         }
     }
-
+    
     public String nextAnnotation() {
         String json = null;
         DBObject obj = cursor.next();
@@ -433,6 +434,12 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } catch (ParseException e) {
             logger.error(e.getMessage(), e.getCause());
         }
+    }
+
+    public void updateDoi(String doi) {
+        DBCollection collection = db.getCollection(MongoCollectionsInterface.IDENTIFIERS);
+        temp.put("doi", doi);
+        collection.update(new BasicDBObject("_id", new ObjectId(currentAnhalyticsId)), temp);
     }
 
     private String generateAnhalyticsId(String repositoryDocId, String doi, String pdfUrl) {
