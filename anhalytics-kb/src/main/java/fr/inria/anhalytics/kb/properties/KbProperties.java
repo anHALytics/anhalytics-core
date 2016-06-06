@@ -36,13 +36,13 @@ public class KbProperties {
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file " + properties_filename, exp);
         }
-        setMysql_url(props.getProperty("ingest.mysql_url"));
-        setMysql_db(props.getProperty("ingest.mysql_db"));
-        setMysql_bibliodb(props.getProperty("ingest.mysql_bibliodb"));
-        setMysql_user(props.getProperty("ingest.mysql_user"));
-        setMysql_pass(props.getProperty("ingest.mysql_pass"));
+        setMysql_url(props.getProperty("kb.mysql_url"));
+        setMysql_db(props.getProperty("kb.mysql_db"));
+        setMysql_bibliodb(props.getProperty("kb.mysql_bibliodb"));
+        setMysql_user(props.getProperty("kb.mysql_user"));
+        setMysql_pass(props.getProperty("kb.mysql_pass"));
         // As grobid process may take a long time we can continue on previous works
-        setReset(Boolean.valueOf(props.getProperty("ingest.reset")));
+        setReset(Boolean.valueOf(props.getProperty("kb.reset")));
     }
 
     /**
