@@ -5,7 +5,6 @@ import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.oaipmh.HALOAIPMHHarvester;
 import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
 import fr.inria.anhalytics.harvest.crossref.CrossRef;
-import fr.inria.anhalytics.harvest.crossref.OpenUrl;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import fr.inria.anhalytics.harvest.teibuild.TeiBuilderProcess;
@@ -36,6 +35,7 @@ public class Main {
             add("harvestIstex");
             add("assetLegend");
             add("crossRef");
+            add("crossRefDaily");
             add("openUrl");
         }
     };
