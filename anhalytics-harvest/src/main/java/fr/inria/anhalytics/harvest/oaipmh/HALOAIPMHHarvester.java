@@ -31,12 +31,13 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
         boolean stop = false;
         String tokenn = null;
         while (!stop) {
-            String request = this.oai_url + "/?verb=ListRecords&metadataPrefix=" + OAI_FORMAT + "&from=" + date + "&until=" + date;
+            String request = String.format("%s/?verb=ListRecords&metadataPrefix=%s&from=%s&until=%s", 
+						this.oai_url, OAI_FORMAT, date, date);
             if(HarvestProperties.getCollection() != null)
-                request += "&set=collection:"+HarvestProperties.getCollection();
+                request += String.format("&set=collection:%s", HarvestProperties.getCollection());
             
             if (tokenn != null) {
-                request = this.oai_url + "/?verb=ListRecords&resumptionToken=" + tokenn;
+                request = String.format("%s/?verb=ListRecords&resumptionToken=%s", this.oai_url, tokenn);
             }
             logger.info("\t Sending: " + request);
 
