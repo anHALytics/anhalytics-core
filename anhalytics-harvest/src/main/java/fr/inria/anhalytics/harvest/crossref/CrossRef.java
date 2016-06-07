@@ -124,96 +124,97 @@ public class CrossRef {
 
                     try {
                         System.out.println("###################" + currentRepositoryDocId + "#######################");
-                        System.out.println("isWithoutDoi");
-                        metadata = docBuilder.parse(metadataStream);
-                        metadataStream.close();
-                        Element rootElement = metadata.getDocumentElement();
-                        Node node = (Node) xPath.compile("text/body/listBibl/biblFull/titleStmt/title")
-                                .evaluate(rootElement, XPathConstants.NODE);
-                        if (node != null) {
-                            title = node.getTextContent();
-                        }
-                        node = (Element) xPath.compile("text/body/listBibl/biblFull/titleStmt/author/persName/surname").evaluate(rootElement, XPathConstants.NODE);
-                        if (node != null) {
-                            aut = node.getTextContent();
-                        }
-                        if (aut != null) {
-                            aut = Utilities.removeAccents(aut);
-                        }
-                        if (title != null) {
-                            title = Utilities.removeAccents(title);
-                        }
+                        if (mm.isWithoutDoi()) {
+                            metadata = docBuilder.parse(metadataStream);
+                            metadataStream.close();
+                            Element rootElement = metadata.getDocumentElement();
+                            Node node = (Node) xPath.compile("text/body/listBibl/biblFull/titleStmt/title")
+                                    .evaluate(rootElement, XPathConstants.NODE);
+                            if (node != null) {
+                                title = node.getTextContent();
+                            }
+                            node = (Element) xPath.compile("text/body/listBibl/biblFull/titleStmt/author/persName/surname").evaluate(rootElement, XPathConstants.NODE);
+                            if (node != null) {
+                                aut = node.getTextContent();
+                            }
+                            if (aut != null) {
+                                aut = Utilities.removeAccents(aut);
+                            }
+                            if (title != null) {
+                                title = Utilities.removeAccents(title);
+                            }
 
-                        if (StringUtils.isNotBlank(title)
-                                && StringUtils.isNotBlank(aut)) {
-                            System.out.println("test retrieval per title, author");
-                            System.out.println(String.format("persName=%s, title=%s", aut, title));
-                            subpath = String.format(TITLE_BASE_QUERY,
-                                    HarvestProperties.getCrossrefId(),
-                                    HarvestProperties.getCrossrefPwd(),
-                                    URLEncoder.encode(title, "UTF-8"),
-                                    URLEncoder.encode(aut, "UTF-8"));
-                            doi = queryCrossref(subpath);
-                        }
-                        if (doi.isEmpty()) {
-                            node = (Element) xPath.compile("text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/title")
-                                    .evaluate(rootElement, XPathConstants.NODE);
-                            if (node != null) {
-                                journalTitle = node.getTextContent();
-                                if (journalTitle != null) {
-                                    journalTitle = Utilities.removeAccents(journalTitle);
-                                }
-                            }
-                            node = (Element) xPath.compile("text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/imprint/biblScope[@unit='pp']")
-                                    .evaluate(rootElement, XPathConstants.NODE);
-                            if (node != null) {
-                                pageRange = node.getTextContent();
-                            }
-                            if (pageRange != null) {
-                                pageRange = pageRange.replaceAll("[A-Za-z.,\\s+]", "");
-                                StringTokenizer st = new StringTokenizer(pageRange, "-");
-                                if (st.countTokens() == 2) {
-                                    firstPage = st.nextToken();
-                                } else if (st.countTokens() == 1) {
-                                    firstPage = pageRange;
-                                }
-                            }
-                            node = (Element) xPath.compile("text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/imprint/biblScope[@unit='volume']")
-                                    .evaluate(rootElement, XPathConstants.NODE);
-                            if (node != null) {
-                                volume = node.getTextContent();
-                            }
-                        }
-
-                        if (doi.isEmpty() && StringUtils.isNotBlank(journalTitle)
-                                && StringUtils.isNotBlank(volume)
-                                //&& StringUtils.isNotBlank(aut)
-                                && StringUtils.isNotBlank(firstPage)) {
-                            // retrieval per journal title, author, volume, first page
-                            System.out.println("test retrieval per journal title, author, volume, first page");
-                            System.out.println(String.format("aut=%s, firstPage=%s, journalTitle=%s, volume=%s",
-                                    aut, firstPage, journalTitle, volume));
-                            if (StringUtils.isNotBlank(aut)) {
-                                subpath = String.format(JOURNAL_AUTHOR_BASE_QUERY,
+                            if (StringUtils.isNotBlank(title)
+                                    && StringUtils.isNotBlank(aut)) {
+                                System.out.println("test retrieval per title, author");
+                                System.out.println(String.format("persName=%s, title=%s", aut, title));
+                                subpath = String.format(TITLE_BASE_QUERY,
                                         HarvestProperties.getCrossrefId(),
                                         HarvestProperties.getCrossrefPwd(),
-                                        URLEncoder.encode(journalTitle, "UTF-8"),
-                                        URLEncoder.encode(aut, "UTF-8"),
-                                        URLEncoder.encode(volume, "UTF-8"),
-                                        firstPage);
-                            } else {
-                                subpath = String.format(JOURNAL_BASE_QUERY,
-                                        HarvestProperties.getCrossrefId(),
-                                        HarvestProperties.getCrossrefPwd(),
-                                        URLEncoder.encode(journalTitle, "UTF-8"),
-                                        URLEncoder.encode(volume, "UTF-8"),
-                                        firstPage);
+                                        URLEncoder.encode(title, "UTF-8"),
+                                        URLEncoder.encode(aut, "UTF-8"));
+                                doi = queryCrossref(subpath);
                             }
-                            doi = queryCrossref(subpath);
-                        }
-                        if (!doi.isEmpty()) {
-                            i++;
-                            mm.updateDoi(doi);
+                            if (doi.isEmpty()) {
+                                node = (Element) xPath.compile("text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/title")
+                                        .evaluate(rootElement, XPathConstants.NODE);
+                                if (node != null) {
+                                    journalTitle = node.getTextContent();
+                                    if (journalTitle != null) {
+                                        journalTitle = Utilities.removeAccents(journalTitle);
+                                    }
+                                }
+                                node = (Element) xPath.compile("text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/imprint/biblScope[@unit='pp']")
+                                        .evaluate(rootElement, XPathConstants.NODE);
+                                if (node != null) {
+                                    pageRange = node.getTextContent();
+                                }
+                                if (pageRange != null) {
+                                    pageRange = pageRange.replaceAll("[A-Za-z.,\\s+]", "");
+                                    StringTokenizer st = new StringTokenizer(pageRange, "-");
+                                    if (st.countTokens() == 2) {
+                                        firstPage = st.nextToken();
+                                    } else if (st.countTokens() == 1) {
+                                        firstPage = pageRange;
+                                    }
+                                }
+                                node = (Element) xPath.compile("text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/imprint/biblScope[@unit='volume']")
+                                        .evaluate(rootElement, XPathConstants.NODE);
+                                if (node != null) {
+                                    volume = node.getTextContent();
+                                }
+                            }
+
+                            if (doi.isEmpty() && StringUtils.isNotBlank(journalTitle)
+                                    && StringUtils.isNotBlank(volume)
+                                    //&& StringUtils.isNotBlank(aut)
+                                    && StringUtils.isNotBlank(firstPage)) {
+                                // retrieval per journal title, author, volume, first page
+                                System.out.println("test retrieval per journal title, author, volume, first page");
+                                System.out.println(String.format("aut=%s, firstPage=%s, journalTitle=%s, volume=%s",
+                                        aut, firstPage, journalTitle, volume));
+                                if (StringUtils.isNotBlank(aut)) {
+                                    subpath = String.format(JOURNAL_AUTHOR_BASE_QUERY,
+                                            HarvestProperties.getCrossrefId(),
+                                            HarvestProperties.getCrossrefPwd(),
+                                            URLEncoder.encode(journalTitle, "UTF-8"),
+                                            URLEncoder.encode(aut, "UTF-8"),
+                                            URLEncoder.encode(volume, "UTF-8"),
+                                            firstPage);
+                                } else {
+                                    subpath = String.format(JOURNAL_BASE_QUERY,
+                                            HarvestProperties.getCrossrefId(),
+                                            HarvestProperties.getCrossrefPwd(),
+                                            URLEncoder.encode(journalTitle, "UTF-8"),
+                                            URLEncoder.encode(volume, "UTF-8"),
+                                            firstPage);
+                                }
+                                doi = queryCrossref(subpath);
+                            }
+                            if (!doi.isEmpty()) {
+                                i++;
+                                mm.updateDoi(doi);
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -245,7 +246,7 @@ public class CrossRef {
 
         URL url = new URL("http://" + HarvestProperties.getCrossrefHost() + "/" + query);
 
-        System.out.println("Sending: " + url.toString());
+        logger.debug("Sending: " + url.toString());
         HttpURLConnection urlConn = null;
         try {
             urlConn = (HttpURLConnection) url.openConnection();

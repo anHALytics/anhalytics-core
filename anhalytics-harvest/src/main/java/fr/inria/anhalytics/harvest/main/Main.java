@@ -5,6 +5,7 @@ import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.oaipmh.HALOAIPMHHarvester;
 import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
 import fr.inria.anhalytics.harvest.crossref.CrossRef;
+import fr.inria.anhalytics.harvest.crossref.OpenUrl;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import fr.inria.anhalytics.harvest.teibuild.TeiBuilderProcess;
@@ -73,6 +74,7 @@ public class Main {
         HALOAIPMHHarvester oai = new HALOAIPMHHarvester();
         IstexHarvester ih = new IstexHarvester();
         CrossRef cr = new CrossRef();
+        OpenUrl ou = new OpenUrl();
         if (process.equals("harvestAll")) {
             oai.fetchAllDocuments();
         } else if (process.equals("harvestDaily")) {
@@ -97,6 +99,8 @@ public class Main {
             cr.findDois();
         } else if (process.equals("assetLegend")) {
             gp.addAssetsLegend();
+        } else if (process.equals("openUrl")) {
+            ou.getIstexUrl();
         }
         return;
     }

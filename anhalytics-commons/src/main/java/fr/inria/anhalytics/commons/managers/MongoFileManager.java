@@ -259,6 +259,32 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
     }
 
+    public boolean initIdentifiersWithoutPdfUrl() {
+        collection = getCollection(MongoCollectionsInterface.IDENTIFIERS);
+        
+        BasicDBObject query = new BasicDBObject("doi", new BasicDBObject("$ne", ""));
+        query.append("pdfUrl", "");
+        cursor = collection.find(query);
+        //181974 init
+        logger.debug("Found "+cursor.size()+" doi elements.");
+        return true;
+    }
+    
+        public boolean initIdentifiers() {
+        collection = getCollection(MongoCollectionsInterface.IDENTIFIERS);
+        cursor = collection.find();
+        System.out.println(cursor.size());
+        return true;
+    }
+    
+    public boolean hasMoreIdentifiers() {
+        if (indexFile < cursor.size()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public boolean hasMoreTeis() {
         if (indexFile < cursor.size()) {
             return true;
@@ -289,6 +315,19 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } else {
             return false;
         }
+    }
+    
+    public String nextIdentifier() {
+        String doi = null;
+        BasicDBObject obj = (BasicDBObject)cursor.next();
+        doi = (String) obj.get("doi");
+        currentRepositoryDocId = (String) obj.get("repositoryDocId");
+        currentAnhalyticsId = (String) obj.getObjectId("_id").toString();
+        if (!cursor.hasNext()) {
+            cursor.close();
+        }
+        indexFile++;
+        return doi;
     }
 
     public String nextAnnotation() {
@@ -436,6 +475,19 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
     }
 
+    public boolean isWithoutDoi() {
+        DBCollection collection = db.getCollection(MongoCollectionsInterface.IDENTIFIERS);
+        DBObject query = new BasicDBObject("repositoryDocId", currentRepositoryDocId);
+        temp = collection.findOne(query);
+        String doi = (String) temp.get("doi");
+        if (doi.isEmpty()) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
     public void updateDoi(String doi) {
         DBCollection collection = db.getCollection(MongoCollectionsInterface.IDENTIFIERS);
         temp.put("doi", doi);
@@ -445,17 +497,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     private String generateAnhalyticsId(String repositoryDocId, String doi, String pdfUrl) {
         DBCollection collection = db.getCollection(MongoCollectionsInterface.IDENTIFIERS);
         BasicDBObject document = new BasicDBObject();
-        document.put("repositoryDocId", repositoryDocId);
-        BasicDBObject result = (BasicDBObject)collection.findOne(document);
-        if(result != null){
-            currentAnhalyticsId = result.getObjectId("_id").toString();
-            return currentAnhalyticsId;
-        }
         /*BasicDBObject index = new BasicDBObject();
-        index.put("repositoryDocId", 1);
-        collection.ensureIndex(index, "index", true);
-        */
-        
+            index.put("repositoryDocId", 1);
+            collection.ensureIndex(index, "index", true);
+         */
+        document.put("repositoryDocId", repositoryDocId);
         document.put("doi", doi);
         document.put("pdfUrl", pdfUrl);
         collection.insert(document);
@@ -887,6 +933,16 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             BasicDBObject whereQuery = new BasicDBObject();
             whereQuery.put("repositoryDocId", repositoryDocId);
             whereQuery.put("url", url);
+            collection.remove(whereQuery);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e.getCause());
+        }
+    }
+    
+    public void removeIdentifier() {
+        try {
+            BasicDBObject whereQuery = new BasicDBObject();
+            whereQuery.put("_id", new ObjectId(currentAnhalyticsId));
             collection.remove(whereQuery);
         } catch (Exception e) {
             logger.error(e.getMessage(), e.getCause());
