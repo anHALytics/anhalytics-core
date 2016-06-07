@@ -114,10 +114,10 @@ public class AnnotateProperties {
     }
 
     /**
-     * @param reset the reset to set
+     * @param isreset the reset to set
      */
-    public static void setReset(boolean reSet) {
-        reset = reSet;
+    public static void setReset(boolean isreset) {
+        reset = isreset;
     }
 
     /**

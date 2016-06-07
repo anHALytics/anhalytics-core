@@ -190,10 +190,10 @@ public class HarvestProperties {
     }
 
     /**
-     * @param reset the reset to set
+     * @param isreset the reset to set
      */
-    public static void setReset(boolean reset) {
-        reset = reset;
+    public static void setReset(boolean isreset) {
+        reset = isreset;
     }
 
     /**
