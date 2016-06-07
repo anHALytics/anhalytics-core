@@ -32,6 +32,7 @@ import fr.inria.anhalytics.kb.entities.Journal;
 import fr.inria.anhalytics.kb.entities.Location;
 import fr.inria.anhalytics.kb.entities.Monograph;
 import fr.inria.anhalytics.kb.entities.Organisation;
+import fr.inria.anhalytics.kb.entities.Organisation_Name;
 import fr.inria.anhalytics.kb.entities.PART_OF;
 import fr.inria.anhalytics.kb.entities.Person;
 import fr.inria.anhalytics.kb.entities.Person_Identifier;
@@ -131,8 +132,8 @@ public class HALMiner extends Miner {
                             NodeList monogr = (NodeList) xPath.compile(TeiPaths.MonogrElement).evaluate(teiDoc, XPathConstants.NODESET);
                             NodeList ids = (NodeList) xPath.compile(TeiPaths.IdnoElement).evaluate(teiDoc, XPathConstants.NODESET);
                             logger.info("Extracting :" + repositoryDocId);
-                            if (authors.getLength() > 10) {
-                                throw new NumberOfCoAuthorsExceededException("Number of authors exceed 10 co-authors for this publication.");
+                            if (authors.getLength() > 20) {
+                                throw new NumberOfCoAuthorsExceededException("Number of authors exceed 20 co-authors for this publication.");
                             }
                             fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId);
 
@@ -347,7 +348,7 @@ public class HALMiner extends Miner {
                 if (ndorg.getNodeType() == Node.ELEMENT_NODE) {
                     Element orgChildElt = (Element) ndorg;
                     if (orgChildElt.getNodeName().equals("orgName")) {
-                        organisationParent.addName(pubDate, orgChildElt.getTextContent());
+                        organisationParent.addName(new Organisation_Name(orgChildElt.getTextContent(), pubDate));
                     } else if (orgChildElt.getNodeName().equals("desc")) {
                         NodeList descorgChilds = ndorg.getChildNodes();
                         for (int l = descorgChilds.getLength() - 1; l >= 0; l--) {
@@ -417,68 +418,60 @@ public class HALMiner extends Miner {
         Location location = null;
         LocationDAO ld = (LocationDAO) adf.getLocationDAO();
         AddressDAO ad = (AddressDAO) adf.getAddressDAO();
-        NodeList orgs = affiliationElt.getElementsByTagName("org");
-        if (orgs != null && (orgs.getLength() != 0)) {
-            Element orgElt = (Element) orgs.item(0);
-            organisation.setType(orgElt.getAttribute("type"));
-            organisation.setStructure(orgElt.getAttribute("xml:id"));
-        }
-        if (orgs != null && orgs.getLength() > 1) {
-            Element org1Elt = (Element) affiliationElt.getElementsByTagName("org").item(1);
-            organisation = parseOrg(org1Elt, organisation, document_organisation, pub.getDate_printed());
-        }
-        NodeList addressNL = affiliationElt.getElementsByTagName("address");
-        if (addressNL != null && (addressNL.getLength() != 0)) {
-            Element addressElt = (Element) addressNL.item(0);
-            location = processAddress(addressElt);
-        }
-        NodeList refNL = affiliationElt.getElementsByTagName("ref");
-        if (refNL != null && (refNL.getLength() != 0)) {
-            Element refElt = (Element) refNL.item(0);
-            String descReftype = refElt.getAttribute("type");
-            if (descReftype.equals("url")) {
-                organisation.setUrl(refElt.getTextContent());
+        NodeList nodes = affiliationElt.getChildNodes();
 
-            }
-        }
+        for (int o = nodes.getLength() - 1; o >= 0; o--) {
 
-        NodeList orgNamesElt = affiliationElt.getElementsByTagName("orgName");
+            Node ndorg = nodes.item(o);
+            if (ndorg.getNodeType() == Node.ELEMENT_NODE) {
+                Element childElt = (Element) ndorg;
+                if (childElt.getNodeName().equals("org")) {
+                    organisation = parseOrg(childElt, organisation, document_organisation, pub.getDate_printed());
+                } else if (childElt.getNodeName().equals("address")) {
 
-        if (orgNamesElt != null && (orgNamesElt.getLength() != 0)) {
+                    location = processAddress(childElt);
+                } else if (childElt.getNodeName().equals("ref")) {
+                    String descReftype = childElt.getAttribute("type");
+                    if (descReftype.equals("url")) {
+                        organisation.setUrl(childElt.getTextContent());
 
-            for (int m = orgNamesElt.getLength() - 1; m >= 0; m--) {
-                Element orgnameChildElt = (Element) orgNamesElt.item(m);
-                if (isGrobid) {
-                    Organisation organisation1 = new Organisation();
-                    if (organisation.getType().isEmpty() && orgnameChildElt.hasAttribute("type")) {
-                        organisation1.setUrl(organisation.getUrl());
-                        organisation1.setType(orgnameChildElt.getAttribute("type"));
-                        organisation1.addName(pub.getDate_printed(), orgnameChildElt.getTextContent());
-                        organisation1.setPublication_date(pub.getDate_printed());
                     }
-                    organisations.add(organisation1);
-                } else {
-                    organisation.addName(pub.getDate_printed(), orgnameChildElt.getTextContent());
-                    organisation.setPublication_date(pub.getDate_printed());
+                } else if (childElt.getNodeName().equals("orgName")) {
+
+                    if (isGrobid) {
+                        Organisation organisation1 = new Organisation();
+                        if (organisation.getType().isEmpty() && childElt.hasAttribute("type")) {
+                            organisation1.setUrl(organisation.getUrl());
+                            organisation1.setType(childElt.getAttribute("type"));
+                            organisation1.addName(new Organisation_Name(childElt.getTextContent(), pub.getDate_printed()));
+                            organisation1.setPublication_date(pub.getDate_printed());
+                        }
+                        organisations.add(organisation1);
+                    } else {
+                        organisation.addName(new Organisation_Name(childElt.getTextContent(), pub.getDate_printed()));
+                        organisation.setPublication_date(pub.getDate_printed());
+                    }
                 }
             }
         }
         if (!isGrobid) {
+            organisation.setType(affiliationElt.getAttribute("type"));
+            organisation.setStructure(affiliationElt.getAttribute("xml:id"));
             organisations.add(organisation);
         }
-        for (int l = 0; l <= organisations.size() - 1; l++) {
-            od.create(organisations.get(l));
+        for (Organisation org : organisations) {
+            od.create(org);
 
-            document_organisation.addOrg(organisations.get(l));
+            document_organisation.addOrg(org);
             d_o.create(document_organisation);
-            affiliation.addOrganisation(organisations.get(l));
+            affiliation.addOrganisation(org);
             affiliation.setBegin_date(pub.getDate_printed());
             if (location != null && location.getAddress() != null) {
                 if (location.getAddress().getAddressId() == null) {
                     ad.create(location.getAddress());
                 }
                 location.setBegin_date(pub.getDate_printed());
-                location.setOrganisation(organisations.get(l));
+                location.setOrganisation(org);
                 ld.create(location);
             }
         }
@@ -522,7 +515,20 @@ public class HALMiner extends Miner {
                                 prs.setUrl(personChildElt.getAttribute("target"));
                             }
                         } else if (personChildElt.getNodeName().equals("affiliation")) {
-                            curateAffiliation(affiliation, pub, personChildElt, false);
+                            NodeList nl = personChildElt.getChildNodes();
+                            Element org = null;
+                            Node n = null;
+                            for (int z = nl.getLength() - 1; z >= 0; z--) {
+                                n = nl.item(z);
+                                if (n.getNodeType() == Node.ELEMENT_NODE) {
+                                    if (n.getNodeName().equals("org")) {
+                                        org = (Element) n;
+                                        break;
+                                    }
+                                }
+
+                            }
+                            curateAffiliation(affiliation, pub, org, false);
                             isAffiliated = true;
                         } else if (personChildElt.getNodeName().equals("idno")) {
                             Person_Identifier pi = new Person_Identifier();

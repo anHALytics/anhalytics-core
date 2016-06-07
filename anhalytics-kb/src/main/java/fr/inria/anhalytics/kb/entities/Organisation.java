@@ -18,14 +18,14 @@ public class Organisation {
     private String type = "";
     private String url = "";
     private String structure = "";
-    private Map<Date, String> names = null;
+    private List<Organisation_Name> names = null;
     private Date publication_date;
     private List<PART_OF> rels = null;
 
     public Organisation() {
     }
 
-    public Organisation(Long organisationId, String type, String url, String structure, Map<Date, String> names, List<PART_OF> rels, Date publication_date) {
+    public Organisation(Long organisationId, String type, String url, String structure, List<Organisation_Name> names, List<PART_OF> rels, Date publication_date) {
         this.organisationId = organisationId;
         this.type = type;
         this.url = url;
@@ -100,9 +100,9 @@ public class Organisation {
     /**
      * @return the name
      */
-    public Map<Date, String> getNames() {
+    public List<Organisation_Name> getNames() {
         if (this.names == null) {
-            this.names = new HashMap<Date, String>();
+            this.names = new ArrayList<Organisation_Name>();
         }
         return names;
     }
@@ -110,13 +110,13 @@ public class Organisation {
     /**
      * @param name the name to set
      */
-    public void addName(Date date, String name) {
+    public void addName(Organisation_Name name) {
         if (this.names == null) {
-            this.names = new HashMap<Date, String>();
+            this.names = new ArrayList<Organisation_Name>();
         }
-        if(name.length() > 150)
-            name = name.substring(0, 149);
-        this.names.put(date, name);
+        if(name.getName().length() > 150)
+            name.setName(name.getName().substring(0, 149));
+        this.names.add(name);
     }
 
     /**
@@ -141,15 +141,10 @@ public class Organisation {
 
     public Map<String, Object> getOrganisationDocument() {
         Map<String, Object> organisationDocument = new HashMap<String, Object>();
-        Map<String, Object> organisationNamesDocument = new HashMap<String, Object>();
+        List<Map<String, Object>> organisationNamesDocument = new ArrayList<Map<String, Object>>();
         organisationDocument.put("organisationId", this.getOrganisationId());
-        Iterator it = this.getNames().entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            Date date = (Date) pair.getKey();
-            String name = (String) pair.getValue();
-        organisationNamesDocument.put(Utilities.formatDate(date), name);
-        
+        for(Organisation_Name name:getNames()){
+            organisationNamesDocument.add(name.getOrganisationNameDocument());
         }
         organisationDocument.put("names", organisationNamesDocument);
         organisationDocument.put("type", this.getType());
