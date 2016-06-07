@@ -290,7 +290,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             return false;
         }
     }
-    
+
     public String nextAnnotation() {
         String json = null;
         DBObject obj = cursor.next();
@@ -445,11 +445,16 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     private String generateAnhalyticsId(String repositoryDocId, String doi, String pdfUrl) {
         DBCollection collection = db.getCollection(MongoCollectionsInterface.IDENTIFIERS);
         BasicDBObject document = new BasicDBObject();
-        /*BasicDBObject index = new BasicDBObject();
-            index.put("repositoryDocId", 1);
-            collection.ensureIndex(index, "index", true);
-         */
         document.put("repositoryDocId", repositoryDocId);
+        BasicDBObject result = (BasicDBObject)collection.findOne(document);
+        if(result != null){
+            currentAnhalyticsId = result.getObjectId("_id").toString();
+            return currentAnhalyticsId;
+        }
+        BasicDBObject index = new BasicDBObject();
+        index.put("repositoryDocId", 1);
+        collection.ensureIndex(index, "index", true);
+        
         document.put("doi", doi);
         document.put("pdfUrl", pdfUrl);
         collection.insert(document);
