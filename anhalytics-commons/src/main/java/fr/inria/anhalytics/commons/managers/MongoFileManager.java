@@ -451,9 +451,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             currentAnhalyticsId = result.getObjectId("_id").toString();
             return currentAnhalyticsId;
         }
-        BasicDBObject index = new BasicDBObject();
+        /*BasicDBObject index = new BasicDBObject();
         index.put("repositoryDocId", 1);
         collection.ensureIndex(index, "index", true);
+        */
         
         document.put("doi", doi);
         document.put("pdfUrl", pdfUrl);
