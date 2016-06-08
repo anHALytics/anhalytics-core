@@ -261,13 +261,38 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
         preparedStatement.setLong(1, id);
         ResultSet rs = preparedStatement.executeQuery();
 
-        while (rs.next()) {
-            org = find(rs.getLong("organisation_motherID"));
-            try {
+        PreparedStatement preparedStatement1 = this.connect.prepareStatement(SQL_SELECT_ORG_BY_ID);
+        try {
+            while (rs.next()) {
+                preparedStatement1.setLong(1, rs.getLong("organisation_motherID"));
+                preparedStatement1.setLong(2, rs.getLong("organisation_motherID"));
+                ResultSet rs1 = preparedStatement1.executeQuery();
+                if (rs1.first()) {
+
+                    org = new Organisation(
+                            rs.getLong("organisation_motherID"),
+                            rs1.getString("org.type"),
+                            rs1.getString("org.url"),
+                            rs1.getString("org.structID"),
+                            (new ArrayList<Organisation_Name>()),
+                            new ArrayList<PART_OF>(),
+                            Utilities.parseStringDate(rs1.getString("orgname.publication_date"))
+                    );
+                    if (rs1.getString("orgname.name") != null) {
+                        org.getNames().add(new Organisation_Name(rs1.getString("orgname.name"), Utilities.parseStringDate(rs1.getString("orgname.publication_date"))));
+                    }
+
+                }
+                while (rs1.next()) {
+                    if (rs1.getString("orgname.name") != null) {
+                        org.getNames().add(new Organisation_Name(rs1.getString("orgname.name"), Utilities.parseStringDate(rs1.getString("orgname.publication_date"))));
+                    }
+                }
                 rels.add(new PART_OF(org, Utilities.parseStringDate(rs.getString("begin_date")), Utilities.parseStringDate(rs.getString("end_date"))));
-            } catch (ParseException ex) {
-                Logger.getLogger(OrganisationDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+        } catch (ParseException ex) {
+            Logger.getLogger(OrganisationDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
         return rels;
     }
