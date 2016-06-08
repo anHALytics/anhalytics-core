@@ -265,6 +265,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         BasicDBObject query = new BasicDBObject("doi", new BasicDBObject("$ne", ""));
         query.append("pdfUrl", "");
         cursor = collection.find(query);
+        indexFile = 0;
         //181974 init
         logger.debug("Found "+cursor.size()+" doi elements.");
         return true;
@@ -273,6 +274,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         public boolean initIdentifiers() {
         collection = getCollection(MongoCollectionsInterface.IDENTIFIERS);
         cursor = collection.find();
+        indexFile = 0;
         System.out.println(cursor.size());
         return true;
     }
@@ -534,7 +536,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * Updates already existing tei with new (more enriched one, fulltext..).
      */
-    public void updateTei(String newTei, String repositoryDocId, boolean isFulltextAdded) {
+    public void updateTei(String newTei, String repositoryDocId, boolean isWithFulltext) {
         try {
             GridFS gfs = new GridFS(db, MongoCollectionsInterface.FINAL_TEIS);
             GridFSDBFile gdf = gfs.findOne(repositoryDocId + ".tei.xml");
@@ -545,12 +547,12 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             gfsNew.put("documentType", gdf.get("documentType"));
             gfsNew.put("anhalyticsId", gdf.get("anhalyticsId"));
             gfsNew.put("source", gdf.get("source"));
-            Object o = gdf.get("isFulltextAdded");
+            Object o = gdf.get("isWithFulltext");
 
             if (o == null) {
-                gfsNew.put("isFulltextAdded", isFulltextAdded);
+                gfsNew.put("isWithFulltext", isWithFulltext);
             } else {
-                gfsNew.put("isFulltextAdded", gdf.get("isFulltextAdded"));
+                gfsNew.put("isWithFulltext", gdf.get("isWithFulltext"));
             }
 
             gfsNew.save();

@@ -163,7 +163,7 @@ public class HALMiner extends Miner {
                         adf.endTransaction();
                         if (teiDoc != null) {
                             String generatedTeiString = Utilities.toString(teiDoc);
-                            mm.updateTei(generatedTeiString, repositoryDocId, false);
+                            mm.updateTei(generatedTeiString, repositoryDocId, true);
                         }
                     }
                 }
