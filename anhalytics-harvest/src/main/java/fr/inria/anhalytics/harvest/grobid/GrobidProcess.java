@@ -51,16 +51,17 @@ public class GrobidProcess {
                             String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
                             String source = mm.getCurrentDocSource();
                             if (toBeGrobidified.contains(type)) {
+                                if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
+                                    logger.info("skipping " + currentRepositoryDocId + " No anHALytics id provided");
+                                    continue;
+                                }
                                 if (!HarvestProperties.isReset()) {
                                     if (mm.isGrobidified(currentRepositoryDocId)) {
                                         logger.info("skipping " + currentRepositoryDocId + " Already grobidified");
                                         continue;
                                     }
-                                    if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
-                                        logger.info("skipping " + currentRepositoryDocId + " No anHALytics id provided");
-                                        continue;
-                                    }
                                 }
+
                                 try {
                                     if (source.equalsIgnoreCase("hal")) {
                                         start = 2;

@@ -132,8 +132,8 @@ public class HALMiner extends Miner {
                             NodeList monogr = (NodeList) xPath.compile(TeiPaths.MonogrElement).evaluate(teiDoc, XPathConstants.NODESET);
                             NodeList ids = (NodeList) xPath.compile(TeiPaths.IdnoElement).evaluate(teiDoc, XPathConstants.NODESET);
                             logger.info("Extracting :" + repositoryDocId);
-                            if (authors.getLength() > 20) {
-                                throw new NumberOfCoAuthorsExceededException("Number of authors exceed 20 co-authors for this publication.");
+                            if (authors.getLength() > 30) {
+                                throw new NumberOfCoAuthorsExceededException("Number of authors exceed 30 co-authors for this publication.");
                             }
                             fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId);
 
