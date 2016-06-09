@@ -129,7 +129,7 @@ public class HALMiner extends Miner {
                             //more than one domain / article
                             NodeList editors = teiHeader.getElementsByTagName("editor");
                             NodeList authors = teiHeader.getElementsByTagName("author");
-                            NodeList monogr = (NodeList) xPath.compile(TeiPaths.MonogrElement).evaluate(teiDoc, XPathConstants.NODESET);
+                            Element monogr = (Element) xPath.compile(TeiPaths.MonogrElement).evaluate(teiDoc, XPathConstants.NODE);
                             NodeList ids = (NodeList) xPath.compile(TeiPaths.IdnoElement).evaluate(teiDoc, XPathConstants.NODESET);
                             logger.info("Extracting :" + repositoryDocId);
                             if (authors.getLength() > 30) {
@@ -146,7 +146,6 @@ public class HALMiner extends Miner {
                             pub.setDoc_title(title.getTextContent());
                             pub.setType(type.getTextContent());
                             pub.setLanguage(language.getTextContent());
-
                             processMonogr(monogr, pub);
 
                             pd.create(pub);
@@ -195,7 +194,7 @@ public class HALMiner extends Miner {
         did.create(dihal);
     }
 
-    private static void processMonogr(NodeList monogr, Publication pub) throws SQLException {
+    private static void processMonogr(Element monogr, Publication pub) throws SQLException {
         MonographDAO md = (MonographDAO) adf.getMonographDAO();
         Conference_EventDAO ced = (Conference_EventDAO) adf.getConference_EventDAO();
         In_SerialDAO isd = (In_SerialDAO) adf.getIn_SerialDAO();
@@ -207,125 +206,127 @@ public class HALMiner extends Miner {
         Collection collection = new Collection();
         List<Serial_Identifier> serial_identifiers = new ArrayList<Serial_Identifier>();
         Publisher pls = new Publisher();
-        NodeList content = monogr.item(0).getChildNodes();
-        for (int i = content.getLength() - 1; i >= 0; i--) {
-            Node node = content.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element monogrChildElt = (Element) node;
-                if (monogrChildElt.getNodeName().equals("idno")) {
-                    serial_identifiers.add(new Serial_Identifier(null, monogrChildElt.getTextContent(), monogrChildElt.getAttribute("type"), journal, collection));
-                } else if (monogrChildElt.getNodeName().equals("title")) {
-                    String type = monogrChildElt.getAttribute("level");
-                    mn.setTitle(monogrChildElt.getTextContent());
-                    mn.setType(type);
-                    if (type.equals("j")) {
-                        journal.setTitle(monogrChildElt.getTextContent());
-                    } else {
-                        collection.setTitle(monogrChildElt.getTextContent());
-                    }
-                } else if (monogrChildElt.getNodeName().equals("imprint")) {
-                    NodeList imprint = monogrChildElt.getChildNodes();
+        NodeList content = monogr.getChildNodes();
+        if (content.getLength() > 0) {
+            for (int i = content.getLength() - 1; i >= 0; i--) {
+                Node node = content.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element monogrChildElt = (Element) node;
+                    if (monogrChildElt.getNodeName().equals("idno")) {
+                        serial_identifiers.add(new Serial_Identifier(null, monogrChildElt.getTextContent(), monogrChildElt.getAttribute("type"), journal, collection));
+                    } else if (monogrChildElt.getNodeName().equals("title")) {
+                        String type = monogrChildElt.getAttribute("level");
+                        mn.setTitle(monogrChildElt.getTextContent());
+                        mn.setType(type);
+                        if (type.equals("j")) {
+                            journal.setTitle(monogrChildElt.getTextContent());
+                        } else {
+                            collection.setTitle(monogrChildElt.getTextContent());
+                        }
+                    } else if (monogrChildElt.getNodeName().equals("imprint")) {
+                        NodeList imprint = monogrChildElt.getChildNodes();
 
-                    for (int j = imprint.getLength() - 1; j >= 0; j--) {
-                        Node entry = imprint.item(j);
-                        if (entry.getNodeType() == Node.ELEMENT_NODE) {
-                            Element imprintChildElt = (Element) entry;
-                            if (imprintChildElt.getNodeName().equals("publisher")) {
-                                pls.setName(imprintChildElt.getTextContent());
-                            } else if (imprintChildElt.getNodeName().equals("date")) {
-                                String type = imprintChildElt.getAttribute("type");
-                                String date = imprintChildElt.getTextContent();
-                                if (type.equals("datePub") || type.equals("dateDefended")) {
-                                    pub.setDate_eletronic(date);
-                                    date = Utilities.completeDate(date);
-                                    try {
-                                        pub.setDate_printed(Utilities.parseStringDate(date));
-                                    } catch (ParseException ex) {
-                                        ex.printStackTrace();
-                                    }
-                                }
-                            } else if (imprintChildElt.getNodeName().equals("biblScope")) {
-                                String unit = imprintChildElt.getAttribute("unit");
-                                if (unit.equals("serie")) {
-                                    collection.setTitle(imprintChildElt.getTextContent());
-                                    if (journal.getTitle().isEmpty()) {
-                                        journal.setTitle(imprintChildElt.getTextContent());
-                                    }
-                                } else if (unit.equals("volume")) {
-                                    is.setVolume(imprintChildElt.getTextContent());
-                                } else if (unit.equals("issue")) {
-                                    is.setIssue(imprintChildElt.getTextContent());
-                                } else if (unit.equals("pp")) {
-                                    String pp = imprintChildElt.getTextContent();
-                                    if (pp.length() < 10) {
-                                        if (pp.contains("-") && pp.length() > 3) {
-                                            String[] pages = pp.split("-");
-                                            pub.setStart_page(pages[0]);
-                                            if (pages.length > 1) {
-                                                pub.setEnd_page(pages[1]);
-                                            }
-                                        } else {
-                                            pub.setStart_page(pp);
+                        for (int j = imprint.getLength() - 1; j >= 0; j--) {
+                            Node entry = imprint.item(j);
+                            if (entry.getNodeType() == Node.ELEMENT_NODE) {
+                                Element imprintChildElt = (Element) entry;
+                                if (imprintChildElt.getNodeName().equals("publisher")) {
+                                    pls.setName(imprintChildElt.getTextContent());
+                                } else if (imprintChildElt.getNodeName().equals("date")) {
+                                    String type = imprintChildElt.getAttribute("type");
+                                    String date = imprintChildElt.getTextContent();
+                                    if (type.equals("datePub") || type.equals("dateDefended")) {
+                                        pub.setDate_eletronic(date);
+                                        date = Utilities.completeDate(date);
+                                        try {
+                                            pub.setDate_printed(Utilities.parseStringDate(date));
+                                        } catch (ParseException ex) {
+                                            ex.printStackTrace();
                                         }
                                     }
-                                }
+                                } else if (imprintChildElt.getNodeName().equals("biblScope")) {
+                                    String unit = imprintChildElt.getAttribute("unit");
+                                    if (unit.equals("serie")) {
+                                        collection.setTitle(imprintChildElt.getTextContent());
+                                        if (journal.getTitle().isEmpty()) {
+                                            journal.setTitle(imprintChildElt.getTextContent());
+                                        }
+                                    } else if (unit.equals("volume")) {
+                                        is.setVolume(imprintChildElt.getTextContent());
+                                    } else if (unit.equals("issue")) {
+                                        is.setIssue(imprintChildElt.getTextContent());
+                                    } else if (unit.equals("pp")) {
+                                        String pp = imprintChildElt.getTextContent();
+                                        if (pp.length() < 10) {
+                                            if (pp.contains("-") && pp.length() > 3) {
+                                                String[] pages = pp.split("-");
+                                                pub.setStart_page(pages[0]);
+                                                if (pages.length > 1) {
+                                                    pub.setEnd_page(pages[1]);
+                                                }
+                                            } else {
+                                                pub.setStart_page(pp);
+                                            }
+                                        }
+                                    }
 
-                            }
-                        }
-                    }
-                } else if (monogrChildElt.getNodeName().equals("meeting")) {
-                    ce = new Conference_Event();
-                    ce.setConference(new Conference());
-                    Address addr = new Address();
-                    AddressDAO ad = (AddressDAO) adf.getAddressDAO();
-                    NodeList meeting = node.getChildNodes();
-                    for (int m = meeting.getLength() - 1; m >= 0; m--) {
-                        Node meetingChild = meeting.item(m);
-                        if (meeting.item(m).getNodeType() == Node.ELEMENT_NODE) {
-                            Element meetingChildElt = (Element) meetingChild;
-                            if (meetingChildElt.getNodeName().equals("title")) {
-                                ce.getConference().setTitle(meetingChildElt.getTextContent());
-                            } else if (meetingChildElt.getNodeName().equals("date")) {
-                                String type = meetingChildElt.getAttribute("type");
-                                if (type.equals("start")) {
-                                    ce.setStart_date(meetingChildElt.getTextContent());
-                                } else if (type.equals("end")) {
-                                    ce.setEnd_date(meetingChildElt.getTextContent());
                                 }
-                            } else if (meetingChildElt.getNodeName().equals("settlement")) {
-                                addr.setSettlement(meetingChildElt.getTextContent());
-                            } else if (meetingChildElt.getNodeName().equals("country")) {
-                                Country c = new Country();
-                                addr.setCountryStr(meetingChildElt.getTextContent());
-                                c.setIso(meetingChildElt.getAttribute("key"));
-                                addr.setCountry(c);
-                            } else if (meetingChildElt.getNodeName().equals("region")) {
-                                addr.setRegion(meetingChildElt.getTextContent());
                             }
                         }
+                    } else if (monogrChildElt.getNodeName().equals("meeting")) {
+                        ce = new Conference_Event();
+                        ce.setConference(new Conference());
+                        Address addr = new Address();
+                        AddressDAO ad = (AddressDAO) adf.getAddressDAO();
+                        NodeList meeting = node.getChildNodes();
+                        for (int m = meeting.getLength() - 1; m >= 0; m--) {
+                            Node meetingChild = meeting.item(m);
+                            if (meeting.item(m).getNodeType() == Node.ELEMENT_NODE) {
+                                Element meetingChildElt = (Element) meetingChild;
+                                if (meetingChildElt.getNodeName().equals("title")) {
+                                    ce.getConference().setTitle(meetingChildElt.getTextContent());
+                                } else if (meetingChildElt.getNodeName().equals("date")) {
+                                    String type = meetingChildElt.getAttribute("type");
+                                    if (type.equals("start")) {
+                                        ce.setStart_date(meetingChildElt.getTextContent());
+                                    } else if (type.equals("end")) {
+                                        ce.setEnd_date(meetingChildElt.getTextContent());
+                                    }
+                                } else if (meetingChildElt.getNodeName().equals("settlement")) {
+                                    addr.setSettlement(meetingChildElt.getTextContent());
+                                } else if (meetingChildElt.getNodeName().equals("country")) {
+                                    Country c = new Country();
+                                    addr.setCountryStr(meetingChildElt.getTextContent());
+                                    c.setIso(meetingChildElt.getAttribute("key"));
+                                    addr.setCountry(c);
+                                } else if (meetingChildElt.getNodeName().equals("region")) {
+                                    addr.setRegion(meetingChildElt.getTextContent());
+                                }
+                            }
+                        }
+                        ad.create(addr);
+                        ce.setAddress(addr);
                     }
-                    ad.create(addr);
-                    ce.setAddress(addr);
                 }
             }
-        }
-        pd.create(pls);
-        pub.setPublisher(pls);
-        md.create(mn);
-        if (ce != null) {
-            ce.setMongoraph(mn);
-            ced.create(ce);
-        }
-        pub.setMonograph(mn);
-        is.setMg(mn);
-        is.setJ(journal);
-        is.setC(collection);
+            pd.create(pls);
+            pub.setPublisher(pls);
+            md.create(mn);
+            if (ce != null) {
+                ce.setMongoraph(mn);
+                ced.create(ce);
+            }
+            pub.setMonograph(mn);
+            is.setMg(mn);
+            is.setJ(journal);
+            is.setC(collection);
 
-        isd.create(is);
-        for (Serial_Identifier serial_identifier : serial_identifiers) {
-            serial_identifier.setJournal(journal);
-            serial_identifier.setCollection(collection);
-            isd.createSerialIdentifier(serial_identifier);
+            isd.create(is);
+            for (Serial_Identifier serial_identifier : serial_identifiers) {
+                serial_identifier.setJournal(journal);
+                serial_identifier.setCollection(collection);
+                isd.createSerialIdentifier(serial_identifier);
+            }
         }
     }
 
@@ -486,110 +487,114 @@ public class HALMiner extends Miner {
         Date pubDate = pub.getDate_printed();
         for (int i = persons.getLength() - 1; i >= 0; i--) {
             person = persons.item(i);
-            prs = new Person();
-            prs.setPublication_date(pubDate);
-            affiliation = new Affiliation();
-            List<Person_Identifier> pis = new ArrayList<Person_Identifier>();
-
+            
             if (person.getNodeType() == Node.ELEMENT_NODE) {
-                NodeList theNodes = person.getChildNodes();
-                NodeList nodes = null;
-                boolean isAffiliated = false;
-                for (int y = theNodes.getLength() - 1; y >= 0; y--) {
-                    Node node = theNodes.item(y);
-                    if (node.getNodeType() == Node.ELEMENT_NODE) {
-                        Element personChildElt = (Element) node;
-                        if (personChildElt.getNodeName().equals("persName")) {
-                            nodes = personChildElt.getChildNodes();
-                            for (int z = nodes.getLength() - 1; z >= 0; z--) {
-                                if (nodes.item(z).getNodeName().equals("forename")) {
-                                    prs.setForename(nodes.item(z).getTextContent());
-                                } else if (nodes.item(z).getNodeName().equals("surname")) {
-                                    prs.setSurname(nodes.item(z).getTextContent());
-                                }
-                            }
-                        } else if (personChildElt.getNodeName().equals("email")) {
-                            prs.setEmail(personChildElt.getTextContent());
-                        } else if (personChildElt.getNodeName().equals("ptr")) {
-                            if (personChildElt.getAttribute("type").equals("url")) {
-                                prs.setUrl(personChildElt.getAttribute("target"));
-                            }
-                        } else if (personChildElt.getNodeName().equals("affiliation")) {
-                            NodeList nl = personChildElt.getChildNodes();
-                            Element org = null;
-                            Node n = null;
-                            for (int z = nl.getLength() - 1; z >= 0; z--) {
-                                n = nl.item(z);
-                                if (n.getNodeType() == Node.ELEMENT_NODE) {
-                                    if (n.getNodeName().equals("org")) {
-                                        org = (Element) n;
-                                        break;
+                Element personElt = (Element) person;
+                if (personElt.getElementsByTagName("persName").getLength() >0) {
+                    NodeList theNodes = person.getChildNodes();
+                    if (theNodes.getLength() > 0) {
+                        prs = new Person();
+                        prs.setPublication_date(pubDate);
+                        affiliation = new Affiliation();
+                        List<Person_Identifier> pis = new ArrayList<Person_Identifier>();
+                        NodeList nodes = null;
+                        boolean isAffiliated = false;
+                        for (int y = theNodes.getLength() - 1; y >= 0; y--) {
+                            Node node = theNodes.item(y);
+                            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                                Element personChildElt = (Element) node;
+                                if (personChildElt.getNodeName().equals("persName")) {
+                                    nodes = personChildElt.getChildNodes();
+                                    for (int z = nodes.getLength() - 1; z >= 0; z--) {
+                                        if (nodes.item(z).getNodeName().equals("forename")) {
+                                            prs.setForename(nodes.item(z).getTextContent());
+                                        } else if (nodes.item(z).getNodeName().equals("surname")) {
+                                            prs.setSurname(nodes.item(z).getTextContent());
+                                        }
+                                    }
+                                } else if (personChildElt.getNodeName().equals("email")) {
+                                    prs.setEmail(personChildElt.getTextContent());
+                                } else if (personChildElt.getNodeName().equals("ptr")) {
+                                    if (personChildElt.getAttribute("type").equals("url")) {
+                                        prs.setUrl(personChildElt.getAttribute("target"));
+                                    }
+                                } else if (personChildElt.getNodeName().equals("affiliation")) {
+                                    NodeList nl = personChildElt.getChildNodes();
+                                    Element org = null;
+                                    Node n = null;
+                                    for (int z = nl.getLength() - 1; z >= 0; z--) {
+                                        n = nl.item(z);
+                                        if (n.getNodeType() == Node.ELEMENT_NODE) {
+                                            if (n.getNodeName().equals("org")) {
+                                                org = (Element) n;
+                                                break;
+                                            }
+                                        }
+
+                                    }
+                                    curateAffiliation(affiliation, pub, org, false);
+                                    isAffiliated = true;
+                                } else if (personChildElt.getNodeName().equals("idno")) {
+                                    Person_Identifier pi = new Person_Identifier();
+                                    String id_type = personChildElt.getAttribute("type");
+                                    String id_value = personChildElt.getTextContent();
+                                    if (id_type.equals("anhalyticsID")) {
+                                        person.removeChild(personChildElt);
+                                    } else {
+                                        pi.setId(id_value);
+                                        pi.setType(id_type);
+                                        pis.add(pi);
                                     }
                                 }
-
-                            }
-                            curateAffiliation(affiliation, pub, org, false);
-                            isAffiliated = true;
-                        } else if (personChildElt.getNodeName().equals("idno")) {
-                            Person_Identifier pi = new Person_Identifier();
-                            String id_type = personChildElt.getAttribute("type");
-                            String id_value = personChildElt.getTextContent();
-                            if (id_type.equals("anhalyticsID")) {
-                                person.removeChild(personChildElt);
-                            } else {
-                                pi.setId(id_value);
-                                pi.setType(id_type);
-                                pis.add(pi);
+                                //person.removeChild(node);
                             }
                         }
-                        //person.removeChild(node);
-                    }
-                }
-                String fullname = prs.getForename();
-                if (!prs.getMiddlename().isEmpty()) {
-                    fullname += " " + prs.getMiddlename();
-                }
-                if (!prs.getForename().isEmpty()) {
-                    fullname += " " + prs.getSurname();
-                }
-                prs.setFullname(fullname);
+                        String fullname = prs.getForename();
+                        if (!prs.getMiddlename().isEmpty()) {
+                            fullname += " " + prs.getMiddlename();
+                        }
+                        if (!prs.getForename().isEmpty()) {
+                            fullname += " " + prs.getSurname();
+                        }
+                        prs.setFullname(fullname);
 
-                if (!isAffiliated && type.equals("author")) {
-                    NodeList affs = null;
-                    Element authorElt = matchAuthor(prs, authorsFromfulltextTeiHeader);
-                    if (authorElt != null) {
-                        affs = authorElt.getElementsByTagName("affiliation");
-                        if (affs != null) {
-                            for (int y = affs.getLength() - 1; y >= 0; y--) {
-                                if (affs.item(y).getNodeType() == Node.ELEMENT_NODE) {
-                                    curateAffiliation(affiliation, pub, (Element) affs.item(y), true);
+                        if (!isAffiliated && type.equals("author")) {
+                            NodeList affs = null;
+                            Element authorElt = matchAuthor(prs, authorsFromfulltextTeiHeader);
+                            if (authorElt != null) {
+                                affs = authorElt.getElementsByTagName("affiliation");
+                                if (affs != null) {
+                                    for (int y = affs.getLength() - 1; y >= 0; y--) {
+                                        if (affs.item(y).getNodeType() == Node.ELEMENT_NODE) {
+                                            curateAffiliation(affiliation, pub, (Element) affs.item(y), true);
+                                        }
+                                    }
                                 }
                             }
+                            //email
+                            //ptr//
                         }
+
+                        prs.setPerson_identifiers(pis);
+
+                        if (type.equals("author")) {
+                            Author author = new Author(pub.getDocument(), prs, 0, 0);
+                            pd.createAuthor(author);
+                            if (affiliation.getOrganisations() != null) {
+                                affiliation.setPerson(prs);
+                                affd.create(affiliation);
+                            }
+                        } else if (type.equals("editor")) {
+                            Editor editor = new Editor(0, prs, pub);
+                            pd.createEditor(editor);
+                        }
+
+                        Element idno = doc.createElement("idno");
+                        idno.setAttribute("type", "anhalyticsID");
+                        idno.setTextContent(Long.toString(prs.getPersonId()));
+                        person.appendChild(idno);
                     }
-                    //email
-                    //ptr//
                 }
-
-                prs.setPerson_identifiers(pis);
-
-                if (type.equals("author")) {
-                    Author author = new Author(pub.getDocument(), prs, 0, 0);
-                    pd.createAuthor(author);
-                    if (affiliation.getOrganisations() != null) {
-                        affiliation.setPerson(prs);
-                        affd.create(affiliation);
-                    }
-                } else if (type.equals("editor")) {
-                    Editor editor = new Editor(0, prs, pub);
-                    pd.createEditor(editor);
-                }
-
-                Element idno = doc.createElement("idno");
-                idno.setAttribute("type", "anhalyticsID");
-                idno.setTextContent(Long.toString(prs.getPersonId()));
-                person.appendChild(idno);
-
             }
         }
 
