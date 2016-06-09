@@ -28,6 +28,12 @@ public class AddressDAO extends DAO<Address, Long> {
     private static final String SQL_SELECT_ADDR_BY_FIELDS
             = "SELECT * FROM ADDRESS addr, COUNTRY country WHERE addr.addrLine = ? AND addr.postBox = ? AND addr.postCode = ? AND addr.settlement = ? AND addr.region = ? AND addr.country = ? AND addr.countryID = country.countryID";
 
+    private static final String SQL_SELECT_ADDR_BY_ID
+            = "SELECT * FROM ADDRESS, COUNTRY WHERE addressID = ? AND ADDRESS.countryID = COUNTRY.countryID";
+    
+    private static final String SQL_SELECT_COUNTRY_BY_ISO
+            = "SELECT * FROM COUNTRY WHERE ISO = ?";
+
     public AddressDAO(Connection conn) {
         super(conn);
     }
@@ -63,6 +69,7 @@ public class AddressDAO extends DAO<Address, Long> {
                     if (rs1.next()) {
                         obj.getCountry().setCountryID(rs1.getLong(1));
                     }
+                    statement1.close();
                 } else {
                     obj.getCountry().setCountryID(country.getCountryID());
                 }
@@ -88,6 +95,7 @@ public class AddressDAO extends DAO<Address, Long> {
             }
 
             result = true;
+            statement.close();
         }
         return result;
     }
@@ -106,9 +114,10 @@ public class AddressDAO extends DAO<Address, Long> {
     public Address find(Long id) throws SQLException {
         Address address = new Address();
 
-        ResultSet result = this.connect.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM ADDRESS, COUNTRY WHERE addressID = " + id + " AND ADDRESS.countryID = COUNTRY.countryID");
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_ID);
+        preparedStatement.setLong(1, id);
+        //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+        ResultSet result = preparedStatement.executeQuery();
         if (result.first()) {
             address = new Address(
                     id,
@@ -122,15 +131,17 @@ public class AddressDAO extends DAO<Address, Long> {
                     new Country(result.getLong("COUNTRY.countryID"), result.getString("COUNTRY.ISO"))
             );
         }
+        preparedStatement.close();
         return address;
     }
 
     public Country findCountry(String iso) throws SQLException {
         Country country = null;
 
-        ResultSet result = this.connect.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM COUNTRY WHERE ISO = \"" + iso + "\"");
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_COUNTRY_BY_ISO);
+        preparedStatement.setString(1, iso);
+        //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+        ResultSet result = preparedStatement.executeQuery();
         if (result.first()) {
             country = new Country(
                     result.getLong("countryID"),
@@ -138,6 +149,7 @@ public class AddressDAO extends DAO<Address, Long> {
                     iso
             );
         }
+        preparedStatement.close();
         return country;
     }
 
@@ -154,6 +166,7 @@ public class AddressDAO extends DAO<Address, Long> {
                 address = find(rs.getLong("addressID"));
 
             }
+            ps.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         }
@@ -186,6 +199,7 @@ public class AddressDAO extends DAO<Address, Long> {
                     new Country(rs.getLong("country.countryID"), rs.getString("COUNTRY.ISO"))
             );
         }
+        ps.close();
         return address;
     }
 }

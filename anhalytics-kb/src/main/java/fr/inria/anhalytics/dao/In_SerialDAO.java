@@ -31,6 +31,9 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
     private static final String SQL_INSERT_SERIAL_IDENTIFIER
             = "INSERT INTO SERIAL_IDENTIFIER (id, type, journalID, collectionID) VALUES (?, ?, ?, ?)";
 
+    private static final String SQL_INSERT_SERIAL_BY_MONOGRID
+            = "SELECT * FROM MONOGRAPH, IN_SERIAL LEFT JOIN COLLECTION ON COLLECTION.collectionID = IN_SERIAL.collectionID LEFT JOIN JOURNAL ON JOURNAL.journalID = IN_SERIAL.journalID WHERE IN_SERIAL.monographID = ? AND MONOGRAPH.monographID = ?";
+    
     public In_SerialDAO(Connection conn) {
         super(conn);
     }
@@ -55,7 +58,7 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
             if (rs.next()) {
                 obj.getJ().setJournalID(rs.getLong(1));
             }
-
+            statement.close();
             result = true;
         }
         if (obj.getC() != null) {
@@ -68,6 +71,7 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
             if (rs1.next()) {
                 obj.getC().setCollectionID(rs1.getLong(1));
             }
+            statement1.close();
         }
         statement2 = connect.prepareStatement(SQL_INSERT);
         statement2.setLong(1, obj.getMg().getMonographID());
@@ -87,7 +91,7 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
         statement2.setString(5, obj.getIssue());
 
         int code2 = statement2.executeUpdate();
-
+        statement2.close();
         result = true;
         return false;
     }
@@ -111,7 +115,7 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
         if (rs.next()) {
             obj1.setSerial_IdentifierID(rs.getLong(1));
         }
-
+        statement.close();
         result = true;
 
         return false;
@@ -131,17 +135,19 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
     public In_Serial find(Long id) {
         In_Serial in_serial = new In_Serial();
         try {
-            ResultSet result = this.connect.createStatement(
-                    ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM MONOGRAPH, IN_SERIAL LEFT JOIN COLLECTION ON COLLECTION.collectionID = IN_SERIAL.collectionID LEFT JOIN JOURNAL ON JOURNAL.journalID = IN_SERIAL.journalID WHERE IN_SERIAL.monographID = "+id+" AND MONOGRAPH.monographID = "+id);
+            PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_INSERT_SERIAL_BY_MONOGRID);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            preparedStatement.setLong(1, id);
+            ResultSet result = preparedStatement.executeQuery();
             if (result.first()) {
                 in_serial = new In_Serial(
-                        new Monograph(result.getLong("MONOGRAPH.monographID"),result.getString("MONOGRAPH.type"), result.getString("MONOGRAPH.title"), result.getString("MONOGRAPH.shortname") ),
+                        new Monograph(result.getLong("MONOGRAPH.monographID"), result.getString("MONOGRAPH.type"), result.getString("MONOGRAPH.title"), result.getString("MONOGRAPH.shortname")),
                         new Journal(result.getLong("JOURNAL.journalID"), result.getString("JOURNAL.title")),
                         new Collection(result.getLong("COLLECTION.collectionID"), result.getString("COLLECTION.title")),
                         result.getString("IN_SERIAL.volume"),
                         result.getString("IN_SERIAL.number"));
             }
+            preparedStatement.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }

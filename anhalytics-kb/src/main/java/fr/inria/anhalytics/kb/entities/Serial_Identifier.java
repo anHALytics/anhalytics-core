@@ -15,8 +15,12 @@ public class Serial_Identifier {
     public Serial_Identifier(){}
     
     public Serial_Identifier(Long serial_IdentifierID, String id, String type, Journal journal, Collection collection){
-        this.serial_IdentifierID = serial_IdentifierID;
+        if(id.length() > 45)
+            id = id.substring(0, 44);
         this.id = id;
+        this.serial_IdentifierID = serial_IdentifierID;
+        this.journal = journal;
+        this.collection = collection;
     }
 
     /**

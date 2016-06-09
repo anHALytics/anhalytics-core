@@ -42,7 +42,7 @@ public class Document_IdentifierDAO extends DAO<Document_Identifier, Long> {
         if (rs.next()) {
             obj.setDoc_identifierID(rs.getLong(1));
         }
-
+        statement.close();
         result = true;
         return result;
     }

@@ -94,9 +94,8 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             if (rs.next()) {
                 obj.setOrganisationId(rs.getLong(1));
             }
-
+            statement1 = connect.prepareStatement(SQL_INSERT_NAMES);
             for (Organisation_Name name : obj.getNames()) {
-                statement1 = connect.prepareStatement(SQL_INSERT_NAMES);
                 statement1.setLong(1, obj.getOrganisationId());
                 statement1.setString(2, name.getName());
                 if (obj.getPublication_date() == null) {
@@ -107,9 +106,9 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 int code1 = statement1.executeUpdate();
             }
 
+            statement2 = connect.prepareStatement(SQL_INSERT_MOTHERS);
             for (PART_OF rel : obj.getRels()) {
 
-                statement2 = connect.prepareStatement(SQL_INSERT_MOTHERS);
                 statement2.setLong(1, rel.getOrganisation_mother().getOrganisationId());
                 statement2.setLong(2, obj.getOrganisationId());
                 if (rel.getBeginDate() == null) {
@@ -125,7 +124,9 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
 
                 int code1 = statement2.executeUpdate();
             }
-
+            statement.close();
+            statement1.close();
+            statement2.close();
             result = true;
         }
         return result;
@@ -148,6 +149,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             preparedStatement.setLong(4, obj.getOrganisationId());
             int code1 = preparedStatement.executeUpdate();
             PreparedStatement statement1 = connect.prepareStatement(SQL_INSERT_NAMES);
+            statement1.setFetchSize(Integer.MIN_VALUE);
             for (Organisation_Name name : obj.getNames()) {
 
                 statement1 = connect.prepareStatement(SQL_INSERT_NAMES);
@@ -160,7 +162,6 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 }
                 int code2 = statement1.executeUpdate();
             }
-
             //save date /
             Date pubDate = obj.getRels().size() > 0 ? obj.getRels().get(0).getBeginDate() : null;
 
@@ -183,6 +184,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             for (PART_OF rel : obj.getRels()) {
 
                 statement2 = connect.prepareStatement(SQL_INSERT_MOTHERS);
+                statement2.setFetchSize(Integer.MIN_VALUE);
                 statement2.setLong(1, rel.getOrganisation_mother().getOrganisationId());
                 statement2.setLong(2, obj.getOrganisationId());
                 if (rel.getBeginDate() == null) {
@@ -203,7 +205,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             for (PART_OF rel : oldMothersOrg) {
 
                 statement3 = connect.prepareStatement(SQL_UPDATE_END_DATE);
-
+                statement3.setFetchSize(Integer.MIN_VALUE);
                 if (pubDate != null) {
                     statement3.setDate(1, new java.sql.Date(pubDate.getTime()));
                     statement3.setLong(2, obj.getOrganisationId());
@@ -260,7 +262,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
         PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_MOTHERID_BY_ORGID);
         preparedStatement.setLong(1, id);
         ResultSet rs = preparedStatement.executeQuery();
-
+        preparedStatement.setFetchSize(Integer.MIN_VALUE);
         PreparedStatement preparedStatement1 = this.connect.prepareStatement(SQL_SELECT_ORG_BY_ID);
         try {
             while (rs.next()) {
@@ -290,10 +292,11 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 }
                 rels.add(new PART_OF(org, Utilities.parseStringDate(rs.getString("begin_date")), Utilities.parseStringDate(rs.getString("end_date"))));
             }
-            
         } catch (ParseException ex) {
             Logger.getLogger(OrganisationDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
+        preparedStatement.close();
+        preparedStatement1.close();
         return rels;
     }
 
@@ -305,6 +308,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             while (rs.next()) {
                 organisations.add(find(rs.getLong("org.organisationID")));
             }
+            preparedStatement.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -331,7 +335,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             }
 
         }
-
+        ps.close();
         return orgs;
     }
 
@@ -345,6 +349,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             if (rs.first()) {
                 orgId = rs.getLong("org.organisationID");
             }
+            statement.close();
         }
         return orgId;
     }
@@ -374,6 +379,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 }
                 affiliations.add(affiliation);
             }
+            ps.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }

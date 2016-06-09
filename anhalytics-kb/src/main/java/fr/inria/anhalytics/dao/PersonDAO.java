@@ -68,9 +68,8 @@ public class PersonDAO extends DAO<Person, Long> {
 
     private Long getEntityIdIfAlreadyStored(Person toBeStored) throws SQLException {
         Long personId = null;
-        PreparedStatement statement;
+        PreparedStatement statement = connect.prepareStatement(READ_QUERY_PERSON_BY_IDENTIFIER);
         for (Person_Identifier id : toBeStored.getPerson_identifiers()) {
-            statement = connect.prepareStatement(READ_QUERY_PERSON_BY_IDENTIFIER);
             statement.setString(1, id.getId());
             ResultSet rs = statement.executeQuery();
             if (rs.first()) {
@@ -78,6 +77,7 @@ public class PersonDAO extends DAO<Person, Long> {
                 return personId;
             }
         }
+        statement.close();
         return personId;
     }
 
@@ -91,7 +91,7 @@ public class PersonDAO extends DAO<Person, Long> {
         statement.setInt(3, author.getRank());
         statement.setInt(4, author.getCorrep());
         int code = statement.executeUpdate();
-
+        statement.close();
         result = true;
         return result;
     }
@@ -105,7 +105,7 @@ public class PersonDAO extends DAO<Person, Long> {
         statement.setLong(2, editor.getPerson().getPersonId());
         statement.setLong(3, editor.getPublication().getPublicationID());
         int code = statement.executeUpdate();
-
+        statement.close();
         result = true;
         return result;
     }
@@ -137,6 +137,7 @@ public class PersonDAO extends DAO<Person, Long> {
             if (rs.next()) {
                 obj.setPersonId(rs.getLong(1));
             }
+            statement.close();
 
             statement1 = connect.prepareStatement(SQL_INSERT_PERSON_NAME);
             statement1.setLong(1, obj.getPersonId());
@@ -152,10 +153,12 @@ public class PersonDAO extends DAO<Person, Long> {
             }
 
             int code1 = statement1.executeUpdate();
+            statement1.close();
+
+            statement2 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
             if (obj.getPerson_identifiers() != null) {
                 for (Person_Identifier pi : obj.getPerson_identifiers()) {
                     if (!isIdentifierIfAlreadyExisting(pi, obj.getPersonId())) {
-                        statement2 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
                         statement2.setLong(1, obj.getPersonId());
                         statement2.setString(2, pi.getId());
                         statement2.setString(3, pi.getType());
@@ -164,6 +167,7 @@ public class PersonDAO extends DAO<Person, Long> {
                     }
                 }
             }
+            statement2.close();
             result = true;
         }
         return result;
@@ -175,6 +179,7 @@ public class PersonDAO extends DAO<Person, Long> {
         PreparedStatement preparedStatement = this.connect.prepareStatement(DELETE_PERSON);
         preparedStatement.setLong(1, obj.getPersonId());
         preparedStatement.executeUpdate();
+        preparedStatement.close();
         result = true;
         return result;
     }
@@ -191,7 +196,7 @@ public class PersonDAO extends DAO<Person, Long> {
             preparedStatement.setString(5, obj.getPhone());
             preparedStatement.setLong(6, obj.getPersonId());
             int code1 = preparedStatement.executeUpdate();
-
+            preparedStatement.close();
             PreparedStatement preparedStatement2 = this.connect.prepareStatement(SQL_INSERT_PERSON_NAME);
             preparedStatement2.setLong(1, obj.getPersonId());
             preparedStatement2.setString(2, obj.getFullname());
@@ -205,10 +210,11 @@ public class PersonDAO extends DAO<Person, Long> {
                 preparedStatement2.setDate(7, new java.sql.Date(obj.getPublication_date().getTime()));
             }
             int code2 = preparedStatement2.executeUpdate();
+            preparedStatement2.close();
 
+            PreparedStatement preparedStatement3 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
             if (obj.getPerson_identifiers() != null) {
                 for (Person_Identifier pi : obj.getPerson_identifiers()) {
-                    PreparedStatement preparedStatement3 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
                     preparedStatement3.setLong(1, obj.getPersonId());
                     preparedStatement3.setString(2, pi.getId());
                     preparedStatement3.setString(3, pi.getType());
@@ -216,6 +222,7 @@ public class PersonDAO extends DAO<Person, Long> {
                     int code3 = preparedStatement3.executeUpdate();
                 }
             }
+            preparedStatement3.close();
             result = true;
         } catch (MySQLIntegrityConstraintViolationException e) {
         }
@@ -269,6 +276,7 @@ public class PersonDAO extends DAO<Person, Long> {
             }
             persons.add(person);
         }
+        preparedStatement.close();
         return persons;
     }
 
@@ -283,6 +291,7 @@ public class PersonDAO extends DAO<Person, Long> {
             while (rs.next()) {
                 persons.put(rs.getLong("personID"), findPerson(rs.getLong("personID")));
             }
+            preparedStatement.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         }
@@ -302,6 +311,7 @@ public class PersonDAO extends DAO<Person, Long> {
                 person = findPerson(rs.getLong("personID"));
                 persons.put(rs.getLong("personID"), person);
             }
+            ps.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         }
@@ -323,7 +333,7 @@ public class PersonDAO extends DAO<Person, Long> {
                     persons.put(rs.getLong("personID"), person);
                 }
             }
-
+            ps.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         }
@@ -341,7 +351,7 @@ public class PersonDAO extends DAO<Person, Long> {
         if (rs.first()) {
             return true;
         }
-
+        statement.close();
         return false;
     }
 
@@ -358,6 +368,7 @@ public class PersonDAO extends DAO<Person, Long> {
                 person = findPerson(rs.getLong("personID"));
                 persons.put(rs.getLong("personID"), person);
             }
+            ps.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         }

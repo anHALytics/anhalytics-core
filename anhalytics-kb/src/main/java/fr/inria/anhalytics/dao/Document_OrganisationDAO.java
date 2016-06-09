@@ -38,6 +38,7 @@ public class Document_OrganisationDAO extends DAO<Document_Organisation, Long> {
                 int code = statement.executeUpdate();
                 result = true;
             }
+            statement.close();
         } catch (MySQLIntegrityConstraintViolationException e) {
         }
         return result;

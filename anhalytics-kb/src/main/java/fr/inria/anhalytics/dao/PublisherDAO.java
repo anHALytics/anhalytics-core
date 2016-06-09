@@ -16,6 +16,12 @@ public class PublisherDAO extends DAO<Publisher, Long> {
     private static final String SQL_INSERT
             = "INSERT INTO PUBLISHER (name) VALUES (?)";
 
+    private static final String SQL_SELECT_PUBLISHER_BY_NAME
+            = "SELECT * FROM PUBLISHER WHERE name = ?";
+
+    private static final String SQL_SELECT_PUBLISHER_BY_ID
+            = "SELECT * FROM PUBLISHER WHERE publisherID = ?";
+
     public PublisherDAO(Connection conn) {
         super(conn);
     }
@@ -40,6 +46,7 @@ public class PublisherDAO extends DAO<Publisher, Long> {
             }
 
             result = true;
+            statement.close();
         }
         return result;
     }
@@ -55,29 +62,32 @@ public class PublisherDAO extends DAO<Publisher, Long> {
     public Publisher find(Long publisher_id) throws SQLException {
         Publisher publisher = new Publisher();
 
-        ResultSet result = this.connect.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM PUBLISHER WHERE publisherID = " + publisher_id);
-        if (result.first()) {
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_ID);
+        preparedStatement.setFetchSize(Integer.MIN_VALUE);
+        preparedStatement.setLong(1, publisher_id);
+        ResultSet rs = preparedStatement.executeQuery();
+        if (rs.first()) {
             publisher = new Publisher(
                     publisher_id,
-                    result.getString("name")
+                    rs.getString("name")
             );
         }
+        preparedStatement.close();
         return publisher;
     }
 
     private Publisher findPublisherIfAlreadyStored(Publisher obj) throws SQLException {
         Publisher publisher = null;
-        ResultSet result = this.connect.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM PUBLISHER WHERE name = \"" + obj.getName() + "\"");
-        if (result.first()) {
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_NAME);
+        preparedStatement.setString(1, obj.getName());
+        ResultSet rs = preparedStatement.executeQuery();
+        if (rs.first()) {
             publisher = new Publisher(
-                    result.getLong("publisherID"),
-                    result.getString("name")
+                    rs.getLong("publisherID"),
+                    rs.getString("name")
             );
         }
+        preparedStatement.close();
         return publisher;
 
     }

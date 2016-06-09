@@ -22,12 +22,15 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
 
     private static final String SQL_INSERT_CONFERENCE
             = "INSERT INTO CONFERENCE (title) VALUES (?)";
-    
+
     private static final String SQL_SELECT_CONFERENCE
             = "SELECT * FROM CONFERENCE_EVENT, CONFERENCE, ADDRESS WHERE conference_eventID = ? AND CONFERENCE_EVENT.conferenceID = CONFERENCE.conferenceID AND ADDRESS.addressID = CONFERENCE_EVENT.addressID";
-    
+
     private static final String SQL_SELECT_CONFERENCE_BY_MONOGR
             = "SELECT * FROM CONFERENCE_EVENT, CONFERENCE, ADDRESS  WHERE monographID = ? AND CONFERENCE_EVENT.conferenceID = CONFERENCE.conferenceID AND ADDRESS.addressID = CONFERENCE_EVENT.addressID";
+
+    private static final String SQL_SELECT_MONOGR_BY_ID
+            = "SELECT * FROM MONOGRAPH WHERE monographID = ?";
 
     public Conference_EventDAO(Connection conn) {
         super(conn);
@@ -72,7 +75,8 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
         if (rs.next()) {
             obj.setConf_eventID(rs.getLong(1));
         }
-
+        statement.close();
+        statement1.close();
         result = true;
         return result;
     }
@@ -91,9 +95,10 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
     public Conference_Event find(Long id) throws SQLException {
         Conference_Event conference_event = null;
 
-        ResultSet result = this.connect.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM MONOGRAPH WHERE monographID = " + id);
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
+        //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+        preparedStatement.setLong(1, id);
+        ResultSet result = preparedStatement.executeQuery();
         if (result.first()) {
             conference_event = new Conference_Event(
                     id,
@@ -104,6 +109,7 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
                     new Address()
             );
         }
+        preparedStatement.close();
         return conference_event;
     }
 
@@ -124,6 +130,7 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
                         new Address(rs.getLong("addressID"), rs.getString("addrLine"), rs.getString("postBox"), rs.getString("postCode"), rs.getString("settlement"), rs.getString("region"), rs.getString("country"), new Country())
                 );
             }
+            ps.close();
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         }

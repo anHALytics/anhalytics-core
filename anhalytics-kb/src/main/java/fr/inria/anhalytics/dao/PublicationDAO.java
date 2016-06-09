@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * @author azhar
  */
 public class PublicationDAO extends DAO<Publication, Long> {
-    
+
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PublicationDAO.class);
 
     private static final String SQL_INSERT
@@ -84,7 +84,7 @@ public class PublicationDAO extends DAO<Publication, Long> {
         if (rs.next()) {
             obj.setPublicationID(rs.getLong(1));
         }
-
+        statement.close();
         result = true;
         return result;
     }
@@ -94,6 +94,7 @@ public class PublicationDAO extends DAO<Publication, Long> {
         PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_DELETE);
         preparedStatement.setLong(1, obj.getPublicationID());
         preparedStatement.executeUpdate();
+        preparedStatement.close();
         result = true;
         return result;
     }
@@ -126,38 +127,39 @@ public class PublicationDAO extends DAO<Publication, Long> {
                 Logger.getLogger(PublicationDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        preparedStatement.close();
         return publication;
     }
 
     public List<Publication> findByDocId(String doc_id) {
         List<Publication> publications = new ArrayList<Publication>();
-        try{
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_BY_DOCID);
-        preparedStatement.setString(1, doc_id);
-        preparedStatement.setString(2, doc_id);
-        ResultSet rs = preparedStatement.executeQuery();
-        while (rs.next()) {
-            try {
-                publications.add(new Publication(
-                        rs.getLong("PUBLICATION.publicationID"),
-                        new Document(doc_id, rs.getString("version"), rs.getString("URI")),
-                        new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
-                        new Publisher(rs.getLong("publisherID"), rs.getString("name")),
-                        rs.getString("PUBLICATION.type"),
-                        rs.getString("doc_title"),
-                        Utilities.parseStringDate(rs.getString("date_printed")),
-                        rs.getString("date_electronic"),
-                        rs.getString("start_page"),
-                        rs.getString("end_page"),
-                        rs.getString("language")
-                )
-                );
-            } catch (ParseException ex) {
-                Logger.getLogger(PublicationDAO.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_BY_DOCID);
+            preparedStatement.setString(1, doc_id);
+            preparedStatement.setString(2, doc_id);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                try {
+                    publications.add(new Publication(
+                            rs.getLong("PUBLICATION.publicationID"),
+                            new Document(doc_id, rs.getString("version"), rs.getString("URI")),
+                            new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
+                            new Publisher(rs.getLong("publisherID"), rs.getString("name")),
+                            rs.getString("PUBLICATION.type"),
+                            rs.getString("doc_title"),
+                            Utilities.parseStringDate(rs.getString("date_printed")),
+                            rs.getString("date_electronic"),
+                            rs.getString("start_page"),
+                            rs.getString("end_page"),
+                            rs.getString("language")
+                    )
+                    );
+                } catch (ParseException ex) {
+                    Logger.getLogger(PublicationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-        }
-        preparedStatement.close();
-        rs.close();
+            preparedStatement.close();
+            rs.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         }

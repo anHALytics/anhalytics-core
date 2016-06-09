@@ -21,12 +21,13 @@ public class DocumentDAO extends DAO<Document, String> {
 
     private static final String SQL_INSERT
             = "INSERT INTO DOCUMENT (docID, version, uri) VALUES (?, ?, ?)";
-    
+
     private static final String READ_QUERY_DOCUMENTS = "SELECT * FROM DOCUMENT";
 
     private static final String READ_QUERY_DOCID_BY_AUTHORS = "SELECT docID FROM AUTHORSHIP WHERE personID = ?";
 
     private static final String SQL_SELECT_DOCID_BY_ORGID = "SELECT * FROM DOCUMENT_ORGANISATION WHERE organisationID = ?";
+    private static final String SQL_SELECT_DOC_BY_ID = "SELECT * FROM DOCUMENT WHERE docID = ?";
 
     public DocumentDAO(Connection conn) {
         super(conn);
@@ -45,7 +46,7 @@ public class DocumentDAO extends DAO<Document, String> {
 
         statement.setString(3, obj.getUri());
         int code = statement.executeUpdate();
-
+        statement.close();
         result = true;
         return result;
     }
@@ -61,16 +62,19 @@ public class DocumentDAO extends DAO<Document, String> {
     public Document find(String doc_id) {
         Document document = null;
         try {
-            ResultSet result = this.connect.createStatement(
-                    ResultSet.TYPE_SCROLL_INSENSITIVE,
-                    ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM DOCUMENT WHERE docID = '" + doc_id + "'");
-            if (result.first()) {
+
+            PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_DOC_BY_ID);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            preparedStatement.setString(1, doc_id);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.first()) {
                 document = new Document(
                         doc_id,
-                        result.getString("version"),
-                        result.getString("uri"
+                        rs.getString("version"),
+                        rs.getString("uri"
                         ));
             }
+            preparedStatement.close();
         } catch (SQLException e) {
             e.printStackTrace();
 
@@ -94,9 +98,9 @@ public class DocumentDAO extends DAO<Document, String> {
     public List<Document> findAllDocuments() {
         List<Document> documents = new ArrayList<Document>();
         try {
-            Statement statement = this.connect.createStatement(java.sql.ResultSet.TYPE_FORWARD_ONLY, java.sql.ResultSet.CONCUR_READ_ONLY);
-            statement.setFetchSize(Integer.MIN_VALUE);
-            ResultSet rs = statement.executeQuery(READ_QUERY_DOCUMENTS);
+            PreparedStatement preparedStatement = this.connect.prepareStatement(READ_QUERY_DOCUMENTS);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
                 documents.add(
@@ -106,6 +110,7 @@ public class DocumentDAO extends DAO<Document, String> {
                                 rs.getString("uri")
                         ));
             }
+            preparedStatement.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         }
@@ -116,28 +121,32 @@ public class DocumentDAO extends DAO<Document, String> {
         List<Document> documents = new ArrayList<Document>();
         try {
             PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_DOCID_BY_ORGID);
+            preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, organisationId);
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
                 documents.add(find(rs.getString("docID")));
             }
+            preparedStatement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return documents;
     }
-    
+
     public List<Document> getDocumentsByAuthorId(Long personId) {
         List<Document> docs = new ArrayList<Document>();
         try {
             PreparedStatement ps = this.connect.prepareStatement(READ_QUERY_DOCID_BY_AUTHORS);
+            ps.setFetchSize(Integer.MIN_VALUE);
             ps.setLong(1, personId);
             // process the results
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 docs.add(find(rs.getString("docID")));
             }
+            ps.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         }

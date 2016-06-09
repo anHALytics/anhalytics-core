@@ -23,6 +23,11 @@ public class LocationDAO extends DAO<Location, Long> {
     private static final String SQL_INSERT
             = "INSERT INTO LOCATION (organisationID, addressID, begin_date, end_date) VALUES (?, ?, ?, ?)";
 
+    private static final String SQL_SELECT_LOCATION_BY_ID
+            = "SELECT * FROM LOCATION WHERE locationID = ? ";
+
+    private static final String SQL_SELECT_LOCATION_BY_ORGID
+            = "SELECT addressID FROM LOCATION WHERE organisationID = ?";
     public LocationDAO(Connection conn) {
         super(conn);
     }
@@ -33,7 +38,7 @@ public class LocationDAO extends DAO<Location, Long> {
         if (obj.getLocationId() != null) {
             throw new IllegalArgumentException("Location is already created, the Location ID is not null.");
         }
-        
+
 // check if location already exist and update dates if it is
         PreparedStatement statement;
         statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
@@ -52,7 +57,7 @@ public class LocationDAO extends DAO<Location, Long> {
             statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
         }
         int code = statement.executeUpdate();
-
+        statement.close();
         result = true;
         return result;
     }
@@ -71,9 +76,10 @@ public class LocationDAO extends DAO<Location, Long> {
     public Location find(Long id) throws SQLException {
         Location location = new Location();
 
-        ResultSet result = this.connect.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT * FROM LOCATION WHERE locationID = " + id);
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
+        //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+        preparedStatement.setLong(1, id);
+        ResultSet result = preparedStatement.executeQuery();
         if (result.first()) {
             try {
                 location = new Location(
@@ -87,18 +93,21 @@ public class LocationDAO extends DAO<Location, Long> {
                 Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        preparedStatement.close();
         return location;
     }
 
-    public Long findAddressIdByOrganisationId(String orgId) throws SQLException {
+    public Long findAddressIdByOrganisationId(Long orgId) throws SQLException {
         Long addressId = null;
 
-        ResultSet result = this.connect.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY).executeQuery("SELECT addressID FROM LOCATION WHERE organisationID = " + orgId);
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
+        //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+        preparedStatement.setLong(1, orgId);
+        ResultSet result = preparedStatement.executeQuery();
         if (result.first()) {
             addressId = result.getLong("addressID");
         }
+        preparedStatement.close();
         return addressId;
     }
 }
