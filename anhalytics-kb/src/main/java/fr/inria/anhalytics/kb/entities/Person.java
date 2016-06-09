@@ -13,33 +13,25 @@ public class Person {
 
     private Long personId;
     private String title = "";
-    private String photo = "";
-    private String fullname = "";
-    private String forename = "";
-    private String middlename = "";
-    private String surname = "";
     private String url = "";
     private String email = "";
+    private String photo = "";
     private String phone = "";
-    private Date publication_date;
     private List<Person_Identifier> person_identifiers = null;
+    private List<Person_Name> person_names = null;
 
     public Person() {
     }
 
-    public Person(Long personId, String title, String photo, String fullname, String forename, String middlename, String surname, String url, String email, String phone, List<Person_Identifier> person_identifiers, Date publication_date) {
+    public Person(Long personId, String title, String photo, String url, String email, String phone, List<Person_Identifier> person_identifiers, List<Person_Name> person_names) {
         this.personId = personId;
-        this.title = title;
+        this.person_names = person_names;
         this.photo = photo;
-        this.fullname = fullname;
-        this.forename = forename;
-        this.middlename = middlename;
-        this.surname = surname;
+        this.title = title;
         this.url = url;
         this.email = email;
         this.person_identifiers = person_identifiers;
         this.phone = phone;
-        this.publication_date = publication_date;
     }
 
     /**
@@ -88,69 +80,6 @@ public class Person {
         this.photo = photo;
     }
 
-    /**
-     * @return the fullname
-     */
-    public String getFullname() {
-        return fullname;
-    }
-
-    /**
-     * @param fullname the fullname to set
-     */
-    public void setFullname(String fullname) {
-        if(fullname.length() > 150)
-            fullname = fullname.substring(0, 149);
-        this.fullname = fullname;
-    }
-
-    /**
-     * @return the forename
-     */
-    public String getForename() {
-        return forename;
-    }
-
-    /**
-     * @param forename the forename to set
-     */
-    public void setForename(String forename) {
-        if(forename.length() > 150)
-            forename = forename.substring(0, 149);
-        this.forename = forename;
-    }
-
-    /**
-     * @return the middlename
-     */
-    public String getMiddlename() {
-        return middlename;
-    }
-
-    /**
-     * @param middlename the middlename to set
-     */
-    public void setMiddlename(String middlename) {
-        if(middlename.length() > 45)
-            middlename = middlename.substring(0, 44);
-        this.middlename = middlename;
-    }
-
-    /**
-     * @return the surname
-     */
-    public String getSurname() {
-        return surname;
-    }
-
-    /**
-     * @param surname the surname to set
-     */
-    public void setSurname(String surname) {
-        if(surname.length() > 150)
-            surname = surname.substring(0, 149);
-        this.surname = surname;
-    }
 
     /**
      * @return the url
@@ -233,16 +162,16 @@ public class Person {
     }
 
     /**
-     * @return the publication_date
+     * @return the person_names
      */
-    public Date getPublication_date() {
-        return publication_date;
+    public List<Person_Name> getPerson_names() {
+        return person_names;
     }
 
     /**
-     * @param publication_date the publication_date to set
+     * @param person_names the person_names to set
      */
-    public void setPublication_date(Date publication_date) {
-        this.publication_date = publication_date;
+    public void setPerson_names(List<Person_Name> person_names) {
+        this.person_names = person_names;
     }
 }

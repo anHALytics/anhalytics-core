@@ -6,6 +6,7 @@ import fr.inria.anhalytics.kb.entities.Author;
 import fr.inria.anhalytics.kb.entities.Editor;
 import fr.inria.anhalytics.kb.entities.Person;
 import fr.inria.anhalytics.kb.entities.Person_Identifier;
+import fr.inria.anhalytics.kb.entities.Person_Name;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,6 +42,8 @@ public class PersonDAO extends DAO<Person, Long> {
 
     private static final String SQL_INSERT_EDITOR
             = "INSERT INTO EDITORSHIP (rank, personID, publicationID) VALUES (?, ?, ?)";
+    
+    private static final String READ_QUERY_PERSON_IDENTIFIER_BY_ID= "SELECT * FROM PERSON_IDENTIFIER pi WHERE pi.personID = ?";
 
     private static final String READ_QUERY_AUTHORS_BY_DOCID = "SELECT personID FROM AUTHORSHIP WHERE docID = ?";
 
@@ -49,8 +52,10 @@ public class PersonDAO extends DAO<Person, Long> {
     private static final String SQL_SELECT_PERSON_BY_ORGID = "SELECT DISTINCT personID FROM AFFILIATION WHERE organisationID = ?";
 
     private static final String READ_QUERY_PERSON_BY_ID
-            = "SELECT p.title, p.phone ,p.photo, p.url, p.email, pn.fullname, pn.forename, pn.middlename, pn.surname, pn.publication_date, pi.person_identifierID, pi.ID, pi.Type FROM PERSON p, PERSON_NAME pn LEFT JOIN PERSON_IDENTIFIER AS pi ON pi.personID = ? WHERE p.personID = ? AND pn.personID = ?";
+            = "SELECT * FROM PERSON p WHERE p.personID = ?";
 
+    private static final String READ_QUERY_PERSON_NAME_BY_ID
+            = "SELECT * FROM PERSON_NAME pn WHERE pn.personID = ?";
     private static final String READ_QUERY_AUTHORS
             = "SELECT DISTINCT personID FROM AUTHORSHIP";
 
@@ -140,19 +145,21 @@ public class PersonDAO extends DAO<Person, Long> {
             statement.close();
 
             statement1 = connect.prepareStatement(SQL_INSERT_PERSON_NAME);
-            statement1.setLong(1, obj.getPersonId());
-            statement1.setString(2, obj.getFullname());
-            statement1.setString(3, obj.getForename());
-            statement1.setString(4, obj.getMiddlename());
-            statement1.setString(5, obj.getSurname());
-            statement1.setString(6, obj.getTitle());
-            if (obj.getPublication_date() == null) {
-                statement1.setDate(7, new java.sql.Date(00000000L));
-            } else {
-                statement1.setDate(7, new java.sql.Date(obj.getPublication_date().getTime()));
-            }
+            for (Person_Name pn : obj.getPerson_names()) {
+                statement1.setLong(1, obj.getPersonId());
+                statement1.setString(2, pn.getFullname());
+                statement1.setString(3, pn.getForename());
+                statement1.setString(4, pn.getMiddlename());
+                statement1.setString(5, pn.getSurname());
+                statement1.setString(6, pn.getTitle());
+                if (pn.getPublication_date() == null) {
+                    statement1.setDate(7, new java.sql.Date(00000000L));
+                } else {
+                    statement1.setDate(7, new java.sql.Date(pn.getPublication_date().getTime()));
+                }
 
-            int code1 = statement1.executeUpdate();
+                int code1 = statement1.executeUpdate();
+            }
             statement1.close();
 
             statement2 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
@@ -198,18 +205,20 @@ public class PersonDAO extends DAO<Person, Long> {
             int code1 = preparedStatement.executeUpdate();
             preparedStatement.close();
             PreparedStatement preparedStatement2 = this.connect.prepareStatement(SQL_INSERT_PERSON_NAME);
-            preparedStatement2.setLong(1, obj.getPersonId());
-            preparedStatement2.setString(2, obj.getFullname());
-            preparedStatement2.setString(3, obj.getForename());
-            preparedStatement2.setString(4, obj.getMiddlename());
-            preparedStatement2.setString(5, obj.getSurname());
-            preparedStatement2.setString(6, obj.getTitle());
-            if (obj.getPublication_date() == null) {
-                preparedStatement2.setDate(7, new java.sql.Date(00000000L));
-            } else {
-                preparedStatement2.setDate(7, new java.sql.Date(obj.getPublication_date().getTime()));
+            for (Person_Name pn : obj.getPerson_names()) {
+                preparedStatement2.setLong(1, obj.getPersonId());
+                preparedStatement2.setString(2, pn.getFullname());
+                preparedStatement2.setString(3, pn.getForename());
+                preparedStatement2.setString(4, pn.getMiddlename());
+                preparedStatement2.setString(5, pn.getSurname());
+                preparedStatement2.setString(6, pn.getTitle());
+                if (pn.getPublication_date() == null) {
+                    preparedStatement2.setDate(7, new java.sql.Date(00000000L));
+                } else {
+                    preparedStatement2.setDate(7, new java.sql.Date(pn.getPublication_date().getTime()));
+                }
+                int code2 = preparedStatement2.executeUpdate();
             }
-            int code2 = preparedStatement2.executeUpdate();
             preparedStatement2.close();
 
             PreparedStatement preparedStatement3 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
@@ -238,50 +247,56 @@ public class PersonDAO extends DAO<Person, Long> {
     /**
      * find person with all names that have.
      */
-    public List<Person> findPerson(Long id) throws SQLException {
-        List<Person> persons = new ArrayList<Person>();
+    public Person findPerson(Long id) throws SQLException {
+        Person person = null;
+        List<Person_Name> person_names = new ArrayList<Person_Name>();
+        List<Person_Identifier> person_identifiers = new ArrayList<Person_Identifier>();
         PreparedStatement preparedStatement = this.connect.prepareStatement(READ_QUERY_PERSON_BY_ID);
         preparedStatement.setLong(1, id);
-        preparedStatement.setLong(2, id);
-        preparedStatement.setLong(3, id);
         ResultSet rs = preparedStatement.executeQuery();
-        while (rs.next()) {
-            Person person = null;
-            try {
-                person = new Person(
-                        id,
-                        rs.getString("p.title"),
-                        rs.getString("p.photo"),
-                        rs.getString("pn.fullname"),
-                        rs.getString("pn.forename"),
-                        rs.getString("pn.middlename"),
-                        rs.getString("pn.surname"),
-                        rs.getString("p.url"),
-                        rs.getString("p.email"),
-                        rs.getString("p.phone"),
-                        new ArrayList<Person_Identifier>(),
-                        Utilities.parseStringDate(rs.getString("pn.publication_date"))
-                );
-            } catch (ParseException ex) {
-                Logger.getLogger(PersonDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            if (rs.getString("pi.ID") != null) {
-                person.getPerson_identifiers().add(new Person_Identifier(rs.getString("pi.ID"), rs.getString("pi.Type")));
-            }
 
-            while (rs.next()) {
-                if (rs.getString("pi.ID") != null) {
-                    person.getPerson_identifiers().add(new Person_Identifier(rs.getString("pi.ID"), rs.getString("pi.Type")));
+        if (rs.next()) {
+            person = new Person(
+                    id,
+                    rs.getString("p.title"),
+                    rs.getString("p.photo"),
+                    rs.getString("p.url"),
+                    rs.getString("p.email"),
+                    rs.getString("p.phone"),
+                    new ArrayList<Person_Identifier>(),
+                    new ArrayList<Person_Name>()
+            );
+            PreparedStatement preparedStatement1 = this.connect.prepareStatement(READ_QUERY_PERSON_NAME_BY_ID);
+            preparedStatement1.setLong(1, id);
+            ResultSet rs1 = preparedStatement1.executeQuery();
+            while (rs1.next()) {
+                try {
+                    person_names.add(new Person_Name(rs1.getLong("pn.person_nameID"), id, rs1.getString("pn.fullname"), rs1.getString("pn.forename"), rs1.getString("pn.middlename"), rs1.getString("pn.surname"), rs1.getString("pn.title"), Utilities.parseStringDate(rs1.getString("pn.publication_date"))));
+                } catch (ParseException ex) {
+                    Logger.getLogger(PersonDAO.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            persons.add(person);
+            preparedStatement1.close();
+            
+            
+            
+            PreparedStatement preparedStatement2 = this.connect.prepareStatement(READ_QUERY_PERSON_IDENTIFIER_BY_ID);
+            preparedStatement2.setLong(1, id);
+            ResultSet rs2 = preparedStatement2.executeQuery();
+            while (rs2.next()) {
+                    person_identifiers.add(new Person_Identifier(rs2.getString("pi.ID"), rs2.getString("pi.Type")));
+
+            }
+            preparedStatement2.close();
+            person.setPerson_names(person_names);
+            person.setPerson_identifiers(person_identifiers);
         }
         preparedStatement.close();
-        return persons;
+        return person;
     }
 
-    public Map<Long, List<Person>> findAllAuthors() {
-        HashMap<Long, List<Person>> persons = new HashMap<Long, List<Person>>();
+    public Map<Long, Person> findAllAuthors() {
+        HashMap<Long, Person> persons = new HashMap<Long, Person>();
         PreparedStatement preparedStatement;
         try {
             preparedStatement = this.connect.prepareStatement(READ_QUERY_AUTHORS);
@@ -298,10 +313,10 @@ public class PersonDAO extends DAO<Person, Long> {
         return persons;
     }
 
-    public Map<Long, List<Person>> getAuthorsByDocId(String docId) {
-        HashMap<Long, List<Person>> persons = new HashMap<Long, List<Person>>();
+    public Map<Long, Person> getAuthorsByDocId(String docId) {
+        HashMap<Long, Person> persons = new HashMap<Long, Person>();
         try {
-            List<Person> person = null;
+            Person person = null;
 
             PreparedStatement ps = this.connect.prepareStatement(READ_QUERY_AUTHORS_BY_DOCID);
             ps.setString(1, docId);
@@ -318,10 +333,10 @@ public class PersonDAO extends DAO<Person, Long> {
         return persons;
     }
 
-    public Map<Long, List<Person>> getEditorsByPubId(Long pubId) {
-        HashMap<Long, List<Person>> persons = new HashMap<Long, List<Person>>();
+    public Map<Long, Person> getEditorsByPubId(Long pubId) {
+        HashMap<Long, Person> persons = new HashMap<Long, Person>();
         try {
-            List<Person> person = null;
+            Person person = null;
 
             PreparedStatement ps = this.connect.prepareStatement(READ_QUERY_EDITORS_BY_PUBID);
             ps.setLong(1, pubId);
@@ -355,10 +370,10 @@ public class PersonDAO extends DAO<Person, Long> {
         return false;
     }
 
-    public Map<Long, List<Person>> getPersonsByOrgID(Long orgID) {
-        HashMap<Long, List<Person>> persons = new HashMap<Long, List<Person>>();
+    public Map<Long, Person> getPersonsByOrgID(Long orgID) {
+        HashMap<Long, Person> persons = new HashMap<Long, Person>();
         try {
-            List<Person> person = null;
+            Person person = null;
 
             PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_PERSON_BY_ORGID);
             ps.setLong(1, orgID);

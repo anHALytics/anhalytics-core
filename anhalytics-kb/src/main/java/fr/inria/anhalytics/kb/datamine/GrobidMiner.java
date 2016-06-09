@@ -21,6 +21,7 @@ import fr.inria.anhalytics.kb.entities.Journal;
 import fr.inria.anhalytics.kb.entities.Monograph;
 import fr.inria.anhalytics.kb.entities.Person;
 import fr.inria.anhalytics.kb.entities.Person_Identifier;
+import fr.inria.anhalytics.kb.entities.Person_Name;
 import fr.inria.anhalytics.kb.entities.Publication;
 import fr.inria.anhalytics.kb.entities.Publisher;
 import fr.inria.anhalytics.kb.entities.Serial_Identifier;
@@ -79,8 +80,8 @@ public class GrobidMiner extends Miner {
                     String teiString = mm.nextTeiDocument();
                     String repositoryDocId = mm.getCurrentRepositoryDocId();
                     String anhalyticsId = mm.getCurrentAnhalyticsId();
-                    if(anhalyticsId == null || anhalyticsId.isEmpty()){
-                        logger.info("skipping "+repositoryDocId+" No anHALytics id provided");
+                    if (anhalyticsId == null || anhalyticsId.isEmpty()) {
+                        logger.info("skipping " + repositoryDocId + " No anHALytics id provided");
                         continue;
                     }
                     if (!dd.isCitationsMined(anhalyticsId)) {
@@ -99,7 +100,7 @@ public class GrobidMiner extends Miner {
                                 for (int j = 0; j < references.getLength() - 1; j++) {
                                     Node reference = references.item(j);
                                     if (reference.getNodeType() == Node.ELEMENT_NODE) {
-                                        processBiblStruct((Element)reference , doc);
+                                        processBiblStruct((Element) reference, doc);
                                     }
                                 }
                             }
@@ -146,45 +147,59 @@ public class GrobidMiner extends Miner {
                         pub.setDoc_title(analyticChildElt.getTextContent());
                         pub.setType(analyticChildElt.getAttribute("level"));
                     } else if (analyticChildElt.getNodeName().equals("author")) {
-                        Person prs = new Person();
-                        List<Person_Identifier> pis = new ArrayList<Person_Identifier>();
-                        NodeList authorChilds = analyticChilds.item(z).getChildNodes();
-                        for (int y = authorChilds.getLength() - 1; y >= 0; y--) {
-                            Node authorChild = authorChilds.item(y);
-                            if (authorChild.getNodeType() == Node.ELEMENT_NODE) {
-                                Element authorChildElt = (Element) authorChild;
-                                if (authorChildElt.getNodeName().equals("persName")) {
-                                    NodeList persNameChilds = authorChildElt.getChildNodes();
-                                    for (int o = persNameChilds.getLength() - 1; o >= 0; o--) {
-                                        Node persNameChild = persNameChilds.item(o);
-                                        if (persNameChild.getNodeType() == Node.ELEMENT_NODE) {
-                                            Element persNameChildElt = (Element)persNameChild;
-                                            if (persNameChildElt.getNodeName().equals("forename")) {
-                                                prs.setForename(persNameChildElt.getTextContent());
-                                            } else if (persNameChildElt.getNodeName().equals("surname")) {
-                                                prs.setSurname(persNameChildElt.getTextContent());
+                        if (analyticChildElt.getElementsByTagName("persName").getLength() > 0) {
+                            Person prs = new Person();
+                            List<Person_Name> prs_names = new ArrayList<Person_Name>();
+                            List<Person_Identifier> pis = new ArrayList<Person_Identifier>();
+                            NodeList authorChilds = analyticChilds.item(z).getChildNodes();
+                            for (int y = authorChilds.getLength() - 1; y >= 0; y--) {
+                                Node authorChild = authorChilds.item(y);
+                                if (authorChild.getNodeType() == Node.ELEMENT_NODE) {
+                                    Element authorChildElt = (Element) authorChild;
+                                    if (authorChildElt.getNodeName().equals("persName")) {
+                                        Person_Name prs_name = new Person_Name();
+                                        NodeList persNameChilds = authorChildElt.getChildNodes();
+                                        for (int o = persNameChilds.getLength() - 1; o >= 0; o--) {
+                                            Node persNameChild = persNameChilds.item(o);
+                                            if (persNameChild.getNodeType() == Node.ELEMENT_NODE) {
+                                                Element persNameChildElt = (Element) persNameChild;
+                                                if (persNameChildElt.getNodeName().equals("forename")) {
+                                                    prs_name.setForename(persNameChildElt.getTextContent());
+                                                } else if (persNameChildElt.getNodeName().equals("surname")) {
+                                                    prs_name.setSurname(persNameChildElt.getTextContent());
+                                                }
                                             }
                                         }
+                                        String fullname = prs_name.getForename();
+                                        if (!prs_name.getMiddlename().isEmpty()) {
+                                            fullname += " " + prs_name.getMiddlename();
+                                        }
+                                        if (!prs_name.getForename().isEmpty()) {
+                                            fullname += " " + prs_name.getSurname();
+                                        }
+                                        prs_name.setFullname(fullname);
+                                        //prs_name.setPublication_date(pubDate);
+                                        prs_names.add(prs_name);
+                                    } else if (authorChildElt.getNodeName().equals("email")) {
+                                        prs.setEmail(authorChildElt.getTextContent());
+                                    } else if (authorChildElt.getNodeName().equals("ptr")) {
+                                        if (authorChildElt.getAttribute("type").equals("url")) {
+                                            prs.setUrl(authorChildElt.getAttribute("type"));
+                                        }
+                                    } else if (authorChildElt.getNodeName().equals("idno")) {
+                                        Person_Identifier pi = new Person_Identifier();
+                                        String id_type = authorChildElt.getAttribute("type");
+                                        String id_value = authorChildElt.getTextContent();
+                                        pi.setId(id_value);
+                                        pi.setType(id_type);
+                                        pis.add(pi);
                                     }
-                                } else if (authorChildElt.getNodeName().equals("email")) {
-                                    prs.setEmail(authorChildElt.getTextContent());
-                                } else if (authorChildElt.getNodeName().equals("ptr")) {
-                                    if (authorChildElt.getAttribute("type").equals("url")) {
-                                        prs.setUrl(authorChildElt.getAttribute("type"));
-                                    }
-                                } else if (authorChildElt.getNodeName().equals("idno")) {
-                                    Person_Identifier pi = new Person_Identifier();
-                                    String id_type = authorChildElt.getAttribute("type");
-                                    String id_value = authorChildElt.getTextContent();
-                                    pi.setId(id_value);
-                                    pi.setType(id_type);
-                                    pis.add(pi);
                                 }
                             }
+                            prs.setPerson_names(prs_names);
+                            prs.setPerson_identifiers(pis);
+                            prss.add(prs);
                         }
-                        prs.setFullname(prs.getSurname() + " " + prs.getMiddlename() + " " + prs.getForename());
-                        prs.setPerson_identifiers(pis);
-                        prss.add(prs);
                     }
                 }
             }
@@ -327,7 +342,9 @@ public class GrobidMiner extends Miner {
 
         pd.create(pub);
         for (Person p : prss) {
-            p.setPublication_date(pub.getDate_printed());
+            for (Person_Name pn : p.getPerson_names()) {
+                pn.setPublication_date(pub.getDate_printed());
+            }
             persd.createEditor(new Editor(0, p, pub));
         }
     }

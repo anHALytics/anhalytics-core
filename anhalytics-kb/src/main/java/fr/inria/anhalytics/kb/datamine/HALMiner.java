@@ -36,6 +36,7 @@ import fr.inria.anhalytics.kb.entities.Organisation_Name;
 import fr.inria.anhalytics.kb.entities.PART_OF;
 import fr.inria.anhalytics.kb.entities.Person;
 import fr.inria.anhalytics.kb.entities.Person_Identifier;
+import fr.inria.anhalytics.kb.entities.Person_Name;
 import fr.inria.anhalytics.kb.entities.Publication;
 import fr.inria.anhalytics.kb.entities.Publisher;
 import fr.inria.anhalytics.kb.entities.Serial_Identifier;
@@ -487,15 +488,15 @@ public class HALMiner extends Miner {
         Date pubDate = pub.getDate_printed();
         for (int i = persons.getLength() - 1; i >= 0; i--) {
             person = persons.item(i);
-            
+
             if (person.getNodeType() == Node.ELEMENT_NODE) {
                 Element personElt = (Element) person;
-                if (personElt.getElementsByTagName("persName").getLength() >0) {
+                if (personElt.getElementsByTagName("persName").getLength() > 0) {
                     NodeList theNodes = person.getChildNodes();
                     if (theNodes.getLength() > 0) {
                         prs = new Person();
-                        prs.setPublication_date(pubDate);
                         affiliation = new Affiliation();
+                        List<Person_Name> prs_names = new ArrayList<Person_Name>();
                         List<Person_Identifier> pis = new ArrayList<Person_Identifier>();
                         NodeList nodes = null;
                         boolean isAffiliated = false;
@@ -504,14 +505,25 @@ public class HALMiner extends Miner {
                             if (node.getNodeType() == Node.ELEMENT_NODE) {
                                 Element personChildElt = (Element) node;
                                 if (personChildElt.getNodeName().equals("persName")) {
+                                    Person_Name prs_name = new Person_Name();
                                     nodes = personChildElt.getChildNodes();
                                     for (int z = nodes.getLength() - 1; z >= 0; z--) {
                                         if (nodes.item(z).getNodeName().equals("forename")) {
-                                            prs.setForename(nodes.item(z).getTextContent());
+                                            prs_name.setForename(nodes.item(z).getTextContent());
                                         } else if (nodes.item(z).getNodeName().equals("surname")) {
-                                            prs.setSurname(nodes.item(z).getTextContent());
+                                            prs_name.setSurname(nodes.item(z).getTextContent());
                                         }
                                     }
+                                    String fullname = prs_name.getForename();
+                                    if (!prs_name.getMiddlename().isEmpty()) {
+                                        fullname += " " + prs_name.getMiddlename();
+                                    }
+                                    if (!prs_name.getForename().isEmpty()) {
+                                        fullname += " " + prs_name.getSurname();
+                                    }
+                                    prs_name.setFullname(fullname);
+                                    prs_name.setPublication_date(pubDate);
+                                    prs_names.add(prs_name);
                                 } else if (personChildElt.getNodeName().equals("email")) {
                                     prs.setEmail(personChildElt.getTextContent());
                                 } else if (personChildElt.getNodeName().equals("ptr")) {
@@ -549,14 +561,7 @@ public class HALMiner extends Miner {
                                 //person.removeChild(node);
                             }
                         }
-                        String fullname = prs.getForename();
-                        if (!prs.getMiddlename().isEmpty()) {
-                            fullname += " " + prs.getMiddlename();
-                        }
-                        if (!prs.getForename().isEmpty()) {
-                            fullname += " " + prs.getSurname();
-                        }
-                        prs.setFullname(fullname);
+                        prs.setPerson_names(prs_names);
 
                         if (!isAffiliated && type.equals("author")) {
                             NodeList affs = null;
@@ -603,7 +608,7 @@ public class HALMiner extends Miner {
     private static Element matchAuthor(Person person, NodeList authorsFromfulltextTeiHeader) {
         Element author = null;
         JaroWinkler jw = new JaroWinkler();
-        String fullname = person.getFullname();
+        String fullname = person.getPerson_names().get(0).getFullname();
         NodeList nodes = null;
         for (int y = authorsFromfulltextTeiHeader.getLength() - 1; y >= 0; y--) {
             Node personChildElt = authorsFromfulltextTeiHeader.item(y);
