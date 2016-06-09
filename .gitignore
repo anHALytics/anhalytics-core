@@ -9,6 +9,7 @@ tempPDF/*
 tempTEI/*
 tempPdf/*
 *.log*
+*.out*
 *.DS_Store
 *.old
 *.bak
