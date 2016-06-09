@@ -1,5 +1,7 @@
 package fr.inria.anhalytics.kb.entities;
 
+import fr.inria.anhalytics.commons.utilities.Utilities;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,8 +61,9 @@ public class Person {
      * @param title the title to set
      */
     public void setTitle(String title) {
-        if(title.length() > 45)
+        if (title.length() > 45) {
             title = title.substring(0, 44);
+        }
         this.title = title;
     }
 
@@ -75,11 +78,11 @@ public class Person {
      * @param photo the photo to set
      */
     public void setPhoto(String photo) {
-        if(photo.length() > 45)
+        if (photo.length() > 45) {
             photo = photo.substring(0, 44);
+        }
         this.photo = photo;
     }
-
 
     /**
      * @return the url
@@ -92,8 +95,9 @@ public class Person {
      * @param url the url to set
      */
     public void setUrl(String url) {
-        if(url.length() > 150)
+        if (url.length() > 150) {
             url = url.substring(0, 149);
+        }
         this.url = url;
     }
 
@@ -122,12 +126,11 @@ public class Person {
      * @param email the email to set
      */
     public void setEmail(String email) {
-        if(email.length() > 150)
+        if (email.length() > 150) {
             email = email.substring(0, 149);
+        }
         this.email = email;
     }
-    
-    
 
     /**
      * @return the phone
@@ -140,8 +143,9 @@ public class Person {
      * @param phone the phone to set
      */
     public void setPhone(String phone) {
-        if(phone.length() > 45)
+        if (phone.length() > 45) {
             phone = phone.substring(0, 44);
+        }
         this.phone = phone;
     }
 
@@ -158,6 +162,17 @@ public class Person {
             personIdentifierDocument.put(pi.getType(), pi.getId());
         }
         personDocument.put("identifers", personIdentifierDocument);
+
+        List<Map<String, Object>> names = new ArrayList<Map<String, Object>>();
+        for (Person_Name pn : this.getPerson_names()) {
+            Map<String, Object> name = new HashMap<String, Object>();
+            name.put("fullname", pn.getFullname());
+            name.put("date", Utilities.formatDate(pn.getPublication_date()));
+            name.put("title", pn.getTitle());
+            names.add(name);
+        }
+        personDocument.put("names", names);
+
         return personDocument;
     }
 
