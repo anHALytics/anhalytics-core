@@ -174,7 +174,7 @@ public class GrobidMiner extends Miner {
                                         if (!prs_name.getMiddlename().isEmpty()) {
                                             fullname += " " + prs_name.getMiddlename();
                                         }
-                                        if (!prs_name.getForename().isEmpty()) {
+                                        if (!prs_name.getSurname().isEmpty()) {
                                             fullname += " " + prs_name.getSurname();
                                         }
                                         prs_name.setFullname(fullname);
