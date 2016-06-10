@@ -42,8 +42,8 @@ public class PersonDAO extends DAO<Person, Long> {
 
     private static final String SQL_INSERT_EDITOR
             = "INSERT INTO EDITORSHIP (rank, personID, publicationID) VALUES (?, ?, ?)";
-    
-    private static final String READ_QUERY_PERSON_IDENTIFIER_BY_ID= "SELECT * FROM PERSON_IDENTIFIER pi WHERE pi.personID = ?";
+
+    private static final String READ_QUERY_PERSON_IDENTIFIER_BY_ID = "SELECT * FROM PERSON_IDENTIFIER pi WHERE pi.personID = ?";
 
     private static final String READ_QUERY_AUTHORS_BY_DOCID = "SELECT personID FROM AUTHORSHIP WHERE docID = ?";
 
@@ -55,7 +55,7 @@ public class PersonDAO extends DAO<Person, Long> {
             = "SELECT * FROM PERSON p WHERE p.personID = ?";
 
     private static final String READ_QUERY_PERSON_NAME_BY_ID
-            = "SELECT * FROM PERSON_NAME pn WHERE pn.personID = ?";
+            = "SELECT * FROM PERSON_NAME pn WHERE pn.personID = ? GROUP BY pn.publication_date";
     private static final String READ_QUERY_AUTHORS
             = "SELECT DISTINCT personID FROM AUTHORSHIP";
 
@@ -194,8 +194,9 @@ public class PersonDAO extends DAO<Person, Long> {
     @Override
     public boolean update(Person obj) throws SQLException {
         boolean result = false;
+        PreparedStatement preparedStatement = null, preparedStatement2 = null, preparedStatement3=null;
         try {
-            PreparedStatement preparedStatement = this.connect.prepareStatement(UPDATE_PERSON);
+            preparedStatement = this.connect.prepareStatement(UPDATE_PERSON);
             preparedStatement.setString(1, obj.getTitle());
             preparedStatement.setString(2, obj.getPhoto());
             preparedStatement.setString(3, obj.getUrl());
@@ -203,8 +204,8 @@ public class PersonDAO extends DAO<Person, Long> {
             preparedStatement.setString(5, obj.getPhone());
             preparedStatement.setLong(6, obj.getPersonId());
             int code1 = preparedStatement.executeUpdate();
-            preparedStatement.close();
-            PreparedStatement preparedStatement2 = this.connect.prepareStatement(SQL_INSERT_PERSON_NAME);
+            
+            preparedStatement2 = this.connect.prepareStatement(SQL_INSERT_PERSON_NAME);
             for (Person_Name pn : obj.getPerson_names()) {
                 preparedStatement2.setLong(1, obj.getPersonId());
                 preparedStatement2.setString(2, pn.getFullname());
@@ -219,9 +220,8 @@ public class PersonDAO extends DAO<Person, Long> {
                 }
                 int code2 = preparedStatement2.executeUpdate();
             }
-            preparedStatement2.close();
 
-            PreparedStatement preparedStatement3 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
+            preparedStatement3 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
             if (obj.getPerson_identifiers() != null) {
                 for (Person_Identifier pi : obj.getPerson_identifiers()) {
                     preparedStatement3.setLong(1, obj.getPersonId());
@@ -231,126 +231,136 @@ public class PersonDAO extends DAO<Person, Long> {
                     int code3 = preparedStatement3.executeUpdate();
                 }
             }
-            preparedStatement3.close();
+            
             result = true;
         } catch (MySQLIntegrityConstraintViolationException e) {
+        } finally {
+            preparedStatement.close();
+            preparedStatement2.close();
+            preparedStatement3.close();
         }
 
         return result;
     }
 
-    @Override
-    public Person find(Long id) throws SQLException {
-        return null;
-    }
-
     /**
      * find person with all names that have.
      */
-    public Person findPerson(Long id) throws SQLException {
+    @Override
+    public Person find(Long id) throws SQLException {
         Person person = null;
         List<Person_Name> person_names = new ArrayList<Person_Name>();
         List<Person_Identifier> person_identifiers = new ArrayList<Person_Identifier>();
-        PreparedStatement preparedStatement = this.connect.prepareStatement(READ_QUERY_PERSON_BY_ID);
-        preparedStatement.setLong(1, id);
-        ResultSet rs = preparedStatement.executeQuery();
+        PreparedStatement preparedStatement = null, preparedStatement1 = null, preparedStatement2 = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(READ_QUERY_PERSON_BY_ID);
+            preparedStatement.setLong(1, id);
+            ResultSet rs = preparedStatement.executeQuery();
 
-        if (rs.next()) {
-            person = new Person(
-                    id,
-                    rs.getString("p.title"),
-                    rs.getString("p.photo"),
-                    rs.getString("p.url"),
-                    rs.getString("p.email"),
-                    rs.getString("p.phone"),
-                    new ArrayList<Person_Identifier>(),
-                    new ArrayList<Person_Name>()
-            );
-            PreparedStatement preparedStatement1 = this.connect.prepareStatement(READ_QUERY_PERSON_NAME_BY_ID);
-            preparedStatement1.setLong(1, id);
-            ResultSet rs1 = preparedStatement1.executeQuery();
-            while (rs1.next()) {
-                try {
-                    person_names.add(new Person_Name(rs1.getLong("pn.person_nameID"), id, rs1.getString("pn.fullname"), rs1.getString("pn.forename"), rs1.getString("pn.middlename"), rs1.getString("pn.surname"), rs1.getString("pn.title"), Utilities.parseStringDate(rs1.getString("pn.publication_date"))));
-                } catch (ParseException ex) {
-                    Logger.getLogger(PersonDAO.class.getName()).log(Level.SEVERE, null, ex);
+            if (rs.next()) {
+                person = new Person(
+                        id,
+                        rs.getString("p.title"),
+                        rs.getString("p.photo"),
+                        rs.getString("p.url"),
+                        rs.getString("p.email"),
+                        rs.getString("p.phone"),
+                        new ArrayList<Person_Identifier>(),
+                        new ArrayList<Person_Name>()
+                );
+                preparedStatement1 = this.connect.prepareStatement(READ_QUERY_PERSON_NAME_BY_ID);
+                preparedStatement1.setLong(1, id);
+                ResultSet rs1 = preparedStatement1.executeQuery();
+                while (rs1.next()) {
+                    try {
+                        person_names.add(new Person_Name(rs1.getLong("pn.person_nameID"), id, rs1.getString("pn.fullname"), rs1.getString("pn.forename"), rs1.getString("pn.middlename"), rs1.getString("pn.surname"), rs1.getString("pn.title"), Utilities.parseStringDate(rs1.getString("pn.publication_date"))));
+                    } catch (ParseException ex) {
+                        Logger.getLogger(PersonDAO.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
-            }
-            preparedStatement1.close();
-            
-            
-            
-            PreparedStatement preparedStatement2 = this.connect.prepareStatement(READ_QUERY_PERSON_IDENTIFIER_BY_ID);
-            preparedStatement2.setLong(1, id);
-            ResultSet rs2 = preparedStatement2.executeQuery();
-            while (rs2.next()) {
+
+                preparedStatement2 = this.connect.prepareStatement(READ_QUERY_PERSON_IDENTIFIER_BY_ID);
+                preparedStatement2.setLong(1, id);
+                ResultSet rs2 = preparedStatement2.executeQuery();
+                while (rs2.next()) {
                     person_identifiers.add(new Person_Identifier(rs2.getString("pi.ID"), rs2.getString("pi.Type")));
 
+                }
+                person.setPerson_names(person_names);
+                person.setPerson_identifiers(person_identifiers);
             }
+
+        } catch (SQLException ex) {
+            logger.error(ex.getMessage());
+        } finally {
+            preparedStatement.close();
+            preparedStatement1.close();
             preparedStatement2.close();
-            person.setPerson_names(person_names);
-            person.setPerson_identifiers(person_identifiers);
         }
-        preparedStatement.close();
         return person;
     }
 
-    public Map<Long, Person> findAllAuthors() {
+    public Map<Long, Person> findAllAuthors() throws SQLException {
         HashMap<Long, Person> persons = new HashMap<Long, Person>();
-        PreparedStatement preparedStatement;
+        PreparedStatement preparedStatement = null;
         try {
             preparedStatement = this.connect.prepareStatement(READ_QUERY_AUTHORS);
 
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
-                persons.put(rs.getLong("personID"), findPerson(rs.getLong("personID")));
+                persons.put(rs.getLong("personID"), find(rs.getLong("personID")));
             }
-            preparedStatement.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
+        } finally {
+            preparedStatement.close();
         }
         return persons;
     }
 
-    public Map<Long, Person> getAuthorsByDocId(String docId) {
+    public Map<Long, Person> getAuthorsByDocId(String docId) throws SQLException {
         HashMap<Long, Person> persons = new HashMap<Long, Person>();
+        PreparedStatement ps = null;
         try {
             Person person = null;
 
-            PreparedStatement ps = this.connect.prepareStatement(READ_QUERY_AUTHORS_BY_DOCID);
+            ps = this.connect.prepareStatement(READ_QUERY_AUTHORS_BY_DOCID);
             ps.setString(1, docId);
             // process the results
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                person = findPerson(rs.getLong("personID"));
+                person = find(rs.getLong("personID"));
                 persons.put(rs.getLong("personID"), person);
             }
-            ps.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
+        } finally {
+            ps.close();
         }
         return persons;
     }
 
-    public Map<Long, Person> getEditorsByPubId(Long pubId) {
+    public Map<Long, Person> getEditorsByPubId(Long pubId) throws SQLException {
         HashMap<Long, Person> persons = new HashMap<Long, Person>();
+        PreparedStatement ps = null;
         try {
             Person person = null;
 
-            PreparedStatement ps = this.connect.prepareStatement(READ_QUERY_EDITORS_BY_PUBID);
+            ps = this.connect.prepareStatement(READ_QUERY_EDITORS_BY_PUBID);
             ps.setLong(1, pubId);
             // process the results
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                person = findPerson(rs.getLong("personID"));
+                person = find(rs.getLong("personID"));
                 if (person != null) {
                     persons.put(rs.getLong("personID"), person);
                 }
             }
-            ps.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
+        } finally {
+            ps.close();
         }
         return persons;
 
@@ -370,22 +380,24 @@ public class PersonDAO extends DAO<Person, Long> {
         return false;
     }
 
-    public Map<Long, Person> getPersonsByOrgID(Long orgID) {
+    public Map<Long, Person> getPersonsByOrgID(Long orgID) throws SQLException {
         HashMap<Long, Person> persons = new HashMap<Long, Person>();
+        PreparedStatement ps = null;
         try {
             Person person = null;
 
-            PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_PERSON_BY_ORGID);
+            ps = this.connect.prepareStatement(SQL_SELECT_PERSON_BY_ORGID);
             ps.setLong(1, orgID);
             // process the results
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                person = findPerson(rs.getLong("personID"));
+                person = find(rs.getLong("personID"));
                 persons.put(rs.getLong("personID"), person);
             }
-            ps.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
+        } finally {
+            ps.close();
         }
         return persons;
     }

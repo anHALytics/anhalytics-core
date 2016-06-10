@@ -6,6 +6,7 @@ import fr.inria.anhalytics.kb.datamine.GrobidMiner;
 import fr.inria.anhalytics.kb.datamine.HALMiner;
 import fr.inria.anhalytics.kb.properties.KbProperties;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class Main {
         }
     };
 
-    public static void main(String[] args) throws UnknownHostException {
+    public static void main(String[] args) throws UnknownHostException, SQLException {
         try {
             KbProperties.init("kb.properties");
         } catch (Exception exp) {
@@ -48,7 +49,7 @@ public class Main {
         }
     }
 
-    private void processCommand() throws UnknownHostException {
+    private void processCommand() throws UnknownHostException, SQLException {
         Scanner sc = new Scanner(System.in);
         char reponse = ' ';
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

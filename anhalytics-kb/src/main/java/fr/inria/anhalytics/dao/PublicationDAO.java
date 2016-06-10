@@ -105,36 +105,43 @@ public class PublicationDAO extends DAO<Publication, Long> {
 
     public Publication find(Long publication_id) throws SQLException {
         Publication publication = new Publication();
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT);
-        preparedStatement.setLong(1, publication_id);
-        ResultSet rs = preparedStatement.executeQuery();
-        if (rs.first()) {
-            try {
-                publication = new Publication(
-                        publication_id,
-                        new Document(rs.getString("docID"), rs.getString("version"), rs.getString("URI")),
-                        new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
-                        new Publisher(rs.getLong("publisherID"), rs.getString("name")),
-                        rs.getString("PUBLICATION.type"),
-                        rs.getString("doc_title"),
-                        Utilities.parseStringDate(rs.getString("date_printed")),
-                        rs.getString("date_eletronic"),
-                        rs.getString("start_page"),
-                        rs.getString("end_page"),
-                        rs.getString("language")
-                );
-            } catch (ParseException ex) {
-                Logger.getLogger(PublicationDAO.class.getName()).log(Level.SEVERE, null, ex);
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT);
+            preparedStatement.setLong(1, publication_id);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.first()) {
+                try {
+                    publication = new Publication(
+                            publication_id,
+                            new Document(rs.getString("docID"), rs.getString("version"), rs.getString("URI")),
+                            new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
+                            new Publisher(rs.getLong("publisherID"), rs.getString("name")),
+                            rs.getString("PUBLICATION.type"),
+                            rs.getString("doc_title"),
+                            Utilities.parseStringDate(rs.getString("date_printed")),
+                            rs.getString("date_eletronic"),
+                            rs.getString("start_page"),
+                            rs.getString("end_page"),
+                            rs.getString("language")
+                    );
+                } catch (ParseException ex) {
+                    Logger.getLogger(PublicationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+        } catch (SQLException ex) {
+            logger.error(ex.getMessage());
+        } finally {
+            preparedStatement.close();
         }
-        preparedStatement.close();
         return publication;
     }
 
-    public List<Publication> findByDocId(String doc_id) {
+    public List<Publication> findByDocId(String doc_id) throws SQLException {
         List<Publication> publications = new ArrayList<Publication>();
+        PreparedStatement preparedStatement = null;
         try {
-            PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_BY_DOCID);
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_BY_DOCID);
             preparedStatement.setString(1, doc_id);
             preparedStatement.setString(2, doc_id);
             ResultSet rs = preparedStatement.executeQuery();
@@ -158,10 +165,11 @@ public class PublicationDAO extends DAO<Publication, Long> {
                     Logger.getLogger(PublicationDAO.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            preparedStatement.close();
             rs.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
+        } finally {
+            preparedStatement.close();
         }
         return publications;
     }

@@ -67,7 +67,7 @@ public class GrobidMiner extends Miner {
     /**
      *
      */
-    public void processCitations() {
+    public void processCitations() throws SQLException {
         BiblioDAOFactory.initConnection();
         DocumentDAO dd = (DocumentDAO) abdf.getDocumentDAO();
 

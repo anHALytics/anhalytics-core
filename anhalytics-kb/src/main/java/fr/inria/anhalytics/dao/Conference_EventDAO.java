@@ -94,29 +94,35 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
     @Override
     public Conference_Event find(Long id) throws SQLException {
         Conference_Event conference_event = null;
-
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
-        //preparedStatement.setFetchSize(Integer.MIN_VALUE);
-        preparedStatement.setLong(1, id);
-        ResultSet result = preparedStatement.executeQuery();
-        if (result.first()) {
-            conference_event = new Conference_Event(
-                    id,
-                    result.getString("start_date"),
-                    result.getString("end_date"),
-                    new Monograph(),
-                    new Conference(result.getLong("conferenceID"), result.getString("title")),
-                    new Address()
-            );
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            preparedStatement.setLong(1, id);
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.first()) {
+                conference_event = new Conference_Event(
+                        id,
+                        result.getString("start_date"),
+                        result.getString("end_date"),
+                        new Monograph(),
+                        new Conference(result.getLong("conferenceID"), result.getString("title")),
+                        new Address()
+                );
+            }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        } finally {
+            preparedStatement.close();
         }
-        preparedStatement.close();
         return conference_event;
     }
 
-    public Conference_Event findByMonograph(Long id) {
+    public Conference_Event findByMonograph(Long id) throws SQLException {
         Conference_Event conference_event = null;
+        PreparedStatement ps = null;
         try {
-            PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_CONFERENCE_BY_MONOGR);
+            ps = this.connect.prepareStatement(SQL_SELECT_CONFERENCE_BY_MONOGR);
             ps.setLong(1, id);
             // process the results
             ResultSet rs = ps.executeQuery();
@@ -130,9 +136,10 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
                         new Address(rs.getLong("addressID"), rs.getString("addrLine"), rs.getString("postBox"), rs.getString("postCode"), rs.getString("settlement"), rs.getString("region"), rs.getString("country"), new Country())
                 );
             }
-            ps.close();
         } catch (SQLException sqle) {
             sqle.printStackTrace();
+        } finally {
+            ps.close();
         }
         return conference_event;
     }

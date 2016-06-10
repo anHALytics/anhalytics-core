@@ -5,6 +5,7 @@ import fr.inria.anhalytics.index.Indexer;
 import fr.inria.anhalytics.index.MetadataIndexer;
 import fr.inria.anhalytics.index.properties.IndexProperties;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,8 +26,8 @@ public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    private static List<String> availableCommands =
-            Arrays.asList("indexAll", "indexDaily", "indexMetadata", "indexFulltext", "indexAnnotations", "indexKB");
+    private static List<String> availableCommands
+            = Arrays.asList("indexAll", "indexDaily", "indexMetadata", "indexFulltext", "indexAnnotations", "indexKB");
 
     public static void main(String[] args) throws UnknownHostException {
 
@@ -117,7 +118,7 @@ public class Main {
             if (reponse != 'N') {
                 esm.setUpIndex(IndexProperties.getFulltextTeisIndexName());
                 esm.setUpIndex(IndexProperties.getNerdAnnotsIndexName());
-				esm.setUpIndex(IndexProperties.getKeytermAnnotsIndexName());
+                esm.setUpIndex(IndexProperties.getKeytermAnnotsIndexName());
                 //mi.setUpIndex(IndexProperties.getMetadataIndexName());
 
                 int nbDoc = esm.indexTeiFulltextCollection();
@@ -127,12 +128,11 @@ public class Main {
                 int nbKeytermAnnot = esm.indexKeytermAnnotations();
                 logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
             }
-            
+
             // TBD: counters would be nice
             //mi.indexAuthors();
             //mi.indexPublications();
             //mi.indexOrganisations();
-
         } else if (process.equals("indexDaily")) {
             if (esm.isIndexExists()) {
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -153,9 +153,8 @@ public class Main {
             logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
             int nbKeytermAnnot = esm.indexKeytermAnnotations();
             logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
-            
-            // TBD: daily KB refresh and indexing ?
 
+            // TBD: daily KB refresh and indexing ?
         } else if (process.equals("indexFulltext")) {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
             reponse = sc.nextLine().charAt(0);
@@ -191,13 +190,17 @@ public class Main {
             if (reponse != 'N') {
                 mi.setUpIndex(IndexProperties.getKbIndexName());
             }
-            int nbAuthtors = mi.indexAuthors();
-            logger.info("Total: " + nbAuthtors + " authors indexed.");
-            int nbPubs = mi.indexPublications();
-            logger.info("Total: " + nbPubs + " publications indexed.");
-            int nbOrgs = mi.indexOrganisations();
-            logger.info("Total: " + nbOrgs + " organisations indexed.");
-        } 
+            try {
+                int nbAuthtors = mi.indexAuthors();
+                logger.info("Total: " + nbAuthtors + " authors indexed.");
+                int nbPubs = mi.indexPublications();
+                logger.info("Total: " + nbPubs + " publications indexed.");
+                int nbOrgs = mi.indexOrganisations();
+                logger.info("Total: " + nbOrgs + " organisations indexed.");
+            } catch (SQLException sqle) {
+                sqle.printStackTrace();
+            }
+        }
         esm.close();
         mi.close();
         return;

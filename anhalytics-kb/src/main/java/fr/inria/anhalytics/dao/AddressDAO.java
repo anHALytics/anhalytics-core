@@ -30,7 +30,7 @@ public class AddressDAO extends DAO<Address, Long> {
 
     private static final String SQL_SELECT_ADDR_BY_ID
             = "SELECT * FROM ADDRESS, COUNTRY WHERE addressID = ? AND ADDRESS.countryID = COUNTRY.countryID";
-    
+
     private static final String SQL_SELECT_COUNTRY_BY_ISO
             = "SELECT * FROM COUNTRY WHERE ISO = ?";
 
@@ -113,51 +113,62 @@ public class AddressDAO extends DAO<Address, Long> {
     @Override
     public Address find(Long id) throws SQLException {
         Address address = new Address();
-
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_ID);
-        preparedStatement.setLong(1, id);
-        //preparedStatement.setFetchSize(Integer.MIN_VALUE);
-        ResultSet result = preparedStatement.executeQuery();
-        if (result.first()) {
-            address = new Address(
-                    id,
-                    //result.getString("document.docID"),
-                    result.getString("addrLine"),
-                    result.getString("postBox"),
-                    result.getString("postCode"),
-                    result.getString("settlement"),
-                    result.getString("region"),
-                    result.getString("country"),
-                    new Country(result.getLong("COUNTRY.countryID"), result.getString("COUNTRY.ISO"))
-            );
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_ID);
+            preparedStatement.setLong(1, id);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.first()) {
+                address = new Address(
+                        id,
+                        //result.getString("document.docID"),
+                        result.getString("addrLine"),
+                        result.getString("postBox"),
+                        result.getString("postCode"),
+                        result.getString("settlement"),
+                        result.getString("region"),
+                        result.getString("country"),
+                        new Country(result.getLong("COUNTRY.countryID"), result.getString("COUNTRY.ISO"))
+                );
+            }
+        } catch (SQLException ex) {
+            logger.error(ex.getMessage());
+        } finally {
+            preparedStatement.close();
         }
-        preparedStatement.close();
         return address;
     }
 
     public Country findCountry(String iso) throws SQLException {
         Country country = null;
-
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_COUNTRY_BY_ISO);
-        preparedStatement.setString(1, iso);
-        //preparedStatement.setFetchSize(Integer.MIN_VALUE);
-        ResultSet result = preparedStatement.executeQuery();
-        if (result.first()) {
-            country = new Country(
-                    result.getLong("countryID"),
-                    //result.getString("document.docID"),
-                    iso
-            );
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_COUNTRY_BY_ISO);
+            preparedStatement.setString(1, iso);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.first()) {
+                country = new Country(
+                        result.getLong("countryID"),
+                        //result.getString("document.docID"),
+                        iso
+                );
+            }
+        } catch (SQLException ex) {
+            logger.error(ex.getMessage());
+        } finally {
+            preparedStatement.close();
         }
-        preparedStatement.close();
         return country;
     }
 
-    public Address getOrganisationAddress(Long orgId) {
+    public Address getOrganisationAddress(Long orgId) throws SQLException {
 
         Address address = null;
+        PreparedStatement ps = null;
         try {
-            PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_LOCATIONSID_BY_ORGID);
+            ps = this.connect.prepareStatement(SQL_SELECT_LOCATIONSID_BY_ORGID);
             ps.setLong(1, orgId);
             // process the results
             ResultSet rs = ps.executeQuery();
@@ -166,9 +177,10 @@ public class AddressDAO extends DAO<Address, Long> {
                 address = find(rs.getLong("addressID"));
 
             }
-            ps.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
+        } finally {
+            ps.close();
         }
         return address;
 
@@ -176,30 +188,35 @@ public class AddressDAO extends DAO<Address, Long> {
 
     private Address findAddressIfAlreadyStored(Address obj) throws SQLException {
         Address address = null;
+        PreparedStatement ps = null;
+        try {
+            ps = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_FIELDS);
+            ps.setString(1, obj.getAddrLine());
+            ps.setString(2, obj.getPostBox());
+            ps.setString(3, obj.getPostCode());
+            ps.setString(4, obj.getSettlement());
+            ps.setString(5, obj.getRegion());
+            ps.setString(6, obj.getCountryStr());
+            // process the results
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
 
-        PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_FIELDS);
-        ps.setString(1, obj.getAddrLine());
-        ps.setString(2, obj.getPostBox());
-        ps.setString(3, obj.getPostCode());
-        ps.setString(4, obj.getSettlement());
-        ps.setString(5, obj.getRegion());
-        ps.setString(6, obj.getCountryStr());
-        // process the results
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-
-            address = new Address(
-                    rs.getLong("addr.addressID"),
-                    rs.getString("addr.addrLine"),
-                    rs.getString("addr.postBox"),
-                    rs.getString("addr.postCode"),
-                    rs.getString("addr.settlement"),
-                    rs.getString("addr.region"),
-                    rs.getString("addr.country"),
-                    new Country(rs.getLong("country.countryID"), rs.getString("COUNTRY.ISO"))
-            );
+                address = new Address(
+                        rs.getLong("addr.addressID"),
+                        rs.getString("addr.addrLine"),
+                        rs.getString("addr.postBox"),
+                        rs.getString("addr.postCode"),
+                        rs.getString("addr.settlement"),
+                        rs.getString("addr.region"),
+                        rs.getString("addr.country"),
+                        new Country(rs.getLong("country.countryID"), rs.getString("COUNTRY.ISO"))
+                );
+            }
+        } catch (SQLException ex) {
+            logger.error(ex.getMessage());
+        } finally {
+            ps.close();
         }
-        ps.close();
         return address;
     }
 }

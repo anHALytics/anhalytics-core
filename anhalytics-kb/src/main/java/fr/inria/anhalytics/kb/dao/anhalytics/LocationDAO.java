@@ -28,6 +28,7 @@ public class LocationDAO extends DAO<Location, Long> {
 
     private static final String SQL_SELECT_LOCATION_BY_ORGID
             = "SELECT addressID FROM LOCATION WHERE organisationID = ?";
+
     public LocationDAO(Connection conn) {
         super(conn);
     }
@@ -75,39 +76,49 @@ public class LocationDAO extends DAO<Location, Long> {
     @Override
     public Location find(Long id) throws SQLException {
         Location location = new Location();
-
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
-        //preparedStatement.setFetchSize(Integer.MIN_VALUE);
-        preparedStatement.setLong(1, id);
-        ResultSet result = preparedStatement.executeQuery();
-        if (result.first()) {
-            try {
-                location = new Location(
-                        id,
-                        new Organisation(),
-                        new Address(),
-                        Utilities.parseStringDate(result.getString("begin_date")),
-                        Utilities.parseStringDate(result.getString("end_date"))
-                );
-            } catch (ParseException ex) {
-                Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            preparedStatement.setLong(1, id);
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.first()) {
+                try {
+                    location = new Location(
+                            id,
+                            new Organisation(),
+                            new Address(),
+                            Utilities.parseStringDate(result.getString("begin_date")),
+                            Utilities.parseStringDate(result.getString("end_date"))
+                    );
+                } catch (ParseException ex) {
+                    Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            preparedStatement.close();
         }
-        preparedStatement.close();
         return location;
     }
 
     public Long findAddressIdByOrganisationId(Long orgId) throws SQLException {
         Long addressId = null;
-
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
-        //preparedStatement.setFetchSize(Integer.MIN_VALUE);
-        preparedStatement.setLong(1, orgId);
-        ResultSet result = preparedStatement.executeQuery();
-        if (result.first()) {
-            addressId = result.getLong("addressID");
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            preparedStatement.setLong(1, orgId);
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.first()) {
+                addressId = result.getLong("addressID");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            preparedStatement.close();
         }
-        preparedStatement.close();
         return addressId;
     }
 }

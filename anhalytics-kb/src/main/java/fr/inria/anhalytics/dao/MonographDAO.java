@@ -66,11 +66,11 @@ public class MonographDAO extends DAO<Monograph, Long> {
         return false;
     }
 
-    public Monograph find(Long monographID) {
+    public Monograph find(Long monographID) throws SQLException {
         Monograph monograph = new Monograph();
-
+        PreparedStatement preparedStatement = null;
         try {
-            PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, monographID);
             ResultSet result = preparedStatement.executeQuery();
@@ -81,9 +81,10 @@ public class MonographDAO extends DAO<Monograph, Long> {
                         result.getString("title"),
                         result.getString("shortname"));
             }
-            preparedStatement.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            preparedStatement.close();
         }
         return monograph;
     }

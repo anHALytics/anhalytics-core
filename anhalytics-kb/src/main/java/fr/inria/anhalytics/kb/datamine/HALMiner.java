@@ -81,7 +81,7 @@ public class HALMiner extends Miner {
     /**
      * Initiates HAL knowledge base and creates working corpus TEI.
      */
-    public void initKnowledgeBase() {
+    public void initKnowledgeBase() throws SQLException {
         DAOFactory.initConnection();
         PublicationDAO pd = (PublicationDAO) adf.getPublicationDAO();
         DocumentDAO dd = (DocumentDAO) adf.getDocumentDAO();

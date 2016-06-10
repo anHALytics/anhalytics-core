@@ -59,11 +59,12 @@ public class DocumentDAO extends DAO<Document, String> {
         return false;
     }
 
-    public Document find(String doc_id) {
+    public Document find(String doc_id) throws SQLException {
         Document document = null;
+        PreparedStatement preparedStatement = null;
         try {
 
-            PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_DOC_BY_ID);
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_DOC_BY_ID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setString(1, doc_id);
             ResultSet rs = preparedStatement.executeQuery();
@@ -74,15 +75,16 @@ public class DocumentDAO extends DAO<Document, String> {
                         rs.getString("uri"
                         ));
             }
-            preparedStatement.close();
         } catch (SQLException e) {
             e.printStackTrace();
 
+        } finally {
+            preparedStatement.close();
         }
         return document;
     }
 
-    public boolean isMined(String docId) {
+    public boolean isMined(String docId) throws SQLException {
         boolean isMined = false;
         Document document = find(docId);
         if (document != null) {
@@ -91,14 +93,15 @@ public class DocumentDAO extends DAO<Document, String> {
         return isMined;
     }
 
-    public boolean isCitationsMined(String docId) {
+    public boolean isCitationsMined(String docId) throws SQLException {
         return isMined(docId);
     }
 
-    public List<Document> findAllDocuments() {
+    public List<Document> findAllDocuments() throws SQLException {
         List<Document> documents = new ArrayList<Document>();
+        PreparedStatement preparedStatement = null;
         try {
-            PreparedStatement preparedStatement = this.connect.prepareStatement(READ_QUERY_DOCUMENTS);
+            preparedStatement = this.connect.prepareStatement(READ_QUERY_DOCUMENTS);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             ResultSet rs = preparedStatement.executeQuery();
 
@@ -110,45 +113,50 @@ public class DocumentDAO extends DAO<Document, String> {
                                 rs.getString("uri")
                         ));
             }
-            preparedStatement.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
+        } finally {
+            preparedStatement.close();
         }
         return documents;
     }
 
-    public List<Document> getDocumentsByOrgId(Long organisationId) {
+    public List<Document> getDocumentsByOrgId(Long organisationId) throws SQLException {
         List<Document> documents = new ArrayList<Document>();
+        PreparedStatement preparedStatement = null;
         try {
-            PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_DOCID_BY_ORGID);
-            preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_DOCID_BY_ORGID);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, organisationId);
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
                 documents.add(find(rs.getString("docID")));
             }
-            preparedStatement.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            preparedStatement.close();
         }
         return documents;
     }
 
-    public List<Document> getDocumentsByAuthorId(Long personId) {
+    public List<Document> getDocumentsByAuthorId(Long personId) throws SQLException {
         List<Document> docs = new ArrayList<Document>();
+        PreparedStatement ps = null;
         try {
-            PreparedStatement ps = this.connect.prepareStatement(READ_QUERY_DOCID_BY_AUTHORS);
-            ps.setFetchSize(Integer.MIN_VALUE);
+            ps = this.connect.prepareStatement(READ_QUERY_DOCID_BY_AUTHORS);
+            //ps.setFetchSize(Integer.MIN_VALUE);
             ps.setLong(1, personId);
             // process the results
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 docs.add(find(rs.getString("docID")));
             }
-            ps.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
+        } finally {
+            ps.close();
         }
         return docs;
     }

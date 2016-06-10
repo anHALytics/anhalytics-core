@@ -132,12 +132,14 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
     }
 
     @Override
-    public In_Serial find(Long id) {
+    public In_Serial find(Long id) throws SQLException {
         In_Serial in_serial = new In_Serial();
+        PreparedStatement preparedStatement = null;
         try {
-            PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_INSERT_SERIAL_BY_MONOGRID);
+            preparedStatement = this.connect.prepareStatement(SQL_INSERT_SERIAL_BY_MONOGRID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, id);
+            preparedStatement.setLong(2, id);
             ResultSet result = preparedStatement.executeQuery();
             if (result.first()) {
                 in_serial = new In_Serial(
@@ -147,9 +149,10 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
                         result.getString("IN_SERIAL.volume"),
                         result.getString("IN_SERIAL.number"));
             }
-            preparedStatement.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
+        } finally {
+            preparedStatement.close();
         }
         return in_serial;
     }

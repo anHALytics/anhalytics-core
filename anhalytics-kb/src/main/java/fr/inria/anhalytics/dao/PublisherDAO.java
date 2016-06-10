@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -13,6 +14,7 @@ import java.sql.Statement;
  */
 public class PublisherDAO extends DAO<Publisher, Long> {
 
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PublisherDAO.class);
     private static final String SQL_INSERT
             = "INSERT INTO PUBLISHER (name) VALUES (?)";
 
@@ -61,33 +63,44 @@ public class PublisherDAO extends DAO<Publisher, Long> {
 
     public Publisher find(Long publisher_id) throws SQLException {
         Publisher publisher = new Publisher();
-
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_ID);
-        preparedStatement.setFetchSize(Integer.MIN_VALUE);
-        preparedStatement.setLong(1, publisher_id);
-        ResultSet rs = preparedStatement.executeQuery();
-        if (rs.first()) {
-            publisher = new Publisher(
-                    publisher_id,
-                    rs.getString("name")
-            );
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_ID);
+            preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            preparedStatement.setLong(1, publisher_id);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.first()) {
+                publisher = new Publisher(
+                        publisher_id,
+                        rs.getString("name")
+                );
+            }
+        } catch (SQLException ex) {
+            logger.error(ex.getMessage());
+        } finally {
+            preparedStatement.close();
         }
-        preparedStatement.close();
         return publisher;
     }
 
     private Publisher findPublisherIfAlreadyStored(Publisher obj) throws SQLException {
         Publisher publisher = null;
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_NAME);
-        preparedStatement.setString(1, obj.getName());
-        ResultSet rs = preparedStatement.executeQuery();
-        if (rs.first()) {
-            publisher = new Publisher(
-                    rs.getLong("publisherID"),
-                    rs.getString("name")
-            );
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_NAME);
+            preparedStatement.setString(1, obj.getName());
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.first()) {
+                publisher = new Publisher(
+                        rs.getLong("publisherID"),
+                        rs.getString("name")
+                );
+            }
+        } catch (SQLException ex) {
+            logger.error(ex.getMessage());
+        } finally {
+            preparedStatement.close();
         }
-        preparedStatement.close();
         return publisher;
 
     }

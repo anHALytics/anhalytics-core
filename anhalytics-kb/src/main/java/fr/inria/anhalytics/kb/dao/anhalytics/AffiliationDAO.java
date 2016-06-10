@@ -83,25 +83,30 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
     @Override
     public Affiliation find(Long id) throws SQLException {
         Affiliation affiliation = new Affiliation();
-
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_AFF_BY_ID);
-        //preparedStatement.setFetchSize(Integer.MIN_VALUE);
-        preparedStatement.setLong(1, id);
-        ResultSet result = preparedStatement.executeQuery();
-        if (result.first()) {
-            try {
-                affiliation = new Affiliation(
-                        id,
-                        new ArrayList<Organisation>(),
-                        new Person(),
-                        Utilities.parseStringDate(result.getString("begin_date")),
-                        Utilities.parseStringDate(result.getString("end_date"))
-                );
-            } catch (ParseException ex) {
-                Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_AFF_BY_ID);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            preparedStatement.setLong(1, id);
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.first()) {
+                try {
+                    affiliation = new Affiliation(
+                            id,
+                            new ArrayList<Organisation>(),
+                            new Person(),
+                            Utilities.parseStringDate(result.getString("begin_date")),
+                            Utilities.parseStringDate(result.getString("end_date"))
+                    );
+                } catch (ParseException ex) {
+                    Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+        } catch (SQLException ex) {
+            logger.error(ex.getMessage());
+        } finally {
+            preparedStatement.close();
         }
-        preparedStatement.close();
         return affiliation;
     }
 

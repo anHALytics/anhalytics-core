@@ -30,6 +30,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -68,7 +69,7 @@ public class MetadataIndexer {
                 .addTransportAddress(new InetSocketTransportAddress(IndexProperties.getElasticSearch_host(), 9300));
     }
 
-    public int indexAuthors() {
+    public int indexAuthors() throws SQLException {
         PersonDAO pdao = (PersonDAO) adf.getPersonDAO();
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
         AddressDAO adao = (AddressDAO) adf.getAddressDAO();
@@ -102,6 +103,7 @@ public class MetadataIndexer {
             }
             jsonDocument.put("publications", publications);
             jsonDocument.put("affiliations", organisations);
+            System.out.println("#############################################################");
             client.prepareIndex(IndexProperties.getKbIndexName(), "authors", "" + personId)
                     .setSource(jsonDocument).execute().actionGet();
             p++;
@@ -109,9 +111,8 @@ public class MetadataIndexer {
         return p;
     }
 
-    public int indexPublications() {
+    public int indexPublications() throws SQLException {
         int p = 0;
-        DAOFactory.initConnection();
         PublicationDAO pubdao = (PublicationDAO) adf.getPublicationDAO();
         PublicationDAO bibliopubdao = (PublicationDAO) biblioadf.getPublicationDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
@@ -188,6 +189,7 @@ public class MetadataIndexer {
                 }
             }
             documentDocument.put("references", referencesPubDocument);
+            System.out.println("#############################################################");
             client.prepareIndex(IndexProperties.getKbIndexName(), "publications", "" + doc.getDocID())
                     .setSource(documentDocument).execute().actionGet();
             p++;
@@ -195,7 +197,7 @@ public class MetadataIndexer {
         return p;
     }
 
-    public int indexOrganisations() {
+    public int indexOrganisations() throws SQLException {
         int p = 0;
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
         List<Organisation> organisations = odao.findAllOrganisations();
@@ -242,6 +244,7 @@ public class MetadataIndexer {
                 authorsDocument.add(jsonDocument);
             }
             organisationDocument.put("authors", authorsDocument);
+            System.out.println("#############################################################");
             client.prepareIndex(IndexProperties.getKbIndexName(), "organisations", "" + org.getOrganisationId())
                     .setSource(organisationDocument).execute().actionGet();
             p++;
