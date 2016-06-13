@@ -498,6 +498,7 @@
                                                             "$listBibl": {
                                                                 "properties": {
                                                                     "$biblStruct": {
+                                                                        "type" : "nested",
                                                                         "properties": {
                                                                             "$analytic": {
                                                                                 "properties": {
@@ -1472,12 +1473,23 @@
                                                             "type": {
                                                                 "index": "not_analyzed",
                                                                 "type": "string"
+                                                            },
+                                                            "$editor": {
+                                                                "enabled": false
                                                             }
                                                         }
                                                     },
                                                     "type": {
                                                         "index": "not_analyzed",
                                                         "type": "string"
+                                                    },
+                                                    "$series": {
+                                                        "properties": {
+                                                            "$editor": {
+                                                                "enabled": false
+                                                            }
+                                                        }
+
                                                     }
                                                 }
                                             }
