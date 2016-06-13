@@ -87,10 +87,6 @@ public class Annotator {
                             String id = mm.getCurrentRepositoryDocId();
                             String anhalyticsId = mm.getCurrentAnhalyticsId();
                             boolean isWithFulltext = mm.isCurrentIsWithFulltext();
-                            if (!isWithFulltext) {
-                                logger.info("skipping " + id + " No fulltext found");
-                                continue;
-                            }
                             if (anhalyticsId == null || anhalyticsId.isEmpty()) {
                                 logger.info("skipping " + id + " No anHALytics id provided");
                                 continue;
@@ -159,11 +155,6 @@ public class Annotator {
                             String tei = mm.nextTeiDocument();
                             String repositoryDocId = mm.getCurrentRepositoryDocId();
                             String anhalyticsId = mm.getCurrentAnhalyticsId();
-                            boolean isWithFulltext = mm.isCurrentIsWithFulltext();
-                            if (!isWithFulltext) {
-                                logger.info("skipping " + repositoryDocId + " No fulltext found");
-                                continue;
-                            }
                             
                             if (anhalyticsId == null || anhalyticsId.isEmpty()) {
                                 logger.info("skipping " + repositoryDocId + " No anHALytics id provided");
