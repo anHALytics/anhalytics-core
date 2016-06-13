@@ -1,14 +1,13 @@
 package fr.inria.anhalytics.index.main;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.index.Indexer;
-import fr.inria.anhalytics.index.MetadataIndexer;
+import fr.inria.anhalytics.index.DocumentIndexer;
+import fr.inria.anhalytics.index.KnowledgeBaseIndexer;
 import fr.inria.anhalytics.index.properties.IndexProperties;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Arrays;
@@ -109,8 +108,8 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         char reponse = ' ';
         String process = IndexProperties.getProcessName();
-        Indexer esm = new Indexer();
-        MetadataIndexer mi = new MetadataIndexer(); // this is the KB in fact !
+        DocumentIndexer esm = new DocumentIndexer();
+        KnowledgeBaseIndexer mi = new KnowledgeBaseIndexer(); // this is the KB in fact !
 
         if (process.equals("indexAll")) {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");

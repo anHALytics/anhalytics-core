@@ -1,6 +1,5 @@
 package fr.inria.anhalytics.index;
 
-import fr.inria.anhalytics.commons.exceptions.ElasticSearchConfigurationException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.AddressDAO;
@@ -24,25 +23,15 @@ import fr.inria.anhalytics.kb.entities.Organisation;
 import fr.inria.anhalytics.kb.entities.PART_OF;
 import fr.inria.anhalytics.kb.entities.Person;
 import fr.inria.anhalytics.kb.entities.Publication;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import org.apache.commons.io.IOUtils;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,23 +39,17 @@ import org.slf4j.LoggerFactory;
  *
  * @author achraf
  */
-public class MetadataIndexer {
+public class KnowledgeBaseIndexer extends Indexer {
 
-    private static final Logger logger = LoggerFactory.getLogger(MetadataIndexer.class);
+    private static final Logger logger = LoggerFactory.getLogger(KnowledgeBaseIndexer.class);
 
     private static final AbstractDAOFactory adf = AbstractDAOFactory.getFactory(AbstractDAOFactory.DAO_FACTORY);
     private static final AbstractBiblioDAOFactory biblioadf = AbstractBiblioDAOFactory.getFactory(AbstractBiblioDAOFactory.DAO_FACTORY);
 
-    private Client client;
-
-    public MetadataIndexer() {
-
+    public KnowledgeBaseIndexer() {
+        super();
         DAOFactory.initConnection();
         BiblioDAOFactory.initConnection();
-        Settings settings = ImmutableSettings.settingsBuilder()
-                .put("cluster.name", IndexProperties.getElasticSearchClusterName()).build();
-        this.client = new TransportClient(settings)
-                .addTransportAddress(new InetSocketTransportAddress(IndexProperties.getElasticSearch_host(), 9300));
     }
 
     public int indexAuthors() throws SQLException {
@@ -75,8 +58,10 @@ public class MetadataIndexer {
         AddressDAO adao = (AddressDAO) adf.getAddressDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
         Map<Long, Person> persons = pdao.findAllAuthors();
-        int p = 0;
+        int nb = 0, i = 0;
         Iterator it = persons.entrySet().iterator();
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
+        bulkRequest.setRefresh(true);
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             Long personId = (Long) pair.getKey();
@@ -104,15 +89,38 @@ public class MetadataIndexer {
             jsonDocument.put("publications", publications);
             jsonDocument.put("affiliations", organisations);
             System.out.println("#############################################################");
-            client.prepareIndex(IndexProperties.getKbIndexName(), "authors", "" + personId)
-                    .setSource(jsonDocument).execute().actionGet();
-            p++;
+            // index the json in ElasticSearch
+            // beware the document type bellow and corresponding mapping!
+            bulkRequest.add(client.prepareIndex(IndexProperties.getKbIndexName(), "authors", "" + personId).setSource(jsonDocument));
+            if (i >= 100) {
+                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                if (bulkResponse.hasFailures()) {
+                    // process failures by iterating through each bulk response item	
+                    logger.error(bulkResponse.buildFailureMessage());
+                }
+                bulkRequest = client.prepareBulk();
+                bulkRequest.setRefresh(true);
+                i = 0;
+                System.out.print(".");
+                System.out.flush();
+            }
+            i++;
+            nb++;
         }
-        return p;
+        // last bulk
+        if (i != 0) {
+            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+            System.out.print(".");
+            if (bulkResponse.hasFailures()) {
+                // process failures by iterating through each bulk response item	
+                logger.error(bulkResponse.buildFailureMessage());
+            }
+        }
+        return nb;
     }
 
     public int indexPublications() throws SQLException {
-        int p = 0;
+        int i = 0, nb = 0;
         PublicationDAO pubdao = (PublicationDAO) adf.getPublicationDAO();
         PublicationDAO bibliopubdao = (PublicationDAO) biblioadf.getPublicationDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
@@ -123,6 +131,8 @@ public class MetadataIndexer {
         MonographDAO mdao = (MonographDAO) adf.getMonographDAO();
         Conference_EventDAO ced = (Conference_EventDAO) adf.getConference_EventDAO();
         List<Document> documents = ddao.findAllDocuments();
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
+        bulkRequest.setRefresh(true);
         for (Document doc : documents) {
             Map<String, Object> documentDocument = doc.getDocumentDocument();
 
@@ -190,20 +200,45 @@ public class MetadataIndexer {
             }
             documentDocument.put("references", referencesPubDocument);
             System.out.println("#############################################################");
-            client.prepareIndex(IndexProperties.getKbIndexName(), "publications", "" + doc.getDocID())
-                    .setSource(documentDocument).execute().actionGet();
-            p++;
+            // index the json in ElasticSearch
+            // beware the document type bellow and corresponding mapping!
+            bulkRequest.add(client.prepareIndex(IndexProperties.getKbIndexName(), "publications", "" + doc.getDocID()).setSource(documentDocument));
+            if (i >= 100) {
+                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                if (bulkResponse.hasFailures()) {
+                    // process failures by iterating through each bulk response item	
+                    logger.error(bulkResponse.buildFailureMessage());
+                }
+                bulkRequest = client.prepareBulk();
+                bulkRequest.setRefresh(true);
+                i = 0;
+                System.out.print(".");
+                System.out.flush();
+            }
+            i++;
+            nb++;
         }
-        return p;
+        // last bulk
+        if (i != 0) {
+            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+            System.out.print(".");
+            if (bulkResponse.hasFailures()) {
+                // process failures by iterating through each bulk response item	
+                logger.error(bulkResponse.buildFailureMessage());
+            }
+        }
+        return nb;
     }
 
     public int indexOrganisations() throws SQLException {
-        int p = 0;
+        int nb = 0, i = 0;
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
         List<Organisation> organisations = odao.findAllOrganisations();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
         AddressDAO adao = (AddressDAO) adf.getAddressDAO();
         PersonDAO pdao = (PersonDAO) adf.getPersonDAO();
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
+        bulkRequest.setRefresh(true);
         for (Organisation org : organisations) {
             Map<String, Object> organisationDocument = org.getOrganisationDocument();
             Address addr = (adao.getOrganisationAddress(org.getOrganisationId()));
@@ -245,164 +280,41 @@ public class MetadataIndexer {
             }
             organisationDocument.put("authors", authorsDocument);
             System.out.println("#############################################################");
-            client.prepareIndex(IndexProperties.getKbIndexName(), "organisations", "" + org.getOrganisationId())
-                    .setSource(organisationDocument).execute().actionGet();
-            p++;
-        }
-        return p;
-    }
-
-    /**
-     * set-up ElasticSearch by loading the mapping and river json for the HAL
-     * document database
-     */
-    public void setUpIndex(String indexName) {
-        try {
-            // delete previous index
-            deleteIndex(indexName);
-
-            // create new index and load the appropriate mapping
-            createIndex(indexName);
-            loadMapping(indexName);
-        } catch (Exception e) {
-            logger.error("Sep-up of ElasticSearch failed for HAL index.", e);
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     *
-     */
-    private boolean deleteIndex(String indexName) throws Exception {
-        boolean val = false;
-        try {
-            String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + indexName;
-            URL url = new URL(urlStr);
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            httpCon.setDoOutput(true);
-            httpCon.setRequestProperty(
-                    "Content-Type", "application/x-www-form-urlencoded");
-            httpCon.setRequestMethod("DELETE");
-            httpCon.connect();
-            logger.info("ElasticSearch Index " + indexName + " deleted: status is "
-                    + httpCon.getResponseCode());
-            if (httpCon.getResponseCode() == 200) {
-                val = true;
+            // index the json in ElasticSearch
+            // beware the document type bellow and corresponding mapping!
+            bulkRequest.add(client.prepareIndex(IndexProperties.getKbIndexName(), "organisations", "" + org.getOrganisationId()).setSource(organisationDocument));
+            if (i >= 100) {
+                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                if (bulkResponse.hasFailures()) {
+                    // process failures by iterating through each bulk response item	
+                    logger.error(bulkResponse.buildFailureMessage());
+                }
+                bulkRequest = client.prepareBulk();
+                bulkRequest.setRefresh(true);
+                i = 0;
+                System.out.print(".");
+                System.out.flush();
             }
-            httpCon.disconnect();
-        } catch (Exception e) {
-            throw new Exception("Cannot delete index for " + indexName);
+            i++;
+            nb++;
         }
-        return val;
-    }
-
-    /**
-     *
-     */
-    private boolean createIndex(String indexName) throws IOException {
-        boolean val = false;
-
-        // create index
-        String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + indexName;
-        URL url = null;
-        try {
-            url = new URL(urlStr);
-        } catch (MalformedURLException ex) {
-            java.util.logging.Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-        httpCon.setDoOutput(true);
-        httpCon.setRequestProperty(
-                "Content-Type", "application/x-www-form-urlencoded");
-        try {
-            httpCon.setRequestMethod("PUT");
-        } catch (ProtocolException ex) {
-            java.util.logging.Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        /*System.out.println("ElasticSearch Index " + indexName + " creation: status is " + 
-         httpCon.getResponseCode());
-         if (httpCon.getResponseCode() == 200) {
-         val = true;
-         }*/
-        // load custom analyzer
-        String analyserStr = null;
-        try {
-            ClassLoader classLoader = Indexer.class.getClassLoader();
-            analyserStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/analyzer.json"));
-        } catch (Exception e) {
-            throw new ElasticSearchConfigurationException("Cannot read analyzer for " + indexName);
-        }
-
-        httpCon.setDoOutput(true);
-        httpCon.setRequestMethod("PUT");
-        httpCon.addRequestProperty("Content-Type", "text/json");
-        OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
-        out.write(analyserStr);
-        out.close();
-
-        logger.info("ElasticSearch analyzer for " + indexName + " : status is "
-                + httpCon.getResponseCode());
-        if (httpCon.getResponseCode() == 200) {
-            val = true;
-        }
-
-        httpCon.disconnect();
-        return val;
-    }
-
-    /**
-     *
-     */
-    private boolean loadMapping(String indexName) throws Exception {
-        boolean val = false;
-
-        String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + indexName;
-        if (indexName.contains("annotation")) {
-            urlStr += "/annotation/_mapping";
-        } else {
-            urlStr += "/npl/_mapping";
-        }
-
-        URL url = new URL(urlStr);
-        HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-        httpCon.setDoOutput(true);
-        httpCon.setRequestProperty(
-                "Content-Type", "application/x-www-form-urlencoded");
-        httpCon.setRequestMethod("PUT");
-        String mappingStr = null;
-        try {
-            ClassLoader classLoader = Indexer.class.getClassLoader();
-            if (indexName.contains("annotation")) {
-                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation.json"));
-            } else {
-                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl.json"));
+        // last bulk
+        if (i != 0) {
+            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+            System.out.print(".");
+            if (bulkResponse.hasFailures()) {
+                // process failures by iterating through each bulk response item	
+                logger.error(bulkResponse.buildFailureMessage());
             }
-        } catch (Exception e) {
-            throw new ElasticSearchConfigurationException("Cannot read mapping for " + indexName);
         }
-        logger.info(urlStr);
-
-        httpCon.setDoOutput(true);
-        httpCon.setRequestMethod("PUT");
-        httpCon.addRequestProperty("Content-Type", "text/json");
-        OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
-        out.write(mappingStr);
-        out.close();
-
-        logger.info("ElasticSearch mapping for " + indexName + " : status is "
-                + httpCon.getResponseCode());
-        if (httpCon.getResponseCode() == 200) {
-            val = true;
-        }
-        return val;
+        return nb;
     }
 
+    @Override
     public void close() {
-
+        super.close();
         BiblioDAOFactory.closeConnection();
         DAOFactory.closeConnection();
-        this.client.close();
     }
 
 }
