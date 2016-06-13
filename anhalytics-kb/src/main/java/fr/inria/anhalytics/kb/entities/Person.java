@@ -159,7 +159,8 @@ public class Person {
         personDocument.put("phone", this.getPhone());
         personDocument.put("url", this.getUrl());
         for (Person_Identifier pi : this.getPerson_identifiers()) {
-            personIdentifierDocument.put(pi.getType(), pi.getId());
+            personIdentifierDocument.put("type", pi.getType());
+            personIdentifierDocument.put("id", pi.getId());
         }
         personDocument.put("identifers", personIdentifierDocument);
 
