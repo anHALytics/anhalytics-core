@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.kb.datamine;
 
 import fr.inria.anhalytics.commons.exceptions.NumberOfCoAuthorsExceededException;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.utilities.JaroWinkler;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.AbstractDAOFactory;
@@ -91,7 +92,7 @@ public class HALMiner extends Miner {
             if (!KbProperties.isProcessByDate()) {
                 date = null;
             }
-            if (mm.initTeis(date, true)) {
+            if (mm.initTeis(date, true, MongoCollectionsInterface.FINAL_TEIS)) {
                 while (mm.hasMoreTeis()) {
                     String metadataTeiString = mm.nextTeiDocument();
                     String repositoryDocId = mm.getCurrentRepositoryDocId();

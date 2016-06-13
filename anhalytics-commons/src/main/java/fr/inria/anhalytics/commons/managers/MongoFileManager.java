@@ -161,40 +161,17 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     /**
-     * This initializes cursor for grobid tei collection.
-     */
-    public boolean initGrobidTeis(String date) throws MongoException {
-        try {
-            setGridFSCollection(MongoCollectionsInterface.GROBID_TEIS);
-            BasicDBObject bdbo = new BasicDBObject();
-            if (date != null) {
-                bdbo.append("uploadDate", Utilities.parseStringDate(date));
-            }
-            cursor = gfs.getFileList(bdbo);
-            cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT);
-            indexFile = 0;
-        } catch (ParseException e) {
-            logger.error(e.getMessage(), e.getCause());
-        }
-        if (cursor.size() > 0) {
-            logger.info(cursor.size() + " documents found for : " + date);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * This initializes cursor for tei generated collection.
      */
-    public boolean initTeis(String date, boolean withFulltext) throws MongoException {
+    public boolean initTeis(String date, boolean withFulltext, String teiCollection) throws MongoException {
         try {
-            setGridFSCollection(MongoCollectionsInterface.FINAL_TEIS);
+            setGridFSCollection(teiCollection);
             BasicDBObject bdbo = new BasicDBObject();
             if (date != null) {
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
             }
-            bdbo.append("isWithFulltext", withFulltext);
+            if(teiCollection.equals(MongoCollectionsInterface.FINAL_TEIS))
+                bdbo.append("isWithFulltext", withFulltext);
             cursor = gfs.getFileList(bdbo);
             cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT);
             indexFile = 0;

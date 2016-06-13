@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.kb.datamine;
 
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.AddressDAO;
 import fr.inria.anhalytics.dao.Conference_EventDAO;
@@ -75,7 +76,7 @@ public class GrobidMiner extends Miner {
             if (!KbProperties.isProcessByDate()) {
                 date = null;
             }
-            if (mm.initTeis(date, true)) {
+            if (mm.initTeis(date, true, MongoCollectionsInterface.FINAL_TEIS)) {
                 while (mm.hasMoreTeis()) {
                     String teiString = mm.nextTeiDocument();
                     String repositoryDocId = mm.getCurrentRepositoryDocId();

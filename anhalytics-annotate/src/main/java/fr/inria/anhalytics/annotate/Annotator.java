@@ -62,11 +62,13 @@ public class Annotator {
     private void annotateTeiCollection(Annotator_Type annotator_type)
             throws UnreachableAnnotateServiceException, AnnotatorNotAvailableException {
         int nb = 0;
-        String annotationsCollection = null;
+        String annotationsCollection = null, teiCollection = null;
         if (annotator_type == Annotator_Type.NERD) {
             annotationsCollection = MongoCollectionsInterface.NERD_ANNOTATIONS;
+            teiCollection = MongoCollectionsInterface.FINAL_TEIS;
         } else if (annotator_type == Annotator_Type.KEYTERM) {
             annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
+            teiCollection = MongoCollectionsInterface.GROBID_TEIS;
         } else {
             throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
         }
@@ -78,7 +80,7 @@ public class Annotator {
                     if (!AnnotateProperties.isProcessByDate()) {
                         date = null;
                     }
-                    if (mm.initTeis(date, true)) {
+                    if (mm.initTeis(date, true, teiCollection)) {
                         logger.debug("processing teis for :" + date);
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
@@ -134,11 +136,13 @@ public class Annotator {
     private void annotateTeiCollectionMultiThreaded(Annotator_Type annotator_type)
             throws UnreachableAnnotateServiceException, AnnotatorNotAvailableException {
         int nb = 0;
-        String annotationsCollection = null;
+        String annotationsCollection = null, teiCollection = null;
         if (annotator_type == Annotator_Type.NERD) {
             annotationsCollection = MongoCollectionsInterface.NERD_ANNOTATIONS;
+            teiCollection = MongoCollectionsInterface.FINAL_TEIS;
         } else if (annotator_type == Annotator_Type.KEYTERM) {
             annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
+            teiCollection = MongoCollectionsInterface.GROBID_TEIS;
         } else {
             throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
         }
@@ -149,7 +153,7 @@ public class Annotator {
                     if (!AnnotateProperties.isProcessByDate()) {
                         date = null;
                     }
-                    if (mm.initTeis(date, true)) {
+                    if (mm.initTeis(date, true, teiCollection)) {
                         //logger.debug("processing teis for :" + date);
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();

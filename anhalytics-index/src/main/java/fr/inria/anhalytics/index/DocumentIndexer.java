@@ -61,7 +61,7 @@ public class DocumentIndexer extends Indexer {
             }
             BulkRequestBuilder bulkRequest = client.prepareBulk();
             bulkRequest.setRefresh(true);
-            if (mm.initTeis(date, false)) {
+            if (mm.initTeis(date, false, MongoCollectionsInterface.FINAL_TEIS)) {
                 int i = 0;
 
                 while (mm.hasMoreTeis()) {
@@ -144,7 +144,7 @@ public class DocumentIndexer extends Indexer {
             }
             BulkRequestBuilder bulkRequest = client.prepareBulk();
             bulkRequest.setRefresh(true);
-            if (mm.initTeis(date, true)) {
+            if (mm.initTeis(date, true, MongoCollectionsInterface.FINAL_TEIS)) {
                 int i = 0;
 
                 while (mm.hasMoreTeis()) {
