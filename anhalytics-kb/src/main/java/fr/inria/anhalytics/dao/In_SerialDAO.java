@@ -33,7 +33,12 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
 
     private static final String SQL_INSERT_SERIAL_BY_MONOGRID
             = "SELECT * FROM MONOGRAPH, IN_SERIAL LEFT JOIN COLLECTION ON COLLECTION.collectionID = IN_SERIAL.collectionID LEFT JOIN JOURNAL ON JOURNAL.journalID = IN_SERIAL.journalID WHERE IN_SERIAL.monographID = ? AND MONOGRAPH.monographID = ?";
-    
+
+    private static final String SQL_SELECT_COLLECTION
+            = "SELECT * FROM COLLECTION WHERE title = ?";
+    private static final String SQL_SELECT_JOURNAL
+            = "SELECT * FROM JOURNAL WHERE title = ?";
+
     public In_SerialDAO(Connection conn) {
         super(conn);
     }
@@ -49,29 +54,40 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
         PreparedStatement statement1;
         PreparedStatement statement2;
         if (obj.getJ() != null) {
-            statement = connect.prepareStatement(SQL_INSERT_JOURNAL, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, obj.getJ().getTitle());
+            Journal journal = findJournalByTitle(obj.getJ().getTitle());
+            if (journal != null) {
+                obj.getJ().setJournalID(journal.getJournalID());
+            } else {
+                statement = connect.prepareStatement(SQL_INSERT_JOURNAL, Statement.RETURN_GENERATED_KEYS);
+                statement.setString(1, obj.getJ().getTitle());
 
-            int code = statement.executeUpdate();
-            ResultSet rs = statement.getGeneratedKeys();
+                int code = statement.executeUpdate();
+                ResultSet rs = statement.getGeneratedKeys();
 
-            if (rs.next()) {
-                obj.getJ().setJournalID(rs.getLong(1));
+                if (rs.next()) {
+                    obj.getJ().setJournalID(rs.getLong(1));
+                }
+                statement.close();
             }
-            statement.close();
-            result = true;
+
         }
         if (obj.getC() != null) {
-            statement1 = connect.prepareStatement(SQL_INSERT_COLLECTION, Statement.RETURN_GENERATED_KEYS);
-            statement1.setString(1, obj.getC().getTitle());
+            Collection collection = findCollectionByTitle(obj.getC().getTitle());
 
-            int code1 = statement1.executeUpdate();
-            ResultSet rs1 = statement1.getGeneratedKeys();
+            if (collection != null) {
+                obj.getC().setCollectionID(collection.getCollectionID());
+            } else {
+                statement1 = connect.prepareStatement(SQL_INSERT_COLLECTION, Statement.RETURN_GENERATED_KEYS);
+                statement1.setString(1, obj.getC().getTitle());
 
-            if (rs1.next()) {
-                obj.getC().setCollectionID(rs1.getLong(1));
+                int code1 = statement1.executeUpdate();
+                ResultSet rs1 = statement1.getGeneratedKeys();
+
+                if (rs1.next()) {
+                    obj.getC().setCollectionID(rs1.getLong(1));
+                }
+                statement1.close();
             }
-            statement1.close();
         }
         statement2 = connect.prepareStatement(SQL_INSERT);
         statement2.setLong(1, obj.getMg().getMonographID());
@@ -129,6 +145,44 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
     @Override
     public boolean update(In_Serial obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public Collection findCollectionByTitle(String title) throws SQLException {
+        Collection collection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_COLLECTION);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            preparedStatement.setString(1, title);
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.first()) {
+                collection = new Collection(result.getLong("collectionID"), result.getString("title"));
+            }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        } finally {
+            preparedStatement.close();
+        }
+        return collection;
+    }
+
+    public Journal findJournalByTitle(String title) throws SQLException {
+        Journal journal = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_JOURNAL);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            preparedStatement.setString(1, title);
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.first()) {
+                journal = new Journal(result.getLong("journalID"), result.getString("title"));
+            }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        } finally {
+            preparedStatement.close();
+        }
+        return journal;
     }
 
     @Override

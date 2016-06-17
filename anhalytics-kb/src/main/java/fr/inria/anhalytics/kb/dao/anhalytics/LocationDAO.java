@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.kb.dao.anhalytics;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.kb.entities.Address;
@@ -11,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,27 +42,33 @@ public class LocationDAO extends DAO<Location, Long> {
         if (obj.getLocationId() != null) {
             throw new IllegalArgumentException("Location is already created, the Location ID is not null.");
         }
-
-// check if location already exist and update dates if it is
         PreparedStatement statement;
         statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-        statement.setLong(1, obj.getOrganisation().getOrganisationId());
-        statement.setLong(2, obj.getAddress().getAddressId());
+        try {
+            //if (!isLocationExists(obj)) {
 
-        if (obj.getBegin_date() == null) {
-            statement.setDate(3, new java.sql.Date(00000000L));
-        } else {
-            statement.setDate(3, new java.sql.Date(obj.getBegin_date().getTime()));
-        }
+            statement.setLong(1, obj.getOrganisation().getOrganisationId());
+            statement.setLong(2, obj.getAddress().getAddressId());
 
-        if (obj.getEnd_date() == null) {
-            statement.setDate(4, new java.sql.Date(00000000L));
-        } else {
-            statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
+            if (obj.getBegin_date() == null) {
+                statement.setDate(3, new java.sql.Date(00000000L));
+            } else {
+                statement.setDate(3, new java.sql.Date(obj.getBegin_date().getTime()));
+            }
+
+            if (obj.getEnd_date() == null) {
+                statement.setDate(4, new java.sql.Date(00000000L));
+            } else {
+                statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
+            }
+            int code = statement.executeUpdate();
+            result = true;
+        } catch (MySQLIntegrityConstraintViolationException e) {
+            //e.printStackTrace();
+        } finally {
+            statement.close();
         }
-        int code = statement.executeUpdate();
-        statement.close();
-        result = true;
+        //}
         return result;
     }
 

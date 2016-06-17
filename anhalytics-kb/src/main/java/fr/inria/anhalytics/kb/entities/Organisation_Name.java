@@ -14,6 +14,7 @@ public class Organisation_Name {
     private String name = "";
     private Date publication_date;
 
+     public Organisation_Name(){};
     public Organisation_Name(String name, Date publication_date) {
         this.name = name;
         this.publication_date = publication_date;

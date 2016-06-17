@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.kb.dao.anhalytics;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.DAO;
@@ -42,31 +43,38 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
             throw new IllegalArgumentException("Affiliation is already created, the Affiliation ID is not null.");
         }
 
-        PreparedStatement statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);;
+        PreparedStatement statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+
         for (Organisation org : obj.getOrganisations()) {
-            statement.setLong(1, org.getOrganisationId());
-            statement.setLong(2, obj.getPerson().getPersonId());
-            if (obj.getBegin_date() == null) {
-                statement.setDate(3, new java.sql.Date(00000000L));
-            } else {
-                statement.setDate(3, new java.sql.Date(obj.getBegin_date().getTime()));
-            }
+            try {
+                statement.setLong(1, org.getOrganisationId());
+                statement.setLong(2, obj.getPerson().getPersonId());
+                if (obj.getBegin_date() == null) {
+                    statement.setDate(3, new java.sql.Date(00000000L));
+                } else {
+                    statement.setDate(3, new java.sql.Date(obj.getBegin_date().getTime()));
+                }
 
-            if (obj.getEnd_date() == null) {
-                statement.setDate(4, new java.sql.Date(00000000L));
-            } else {
-                statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
-            }
-            int code = statement.executeUpdate();
-            ResultSet rs = statement.getGeneratedKeys();
+                if (obj.getEnd_date() == null) {
+                    statement.setDate(4, new java.sql.Date(00000000L));
+                } else {
+                    statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
+                }
+                int code = statement.executeUpdate();
+                ResultSet rs = statement.getGeneratedKeys();
 
-            if (rs.next()) {
-                obj.setAffiliationId(rs.getLong(1));
-            }
+                if (rs.next()) {
+                    obj.setAffiliationId(rs.getLong(1));
+                }
 
-            result = true;
+                result = true;
+
+            } catch (MySQLIntegrityConstraintViolationException e) {
+                //e.printStackTrace();
+            } 
         }
-        statement.close();
+                statement.close();
+            
         return result;
     }
 

@@ -160,7 +160,6 @@ public class PersonDAO extends DAO<Person, Long> {
 
                 int code1 = statement1.executeUpdate();
             }
-            statement1.close();
 
             statement2 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
             if (obj.getPerson_identifiers() != null) {
@@ -194,19 +193,20 @@ public class PersonDAO extends DAO<Person, Long> {
     @Override
     public boolean update(Person obj) throws SQLException {
         boolean result = false;
-        PreparedStatement preparedStatement = null, preparedStatement2 = null, preparedStatement3=null;
-        try {
-            preparedStatement = this.connect.prepareStatement(UPDATE_PERSON);
-            preparedStatement.setString(1, obj.getTitle());
-            preparedStatement.setString(2, obj.getPhoto());
-            preparedStatement.setString(3, obj.getUrl());
-            preparedStatement.setString(4, obj.getEmail());
-            preparedStatement.setString(5, obj.getPhone());
-            preparedStatement.setLong(6, obj.getPersonId());
-            int code1 = preparedStatement.executeUpdate();
-            
-            preparedStatement2 = this.connect.prepareStatement(SQL_INSERT_PERSON_NAME);
+        PreparedStatement preparedStatement = null, preparedStatement2 = null, preparedStatement3 = null;
+        preparedStatement = this.connect.prepareStatement(UPDATE_PERSON);
+        preparedStatement.setString(1, obj.getTitle());
+        preparedStatement.setString(2, obj.getPhoto());
+        preparedStatement.setString(3, obj.getUrl());
+        preparedStatement.setString(4, obj.getEmail());
+        preparedStatement.setString(5, obj.getPhone());
+        preparedStatement.setLong(6, obj.getPersonId());
+        int code1 = preparedStatement.executeUpdate();
+
+        preparedStatement2 = this.connect.prepareStatement(SQL_INSERT_PERSON_NAME);
+       
             for (Person_Name pn : obj.getPerson_names()) {
+                 try {
                 preparedStatement2.setLong(1, obj.getPersonId());
                 preparedStatement2.setString(2, pn.getFullname());
                 preparedStatement2.setString(3, pn.getForename());
@@ -219,27 +219,33 @@ public class PersonDAO extends DAO<Person, Long> {
                     preparedStatement2.setDate(7, new java.sql.Date(pn.getPublication_date().getTime()));
                 }
                 int code2 = preparedStatement2.executeUpdate();
+                } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e) {
+            //e.printStackTrace();
+        } 
             }
+            preparedStatement2.close();
+        
+        
+        preparedStatement3 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
 
-            preparedStatement3 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
-            if (obj.getPerson_identifiers() != null) {
-                for (Person_Identifier pi : obj.getPerson_identifiers()) {
+        if (obj.getPerson_identifiers() != null) {
+            for (Person_Identifier pi : obj.getPerson_identifiers()) {
+                try {
                     preparedStatement3.setLong(1, obj.getPersonId());
                     preparedStatement3.setString(2, pi.getId());
                     preparedStatement3.setString(3, pi.getType());
 
                     int code3 = preparedStatement3.executeUpdate();
-                }
+                } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e) {
+                } 
             }
-            
-            result = true;
-        } catch (MySQLIntegrityConstraintViolationException e) {
-        } finally {
-            preparedStatement.close();
-            preparedStatement2.close();
-            preparedStatement3.close();
+                    preparedStatement3.close();
+                
         }
 
+        result = true;
+
+        preparedStatement.close();
         return result;
     }
 

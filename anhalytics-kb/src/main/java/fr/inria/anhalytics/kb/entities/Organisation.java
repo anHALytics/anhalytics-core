@@ -18,6 +18,7 @@ public class Organisation {
     private String type = "";
     private String url = "";
     private String structure = "";
+    private String status = "";
     private List<Organisation_Name> names = null;
     private Date publication_date;
     private List<PART_OF> rels = null;
@@ -25,7 +26,7 @@ public class Organisation {
     public Organisation() {
     }
 
-    public Organisation(Long organisationId, String type, String url, String structure, List<Organisation_Name> names, List<PART_OF> rels, Date publication_date) {
+    public Organisation(Long organisationId, String type, String status, String url, String structure, List<Organisation_Name> names, List<PART_OF> rels, Date publication_date) {
         this.organisationId = organisationId;
         this.type = type;
         this.url = url;
@@ -167,6 +168,20 @@ public class Organisation {
      */
     public void setPublication_date(Date publication_date) {
         this.publication_date = publication_date;
+    }
+
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

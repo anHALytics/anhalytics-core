@@ -345,6 +345,8 @@ public class HALMiner extends Miner {
 
             organisationParent.setType(orgElt.getAttribute("type"));
             organisationParent.setStructure(orgElt.getAttribute("xml:id"));
+            
+            organisationParent.setStatus(orgElt.getAttribute("status"));
             NodeList nlorg = orgElt.getChildNodes();
             for (int o = nlorg.getLength() - 1; o >= 0; o--) {
                 Node ndorg = nlorg.item(o);
@@ -460,6 +462,7 @@ public class HALMiner extends Miner {
         if (!isGrobid) {
             organisation.setType(affiliationElt.getAttribute("type"));
             organisation.setStructure(affiliationElt.getAttribute("xml:id"));
+            organisation.setStatus(affiliationElt.getAttribute("status"));
             organisations.add(organisation);
         }
         for (Organisation org : organisations) {
