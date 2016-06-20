@@ -1,7 +1,7 @@
 package fr.inria.anhalytics.dao;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
-import fr.inria.anhalytics.kb.properties.KbProperties;
+import fr.inria.anhalytics.commons.properties.CommonsProperties;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -22,7 +22,7 @@ public class DatabaseConnection {
         try {
             if (connectDB == null ) {
 
-                connectDB = DriverManager.getConnection(KbProperties.getMysql_url() + KbProperties.getMysql_db(), KbProperties.getMysql_user(), KbProperties.getMysql_pass());
+                connectDB = DriverManager.getConnection(CommonsProperties.getMysql_url() + CommonsProperties.getMysql_db(), CommonsProperties.getMysql_user(), CommonsProperties.getMysql_pass());
 
             }
         } catch (SQLException e) {
@@ -35,7 +35,7 @@ public class DatabaseConnection {
         try {
             if (connectBiblioDB == null ) {
 
-                connectBiblioDB = DriverManager.getConnection(KbProperties.getMysql_url() + KbProperties.getMysql_bibliodb(), KbProperties.getMysql_user(), KbProperties.getMysql_pass());
+                connectBiblioDB = DriverManager.getConnection(CommonsProperties.getMysql_url() + CommonsProperties.getMysql_bibliodb(), CommonsProperties.getMysql_user(), CommonsProperties.getMysql_pass());
 
             }
         } catch (SQLException e) {

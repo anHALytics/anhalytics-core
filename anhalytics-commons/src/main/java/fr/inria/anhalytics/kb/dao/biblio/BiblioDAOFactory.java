@@ -6,6 +6,7 @@
 package fr.inria.anhalytics.kb.dao.biblio;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
+import fr.inria.anhalytics.commons.properties.CommonsProperties;
 import fr.inria.anhalytics.dao.AddressDAO;
 import fr.inria.anhalytics.dao.Conference_EventDAO;
 import fr.inria.anhalytics.dao.DatabaseConnection;
@@ -16,7 +17,6 @@ import fr.inria.anhalytics.dao.MonographDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.dao.PublicationDAO;
 import fr.inria.anhalytics.dao.PublisherDAO;
-import fr.inria.anhalytics.kb.properties.KbProperties;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
     public static void initConnection() {
         if (conn == null) {
             try {
-                KbProperties.init("kb.properties");
+                CommonsProperties.init("commons.properties", false);
             } catch (Exception exp) {
                 throw new PropertyException("Cannot open file of harvest properties ingest.properties", exp);
             }

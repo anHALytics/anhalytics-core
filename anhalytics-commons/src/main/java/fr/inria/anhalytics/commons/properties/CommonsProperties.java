@@ -17,6 +17,11 @@ public class CommonsProperties {
     private static String mongodbUser;
     private static String mongodbPass;
 
+    private static String mysql_url;
+    private static String mysql_db;
+    private static String mysql_bibliodb;
+    private static String mysql_user = "";
+    private static String mysql_pass = "";
 
     public static void init(String properties_filename, boolean isTest) {
         try {
@@ -29,12 +34,17 @@ public class CommonsProperties {
                 setMongodbDb(prop.getProperty("commons.mongodb_db"));
                 setMongodbUser(prop.getProperty("commons.mongodb_user"));
                 setMongodbPass(prop.getProperty("commons.mongodb_pass"));
+
+                setMysql_url(prop.getProperty("kb.mysql_url"));
+                setMysql_db(prop.getProperty("kb.mysql_db"));
+                setMysql_bibliodb(prop.getProperty("kb.mysql_bibliodb"));
+                setMysql_user(prop.getProperty("kb.mysql_user"));
+                setMysql_pass(prop.getProperty("kb.mysql_pass"));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 
     /**
      * @return the mongodbServer
@@ -106,5 +116,74 @@ public class CommonsProperties {
         mongodbPass = aMongodbPass;
     }
 
-    
+    /**
+     * @return the mysql_url
+     */
+    public static String getMysql_url() {
+        return mysql_url;
+    }
+
+    /**
+     * @param aMysql_url the mysql_url to set
+     */
+    public static void setMysql_url(String aMysql_url) {
+        mysql_url = aMysql_url;
+    }
+
+    /**
+     * @return the mysql_db
+     */
+    public static String getMysql_db() {
+        return mysql_db;
+    }
+
+    /**
+     * @param aMysql_db the mysql_db to set
+     */
+    public static void setMysql_db(String aMysql_db) {
+        mysql_db = aMysql_db;
+    }
+
+    /**
+     * @return the mysql_bibliodb
+     */
+    public static String getMysql_bibliodb() {
+        return mysql_bibliodb;
+    }
+
+    /**
+     * @param aMysql_bibliodb the mysql_bibliodb to set
+     */
+    public static void setMysql_bibliodb(String aMysql_bibliodb) {
+        mysql_bibliodb = aMysql_bibliodb;
+    }
+
+    /**
+     * @return the mysql_user
+     */
+    public static String getMysql_user() {
+        return mysql_user;
+    }
+
+    /**
+     * @param aMysql_user the mysql_user to set
+     */
+    public static void setMysql_user(String aMysql_user) {
+        mysql_user = aMysql_user;
+    }
+
+    /**
+     * @return the mysql_pass
+     */
+    public static String getMysql_pass() {
+        return mysql_pass;
+    }
+
+    /**
+     * @param aMysql_pass the mysql_pass to set
+     */
+    public static void setMysql_pass(String aMysql_pass) {
+        mysql_pass = aMysql_pass;
+    }
+
 }

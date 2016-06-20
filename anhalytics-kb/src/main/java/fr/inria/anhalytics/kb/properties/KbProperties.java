@@ -19,12 +19,6 @@ public class KbProperties {
 
     private static boolean processByDate = true;
 
-    private static String mysql_url;
-    private static String mysql_db;
-    private static String mysql_bibliodb;
-    private static String mysql_user = "";
-    private static String mysql_pass = "";
-
     private static boolean reset;
 
 
@@ -36,11 +30,6 @@ public class KbProperties {
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file " + properties_filename, exp);
         }
-        setMysql_url(props.getProperty("kb.mysql_url"));
-        setMysql_db(props.getProperty("kb.mysql_db"));
-        setMysql_bibliodb(props.getProperty("kb.mysql_bibliodb"));
-        setMysql_user(props.getProperty("kb.mysql_user"));
-        setMysql_pass(props.getProperty("kb.mysql_pass"));
         // As grobid process may take a long time we can continue on previous works
         setReset(Boolean.valueOf(props.getProperty("kb.reset")));
     }
@@ -99,76 +88,6 @@ public class KbProperties {
      */
     public static void setReset(boolean isreset) {
         reset = isreset;
-    }
-
-    /**
-     * @return the mysql_url
-     */
-    public static String getMysql_url() {
-        return mysql_url;
-    }
-
-    /**
-     * @param aMysql_url the mysql_url to set
-     */
-    public static void setMysql_url(String aMysql_url) {
-        mysql_url = aMysql_url;
-    }
-
-    /**
-     * @return the mysql_db
-     */
-    public static String getMysql_db() {
-        return mysql_db;
-    }
-
-    /**
-     * @param aMysql_db the mysql_db to set
-     */
-    public static void setMysql_db(String aMysql_db) {
-        mysql_db = aMysql_db;
-    }
-
-    /**
-     * @return the mysql_bibliodb
-     */
-    public static String getMysql_bibliodb() {
-        return mysql_bibliodb;
-    }
-
-    /**
-     * @param aMysql_bibliodb the mysql_bibliodb to set
-     */
-    public static void setMysql_bibliodb(String aMysql_bibliodb) {
-        mysql_bibliodb = aMysql_bibliodb;
-    }
-
-    /**
-     * @return the mysql_user
-     */
-    public static String getMysql_user() {
-        return mysql_user;
-    }
-
-    /**
-     * @param aMysql_user the mysql_user to set
-     */
-    public static void setMysql_user(String aMysql_user) {
-        mysql_user = aMysql_user;
-    }
-
-    /**
-     * @return the mysql_pass
-     */
-    public static String getMysql_pass() {
-        return mysql_pass;
-    }
-
-    /**
-     * @param aMysql_pass the mysql_pass to set
-     */
-    public static void setMysql_pass(String aMysql_pass) {
-        mysql_pass = aMysql_pass;
     }
 
     /**

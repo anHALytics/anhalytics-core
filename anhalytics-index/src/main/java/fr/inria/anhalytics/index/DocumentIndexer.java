@@ -116,7 +116,7 @@ public class DocumentIndexer extends Indexer {
         // last bulk
         if (nb % bulkSize != 0) {
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            System.out.print(".");
+            logger.debug("\n One Last Bulk.");
             if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item	
                 logger.error(bulkResponse.buildFailureMessage());
