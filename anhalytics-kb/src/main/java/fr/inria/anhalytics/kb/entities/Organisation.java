@@ -149,6 +149,7 @@ public class Organisation {
         }
         organisationDocument.put("names", organisationNamesDocument);
         organisationDocument.put("type", this.getType());
+        organisationDocument.put("status", this.getStatus());
         organisationDocument.put("structId", this.getStructure());
         organisationDocument.put("url", this.getUrl());
         //organisationDocument.put("orgs", this.getRels());
