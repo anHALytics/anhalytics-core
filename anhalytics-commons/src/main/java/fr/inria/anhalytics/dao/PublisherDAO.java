@@ -28,6 +28,7 @@ public class PublisherDAO extends DAO<Publisher, Long> {
         super(conn);
     }
 
+    @Override
     public boolean create(Publisher obj) throws SQLException {
         boolean result = false;
         if (obj.getPublisherID() != null) {
@@ -53,19 +54,21 @@ public class PublisherDAO extends DAO<Publisher, Long> {
         return result;
     }
 
+    @Override
     public boolean delete(Publisher obj) {
         return false;
     }
 
+    @Override
     public boolean update(Publisher obj) {
         return false;
     }
 
+    @Override
     public Publisher find(Long publisher_id) throws SQLException {
         Publisher publisher = new Publisher();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_ID);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_ID);
             preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, publisher_id);
             ResultSet rs = preparedStatement.executeQuery();
@@ -85,9 +88,8 @@ public class PublisherDAO extends DAO<Publisher, Long> {
 
     private Publisher findPublisherIfAlreadyStored(Publisher obj) throws SQLException {
         Publisher publisher = null;
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_NAME);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_NAME);
             preparedStatement.setString(1, obj.getName());
             ResultSet rs = preparedStatement.executeQuery();
             if (rs.first()) {

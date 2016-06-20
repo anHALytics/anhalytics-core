@@ -44,6 +44,7 @@ public class PublicationDAO extends DAO<Publication, Long> {
         super(conn);
     }
 
+    @Override
     public boolean create(Publication obj) throws SQLException {
         boolean result = false;
         if (obj.getPublicationID() != null) {
@@ -89,6 +90,7 @@ public class PublicationDAO extends DAO<Publication, Long> {
         return result;
     }
 
+    @Override
     public boolean delete(Publication obj) throws SQLException {
         boolean result = false;
         PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_DELETE);
@@ -99,15 +101,16 @@ public class PublicationDAO extends DAO<Publication, Long> {
         return result;
     }
 
+    @Override
     public boolean update(Publication obj) {
         return false;
     }
 
+    @Override
     public Publication find(Long publication_id) throws SQLException {
         Publication publication = new Publication();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT);
             preparedStatement.setLong(1, publication_id);
             ResultSet rs = preparedStatement.executeQuery();
             if (rs.first()) {
@@ -139,9 +142,8 @@ public class PublicationDAO extends DAO<Publication, Long> {
 
     public List<Publication> findByDocId(String doc_id) throws SQLException {
         List<Publication> publications = new ArrayList<Publication>();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_BY_DOCID);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_BY_DOCID);
             preparedStatement.setString(1, doc_id);
             preparedStatement.setString(2, doc_id);
             ResultSet rs = preparedStatement.executeQuery();

@@ -257,9 +257,11 @@ public class PersonDAO extends DAO<Person, Long> {
         Person person = null;
         List<Person_Name> person_names = new ArrayList<Person_Name>();
         List<Person_Identifier> person_identifiers = new ArrayList<Person_Identifier>();
-        PreparedStatement preparedStatement = null, preparedStatement1 = null, preparedStatement2 = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(READ_QUERY_PERSON_BY_ID),
+                preparedStatement1 = this.connect.prepareStatement(READ_QUERY_PERSON_NAME_BY_ID),
+                preparedStatement2 = this.connect.prepareStatement(READ_QUERY_PERSON_IDENTIFIER_BY_ID);
         try {
-            preparedStatement = this.connect.prepareStatement(READ_QUERY_PERSON_BY_ID);
+            
             preparedStatement.setLong(1, id);
             ResultSet rs = preparedStatement.executeQuery();
 
@@ -274,7 +276,7 @@ public class PersonDAO extends DAO<Person, Long> {
                         new ArrayList<Person_Identifier>(),
                         new ArrayList<Person_Name>()
                 );
-                preparedStatement1 = this.connect.prepareStatement(READ_QUERY_PERSON_NAME_BY_ID);
+                
                 preparedStatement1.setLong(1, id);
                 ResultSet rs1 = preparedStatement1.executeQuery();
                 while (rs1.next()) {
@@ -285,7 +287,6 @@ public class PersonDAO extends DAO<Person, Long> {
                     }
                 }
 
-                preparedStatement2 = this.connect.prepareStatement(READ_QUERY_PERSON_IDENTIFIER_BY_ID);
                 preparedStatement2.setLong(1, id);
                 ResultSet rs2 = preparedStatement2.executeQuery();
                 while (rs2.next()) {
@@ -308,10 +309,9 @@ public class PersonDAO extends DAO<Person, Long> {
 
     public Map<Long, Person> findAllAuthors() throws SQLException {
         HashMap<Long, Person> persons = new HashMap<Long, Person>();
-        PreparedStatement preparedStatement = null;
-        try {
+        PreparedStatement 
             preparedStatement = this.connect.prepareStatement(READ_QUERY_AUTHORS);
-
+        try {
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()) {
@@ -327,11 +327,10 @@ public class PersonDAO extends DAO<Person, Long> {
 
     public Map<Long, Person> getAuthorsByDocId(String docId) throws SQLException {
         HashMap<Long, Person> persons = new HashMap<Long, Person>();
-        PreparedStatement ps = null;
+        PreparedStatement ps = this.connect.prepareStatement(READ_QUERY_AUTHORS_BY_DOCID);
         try {
             Person person = null;
 
-            ps = this.connect.prepareStatement(READ_QUERY_AUTHORS_BY_DOCID);
             ps.setString(1, docId);
             // process the results
             ResultSet rs = ps.executeQuery();
@@ -349,11 +348,9 @@ public class PersonDAO extends DAO<Person, Long> {
 
     public Map<Long, Person> getEditorsByPubId(Long pubId) throws SQLException {
         HashMap<Long, Person> persons = new HashMap<Long, Person>();
-        PreparedStatement ps = null;
+        PreparedStatement ps = this.connect.prepareStatement(READ_QUERY_EDITORS_BY_PUBID);
         try {
             Person person = null;
-
-            ps = this.connect.prepareStatement(READ_QUERY_EDITORS_BY_PUBID);
             ps.setLong(1, pubId);
             // process the results
             ResultSet rs = ps.executeQuery();
@@ -388,11 +385,9 @@ public class PersonDAO extends DAO<Person, Long> {
 
     public Map<Long, Person> getPersonsByOrgID(Long orgID) throws SQLException {
         HashMap<Long, Person> persons = new HashMap<Long, Person>();
-        PreparedStatement ps = null;
+        PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_PERSON_BY_ORGID);;
         try {
             Person person = null;
-
-            ps = this.connect.prepareStatement(SQL_SELECT_PERSON_BY_ORGID);
             ps.setLong(1, orgID);
             // process the results
             ResultSet rs = ps.executeQuery();

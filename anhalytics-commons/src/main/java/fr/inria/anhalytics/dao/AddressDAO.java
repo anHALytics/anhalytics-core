@@ -113,9 +113,8 @@ public class AddressDAO extends DAO<Address, Long> {
     @Override
     public Address find(Long id) throws SQLException {
         Address address = new Address();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_ID);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_ID);
             preparedStatement.setLong(1, id);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             ResultSet result = preparedStatement.executeQuery();
@@ -142,9 +141,8 @@ public class AddressDAO extends DAO<Address, Long> {
 
     public Country findCountry(String iso) throws SQLException {
         Country country = null;
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_COUNTRY_BY_ISO);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_COUNTRY_BY_ISO);
             preparedStatement.setString(1, iso);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             ResultSet result = preparedStatement.executeQuery();
@@ -166,9 +164,8 @@ public class AddressDAO extends DAO<Address, Long> {
     public Address getOrganisationAddress(Long orgId) throws SQLException {
 
         Address address = null;
-        PreparedStatement ps = null;
+        PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_LOCATIONSID_BY_ORGID);
         try {
-            ps = this.connect.prepareStatement(SQL_SELECT_LOCATIONSID_BY_ORGID);
             ps.setLong(1, orgId);
             // process the results
             ResultSet rs = ps.executeQuery();
@@ -188,9 +185,8 @@ public class AddressDAO extends DAO<Address, Long> {
 
     private Address findAddressIfAlreadyStored(Address obj) throws SQLException {
         Address address = null;
-        PreparedStatement ps = null;
+        PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_FIELDS);
         try {
-            ps = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_FIELDS);
             ps.setString(1, obj.getAddrLine());
             ps.setString(2, obj.getPostBox());
             ps.setString(3, obj.getPostCode());

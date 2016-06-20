@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package fr.inria.anhalytics.dao;
 
-import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.kb.entities.Monograph;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,6 +25,7 @@ public class MonographDAO extends DAO<Monograph, Long> {
         super(conn);
     }
 
+    @Override
     public boolean create(Monograph obj) {
         boolean result = false;
         if (obj.getMonographID() != null) {
@@ -58,19 +53,21 @@ public class MonographDAO extends DAO<Monograph, Long> {
         return false;
     }
 
+    @Override
     public boolean delete(Monograph obj) {
         return false;
     }
 
+    @Override
     public boolean update(Monograph obj) {
         return false;
     }
 
+    @Override
     public Monograph find(Long monographID) throws SQLException {
         Monograph monograph = new Monograph();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, monographID);
             ResultSet result = preparedStatement.executeQuery();

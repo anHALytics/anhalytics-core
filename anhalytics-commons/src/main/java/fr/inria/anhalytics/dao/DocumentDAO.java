@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -33,6 +32,7 @@ public class DocumentDAO extends DAO<Document, String> {
         super(conn);
     }
 
+    @Override
     public boolean create(Document obj) throws SQLException {
         boolean result = false;
         if (obj.getDocID() == null) {
@@ -51,20 +51,21 @@ public class DocumentDAO extends DAO<Document, String> {
         return result;
     }
 
+    @Override
     public boolean delete(Document obj) {
         return false;
     }
 
+    @Override
     public boolean update(Document obj) {
         return false;
     }
 
+    @Override
     public Document find(String doc_id) throws SQLException {
         Document document = null;
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_DOC_BY_ID);
         try {
-
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_DOC_BY_ID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setString(1, doc_id);
             ResultSet rs = preparedStatement.executeQuery();
@@ -99,9 +100,8 @@ public class DocumentDAO extends DAO<Document, String> {
 
     public List<Document> findAllDocuments() throws SQLException {
         List<Document> documents = new ArrayList<Document>();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(READ_QUERY_DOCUMENTS);
         try {
-            preparedStatement = this.connect.prepareStatement(READ_QUERY_DOCUMENTS);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             ResultSet rs = preparedStatement.executeQuery();
 
@@ -123,9 +123,8 @@ public class DocumentDAO extends DAO<Document, String> {
 
     public List<Document> getDocumentsByOrgId(Long organisationId) throws SQLException {
         List<Document> documents = new ArrayList<Document>();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_DOCID_BY_ORGID);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_DOCID_BY_ORGID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, organisationId);
             ResultSet rs = preparedStatement.executeQuery();
@@ -143,9 +142,8 @@ public class DocumentDAO extends DAO<Document, String> {
 
     public List<Document> getDocumentsByAuthorId(Long personId) throws SQLException {
         List<Document> docs = new ArrayList<Document>();
-        PreparedStatement ps = null;
+        PreparedStatement ps = this.connect.prepareStatement(READ_QUERY_DOCID_BY_AUTHORS);
         try {
-            ps = this.connect.prepareStatement(READ_QUERY_DOCID_BY_AUTHORS);
             //ps.setFetchSize(Integer.MIN_VALUE);
             ps.setLong(1, personId);
             // process the results

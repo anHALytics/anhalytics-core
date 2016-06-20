@@ -10,8 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -149,9 +147,8 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
 
     public Collection findCollectionByTitle(String title) throws SQLException {
         Collection collection = null;
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_COLLECTION);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_COLLECTION);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setString(1, title);
             ResultSet result = preparedStatement.executeQuery();
@@ -168,9 +165,8 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
 
     public Journal findJournalByTitle(String title) throws SQLException {
         Journal journal = null;
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_JOURNAL);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_JOURNAL);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setString(1, title);
             ResultSet result = preparedStatement.executeQuery();
@@ -188,9 +184,8 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
     @Override
     public In_Serial find(Long id) throws SQLException {
         In_Serial in_serial = new In_Serial();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_INSERT_SERIAL_BY_MONOGRID);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_INSERT_SERIAL_BY_MONOGRID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, id);
             preparedStatement.setLong(2, id);

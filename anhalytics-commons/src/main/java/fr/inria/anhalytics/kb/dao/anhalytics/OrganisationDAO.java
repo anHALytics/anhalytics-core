@@ -2,8 +2,6 @@ package fr.inria.anhalytics.kb.dao.anhalytics;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.dao.AbstractDAOFactory;
-import fr.inria.anhalytics.dao.DocumentDAO;
 import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.kb.entities.Affiliation;
 import fr.inria.anhalytics.kb.entities.Organisation;
@@ -18,10 +16,8 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -245,9 +241,8 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
     @Override
     public Organisation find(Long id) throws SQLException {
         Organisation organisation = new Organisation();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_ORG_BY_ID);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_ORG_BY_ID);
             preparedStatement.setLong(1, id);
             preparedStatement.setLong(2, id);
             ResultSet rs = preparedStatement.executeQuery();
@@ -288,13 +283,13 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
     public List<PART_OF> findMothers(Long id) throws SQLException {
         List<PART_OF> rels = new ArrayList<PART_OF>();
         Organisation org = null;
-        PreparedStatement preparedStatement = null, preparedStatement1 = null;
+        PreparedStatement 
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_MOTHERID_BY_ORGID),
+            preparedStatement1 = this.connect.prepareStatement(SQL_SELECT_ORG_BY_ID);;
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_MOTHERID_BY_ORGID);
             preparedStatement.setLong(1, id);
             ResultSet rs = preparedStatement.executeQuery();
             preparedStatement.setFetchSize(Integer.MIN_VALUE);
-            preparedStatement1 = this.connect.prepareStatement(SQL_SELECT_ORG_BY_ID);
             try {
                 while (rs.next()) {
                     preparedStatement1.setLong(1, rs.getLong("organisation_motherID"));
@@ -339,9 +334,8 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
 
     public List<Organisation> findAllOrganisations() throws SQLException {
         List<Organisation> organisations = new ArrayList<Organisation>();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECTALL);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECTALL);
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
                 organisations.add(find(rs.getLong("org.organisationID")));
@@ -358,14 +352,14 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
         List<Organisation> orgs = new ArrayList<Organisation>();
 
         Organisation organisation = null;
-        PreparedStatement ps = null, ps1 = null;
+        PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_AUTHORSID_BY_DOCID),
+                ps1 = this.connect.prepareStatement(SQL_SELECT_ORGID_BY_PERSONID);
         try {
-            ps = this.connect.prepareStatement(SQL_SELECT_AUTHORSID_BY_DOCID);
+            
             ps.setLong(1, docId);
             // process the results
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                ps1 = this.connect.prepareStatement(SQL_SELECT_ORGID_BY_PERSONID);
                 ps1.setLong(1, rs.getLong("personID"));
                 ResultSet rs1 = ps1.executeQuery();
                 while (rs1.next()) {
@@ -407,9 +401,8 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
 
         Affiliation affiliation = null;
         Organisation organisation = null;
-        PreparedStatement ps = null;
+        PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_AFFILIATION_BY_PERSONID);
         try {
-            ps = this.connect.prepareStatement(SQL_SELECT_AFFILIATION_BY_PERSONID);
             ps.setLong(1, person.getPersonId());
             // process the results
             ResultSet rs = ps.executeQuery();

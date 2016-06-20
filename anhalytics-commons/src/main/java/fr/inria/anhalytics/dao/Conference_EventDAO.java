@@ -101,9 +101,8 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
     @Override
     public Conference_Event find(Long id) throws SQLException {
         Conference_Event conference_event = null;
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, id);
             ResultSet result = preparedStatement.executeQuery();
@@ -127,9 +126,8 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
 
     public Conference findConferenceByTitle(String title) throws SQLException {
         Conference conference = null;
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_CONFERENCE);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_CONFERENCE);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setString(1, title);
             ResultSet result = preparedStatement.executeQuery();
@@ -146,9 +144,8 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
 
     public Conference_Event findByMonograph(Long id) throws SQLException {
         Conference_Event conference_event = null;
-        PreparedStatement ps = null;
+        PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_CONFERENCE_BY_MONOGR);
         try {
-            ps = this.connect.prepareStatement(SQL_SELECT_CONFERENCE_BY_MONOGR);
             ps.setLong(1, id);
             // process the results
             ResultSet rs = ps.executeQuery();

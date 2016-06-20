@@ -2,7 +2,6 @@ package fr.inria.anhalytics.kb.dao.anhalytics;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.kb.entities.Affiliation;
 import fr.inria.anhalytics.kb.entities.Organisation;
@@ -14,7 +13,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,9 +89,8 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
     @Override
     public Affiliation find(Long id) throws SQLException {
         Affiliation affiliation = new Affiliation();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_AFF_BY_ID);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_AFF_BY_ID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, id);
             ResultSet result = preparedStatement.executeQuery();

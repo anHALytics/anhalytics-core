@@ -12,8 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,9 +83,8 @@ public class LocationDAO extends DAO<Location, Long> {
     @Override
     public Location find(Long id) throws SQLException {
         Location location = new Location();
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, id);
             ResultSet result = preparedStatement.executeQuery();
@@ -114,9 +111,8 @@ public class LocationDAO extends DAO<Location, Long> {
 
     public Long findAddressIdByOrganisationId(Long orgId) throws SQLException {
         Long addressId = null;
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
         try {
-            preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, orgId);
             ResultSet result = preparedStatement.executeQuery();
