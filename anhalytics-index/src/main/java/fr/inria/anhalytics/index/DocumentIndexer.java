@@ -47,23 +47,21 @@ public class DocumentIndexer extends Indexer {
         boolean annotsKeytermIndexExists = this.client.admin().indices().prepareExists(IndexProperties.getKeytermAnnotsIndexName()).execute().actionGet().isExists();
         return (fulltextTeisIndexExists && annotsNerdIndexExists && annotsKeytermIndexExists);
     }
-    
+
     /**
      * Indexing of the document collection in ElasticSearch
      */
     public int indexTeiMetadataCollection() {
         int nb = 0;
-
+        int bulkSize = 100;
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
+        bulkRequest.setRefresh(true);
         for (String date : Utilities.getDates()) {
 
             if (!IndexProperties.isProcessByDate()) {
                 date = null;
             }
-            BulkRequestBuilder bulkRequest = client.prepareBulk();
-            bulkRequest.setRefresh(true);
             if (mm.initTeis(date, false, MongoCollectionsInterface.FINAL_TEIS)) {
-                int i = 0;
-
                 while (mm.hasMoreTeis()) {
                     String tei = mm.nextTeiDocument();
                     String id = mm.getCurrentRepositoryDocId();
@@ -94,7 +92,7 @@ public class DocumentIndexer extends Indexer {
                         // beware the document type bellow and corresponding mapping!
                         bulkRequest.add(client.prepareIndex(IndexProperties.getMetadataTeisIndexName(), "npl", anhalyticsId).setSource(jsonStr));
 
-                        if (i >= 100) {
+                        if (nb % bulkSize == 0) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                             if (bulkResponse.hasFailures()) {
                                 // process failures by iterating through each bulk response item	
@@ -102,30 +100,26 @@ public class DocumentIndexer extends Indexer {
                             }
                             bulkRequest = client.prepareBulk();
                             bulkRequest.setRefresh(true);
-                            i = 0;
-                            System.out.print(".");
-                            System.out.flush();
+                            logger.debug("\n Bulk number : " + nb / bulkSize);
                         }
-
-                        i++;
                         nb++;
                     } catch (Exception e) {
                         e.printStackTrace();
-                    }
-                }
-                // last bulk
-                if (i != 0) {
-                    BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                    System.out.print(".");
-                    if (bulkResponse.hasFailures()) {
-                        // process failures by iterating through each bulk response item	
-                        logger.error(bulkResponse.buildFailureMessage());
                     }
                 }
             }
 
             if (!IndexProperties.isProcessByDate()) {
                 break;
+            }
+        }
+        // last bulk
+        if (nb % bulkSize != 0) {
+            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+            System.out.print(".");
+            if (bulkResponse.hasFailures()) {
+                // process failures by iterating through each bulk response item	
+                logger.error(bulkResponse.buildFailureMessage());
             }
         }
         return nb;
@@ -136,16 +130,15 @@ public class DocumentIndexer extends Indexer {
      */
     public int indexTeiFulltextCollection() {
         int nb = 0;
-
+        int bulkSize = 100;
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
+        bulkRequest.setRefresh(true);
         for (String date : Utilities.getDates()) {
 
             if (!IndexProperties.isProcessByDate()) {
                 date = null;
             }
-            BulkRequestBuilder bulkRequest = client.prepareBulk();
-            bulkRequest.setRefresh(true);
             if (mm.initTeis(date, true, MongoCollectionsInterface.FINAL_TEIS)) {
-                int i = 0;
 
                 while (mm.hasMoreTeis()) {
                     String tei = mm.nextTeiDocument();
@@ -176,7 +169,7 @@ public class DocumentIndexer extends Indexer {
                         // beware the document type bellow and corresponding mapping!
                         bulkRequest.add(client.prepareIndex(IndexProperties.getFulltextTeisIndexName(), "npl", anhalyticsId).setSource(jsonStr));
 
-                        if (i >= 100) {
+                        if (nb % bulkSize == 0) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                             if (bulkResponse.hasFailures()) {
                                 // process failures by iterating through each bulk response item
@@ -184,30 +177,25 @@ public class DocumentIndexer extends Indexer {
                             }
                             bulkRequest = client.prepareBulk();
                             bulkRequest.setRefresh(true);
-                            i = 0;
-                            System.out.print(".");
-                            System.out.flush();
+                            logger.debug("\n Bulk number : " + nb / bulkSize);
                         }
-
-                        i++;
                         nb++;
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-                // last bulk
-                if (i != 0) {
-                    BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                    System.out.print(".");
-                    if (bulkResponse.hasFailures()) {
-                        // process failures by iterating through each bulk response item
-                        logger.error(bulkResponse.buildFailureMessage());
-                    }
-                }
             }
-
             if (!IndexProperties.isProcessByDate()) {
                 break;
+            }
+        }
+        // last bulk
+        if (nb % bulkSize != 0) {
+            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+            logger.debug("\n One Last Bulk.");
+            if (bulkResponse.hasFailures()) {
+                // process failures by iterating through each bulk response item
+                logger.error(bulkResponse.buildFailureMessage());
             }
         }
         return nb;
@@ -218,11 +206,15 @@ public class DocumentIndexer extends Indexer {
      */
     public int indexKeytermAnnotations() {
         int nb = 0;
+
+        int bulkSize = 200;
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
+        bulkRequest.setRefresh(true);
         for (String date : Utilities.getDates()) {
+            if (!IndexProperties.isProcessByDate()) {
+                date = null;
+            }
             if (mm.initAnnotations(date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS)) {
-                int i = 0;
-                BulkRequestBuilder bulkRequest = client.prepareBulk();
-                bulkRequest.setRefresh(true);
                 while (mm.hasMoreAnnotations()) {
                     String json = mm.nextAnnotation();
                     String id = mm.getCurrentRepositoryDocId();
@@ -238,7 +230,7 @@ public class DocumentIndexer extends Indexer {
                                 IndexProperties.getKeytermAnnotsIndexName(), "annotation_keyterm",
                                 anhalyticsId).setSource(json));
 
-                        if (i >= 200) {
+                        if (nb % bulkSize == 0) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                             if (bulkResponse.hasFailures()) {
                                 // process failures by iterating through each bulk response item	
@@ -246,25 +238,26 @@ public class DocumentIndexer extends Indexer {
                             }
                             bulkRequest = client.prepareBulk();
                             bulkRequest.setRefresh(true);
-                            i = 0;
-                            System.out.print(".");
-                            System.out.flush();
+                            logger.debug("\n Bulk number : " + nb / bulkSize);
                         }
-                        i++;
                         nb++;
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-                if (i != 0) {
-                    // last bulk
-                    BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                    if (bulkResponse.hasFailures()) {
-                        // process failures by iterating through each bulk response item	
-                        logger.error(bulkResponse.buildFailureMessage());
-                    }
-                }
+            }
+            if (!IndexProperties.isProcessByDate()) {
+                break;
+            }
+        }
+        if (nb % bulkSize != 0) {
+            // last bulk
+            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+            logger.debug("\n One Last Bulk.");
+            if (bulkResponse.hasFailures()) {
+                // process failures by iterating through each bulk response item	
+                logger.error(bulkResponse.buildFailureMessage());
             }
         }
         return nb;
@@ -275,16 +268,15 @@ public class DocumentIndexer extends Indexer {
      */
     public int indexNerdAnnotations() {
         int nb = 0;
+        int bulkSize = 200;
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
+        bulkRequest.setRefresh(true);
         ObjectMapper mapper = new ObjectMapper();
         for (String date : Utilities.getDates()) {
-
             if (!IndexProperties.isProcessByDate()) {
                 date = null;
             }
-            BulkRequestBuilder bulkRequest = client.prepareBulk();
-            bulkRequest.setRefresh(true);
             if (mm.initAnnotations(date, MongoCollectionsInterface.NERD_ANNOTATIONS)) {
-                int i = 0;
                 while (mm.hasMoreAnnotations()) {
                     String json = mm.nextAnnotation();
                     String id = mm.getCurrentRepositoryDocId();
@@ -332,8 +324,7 @@ public class DocumentIndexer extends Indexer {
                             // beware the document type bellow and corresponding mapping!
                             bulkRequest.add(client.prepareIndex(
                                     IndexProperties.getNerdAnnotsIndexName(), "annotation_nerd", xmlID).setSource(annotJson));
-
-                            if (i >= 200) {
+                            if (nb % bulkSize == 0) {
                                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                                 if (bulkResponse.hasFailures()) {
                                     // process failures by iterating through each bulk response item	
@@ -341,26 +332,13 @@ public class DocumentIndexer extends Indexer {
                                 }
                                 bulkRequest = client.prepareBulk();
                                 bulkRequest.setRefresh(true);
-                                i = 0;
-                                System.out.print(".");
-                                System.out.flush();
+                                logger.debug("\n Bulk number : " + nb / bulkSize);
                             }
-
-                            i++;
                             nb++;
 
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                    }
-                }
-                // last bulk
-                if (i != 0) {
-                    BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                    System.out.print(".");
-                    if (bulkResponse.hasFailures()) {
-                        // process failures by iterating through each bulk response item	
-                        logger.error(bulkResponse.buildFailureMessage());
                     }
                 }
             }
@@ -370,6 +348,15 @@ public class DocumentIndexer extends Indexer {
             }
         }
 
+        // last bulk
+        if (nb % bulkSize != 0) {
+            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+            logger.debug("\n One Last Bulk.");
+            if (bulkResponse.hasFailures()) {
+                // process failures by iterating through each bulk response item	
+                logger.error(bulkResponse.buildFailureMessage());
+            }
+        }
         return nb;
     }
 
