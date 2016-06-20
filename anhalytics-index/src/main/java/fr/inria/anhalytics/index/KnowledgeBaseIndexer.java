@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.client.Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +57,8 @@ public class KnowledgeBaseIndexer extends Indexer {
         AddressDAO adao = (AddressDAO) adf.getAddressDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
         Map<Long, Person> persons = pdao.findAllAuthors();
-        int nb = 0, i = 0;
+        int nb = 0 ;
+        int bulkSize = 100;
         Iterator it = persons.entrySet().iterator();
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         bulkRequest.setRefresh(true);
@@ -88,11 +88,10 @@ public class KnowledgeBaseIndexer extends Indexer {
             }
             jsonDocument.put("publications", publications);
             jsonDocument.put("affiliations", organisations);
-            System.out.println("#############################################################");
             // index the json in ElasticSearch
             // beware the document type bellow and corresponding mapping!
             bulkRequest.add(client.prepareIndex(IndexProperties.getKbIndexName(), "authors", "" + personId).setSource(jsonDocument));
-            if (i >= 100) {
+            if (nb % bulkSize == 0) {
                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                 if (bulkResponse.hasFailures()) {
                     // process failures by iterating through each bulk response item	
@@ -100,17 +99,14 @@ public class KnowledgeBaseIndexer extends Indexer {
                 }
                 bulkRequest = client.prepareBulk();
                 bulkRequest.setRefresh(true);
-                i = 0;
-                System.out.print(".");
-                System.out.flush();
+                logger.debug("\n Bulk number : " + nb / bulkSize);
             }
-            i++;
             nb++;
         }
         // last bulk
-        if (i != 0) {
+        if (nb % bulkSize != 0) {
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            System.out.print(".");
+            logger.debug("\n One Last Bulk.");
             if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item	
                 logger.error(bulkResponse.buildFailureMessage());
@@ -120,7 +116,8 @@ public class KnowledgeBaseIndexer extends Indexer {
     }
 
     public int indexPublications() throws SQLException {
-        int i = 0, nb = 0;
+        int nb = 0;
+        int bulkSize = 100;
         PublicationDAO pubdao = (PublicationDAO) adf.getPublicationDAO();
         PublicationDAO bibliopubdao = (PublicationDAO) biblioadf.getPublicationDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
@@ -199,11 +196,10 @@ public class KnowledgeBaseIndexer extends Indexer {
                 }
             }
             documentDocument.put("references", referencesPubDocument);
-            System.out.println("#############################################################");
             // index the json in ElasticSearch
             // beware the document type bellow and corresponding mapping!
             bulkRequest.add(client.prepareIndex(IndexProperties.getKbIndexName(), "publications", "" + doc.getDocID()).setSource(documentDocument));
-            if (i >= 100) {
+            if (nb % bulkSize == 0) {
                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                 if (bulkResponse.hasFailures()) {
                     // process failures by iterating through each bulk response item	
@@ -211,17 +207,14 @@ public class KnowledgeBaseIndexer extends Indexer {
                 }
                 bulkRequest = client.prepareBulk();
                 bulkRequest.setRefresh(true);
-                i = 0;
-                System.out.print(".");
-                System.out.flush();
+                logger.debug("\n Bulk number : " + nb / bulkSize);
             }
-            i++;
             nb++;
         }
         // last bulk
-        if (i != 0) {
+        if (nb % bulkSize != 0) {
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            System.out.print(".");
+            logger.debug("\n One Last Bulk.");
             if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item	
                 logger.error(bulkResponse.buildFailureMessage());
@@ -231,7 +224,8 @@ public class KnowledgeBaseIndexer extends Indexer {
     }
 
     public int indexOrganisations() throws SQLException {
-        int nb = 0, i = 0;
+        int nb = 0;
+        int bulkSize = 100;
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
         List<Organisation> organisations = odao.findAllOrganisations();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
@@ -279,11 +273,10 @@ public class KnowledgeBaseIndexer extends Indexer {
                 authorsDocument.add(jsonDocument);
             }
             organisationDocument.put("authors", authorsDocument);
-            System.out.println("#############################################################");
             // index the json in ElasticSearch
             // beware the document type bellow and corresponding mapping!
             bulkRequest.add(client.prepareIndex(IndexProperties.getKbIndexName(), "organisations", "" + org.getOrganisationId()).setSource(organisationDocument));
-            if (i >= 100) {
+            if (nb % bulkSize == 0) {
                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                 if (bulkResponse.hasFailures()) {
                     // process failures by iterating through each bulk response item	
@@ -291,17 +284,14 @@ public class KnowledgeBaseIndexer extends Indexer {
                 }
                 bulkRequest = client.prepareBulk();
                 bulkRequest.setRefresh(true);
-                i = 0;
-                System.out.print(".");
-                System.out.flush();
+                logger.debug("\n Bulk number : " + nb / bulkSize);
             }
-            i++;
             nb++;
         }
         // last bulk
-        if (i != 0) {
+        if (nb % bulkSize != 0) {
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            System.out.print(".");
+            logger.debug("\n One Last Bulk.");
             if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item	
                 logger.error(bulkResponse.buildFailureMessage());
