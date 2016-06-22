@@ -5,7 +5,6 @@ import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -13,8 +12,6 @@ import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,8 +26,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Class for managing the extraction of bibliographical informations from pdf
@@ -123,8 +118,9 @@ public class CrossRef {
                     Document metadata = null;
 
                     try {
-                        System.out.println("###################" + currentRepositoryDocId + "#######################");
-                        if (mm.isWithoutDoi()) {
+                        logger.debug("###################" + currentRepositoryDocId + "#######################");
+                        doi = mm.getDocumentDoi(currentAnhalyticsId);
+                        if (doi == null || doi.isEmpty()) {
                             metadata = docBuilder.parse(metadataStream);
                             metadataStream.close();
                             Element rootElement = metadata.getDocumentElement();
@@ -146,8 +142,8 @@ public class CrossRef {
 
                             if (StringUtils.isNotBlank(title)
                                     && StringUtils.isNotBlank(aut)) {
-                                System.out.println("test retrieval per title, author");
-                                System.out.println(String.format("persName=%s, title=%s", aut, title));
+                                logger.debug("test retrieval per title, author");
+                                logger.debug(String.format("persName=%s, title=%s", aut, title));
                                 subpath = String.format(TITLE_BASE_QUERY,
                                         HarvestProperties.getCrossrefId(),
                                         HarvestProperties.getCrossrefPwd(),
@@ -190,8 +186,8 @@ public class CrossRef {
                                     //&& StringUtils.isNotBlank(aut)
                                     && StringUtils.isNotBlank(firstPage)) {
                                 // retrieval per journal title, author, volume, first page
-                                System.out.println("test retrieval per journal title, author, volume, first page");
-                                System.out.println(String.format("aut=%s, firstPage=%s, journalTitle=%s, volume=%s",
+                                logger.debug("test retrieval per journal title, author, volume, first page");
+                                logger.debug(String.format("aut=%s, firstPage=%s, journalTitle=%s, volume=%s",
                                         aut, firstPage, journalTitle, volume));
                                 if (StringUtils.isNotBlank(aut)) {
                                     subpath = String.format(JOURNAL_AUTHOR_BASE_QUERY,
@@ -213,7 +209,7 @@ public class CrossRef {
                             }
                             if (!doi.isEmpty()) {
                                 i++;
-                                mm.updateDoi(doi);
+                                mm.updateDoi(currentAnhalyticsId, doi);
                             }
                         }
                     } catch (Exception e) {
@@ -226,9 +222,10 @@ public class CrossRef {
             }
             logger.info("Done");
         }
-        System.out.println("nb of found doi : " + i);
+        logger.info("nb of found doi : " + i);
 
     }
+   
 
     /**
      * Try to consolidate some uncertain bibliographical data with crossref web
@@ -277,7 +274,7 @@ public class CrossRef {
                     doi = nl.item(0).getTextContent();
                 }
                 in.close();
-                System.out.println("DOI : " + doi);
+                logger.info("DOI : " + doi);
                 urlConn.disconnect();
             } catch (Exception e) {
                 e.printStackTrace();

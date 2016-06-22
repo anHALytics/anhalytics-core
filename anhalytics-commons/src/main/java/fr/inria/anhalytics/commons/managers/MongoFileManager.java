@@ -454,23 +454,28 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
     }
 
-    public boolean isWithoutDoi() {
-        DBCollection collection = db.getCollection(MongoCollectionsInterface.IDENTIFIERS);
-        DBObject query = new BasicDBObject("repositoryDocId", currentRepositoryDocId);
-        temp = collection.findOne(query);
-        String doi = (String) temp.get("doi");
-        if (doi.isEmpty()) {
+    public boolean isWithoutDoi(String anhalyticsId) {
+        String doi = this.getDocumentDoi(anhalyticsId);
+        if (doi == null || doi.isEmpty()) {
             return true;
         } else {
             return false;
         }
-
+    }
+    
+    public String getDocumentDoi(String anhalyticsId) {
+        DBCollection collection = db.getCollection(MongoCollectionsInterface.IDENTIFIERS);
+        DBObject query = new BasicDBObject("_id", new ObjectId(anhalyticsId));
+        temp = collection.findOne(query);
+        String doi = (String) temp.get("doi");
+        return doi;
     }
 
-    public void updateDoi(String doi) {
+    //synchronize
+    public void updateDoi(String anhalyticsId, String doi) {
         DBCollection collection = db.getCollection(MongoCollectionsInterface.IDENTIFIERS);
         temp.put("doi", doi);
-        collection.update(new BasicDBObject("_id", new ObjectId(currentAnhalyticsId)), temp);
+        collection.update(new BasicDBObject("_id", new ObjectId(anhalyticsId)), temp);
     }
 
     private String generateAnhalyticsId(String repositoryDocId, String doi, String pdfUrl) {
