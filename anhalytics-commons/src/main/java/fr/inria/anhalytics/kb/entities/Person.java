@@ -151,7 +151,7 @@ public class Person {
 
     public Map<String, Object> getPersonDocument() {
         Map<String, Object> personDocument = new HashMap<String, Object>();
-        Map<String, Object> personIdentifierDocument = new HashMap<String, Object>();
+        List<Map<String, Object>> personIdentifiersDocument = new ArrayList<Map<String, Object>>();
         personDocument.put("personId", this.getPersonId());
         personDocument.put("email", this.getEmail());
         personDocument.put("title", this.getTitle());
@@ -159,10 +159,12 @@ public class Person {
         personDocument.put("phone", this.getPhone());
         personDocument.put("url", this.getUrl());
         for (Person_Identifier pi : this.getPerson_identifiers()) {
-            personIdentifierDocument.put("type", pi.getType());
-            personIdentifierDocument.put("id", pi.getId());
+            Map<String, Object> id = new HashMap<String, Object>();
+            id.put("type", pi.getType());
+            id.put("id", pi.getId());
+            personIdentifiersDocument.add(id);
         }
-        personDocument.put("identifers", personIdentifierDocument);
+        personDocument.put("identifers", personIdentifiersDocument);
 
         List<Map<String, Object>> names = new ArrayList<Map<String, Object>>();
         for (Person_Name pn : this.getPerson_names()) {
