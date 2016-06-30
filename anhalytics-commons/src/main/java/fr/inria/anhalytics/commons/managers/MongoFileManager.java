@@ -453,6 +453,29 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             logger.error(e.getMessage(), e.getCause());
         }
     }
+    
+    public boolean insertCrossRefMetadata(String currentAnhalyticsId, String currentRepositoryDocId, String crossRefMetadata) {
+        boolean done = false;
+        try {
+            DBCollection c = null;
+            c = db.getCollection(MongoCollectionsInterface.CROSSREF_METADATAS);
+            BasicDBObject index = new BasicDBObject();
+            index.put("repositoryDocId", 1);
+            index.put("anhalyticsId", 1);
+            c.ensureIndex(index, "index", true);
+            DBObject dbObject = (DBObject) JSON.parse(crossRefMetadata);
+            WriteResult result = c.insert(dbObject);
+            CommandResult res = result.getCachedLastError();
+            if ((res != null) && (res.ok())) {
+                done = true;
+            } else {
+                done = false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return done;
+    }
 
     public boolean isWithoutDoi(String anhalyticsId) {
         String doi = this.getDocumentDoi(anhalyticsId);

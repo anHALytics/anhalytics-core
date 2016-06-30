@@ -3,8 +3,10 @@ package fr.inria.anhalytics.harvest.crossref;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.properties.HarvestProperties;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -18,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -212,6 +216,17 @@ public class CrossRef {
                                 mm.updateDoi(currentAnhalyticsId, doi);
                             }
                         }
+
+                        if (!doi.isEmpty()) {
+                            String crossRefMetadata = getMetadataByDoi(doi);
+                            System.out.println(crossRefMetadata);
+                            if (!crossRefMetadata.isEmpty()) {
+                                crossRefMetadata = "{ \"repositoryDocId\" : \"" + currentRepositoryDocId
+                                        + "\",\"anhalyticsId\" : \"" + currentAnhalyticsId+"\""
+                                        + "," + crossRefMetadata + "}";
+                                mm.insertCrossRefMetadata(currentAnhalyticsId, currentRepositoryDocId, crossRefMetadata);
+                            }
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -225,7 +240,61 @@ public class CrossRef {
         logger.info("nb of found doi : " + i);
 
     }
-   
+
+    /*
+    here we are using the new crossRef api as it's faster than the old one, but in beta version.
+     */
+    private String getMetadataByDoi(String doi) throws Exception {
+        String metadata = "";
+        ObjectMapper mapper = new ObjectMapper();
+        URL url = new URL("http://api.crossref.org/works/" + doi);
+        logger.debug("Fetching for metadata: " + url.toString());
+        logger.debug("Sending: " + url.toString());
+        HttpURLConnection urlConn = null;
+        try {
+            urlConn = (HttpURLConnection) url.openConnection();
+        } catch (Exception e) {
+            try {
+                urlConn = (HttpURLConnection) url.openConnection();
+            } catch (Exception e2) {
+//						e2.printStackTrace();
+                urlConn = null;
+                throw new Exception("An exception occured while running Grobid.", e2);
+            }
+        }
+        if (urlConn != null) {
+            try {
+                urlConn.setDoOutput(true);
+                urlConn.setDoInput(true);
+                urlConn.setRequestMethod("GET");
+
+                urlConn.setRequestProperty("Content-Type", "application/json");
+
+                InputStream in = urlConn.getInputStream();
+
+                BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                StringBuilder responseStrBuilder = new StringBuilder();
+
+                String inputStr;
+                while ((inputStr = streamReader.readLine()) != null) {
+                    responseStrBuilder.append(inputStr);
+                }
+                JsonNode jsonAnnotation = mapper.readTree(responseStrBuilder.toString());
+                JsonNode metadataNode = jsonAnnotation.findPath("message");
+                if (!metadataNode.isNull()) {
+                    metadata = mapper.writeValueAsString(metadataNode);
+                    metadata = " \"metadata\": " + metadata;
+                }
+                in.close();
+                logger.info("DOI : " + doi);
+                urlConn.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        return metadata;
+    }
 
     /**
      * Try to consolidate some uncertain bibliographical data with crossref web
@@ -268,9 +337,9 @@ public class CrossRef {
 
                 Document response = docBuilder.parse(in);
                 Element root = response.getDocumentElement();
-                Element fulltext_metadata = Utilities.getElementByAttribute("publication_type", "full_text", root);
-                NodeList nl = fulltext_metadata.getElementsByTagName("doi");
-                if (nl != null) {
+                //Element fulltext_metadata = Utilities.getElementByAttribute("publication_type", "full_text", root);
+                NodeList nl = root.getElementsByTagName("doi");
+                if (nl != null && nl.getLength() > 0) {
                     doi = nl.item(0).getTextContent();
                 }
                 in.close();

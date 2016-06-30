@@ -33,4 +33,5 @@ public interface MongoCollectionsInterface {
     //metadata harvested from other repositorues
     public static final String ISTEX_TEIS = "istex_teis";
     public static final String ARXIV_METADATA = "arxiv_metadata";
+    public static String CROSSREF_METADATAS = "crossref_metadata";
 }

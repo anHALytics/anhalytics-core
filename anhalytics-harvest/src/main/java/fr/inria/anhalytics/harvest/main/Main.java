@@ -35,7 +35,7 @@ public class Main {
             add("processGrobidDaily");
             add("harvestIstex");
             add("assetLegend");
-            add("crossRef");
+            add("harvestDOI");
             add("crossRefDaily");
             add("openUrl");
         }
@@ -92,9 +92,9 @@ public class Main {
             gp.processFulltexts();
         } else if (process.equals("fetchEmbargoPublications")) {
             oai.fetchEmbargoPublications();
-        } else if (process.equals("crossRef")) {
+        } else if (process.equals("harvestDOI")) {
             cr.findDois();
-        } else if (process.equals("crossRefDaily")) {
+        } else if (process.equals("harvestDOIDaily")) {
             Utilities.updateDates(todayDate, todayDate);
             cr.findDois();
         } else if (process.equals("assetLegend")) {
