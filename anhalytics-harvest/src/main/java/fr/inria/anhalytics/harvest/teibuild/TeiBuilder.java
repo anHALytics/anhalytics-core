@@ -63,6 +63,7 @@ public class TeiBuilder {
     public Document addGrobidTEIToTEICorpus(String teiCorpus, String grobidTei) {
         Document resultTei = null;
         Document teiCorpusDoc = null;
+        HalTEIConverter htc = new HalTEIConverter();
         try {
             teiCorpusDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(teiCorpus.getBytes("utf-8"))));
         } catch (Exception e) {
@@ -78,6 +79,9 @@ public class TeiBuilder {
                 Attr attr = grobidTeiElement.getAttributeNode("xmlns");
                 grobidTeiElement.removeAttributeNode(attr);
                 grobidTeiElement.setAttribute("type", "main");
+                htc.fillAbstract(doc, teiCorpusDoc);
+                htc.fillKeywords(doc, teiCorpusDoc);
+                htc.fillPubDate(doc, teiCorpusDoc);
             }
             resultTei = addNewElementToTEI(teiCorpusDoc, grobidTeiElement);
         } catch (Exception e) {
@@ -92,6 +96,7 @@ public class TeiBuilder {
      * Appends new element to TEICorpus.
      */
     private static Document addNewElementToTEI(Document doc, Node newNode) {
+        
         if (newNode != null) {
             newNode = (Element) doc.importNode(newNode, true);
             Element teiCorpus = (Element) doc.getElementsByTagName("teiCorpus").item(0);
