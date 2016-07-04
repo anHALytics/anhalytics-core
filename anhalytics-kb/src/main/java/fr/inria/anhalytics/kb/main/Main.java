@@ -2,8 +2,7 @@ package fr.inria.anhalytics.kb.main;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.kb.datamine.GrobidMiner;
-import fr.inria.anhalytics.kb.datamine.HALMiner;
+import fr.inria.anhalytics.kb.datamine.KnowledgeBaseFeeder;
 import fr.inria.anhalytics.kb.properties.KbProperties;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
@@ -57,17 +56,16 @@ public class Main {
         cal.add(Calendar.DATE, -1);
         String todayDate = dateFormat.format(cal.getTime());
         String process = KbProperties.getProcessName();
-        GrobidMiner gm = new GrobidMiner();
-        HALMiner hm = new HALMiner();
+        KnowledgeBaseFeeder kbf = new KnowledgeBaseFeeder();
         if (process.equals("initKnowledgeBase")) {
             //Initiates HAL knowledge base and creates working corpus TEI.
-            hm.initKnowledgeBase();
+            kbf.initKnowledgeBase();
         } else if (process.equals("initKnowledgeBaseDaily")) {
             //Initiates HAL knowledge base and creates working corpus TEI.
             Utilities.updateDates(todayDate, todayDate);
-            hm.initKnowledgeBase();
+            kbf.initKnowledgeBase();
         }  else if (process.equals("initCitationKnowledgeBase")) {
-            gm.processCitations();
+            kbf.processCitations();
         }
         return;
     }
