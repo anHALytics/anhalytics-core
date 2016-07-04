@@ -301,7 +301,7 @@ public class HalTEIConverter implements MetadataConverter {
                 String date = "";
                 Element grobidDateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/publicationStmt/date[@type=\"published\"]").evaluate(doc, XPathConstants.NODE);
                 if (grobidDateElt != null) {
-                    String grobidDate = grobidDateElt.getTextContent();
+                    String grobidDate = grobidDateElt.getAttribute("when");
                     if (!grobidDate.contains("0000")) {
                         grobidDate = Utilities.completeDate(grobidDate);
                         date = grobidDate;
