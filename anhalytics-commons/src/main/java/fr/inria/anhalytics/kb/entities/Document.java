@@ -1,6 +1,8 @@
 package fr.inria.anhalytics.kb.entities;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,11 +14,13 @@ public class Document {
     private String docID;
     private String version = "";
     private String uri = "";
+    private List<Document_Identifier> document_Identifiers = null;
 
-    public Document(String docID, String version, String uri) {
+    public Document(String docID, String version, String uri, List<Document_Identifier> document_Identifiers) {
         this.docID = docID;
         this.version = version;
         this.uri = uri;
+        this.document_Identifiers = document_Identifiers;
     }
 
     public Document() {
@@ -112,5 +116,22 @@ public class Document {
         documentDocument.put("version", this.getVersion());
         documentDocument.put("uri", this.getUri());
         return documentDocument;
+    }
+
+    /**
+     * @return the document_Identifiers
+     */
+    public List<Document_Identifier> getDocument_Identifiers() {
+        if (this.document_Identifiers == null) {
+            this.document_Identifiers = new ArrayList<Document_Identifier>();
+        }
+        return document_Identifiers;
+    }
+
+    /**
+     * @param document_Identifiers the document_Identifiers to set
+     */
+    public void setDocument_Identifiers(List<Document_Identifier> document_Identifiers) {
+        this.document_Identifiers = document_Identifiers;
     }
 }

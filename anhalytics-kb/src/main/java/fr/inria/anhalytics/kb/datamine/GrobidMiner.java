@@ -16,6 +16,7 @@ import fr.inria.anhalytics.kb.entities.Collection;
 import fr.inria.anhalytics.kb.entities.Conference;
 import fr.inria.anhalytics.kb.entities.Conference_Event;
 import fr.inria.anhalytics.kb.entities.Country;
+import fr.inria.anhalytics.kb.entities.Document_Identifier;
 import fr.inria.anhalytics.kb.entities.Editor;
 import fr.inria.anhalytics.kb.entities.In_Serial;
 import fr.inria.anhalytics.kb.entities.Journal;
@@ -95,7 +96,7 @@ public class GrobidMiner extends Miner {
                             Node citations = (Node) xPath.compile("/teiCorpus/TEI/text/back/div[@type='references']/listBibl").evaluate(teiDoc, XPathConstants.NODE);
                             if (citations != null) {
                                 NodeList references = citations.getChildNodes();
-                                fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(anhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId);
+                                fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(anhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId, new ArrayList<Document_Identifier>());
                                 dd.create(doc);
 
                                 for (int j = 0; j < references.getLength() - 1; j++) {

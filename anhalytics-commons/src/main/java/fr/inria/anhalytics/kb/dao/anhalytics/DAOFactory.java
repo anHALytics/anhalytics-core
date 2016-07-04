@@ -57,10 +57,6 @@ public class DAOFactory extends AbstractDAOFactory {
         return new Conference_EventDAO(conn);
     }
 
-    public DAO getDocument_IdentifierDAO() {
-        return new Document_IdentifierDAO(conn);
-    }
-
     public DAO getIn_SerialDAO() {
         return new In_SerialDAO(conn);
     }

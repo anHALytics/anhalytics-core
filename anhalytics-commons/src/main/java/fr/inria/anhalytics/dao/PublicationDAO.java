@@ -2,6 +2,7 @@ package fr.inria.anhalytics.dao;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.kb.entities.Document;
+import fr.inria.anhalytics.kb.entities.Document_Identifier;
 import fr.inria.anhalytics.kb.entities.Monograph;
 import fr.inria.anhalytics.kb.entities.Publication;
 import fr.inria.anhalytics.kb.entities.Publisher;
@@ -117,7 +118,7 @@ public class PublicationDAO extends DAO<Publication, Long> {
                 try {
                     publication = new Publication(
                             publication_id,
-                            new Document(rs.getString("docID"), rs.getString("version"), rs.getString("URI")),
+                            new Document(rs.getString("docID"), rs.getString("version"), rs.getString("URI"), new ArrayList<Document_Identifier>()),
                             new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
                             new Publisher(rs.getLong("publisherID"), rs.getString("name")),
                             rs.getString("PUBLICATION.type"),
@@ -151,7 +152,7 @@ public class PublicationDAO extends DAO<Publication, Long> {
                 try {
                     publications.add(new Publication(
                             rs.getLong("PUBLICATION.publicationID"),
-                            new Document(doc_id, rs.getString("version"), rs.getString("URI")),
+                            new Document(doc_id, rs.getString("version"), rs.getString("URI"), new ArrayList<Document_Identifier>()),
                             new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
                             new Publisher(rs.getLong("publisherID"), rs.getString("name")),
                             rs.getString("PUBLICATION.type"),

@@ -26,8 +26,6 @@ public abstract class AbstractDAOFactory {
 
     public abstract DAO getConference_EventDAO();
 
-    public abstract DAO getDocument_IdentifierDAO();
-
     public abstract DAO getIn_SerialDAO();
 
     public abstract DAO getLocationDAO();

@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.dao;
 
 import fr.inria.anhalytics.kb.entities.Document;
+import fr.inria.anhalytics.kb.entities.Document_Identifier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,6 +22,9 @@ public class DocumentDAO extends DAO<Document, String> {
     private static final String SQL_INSERT
             = "INSERT INTO DOCUMENT (docID, version, uri) VALUES (?, ?, ?)";
 
+    private static final String SQL_INSERT_IDENTIFIER
+            = "INSERT INTO DOCUMENT_IDENTIFIER (docID, ID, Type) VALUES (?, ?, ?)";
+
     private static final String READ_QUERY_DOCUMENTS = "SELECT * FROM DOCUMENT";
 
     private static final String READ_QUERY_DOCID_BY_AUTHORS = "SELECT docID FROM AUTHORSHIP WHERE personID = ?";
@@ -39,7 +43,7 @@ public class DocumentDAO extends DAO<Document, String> {
             throw new IllegalArgumentException("The document ID is null, an ID should be provided.");
         }
 
-        PreparedStatement statement;
+        PreparedStatement statement, statement1;
         statement = connect.prepareStatement(SQL_INSERT);
         statement.setString(1, obj.getDocID());
         statement.setString(2, obj.getVersion());
@@ -47,6 +51,20 @@ public class DocumentDAO extends DAO<Document, String> {
         statement.setString(3, obj.getUri());
         int code = statement.executeUpdate();
         statement.close();
+
+        statement1 = connect.prepareStatement(SQL_INSERT_IDENTIFIER);
+        for (Document_Identifier di : obj.getDocument_Identifiers()) {
+            try {
+                statement1.setString(1, obj.getDocID());
+                statement1.setString(2, di.getId());
+                statement1.setString(3, di.getType());
+
+                int code3 = statement1.executeUpdate();
+            } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e) {
+            }
+        }
+        statement1.close();
+
         result = true;
         return result;
     }
@@ -74,7 +92,8 @@ public class DocumentDAO extends DAO<Document, String> {
                         doc_id,
                         rs.getString("version"),
                         rs.getString("uri"
-                        ));
+                        ),
+                new ArrayList<Document_Identifier>());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -110,7 +129,8 @@ public class DocumentDAO extends DAO<Document, String> {
                         new Document(
                                 rs.getString("docID"),
                                 rs.getString("version"),
-                                rs.getString("uri")
+                                rs.getString("uri"),
+                new ArrayList<Document_Identifier>()
                         ));
             }
         } catch (SQLException ex) {

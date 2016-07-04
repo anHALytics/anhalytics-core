@@ -4,17 +4,18 @@ package fr.inria.anhalytics.kb.entities;
  *
  * @author azhar
  */
-public class Document_Identifier {
+public class Organisation_Identifier {
 
     private String id = "";
     private String type = "";
 
-    public Document_Identifier(String id, String type) {
+    public Organisation_Identifier(String id, String type) {
         this.id = id;
         this.type = type;
     }
-    
-    public Document_Identifier(){}
+
+    public Organisation_Identifier() {
+    }
 
     /**
      * @return the id
@@ -27,8 +28,6 @@ public class Document_Identifier {
      * @param id the id to set
      */
     public void setId(String id) {
-        if(id.length() > 150)
-            id = id.substring(0, 149);
         this.id = id;
     }
 
@@ -43,12 +42,7 @@ public class Document_Identifier {
      * @param type the type to set
      */
     public void setType(String type) {
-        if(type.length() > 55)
-            type = type.substring(0, 54);
         this.type = type;
     }
 
-    public String getVersion() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 }

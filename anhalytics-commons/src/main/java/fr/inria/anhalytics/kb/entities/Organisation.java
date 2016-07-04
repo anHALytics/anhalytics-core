@@ -22,11 +22,12 @@ public class Organisation {
     private List<Organisation_Name> names = null;
     private Date publication_date;
     private List<PART_OF> rels = null;
+    private List<Organisation_Identifier> organisation_identifiers = null;
 
     public Organisation() {
     }
 
-    public Organisation(Long organisationId, String type, String status, String url, String structure, List<Organisation_Name> names, List<PART_OF> rels, Date publication_date) {
+    public Organisation(Long organisationId, String type, String status, String url, String structure, List<Organisation_Name> names, List<PART_OF> rels, List<Organisation_Identifier> organisation_identifiers, Date publication_date) {
         this.organisationId = organisationId;
         this.type = type;
         this.url = url;
@@ -34,6 +35,7 @@ public class Organisation {
         this.names = names;
         this.rels = rels;
         this.publication_date = publication_date;
+        this.organisation_identifiers = organisation_identifiers;
     }
 
     /**
@@ -144,6 +146,7 @@ public class Organisation {
         Map<String, Object> organisationDocument = new HashMap<String, Object>();
         List<Map<String, Object>> organisationNamesDocument = new ArrayList<Map<String, Object>>();
         organisationDocument.put("organisationId", this.getOrganisationId());
+        List<Map<String, Object>> organisationIdentifiersDocument = new ArrayList<Map<String, Object>>();
         for(Organisation_Name name:getNames()){
             organisationNamesDocument.add(name.getOrganisationNameDocument());
         }
@@ -152,6 +155,13 @@ public class Organisation {
         organisationDocument.put("status", this.getStatus());
         organisationDocument.put("structId", this.getStructure());
         organisationDocument.put("url", this.getUrl());
+        for (Organisation_Identifier oi : this.getOrganisation_identifiers()) {
+            Map<String, Object> id = new HashMap<String, Object>();
+            id.put("type", oi.getType());
+            id.put("id", oi.getId());
+            organisationIdentifiersDocument.add(id);
+        }
+        organisationDocument.put("identifers", organisationIdentifiersDocument);
         //organisationDocument.put("orgs", this.getRels());
         return organisationDocument;
 
@@ -183,6 +193,23 @@ public class Organisation {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    /**
+     * @return the organisation_identifiers
+     */
+    public List<Organisation_Identifier> getOrganisation_identifiers() {
+        if (this.organisation_identifiers == null) {
+            this.organisation_identifiers = new ArrayList<Organisation_Identifier>();
+        }
+        return organisation_identifiers;
+    }
+
+    /**
+     * @param organisation_identifiers the organisation_identifiers to set
+     */
+    public void setOrganisation_identifiers(List<Organisation_Identifier> organisation_identifiers) {
+        this.organisation_identifiers = organisation_identifiers;
     }
 
 }

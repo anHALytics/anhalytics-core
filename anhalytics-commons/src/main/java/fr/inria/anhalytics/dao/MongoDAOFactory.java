@@ -46,11 +46,6 @@ public class MongoDAOFactory  extends AbstractDAOFactory {
     }
 
     @Override
-    public DAO getDocument_IdentifierDAO() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public DAO getIn_SerialDAO() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

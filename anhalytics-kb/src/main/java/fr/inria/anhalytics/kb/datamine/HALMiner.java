@@ -11,7 +11,6 @@ import fr.inria.anhalytics.dao.Conference_EventDAO;
 import fr.inria.anhalytics.kb.dao.anhalytics.LocationDAO;
 import fr.inria.anhalytics.dao.DocumentDAO;
 import fr.inria.anhalytics.dao.Document_OrganisationDAO;
-import fr.inria.anhalytics.kb.dao.anhalytics.Document_IdentifierDAO;
 import fr.inria.anhalytics.dao.In_SerialDAO;
 import fr.inria.anhalytics.dao.MonographDAO;
 import fr.inria.anhalytics.kb.dao.anhalytics.OrganisationDAO;
@@ -26,6 +25,7 @@ import fr.inria.anhalytics.kb.entities.Collection;
 import fr.inria.anhalytics.kb.entities.Conference;
 import fr.inria.anhalytics.kb.entities.Conference_Event;
 import fr.inria.anhalytics.kb.entities.Country;
+import fr.inria.anhalytics.kb.entities.Document_Identifier;
 import fr.inria.anhalytics.kb.entities.Document_Organisation;
 import fr.inria.anhalytics.kb.entities.Editor;
 import fr.inria.anhalytics.kb.entities.In_Serial;
@@ -33,6 +33,7 @@ import fr.inria.anhalytics.kb.entities.Journal;
 import fr.inria.anhalytics.kb.entities.Location;
 import fr.inria.anhalytics.kb.entities.Monograph;
 import fr.inria.anhalytics.kb.entities.Organisation;
+import fr.inria.anhalytics.kb.entities.Organisation_Identifier;
 import fr.inria.anhalytics.kb.entities.Organisation_Name;
 import fr.inria.anhalytics.kb.entities.PART_OF;
 import fr.inria.anhalytics.kb.entities.Person;
@@ -137,8 +138,10 @@ public class HALMiner extends Miner {
                             if (authors.getLength() > 30) {
                                 throw new NumberOfCoAuthorsExceededException("Number of authors exceed 30 co-authors for this publication.");
                             }
-                            fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId);
+                            
+                            fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId, new ArrayList<Document_Identifier>());
 
+                            processIdentifiers(ids, doc, repositoryDocId);
                             dd.create(doc);
 
                             pub.setDocument(doc);
@@ -153,7 +156,6 @@ public class HALMiner extends Miner {
                             pd.create(pub);
                             processPersons(authors, "author", pub, teiDoc, authorsFromfulltextTeiHeader);
                             processPersons(editors, "editor", pub, teiDoc, authorsFromfulltextTeiHeader);
-                            processIdentifiers(ids, doc);
 
                             logger.debug("#################################################################");
                         } catch (Exception xpe) {
@@ -178,10 +180,10 @@ public class HALMiner extends Miner {
         logger.info("DONE.");
     }
 
-    private static void processIdentifiers(NodeList ids, fr.inria.anhalytics.kb.entities.Document doc) throws SQLException {
+    private static void processIdentifiers(NodeList ids, fr.inria.anhalytics.kb.entities.Document doc, String halId) throws SQLException {
         String type = null;
         String id = null;
-        Document_IdentifierDAO did = (Document_IdentifierDAO) adf.getDocument_IdentifierDAO();
+        List<Document_Identifier> dis = new ArrayList<Document_Identifier>();
         for (int i = ids.getLength() - 1; i >= 0; i--) {
             Node node = ids.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -189,11 +191,12 @@ public class HALMiner extends Miner {
                 type = identifierElt.getAttribute("type");
                 id = node.getTextContent();
             }
-            fr.inria.anhalytics.kb.entities.Document_Identifier di = new fr.inria.anhalytics.kb.entities.Document_Identifier(null, id, type, doc);
-            did.create(di);
+            Document_Identifier di = new Document_Identifier(id, type);
+            dis.add(di);
         }
-        fr.inria.anhalytics.kb.entities.Document_Identifier dihal = new fr.inria.anhalytics.kb.entities.Document_Identifier(null, doc.getUri(), "hal", doc);
-        did.create(dihal);
+        Document_Identifier dihal = new Document_Identifier(halId, "hal");
+        dis.add(dihal);
+        doc.setDocument_Identifiers(dis);
     }
 
     private static void processMonogr(Element monogr, Publication pub) throws SQLException {
@@ -337,15 +340,15 @@ public class HALMiner extends Miner {
         AddressDAO ad = (AddressDAO) adf.getAddressDAO();
         OrganisationDAO od = (OrganisationDAO) adf.getOrganisationDAO();
         Organisation organisationParent = new Organisation();
+        List<Organisation_Identifier> ois = new ArrayList<Organisation_Identifier>();
         Location locationParent = null;
         Address addrParent = null;
         PART_OF part_of = new PART_OF();
         if (orgNode.getNodeType() == Node.ELEMENT_NODE) {
             Element orgElt = (Element) orgNode;
-
+            ois.add(new Organisation_Identifier(orgElt.getAttribute("xml:id"), "halId"));
             organisationParent.setType(orgElt.getAttribute("type"));
-            organisationParent.setStructure(orgElt.getAttribute("xml:id"));
-            
+
             organisationParent.setStatus(orgElt.getAttribute("status"));
             NodeList nlorg = orgElt.getChildNodes();
             for (int o = nlorg.getLength() - 1; o >= 0; o--) {
@@ -461,7 +464,7 @@ public class HALMiner extends Miner {
         }
         if (!isGrobid) {
             organisation.setType(affiliationElt.getAttribute("type"));
-            organisation.setStructure(affiliationElt.getAttribute("xml:id"));
+            organisation.getOrganisation_identifiers().add(new Organisation_Identifier(affiliationElt.getAttribute("xml:id"), "halId"));
             organisation.setStatus(affiliationElt.getAttribute("status"));
             organisations.add(organisation);
         }
