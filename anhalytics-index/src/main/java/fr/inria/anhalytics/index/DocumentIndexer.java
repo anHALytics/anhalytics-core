@@ -31,7 +31,7 @@ public class DocumentIndexer extends Indexer {
     IndexingPreprocess indexingPreprocess;
     // only annotations under these paths will be indexed for the moment
     static final public List<String> toBeIndexed
-            = Arrays.asList("$teiCorpus.$teiHeader.$titleStmt.xml:id",
+            = Arrays.asList("$teiCorpus.$teiHeader.$fileDesc.$titleStmt.xml:id",
                     "$teiCorpus.$teiHeader.$profileDesc.xml:id",
                     "$teiCorpus.$teiHeader.$profileDesc.$textClass.$keywords.$type_author.xml:id");
 
@@ -363,7 +363,6 @@ public class DocumentIndexer extends Indexer {
     private List<String> validDocIDs(String anhalyticsId, ObjectMapper mapper) {
         List<String> results = new ArrayList<String>();
         logger.debug("validDocIDs: " + anhalyticsId);
-
         String request = "{\"fields\": [ ";
         boolean first = true;
         for (String path : toBeIndexed) {
