@@ -498,7 +498,7 @@
                                                             "$listBibl": {
                                                                 "properties": {
                                                                     "$biblStruct": {
-                                                                        "type" : "nested",
+                                                                        "type": "nested",
                                                                         "properties": {
                                                                             "$analytic": {
                                                                                 "properties": {
@@ -1277,8 +1277,18 @@
                                                                                 "type": "string"
                                                                             },
                                                                             "$fullName": {
-                                                                                "index": "not_analyzed",
-                                                                                "type": "string"
+                                                                                "type": "multi_field",
+                                                                                "fields": {
+                                                                                    "notAnalyzed": {
+                                                                                        "index": "not_analyzed",
+                                                                                        "type": "string"
+                                                                                    },
+                                                                                    "analyzed": {
+                                                                                        "index": "analyzed",
+                                                                                        "analyzer": "case_insensitive",
+                                                                                        "type": "string"
+                                                                                    }
+                                                                                }
                                                                             },
                                                                             "$surname": {
                                                                                 "index": "not_analyzed",
@@ -1583,9 +1593,18 @@
                                                     "$type_author": {
                                                         "properties": {
                                                             "$term": {
-                                                                "analyzer": "case_insensitive",
-                                                                "index": "analyzed",
-                                                                "type": "string"
+                                                                "type": "multi_field",
+                                                                "fields": {
+                                                                    "notAnalyzed": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string"
+                                                                    },
+                                                                    "analyzed": {
+                                                                        "analyzer": "case_insensitive",
+                                                                        "index": "analyzed",
+                                                                        "type": "string"
+                                                                    }
+                                                                }
                                                             },
                                                             "xml:id": {
                                                                 "index": "not_analyzed",
