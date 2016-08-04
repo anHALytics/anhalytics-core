@@ -20,21 +20,19 @@ public class Organisation {
     private String structure = "";
     private String status = "";
     private List<Organisation_Name> names = null;
-    private Date publication_date;
     private List<PART_OF> rels = null;
     private List<Organisation_Identifier> organisation_identifiers = null;
 
     public Organisation() {
     }
 
-    public Organisation(Long organisationId, String type, String status, String url, String structure, List<Organisation_Name> names, List<PART_OF> rels, List<Organisation_Identifier> organisation_identifiers, Date publication_date) {
+    public Organisation(Long organisationId, String type, String status, String url, String structure, List<Organisation_Name> names, List<PART_OF> rels, List<Organisation_Identifier> organisation_identifiers) {
         this.organisationId = organisationId;
         this.type = type;
         this.url = url;
         this.structure = structure;
         this.names = names;
         this.rels = rels;
-        this.publication_date = publication_date;
         this.organisation_identifiers = organisation_identifiers;
     }
 
@@ -165,20 +163,6 @@ public class Organisation {
         //organisationDocument.put("orgs", this.getRels());
         return organisationDocument;
 
-    }
-
-    /**
-     * @return the publication_date
-     */
-    public Date getPublication_date() {
-        return publication_date;
-    }
-
-    /**
-     * @param publication_date the publication_date to set
-     */
-    public void setPublication_date(Date publication_date) {
-        this.publication_date = publication_date;
     }
 
     /**

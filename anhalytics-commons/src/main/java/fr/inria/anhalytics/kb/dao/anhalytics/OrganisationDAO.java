@@ -107,7 +107,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 try {
                     statement1.setLong(1, obj.getOrganisationId());
                     statement1.setString(2, name.getName());
-                    if (obj.getPublication_date() == null) {
+                    if (name.getPublication_date()== null) {
                         statement1.setDate(3, new java.sql.Date(00000000L));
                     } else {
                         statement1.setDate(3, new java.sql.Date(name.getPublication_date().getTime()));
@@ -189,7 +189,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             try {
                 statement1.setLong(1, obj.getOrganisationId());
                 statement1.setString(2, name.getName());
-                if (obj.getPublication_date() == null) {
+                if (name.getPublication_date() == null) {
                     statement1.setDate(3, new java.sql.Date(00000000L));
                 } else {
                     statement1.setDate(3, new java.sql.Date(name.getPublication_date().getTime()));
@@ -283,7 +283,6 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
         PreparedStatement preparedStatement2 = this.connect.prepareStatement(SQL_SELECT_ORGIDENTIFIERS_BY_ID);
         try {
             preparedStatement.setLong(1, id);
-            preparedStatement.setLong(2, id);
             ResultSet rs = preparedStatement.executeQuery();
             try {
                 if (rs.first()) {
@@ -296,8 +295,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                             rs.getString("org.struct"),
                             (new ArrayList<Organisation_Name>()),
                             findMothers(id),
-                            (new ArrayList<Organisation_Identifier>()),
-                            Utilities.parseStringDate(rs.getString("orgname.publication_date"))
+                            (new ArrayList<Organisation_Identifier>())
                     );
 
                     preparedStatement1.setLong(1, id);
@@ -339,7 +337,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
         try {
             preparedStatement.setLong(1, id);
             ResultSet rs = preparedStatement.executeQuery();
-            preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             try {
                 while (rs.next()) {
                     preparedStatement1.setLong(1, rs.getLong("organisation_motherID"));
@@ -353,8 +351,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                                 rs1.getString("org.struct"),
                                 (new ArrayList<Organisation_Name>()),
                                 new ArrayList<PART_OF>(),
-                                (new ArrayList<Organisation_Identifier>()),
-                                null
+                                (new ArrayList<Organisation_Identifier>())
                         );
                         preparedStatement2.setLong(1, id);
 
