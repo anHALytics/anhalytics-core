@@ -150,7 +150,12 @@
                                                                                 "term_vector": "with_positions_offsets"
                                                                             }
                                                                         }
-                                                                    }
+                                                                    },
+                                                                    "xml:id": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string",
+                                                        "include_in_all": false
+                                                    }
                                                                 }
                                                             },
                                                             "$idno": {
@@ -259,7 +264,11 @@
                                                                                 "term_vector": "with_positions_offsets"
                                                                             }
                                                                         }
-                                                                    },
+                                                                    },"xml:id": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string",
+                                                        "include_in_all": false
+                                                    },
                                                                     "$meeting": {
                                                                         "properties": {
                                                                             "$title": {
@@ -291,6 +300,11 @@
                                                                                     }
                                                                                 }
                                                                             },
+                                                                            "xml:id": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string",
+                                                        "include_in_all": false
+                                                    },
                                                                             "date": {
                                                                                 "properties": {
                                                                                     "$type_start": {
@@ -357,7 +371,13 @@
                                                                 "term_vector": "with_positions_offsets"
                                                             }
                                                         }
+                                                    },
+                                                    "xml:id": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string",
+                                                        "include_in_all": false
                                                     }
+                                                    
                                                 }
                                             }
                                         }
@@ -390,9 +410,19 @@
                                                                 "term_vector": "with_positions_offsets"
                                                             }
                                                         }
-                                                    }
+                                                    },
+                                                            "xml:id": {
+                                                                "index": "not_analyzed",
+                                                                "type": "string",
+                                                                "include_in_all": false
+                                                            }
                                                 }
                                             },
+                                                            "xml:id": {
+                                                                "index": "not_analyzed",
+                                                                "type": "string",
+                                                                "include_in_all": false
+                                                            },
                                             "$textClass": {
                                                 "properties": {
                                                     "$keywords": {
@@ -401,6 +431,11 @@
                                                                 "analyzer": "case_insensitive",
                                                                 "index": "analyzed",
                                                                 "type": "string"
+                                                            },
+                                                            "xml:id": {
+                                                                "index": "not_analyzed",
+                                                                "type": "string",
+                                                                "include_in_all": false
                                                             },
                                                             "$raw": {
                                                                 "index": "not_analyzed",
@@ -444,7 +479,8 @@
                                                             },
                                                             "xml:id": {
                                                                 "index": "not_analyzed",
-                                                                "type": "string"
+                                                                "type": "string",
+                                                                "include_in_all": false
                                                             }
 
                                                         },
@@ -476,7 +512,8 @@
                                                                 },
                                                                 "xml:id": {
                                                                     "index": "not_analyzed",
-                                                                    "type": "string"
+                                                                    "type": "string",
+                                                                    "include_in_all": false
                                                                 }
                                                             }
                                                         },
@@ -539,7 +576,11 @@
                                                                                                 "type": "string"
                                                                                             }
                                                                                         }
-                                                                                    },
+                                                                                    },"xml:id": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string",
+                                                        "include_in_all": false
+                                                    },
                                                                                     "id": {
                                                                                         "index": "not_analyzed",
                                                                                         "type": "string"
@@ -629,7 +670,11 @@
                                                                                                 "term_vector": "with_positions_offsets"
                                                                                             }
                                                                                         }
-                                                                                    },
+                                                                                    },"xml:id": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string",
+                                                        "include_in_all": false
+                                                    },
                                                                                     "$title-first": {
                                                                                         "type": "string"
                                                                                     },
@@ -654,7 +699,8 @@
                                                                     },
                                                                     "xml:id": {
                                                                         "index": "not_analyzed",
-                                                                        "type": "string"
+                                                                        "type": "string",
+                                                                        "include_in_all": false
                                                                     }
                                                                 }
                                                             }
@@ -684,7 +730,8 @@
                                                             },
                                                             "xml:id": {
                                                                 "index": "not_analyzed",
-                                                                "type": "string"
+                                                                "type": "string",
+                                                                "include_in_all": false
                                                             }
 
                                                         }
@@ -721,7 +768,8 @@
                                                             },
                                                             "xml:id": {
                                                                 "index": "not_analyzed",
-                                                                "type": "string"
+                                                                "type": "string",
+                                                                "include_in_all": false
                                                             }
                                                         }
                                                     },
@@ -755,7 +803,8 @@
                                                     },
                                                     "xml:id": {
                                                         "index": "not_analyzed",
-                                                        "type": "string"
+                                                        "type": "string",
+                                                        "include_in_all": false
                                                     }
                                                 }
                                             },
@@ -779,7 +828,8 @@
                                                     },
                                                     "xml:id": {
                                                         "index": "not_analyzed",
-                                                        "type": "string"
+                                                        "type": "string",
+                                                        "include_in_all": false
                                                     }
                                                 }
                                             }
@@ -813,6 +863,11 @@
                                                                 "term_vector": "with_positions_offsets"
                                                             }
                                                         }
+                                                    },
+                                                    "xml:id": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string",
+                                                        "include_in_all": false
                                                     },
                                                     "id": {
                                                         "type": "string"
@@ -875,7 +930,8 @@
                                                 "properties": {
                                                     "xml:id": {
                                                         "index": "not_analyzed",
-                                                        "type": "string"
+                                                        "type": "string",
+                                                        "include_in_all": false
                                                     },
                                                     "nerd": {
                                                         "dynamic": "false",
@@ -932,7 +988,8 @@
                                             },
                                             "xml:id": {
                                                 "index": "not_analyzed",
-                                                "type": "string"
+                                                "type": "string",
+                                                "include_in_all": false
                                             },
                                             "xml:lang": {
                                                 "index": "not_analyzed",
@@ -1421,7 +1478,11 @@
                                                                         "term_vector": "with_positions_offsets"
                                                                     }
                                                                 }
-                                                            },
+                                                            },"xml:id": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string",
+                                                        "include_in_all": false
+                                                    },
                                                             "$meeting": {
                                                                 "properties": {
                                                                     "$title": {
@@ -1452,7 +1513,11 @@
                                                                                 "term_vector": "with_positions_offsets"
                                                                             }
                                                                         }
-                                                                    },
+                                                                    },"xml:id": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string",
+                                                        "include_in_all": false
+                                                    },
                                                                     "$date": {
                                                                         "properties": {
                                                                             "$type_start": {
@@ -1551,6 +1616,11 @@
                                             }
                                         }
                                     },
+                                                            "xml:id": {
+                                                                "index": "not_analyzed",
+                                                                "type": "string",
+                                                                "include_in_all": false
+                                                            },
                                     "$langUsage": {
                                         "properties": {
                                             "$language": {
@@ -1608,7 +1678,8 @@
                                                             },
                                                             "xml:id": {
                                                                 "index": "not_analyzed",
-                                                                "type": "string"
+                                                                "type": "string",
+                                                                "include_in_all": false
                                                             },
                                                             "xml:lang": {
                                                                 "index": "not_analyzed",
@@ -1628,7 +1699,8 @@
                                             },
                                             "xml:id": {
                                                 "index": "not_analyzed",
-                                                "type": "string"
+                                                "type": "string",
+                                                "include_in_all": false
                                             }
                                         }
                                     }
