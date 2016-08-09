@@ -47,6 +47,8 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
 
     private static final String SQL_SELECT_MOTHERID_BY_ORGID = "SELECT * FROM PART_OF WHERE organisationID = ?";
 
+    private static final String SQL_SELECT_ORGNAME_BY_ORGID = "SELECT * FROM ORGANISATION_NAME WHERE organisationID = ?";
+
     private static final String SQL_SELECT_AUTHORSID_BY_DOCID = "SELECT personID FROM AUTHOR WHERE docID = ?";
 
     private static final String SQL_SELECT_ORGID_BY_PERSONID = "SELECT organisationID FROM AFFILIATION WHERE personID = ?";
@@ -63,6 +65,8 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
 
     private static final String UPDATE_ORGANISATION = "UPDATE ORGANISATION SET type = ? ,struct = ? ,url = ?, status = ? WHERE organisationID = ?";
 
+    private static final String UPDATE_ORGANISATION_NAME = "UPDATE ORGANISATION_NAME SET publication_date = ? WHERE organisation_nameID = ?";
+    
     public OrganisationDAO(Connection conn) {
         super(conn);
     }
@@ -107,7 +111,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 try {
                     statement1.setLong(1, obj.getOrganisationId());
                     statement1.setString(2, name.getName());
-                    if (name.getPublication_date()== null) {
+                    if (name.getPublication_date() == null) {
                         statement1.setDate(3, new java.sql.Date(00000000L));
                     } else {
                         statement1.setDate(3, new java.sql.Date(name.getPublication_date().getTime()));
@@ -170,6 +174,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
     public boolean update(Organisation obj) throws SQLException {
         boolean result = false;
         PreparedStatement preparedStatement = this.connect.prepareStatement(UPDATE_ORGANISATION);
+        PreparedStatement preparedStatement1 = this.connect.prepareStatement(UPDATE_ORGANISATION_NAME);
         PreparedStatement statement1 = connect.prepareStatement(SQL_INSERT_NAMES);
         statement1.setFetchSize(Integer.MIN_VALUE);
         PreparedStatement statement2 = connect.prepareStatement(SQL_INSERT_MOTHERS);
@@ -185,20 +190,39 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
         preparedStatement.setLong(5, obj.getOrganisationId());
         int code1 = preparedStatement.executeUpdate();
 
+        List<Organisation_Name> names = getOrganisationNames(obj.getOrganisationId());
+
         for (Organisation_Name name : obj.getNames()) {
-            try {
-                statement1.setLong(1, obj.getOrganisationId());
-                statement1.setString(2, name.getName());
-                if (name.getPublication_date() == null) {
-                    statement1.setDate(3, new java.sql.Date(00000000L));
-                } else {
-                    statement1.setDate(3, new java.sql.Date(name.getPublication_date().getTime()));
+            if (names.contains(name)) {
+                Organisation_Name existingName = names.get(names.indexOf(name));
+                if (name.getPublication_date().after(existingName.getPublication_date())) {
+                    // we keep the most recent publication date to keep track of changing names !
+                    if (name.getPublication_date() == null) {
+                        preparedStatement1.setDate(1, new java.sql.Date(00000000L));
+                    } else {
+                        preparedStatement1.setDate(1, new java.sql.Date(name.getPublication_date().getTime()));
+                    }
+                    preparedStatement1.setLong(2, existingName.getOrganisation_nameid());
+                    int code2 = preparedStatement1.executeUpdate();
                 }
-                int code2 = statement1.executeUpdate();
-            } catch (MySQLIntegrityConstraintViolationException e) {
-                //e.printStackTrace();
+                //update pub date
+            } else {
+
+                try {
+                    statement1.setLong(1, obj.getOrganisationId());
+                    statement1.setString(2, name.getName());
+                    if (name.getPublication_date() == null) {
+                        statement1.setDate(3, new java.sql.Date(00000000L));
+                    } else {
+                        statement1.setDate(3, new java.sql.Date(name.getPublication_date().getTime()));
+                    }
+                    int code2 = statement1.executeUpdate();
+                } catch (MySQLIntegrityConstraintViolationException e) {
+                    //e.printStackTrace();
+                }
             }
         }
+        preparedStatement1.close();
         preparedStatement.close();
         statement1.close();
         //}
@@ -303,7 +327,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
 
                     while (rs1.next()) {
                         if (rs1.getString("orgname.name") != null) {
-                            organisation.getNames().add(new Organisation_Name(rs1.getString("orgname.name"), Utilities.parseStringDate(rs1.getString("orgname.publication_date"))));
+                            organisation.getNames().add(new Organisation_Name(rs1.getLong("orgname.organisation_nameID"), rs1.getString("orgname.name"), Utilities.parseStringDate(rs1.getString("orgname.publication_date"))));
                         }
                     }
 
@@ -358,7 +382,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                         ResultSet rs2 = preparedStatement2.executeQuery();
                         while (rs2.next()) {
                             if (rs2.getString("orgname.name") != null) {
-                                org.getNames().add(new Organisation_Name(rs2.getString("orgname.name"), Utilities.parseStringDate(rs2.getString("orgname.publication_date"))));
+                                org.getNames().add(new Organisation_Name(rs2.getLong("orgname.organisation_nameID"), rs2.getString("orgname.name"), Utilities.parseStringDate(rs2.getString("orgname.publication_date"))));
                             }
                         }
                         preparedStatement3.setLong(1, id);
@@ -382,6 +406,30 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             preparedStatement3.close();
         }
         return rels;
+    }
+
+    public List<Organisation_Name> getOrganisationNames(Long id) throws SQLException {
+        List<Organisation_Name> names = new ArrayList<Organisation_Name>();
+        Organisation org = null;
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_ORGNAME_BY_ORGID);
+        try {
+            preparedStatement.setLong(1, id);
+            ResultSet rs = preparedStatement.executeQuery();
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            try {
+                while (rs.next()) {
+                    names.add(new Organisation_Name(rs.getLong("organisation_nameID"), rs.getString("name"), Utilities.parseStringDate(rs.getString("publication_date"))));
+                }
+            } catch (ParseException ex) {
+                Logger.getLogger(OrganisationDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            preparedStatement.close();
+        }
+        return names;
     }
 
     public List<Organisation> findAllOrganisations() throws SQLException {
