@@ -4,8 +4,6 @@ import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.grobid.MyGrobid;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,7 +28,7 @@ import org.xml.sax.SAXException;
  * @author achraf
  */
 public class HalTEIConverter implements MetadataConverter {
-
+    
     private static XPath xPath = XPathFactory.newInstance().newXPath();
 
     /**
@@ -48,9 +46,9 @@ public class HalTEIConverter implements MetadataConverter {
         //read an xml node using xpath
         Element teiHeader = null;
         try {
-
+            
             metadata = transformMetadata(metadata);
-
+            
             NodeList editors = (NodeList) xPath.compile("/TEI/text/body/listBibl/fileDesc/sourceDesc/biblStruct/analytic/editor").evaluate(metadata, XPathConstants.NODESET);
             NodeList authors = (NodeList) xPath.compile("/TEI/text/body/listBibl/fileDesc/sourceDesc/biblStruct/analytic/author").evaluate(metadata, XPathConstants.NODESET);
             NodeList orgs = (NodeList) xPath.compile("/TEI/text/back/listOrg/org").evaluate(metadata, XPathConstants.NODESET);
@@ -59,15 +57,44 @@ public class HalTEIConverter implements MetadataConverter {
             updateAffiliations(editors, orgs, metadata);
             Utilities.trimEOL(metadata.getDocumentElement(), metadata);
             NodeList stuffToTake = (NodeList) xPath.compile("/TEI/text/body/listBibl").evaluate(metadata, XPathConstants.NODESET);
-
             teiHeader = createMetadataTEIHeader(stuffToTake, newTEICorpus);
         } catch (XPathExpressionException e) {
             e.printStackTrace();
-
+            
         }
         return teiHeader;
     }
-
+    
+    public void updatePublicationDate(Element teiHeader, Document newTEICorpus) {
+        String date = "";
+        try {
+            Element dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"datePub\"]").evaluate(newTEICorpus, XPathConstants.NODE);
+            if (dateElt == null) {
+                dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"dateDefended\"]").evaluate(newTEICorpus, XPathConstants.NODE);
+            }
+            Element submissionDateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/editionStmt/edition[@type=\"current\"]/date[@type=\"whenSubmitted\"]").evaluate(newTEICorpus, XPathConstants.NODE);
+            String pubDate = "";
+            if (dateElt != null) {
+                pubDate = Utilities.completeDate(dateElt.getTextContent());
+            }
+            if (dateElt == null || dateElt.getTextContent().contains("0000") || !pubDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                date = submissionDateElt.getTextContent().split(" ")[0];
+                Element newPubDate = newTEICorpus.createElement("date");
+                newPubDate.setAttribute("type", "datePub");
+                newPubDate.setTextContent(date);
+                Element eltMonogr = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr").evaluate(newTEICorpus, XPathConstants.NODE);
+                Element eltImprint = (Element) eltMonogr.getElementsByTagName("imprint").item(0);
+                eltImprint = (eltImprint == null) ? newTEICorpus.createElement("imprint") : eltImprint;
+                eltImprint.appendChild(newPubDate);
+                eltMonogr.appendChild(eltImprint);
+            }
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+            
+        }
+        
+    }
+    
     private Element createMetadataTEIHeader(NodeList stuffToTake, Document doc) {
         Element teiHeader = doc.createElement("teiHeader");
         if (stuffToTake.getLength() == 0) {
@@ -77,15 +104,15 @@ public class HalTEIConverter implements MetadataConverter {
         for (int i = 0; i < biblFullRoot.getChildNodes().getLength(); i++) {
             Node localNode = doc.importNode(biblFullRoot.getChildNodes().item(i), true);
             teiHeader.appendChild(localNode);
-
+            
         }
         return teiHeader;
     }
-
+    
     private void setPublicationDate(Document doc) {
-
+        
     }
-
+    
     private void parseOrgsAddress(Document doc, NodeList orgs) {
         Node org = null;
         for (int i = orgs.getLength() - 1; i >= 0; i--) {
@@ -114,12 +141,12 @@ public class HalTEIConverter implements MetadataConverter {
                                 addrLineString += line2.item(y).getTextContent();
                             }
                             addrLine.setTextContent(addrLineString);
-
+                            
                             NodeList address = node.getElementsByTagName("address");
                             for (int n = address.getLength() - 1; n >= 0; n--) {
                                 NodeList addressChilds = address.item(n).getChildNodes();
                                 for (int j = addressChilds.getLength() - 1; j >= 0; j--) {
-
+                                    
                                     if (addressChilds.item(j).getNodeType() == Node.ELEMENT_NODE) {
                                         Element e = (Element) (addressChilds.item(j));
                                         if (!e.getTagName().equals("addrLine")) {
@@ -139,7 +166,7 @@ public class HalTEIConverter implements MetadataConverter {
                     }
                 }
             }
-
+            
         }
     }
 
@@ -153,13 +180,13 @@ public class HalTEIConverter implements MetadataConverter {
         Node person = null;
         for (int i = entities.getLength() - 1; i >= 0; i--) {
             person = entities.item(i);
-
+            
             person.getParentNode().removeChild(person);
-
+            
             NodeList biblStruct = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct").evaluate(docAdditionalTei, XPathConstants.NODESET);
             biblStruct.item(0).insertBefore(person, biblStruct.item(0).getFirstChild());
         }
-
+        
     }
 
     /**
@@ -168,7 +195,7 @@ public class HalTEIConverter implements MetadataConverter {
     private Document transformMetadata(Document metadata) throws XPathExpressionException {
         Node title = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/analytic/title").evaluate(metadata, XPathConstants.NODE);
         title.getParentNode().removeChild(title);
-
+        
         NodeList authorsDuplicate = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/author").evaluate(metadata, XPathConstants.NODESET);
         for (int j = authorsDuplicate.getLength() - 1; j >= 0; j--) {
             authorsDuplicate.item(j).getParentNode().removeChild(authorsDuplicate.item(j));
@@ -183,7 +210,7 @@ public class HalTEIConverter implements MetadataConverter {
         //seriesStmt.getParentNode().removeChild(seriesStmt);
         Node notesStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/notesStmt").evaluate(metadata, XPathConstants.NODE);
         notesStmt.getParentNode().removeChild(notesStmt);
-
+        
         Node profileDesc = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/profileDesc").evaluate(metadata, XPathConstants.NODE);
         profileDesc.getParentNode().removeChild(profileDesc);
         Node listBibl = (Node) xPath.compile("/TEI/text/body/listBibl").evaluate(metadata, XPathConstants.NODE);
@@ -192,9 +219,9 @@ public class HalTEIConverter implements MetadataConverter {
         metadata.renameNode(biblFull, biblFull.getNamespaceURI(), "fileDesc");
         return metadata;
     }
-
+    
     private void updateOrgType(Element org, NodeList orgs) {
-
+        
         NodeList relations = org.getElementsByTagName("relation");
         for (int j = relations.getLength() - 1; j >= 0; j--) {
             Node relationNode = relations.item(j);
@@ -206,13 +233,13 @@ public class HalTEIConverter implements MetadataConverter {
                     Node rel = Utilities.findNode(id, orgs);
                     Node newRel = rel.cloneNode(true);
                     updateOrgType((Element) newRel, orgs);
-
+                    
                     org.appendChild(newRel);
                 }
             }
         }
     }
-
+    
     private void updateAffiliations(NodeList persons, NodeList orgs, Document docAdditionalTei) {
         Node person = null;
         NodeList theNodes = null;
@@ -241,7 +268,7 @@ public class HalTEIConverter implements MetadataConverter {
             }
         }
     }
-
+    
     public void fillAbstract(Document doc, Document teiCorpusDoc) throws XPathExpressionException {
         Element profileDescElt = (Element) xPath.compile("/teiCorpus/teiHeader/profileDesc").evaluate(teiCorpusDoc, XPathConstants.NODE);
         NodeList profileDescChilds = profileDescElt.getElementsByTagName("abstract");
@@ -260,7 +287,7 @@ public class HalTEIConverter implements MetadataConverter {
             }
         }
     }
-
+    
     public void fillKeywords(Document doc, Document teiCorpusDoc) throws XPathExpressionException {
         Element profileDescElt = (Element) xPath.compile("/teiCorpus/teiHeader/profileDesc").evaluate(teiCorpusDoc, XPathConstants.NODE);
         NodeList existingKeywordsNode = profileDescElt.getElementsByTagName("term");
@@ -288,37 +315,27 @@ public class HalTEIConverter implements MetadataConverter {
         }
     }
 
+    /*
+    We consider that grobid is accurate.
+     */
     public void fillPubDate(Document doc, Document teiCorpusDoc) throws XPathExpressionException {
         try {
             Element dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"datePub\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
             if (dateElt == null) {
                 dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"dateDefended\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
             }
-            if (dateElt != null) {
-                dateElt.setTextContent(Utilities.completeDate(dateElt.getTextContent()));
-            }
-            if (dateElt == null || dateElt.getTextContent().contains("0000")) {
-                String date = "";
-                Element grobidDateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/publicationStmt/date[@type=\"published\"]").evaluate(doc, XPathConstants.NODE);
-                if (grobidDateElt != null) {
-                    String grobidDate = grobidDateElt.getAttribute("when");
-                    if (!grobidDate.contains("0000")) {
-                        grobidDate = Utilities.completeDate(grobidDate);
-                        date = grobidDate;
-                    }
-                } 
-                if(date.isEmpty()) {
-                    Node submitDate = (Node) xPath.compile("/teiCorpus/teiHeader/fileDesc/editionStmt/edition[@type=\"current\"]/date[@type=\"whenSubmitted\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
-                    date = submitDate.getTextContent().split(" ")[0];
+            
+            String date = "";
+            Element grobidDateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/publicationStmt/date[@type=\"published\"]").evaluate(doc, XPathConstants.NODE);
+            if (grobidDateElt != null) {
+                String grobidDate = grobidDateElt.getAttribute("when");
+                if (!grobidDate.contains("0000")) {
+                    grobidDate = Utilities.completeDate(grobidDate);
+                    date = grobidDate;
                 }
-                Element newPubDate = teiCorpusDoc.createElement("date");
-                newPubDate.setAttribute("type", "datePub");
-                newPubDate.setTextContent(date);
-                Element eltMonogr = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr").evaluate(teiCorpusDoc, XPathConstants.NODE);
-                Element eltImprint = (Element) eltMonogr.getElementsByTagName("imprint").item(0);
-                eltImprint = (eltImprint == null) ? doc.createElement("imprint") : eltImprint;
-                eltImprint.appendChild(newPubDate);
-                eltMonogr.appendChild(eltImprint);
+            }
+            if (date.matches("\\d{4}-\\d{2}-\\d{2}") && Utilities.isValidDate(date)) {
+                dateElt.setTextContent(date);
             }
         } catch (XPathExpressionException e) {
             e.printStackTrace();

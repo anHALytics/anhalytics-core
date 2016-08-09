@@ -54,6 +54,8 @@ public class TeiBuilder {
         teiCorpus.appendChild(teiHeader);
         teiCorpus.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
         newTEICorpus.appendChild(teiCorpus);
+        
+            htc.updatePublicationDate(teiHeader, newTEICorpus);
         return newTEICorpus;
     }
 
