@@ -79,11 +79,11 @@ public class KnowledgeBaseFeeder {
     private static final Logger logger = LoggerFactory.getLogger(KnowledgeBaseFeeder.class);
 
     private static final AbstractDAOFactory adf = AbstractDAOFactory.getFactory(AbstractDAOFactory.DAO_FACTORY);
-    
+
     private static final AbstractBiblioDAOFactory abdf = AbstractBiblioDAOFactory.getFactory(AbstractBiblioDAOFactory.DAO_FACTORY);
 
     private static XPath xPath = XPathFactory.newInstance().newXPath();
-    
+
     protected MongoFileManager mm = null;
 
     public KnowledgeBaseFeeder() throws UnknownHostException {
@@ -366,7 +366,7 @@ public class KnowledgeBaseFeeder {
                 if (ndorg.getNodeType() == Node.ELEMENT_NODE) {
                     Element orgChildElt = (Element) ndorg;
                     if (orgChildElt.getNodeName().equals("orgName")) {
-                        organisationParent.addName(new Organisation_Name(orgChildElt.getTextContent(), pubDate));
+                        organisationParent.addName(new Organisation_Name(null, orgChildElt.getTextContent(), pubDate));
                     } else if (orgChildElt.getNodeName().equals("desc")) {
                         NodeList descorgChilds = ndorg.getChildNodes();
                         for (int l = descorgChilds.getLength() - 1; l >= 0; l--) {
@@ -404,11 +404,20 @@ public class KnowledgeBaseFeeder {
                         }
                     } else if (orgChildElt.getNodeName().equals("org")) {
                         organisationParent = parseOrg(orgChildElt, organisationParent, document_organisation, pubDate);
+                    } else if (orgChildElt.getNodeName().equals("idno")) {
+                        String id_type = orgChildElt.getAttribute("type");
+                        String id_value = orgChildElt.getTextContent();
+                        if (id_type.equals("anhalyticsID")) {
+                            orgNode.removeChild(orgChildElt);
+                        } else {
+                            organisationParent.getOrganisation_identifiers().add(new Organisation_Identifier(id_value, id_type));
+                        }
                     }
                 }
             }
+
+            organisationParent.setOrganisation_identifiers(ois);
             part_of.setBeginDate(pubDate);
-            organisationParent.setPublication_date(pubDate);
             od.create(organisationParent);
             document_organisation.addOrg(organisationParent);
             part_of.setOrganisation_mother(organisationParent);
@@ -461,17 +470,28 @@ public class KnowledgeBaseFeeder {
                         if (organisation.getType().isEmpty() && childElt.hasAttribute("type")) {
                             organisation1.setUrl(organisation.getUrl());
                             organisation1.setType(childElt.getAttribute("type"));
-                            organisation1.addName(new Organisation_Name(childElt.getTextContent(), pub.getDate_printed()));
-                            organisation1.setPublication_date(pub.getDate_printed());
+                            organisation1.addName(new Organisation_Name(null, childElt.getTextContent(), pub.getDate_printed()));
                         }
                         organisations.add(organisation1);
                     } else {
-                        organisation.addName(new Organisation_Name(childElt.getTextContent(), pub.getDate_printed()));
-                        organisation.setPublication_date(pub.getDate_printed());
+                        organisation.addName(new Organisation_Name(null, childElt.getTextContent(), pub.getDate_printed()));
+                    }
+                } else if (childElt.getNodeName().equals("idno")) {
+                    String id_type = childElt.getAttribute("type");
+                    String id_value = childElt.getTextContent();
+                    if (id_type.equals("anhalyticsID")) {
+                        affiliationElt.removeChild(childElt);
+                    } else {
+                        organisation.getOrganisation_identifiers().add(new Organisation_Identifier(id_value, id_type));
                     }
                 }
             }
         }
+        // how to handle it for grobid case ?
+//        Element idno = doc.createElement("idno");
+//                        idno.setAttribute("type", "anhalyticsID");
+//                        idno.setTextContent(Long.toString(prs.getPersonId()));
+//                        affiliationElt.appendChild(idno);
         if (!isGrobid) {
             organisation.setType(affiliationElt.getAttribute("type"));
             organisation.getOrganisation_identifiers().add(new Organisation_Identifier(affiliationElt.getAttribute("xml:id"), "halId"));
@@ -482,7 +502,6 @@ public class KnowledgeBaseFeeder {
             od.create(org);
 
             document_organisation.addOrg(org);
-            d_o.create(document_organisation);
             affiliation.addOrganisation(org);
             affiliation.setBegin_date(pub.getDate_printed());
             if (location != null && location.getAddress() != null) {
@@ -494,6 +513,7 @@ public class KnowledgeBaseFeeder {
                 ld.create(location);
             }
         }
+        d_o.create(document_organisation);
     }
 
     private static void processPersons(NodeList persons, String type, Publication pub, Document doc, NodeList authorsFromfulltextTeiHeader) throws SQLException {
@@ -684,8 +704,7 @@ public class KnowledgeBaseFeeder {
         location.setAddress(addr);
         return location;
     }
-    
-    
+
     /**
      *
      */
