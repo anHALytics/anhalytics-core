@@ -674,4 +674,40 @@ public class Utilities {
         }
         return null;
     }
+    
+    
+    public static Element matchAuthor(String fullname, NodeList authorsFromfulltextTeiHeader) {
+        Element author = null;
+        JaroWinkler jw = new JaroWinkler();
+        NodeList nodes = null;
+        for (int y = authorsFromfulltextTeiHeader.getLength() - 1; y >= 0; y--) {
+            Node personChildElt = authorsFromfulltextTeiHeader.item(y);
+            if (personChildElt.getNodeType() == Node.ELEMENT_NODE) {
+                String forename = "", lastname = "";
+                NodeList personChildEltNL = personChildElt.getChildNodes();
+                for (int i = personChildEltNL.getLength() - 1; i >= 0; i--) {
+                    Node personChildEltElt = personChildEltNL.item(i);
+                    if (personChildEltElt.getNodeType() == Node.ELEMENT_NODE) {
+                        if (personChildEltElt.getNodeName().equals("persName")) {
+                            nodes = personChildEltElt.getChildNodes();
+                            for (int z = nodes.getLength() - 1; z >= 0; z--) {
+                                if (nodes.item(z).getNodeName().equals("forename")) {
+                                    boolean first = forename.isEmpty();
+                                    forename += (first ? "" : " ") + nodes.item(z).getTextContent();
+                                } else if (nodes.item(z).getNodeName().equals("surname")) {
+                                    boolean first = lastname.isEmpty();
+                                    lastname += (first ? "" : " ") + nodes.item(z).getTextContent();
+                                }
+                            }
+                        }
+                    }
+                }
+                if (jw.similarity(fullname, forename + " " + lastname) > 0.7) {
+                    author = (Element) personChildElt;
+                    break;
+                }
+            }
+        }
+        return author;
+    }
 }

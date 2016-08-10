@@ -84,6 +84,7 @@ public class TeiBuilder {
                 htc.fillAbstract(doc, teiCorpusDoc);
                 htc.fillKeywords(doc, teiCorpusDoc);
                 htc.fillPubDate(doc, teiCorpusDoc);
+                htc.fillAuthors(doc, teiCorpusDoc);
             }
             resultTei = addNewElementToTEI(teiCorpusDoc, grobidTeiElement);
         } catch (Exception e) {

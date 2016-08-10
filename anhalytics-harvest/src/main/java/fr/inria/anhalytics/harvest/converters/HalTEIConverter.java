@@ -1,9 +1,14 @@
 package fr.inria.anhalytics.harvest.converters;
 
+import fr.inria.anhalytics.commons.utilities.JaroWinkler;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.grobid.MyGrobid;
+import fr.inria.anhalytics.kb.entities.Person;
+import fr.inria.anhalytics.kb.entities.Person_Name;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,7 +33,7 @@ import org.xml.sax.SAXException;
  * @author achraf
  */
 public class HalTEIConverter implements MetadataConverter {
-    
+
     private static XPath xPath = XPathFactory.newInstance().newXPath();
 
     /**
@@ -46,9 +51,9 @@ public class HalTEIConverter implements MetadataConverter {
         //read an xml node using xpath
         Element teiHeader = null;
         try {
-            
+
             metadata = transformMetadata(metadata);
-            
+
             NodeList editors = (NodeList) xPath.compile("/TEI/text/body/listBibl/fileDesc/sourceDesc/biblStruct/analytic/editor").evaluate(metadata, XPathConstants.NODESET);
             NodeList authors = (NodeList) xPath.compile("/TEI/text/body/listBibl/fileDesc/sourceDesc/biblStruct/analytic/author").evaluate(metadata, XPathConstants.NODESET);
             NodeList orgs = (NodeList) xPath.compile("/TEI/text/back/listOrg/org").evaluate(metadata, XPathConstants.NODESET);
@@ -60,11 +65,11 @@ public class HalTEIConverter implements MetadataConverter {
             teiHeader = createMetadataTEIHeader(stuffToTake, newTEICorpus);
         } catch (XPathExpressionException e) {
             e.printStackTrace();
-            
+
         }
         return teiHeader;
     }
-    
+
     public void updatePublicationDate(Element teiHeader, Document newTEICorpus) {
         String date = "";
         try {
@@ -90,11 +95,11 @@ public class HalTEIConverter implements MetadataConverter {
             }
         } catch (XPathExpressionException e) {
             e.printStackTrace();
-            
+
         }
-        
+
     }
-    
+
     private Element createMetadataTEIHeader(NodeList stuffToTake, Document doc) {
         Element teiHeader = doc.createElement("teiHeader");
         if (stuffToTake.getLength() == 0) {
@@ -104,15 +109,15 @@ public class HalTEIConverter implements MetadataConverter {
         for (int i = 0; i < biblFullRoot.getChildNodes().getLength(); i++) {
             Node localNode = doc.importNode(biblFullRoot.getChildNodes().item(i), true);
             teiHeader.appendChild(localNode);
-            
+
         }
         return teiHeader;
     }
-    
+
     private void setPublicationDate(Document doc) {
-        
+
     }
-    
+
     private void parseOrgsAddress(Document doc, NodeList orgs) {
         Node org = null;
         for (int i = orgs.getLength() - 1; i >= 0; i--) {
@@ -141,12 +146,12 @@ public class HalTEIConverter implements MetadataConverter {
                                 addrLineString += line2.item(y).getTextContent();
                             }
                             addrLine.setTextContent(addrLineString);
-                            
+
                             NodeList address = node.getElementsByTagName("address");
                             for (int n = address.getLength() - 1; n >= 0; n--) {
                                 NodeList addressChilds = address.item(n).getChildNodes();
                                 for (int j = addressChilds.getLength() - 1; j >= 0; j--) {
-                                    
+
                                     if (addressChilds.item(j).getNodeType() == Node.ELEMENT_NODE) {
                                         Element e = (Element) (addressChilds.item(j));
                                         if (!e.getTagName().equals("addrLine")) {
@@ -166,7 +171,7 @@ public class HalTEIConverter implements MetadataConverter {
                     }
                 }
             }
-            
+
         }
     }
 
@@ -180,13 +185,13 @@ public class HalTEIConverter implements MetadataConverter {
         Node person = null;
         for (int i = entities.getLength() - 1; i >= 0; i--) {
             person = entities.item(i);
-            
+
             person.getParentNode().removeChild(person);
-            
+
             NodeList biblStruct = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct").evaluate(docAdditionalTei, XPathConstants.NODESET);
             biblStruct.item(0).insertBefore(person, biblStruct.item(0).getFirstChild());
         }
-        
+
     }
 
     /**
@@ -195,7 +200,7 @@ public class HalTEIConverter implements MetadataConverter {
     private Document transformMetadata(Document metadata) throws XPathExpressionException {
         Node title = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/analytic/title").evaluate(metadata, XPathConstants.NODE);
         title.getParentNode().removeChild(title);
-        
+
         NodeList authorsDuplicate = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/author").evaluate(metadata, XPathConstants.NODESET);
         for (int j = authorsDuplicate.getLength() - 1; j >= 0; j--) {
             authorsDuplicate.item(j).getParentNode().removeChild(authorsDuplicate.item(j));
@@ -210,7 +215,7 @@ public class HalTEIConverter implements MetadataConverter {
         //seriesStmt.getParentNode().removeChild(seriesStmt);
         Node notesStmt = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/notesStmt").evaluate(metadata, XPathConstants.NODE);
         notesStmt.getParentNode().removeChild(notesStmt);
-        
+
         Node profileDesc = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/profileDesc").evaluate(metadata, XPathConstants.NODE);
         profileDesc.getParentNode().removeChild(profileDesc);
         Node listBibl = (Node) xPath.compile("/TEI/text/body/listBibl").evaluate(metadata, XPathConstants.NODE);
@@ -219,9 +224,9 @@ public class HalTEIConverter implements MetadataConverter {
         metadata.renameNode(biblFull, biblFull.getNamespaceURI(), "fileDesc");
         return metadata;
     }
-    
+
     private void updateOrgType(Element org, NodeList orgs) {
-        
+
         NodeList relations = org.getElementsByTagName("relation");
         for (int j = relations.getLength() - 1; j >= 0; j--) {
             Node relationNode = relations.item(j);
@@ -233,13 +238,13 @@ public class HalTEIConverter implements MetadataConverter {
                     Node rel = Utilities.findNode(id, orgs);
                     Node newRel = rel.cloneNode(true);
                     updateOrgType((Element) newRel, orgs);
-                    
+
                     org.appendChild(newRel);
                 }
             }
         }
     }
-    
+
     private void updateAffiliations(NodeList persons, NodeList orgs, Document docAdditionalTei) {
         Node person = null;
         NodeList theNodes = null;
@@ -268,7 +273,7 @@ public class HalTEIConverter implements MetadataConverter {
             }
         }
     }
-    
+
     public void fillAbstract(Document doc, Document teiCorpusDoc) throws XPathExpressionException {
         Element profileDescElt = (Element) xPath.compile("/teiCorpus/teiHeader/profileDesc").evaluate(teiCorpusDoc, XPathConstants.NODE);
         NodeList profileDescChilds = profileDescElt.getElementsByTagName("abstract");
@@ -287,7 +292,7 @@ public class HalTEIConverter implements MetadataConverter {
             }
         }
     }
-    
+
     public void fillKeywords(Document doc, Document teiCorpusDoc) throws XPathExpressionException {
         Element profileDescElt = (Element) xPath.compile("/teiCorpus/teiHeader/profileDesc").evaluate(teiCorpusDoc, XPathConstants.NODE);
         NodeList existingKeywordsNode = profileDescElt.getElementsByTagName("term");
@@ -324,7 +329,7 @@ public class HalTEIConverter implements MetadataConverter {
             if (dateElt == null) {
                 dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"dateDefended\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
             }
-            
+
             String date = "";
             Element grobidDateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/publicationStmt/date[@type=\"published\"]").evaluate(doc, XPathConstants.NODE);
             if (grobidDateElt != null) {
@@ -339,6 +344,137 @@ public class HalTEIConverter implements MetadataConverter {
             }
         } catch (XPathExpressionException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void fillAuthors(Document grobidDoc, Document teiCorpusDoc) throws XPathExpressionException {
+        
+        // email & ptr to be done
+        Element teiHeader = (Element) xPath.compile("/teiCorpus/teiHeader").evaluate(teiCorpusDoc, XPathConstants.NODE);
+        NodeList authorsFromfulltextTeiHeader = (NodeList) xPath.compile("/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/analytic/author").evaluate(grobidDoc, XPathConstants.NODESET);
+        NodeList authors = teiHeader.getElementsByTagName("author");
+        Element person = null;
+        for (int i = authors.getLength() - 1; i >= 0; i--) {
+            if (authors.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                person = (Element) authors.item(i);
+                if (person.getElementsByTagName("affiliation").getLength() == 0) {
+                    String fullname = "";
+                    Element persName = (Element) person.getElementsByTagName("persName").item(0);
+                    if (persName != null) {
+                        NodeList nodes = persName.getChildNodes();
+                        String forename = "", surname = "";
+                        for (int z = nodes.getLength() - 1; z >= 0; z--) {
+                            if (nodes.item(z).getNodeName().equals("forename")) {
+                                forename = nodes.item(z).getTextContent();
+                            } else if (nodes.item(z).getNodeName().equals("surname")) {
+                                surname = nodes.item(z).getTextContent();
+                            }
+                        }
+                        fullname = forename;
+                        if (!surname.isEmpty()) {
+                            fullname += " " + surname;
+                        }
+                    }
+                    NodeList affs = null;
+                    Element authorElt = Utilities.matchAuthor(fullname, authorsFromfulltextTeiHeader);
+                    if (authorElt != null) {
+                        affs = authorElt.getElementsByTagName("affiliation");
+                        if (affs != null) {
+                            Element affiliation = null;
+                            Element address = null;
+                            Element desc = null;
+                            NodeList orgnames = null;
+                            for (int y = affs.getLength() - 1; y >= 0; y--) {
+                                if (affs.item(y).getNodeType() == Node.ELEMENT_NODE) {
+                                    affiliation = (Element) affs.item(y);
+                                    address = (Element) authorElt.getElementsByTagName("address").item(0);
+                                    
+                                    
+                                    if (address != null) {
+                                        address = (Element) (teiCorpusDoc.importNode(address.cloneNode(true), true));
+                                        desc = teiCorpusDoc.createElement("desc");
+                                        desc.appendChild(address);
+                                    }
+                                    
+                                                
+                                    System.out.println(Utilities.innerXmlToString(authorElt));
+                                    orgnames = authorElt.getElementsByTagName("orgName");
+                                    List<Element> labOrgnames = new ArrayList<Element>();
+                                    List<Element> deptOrgnames = new ArrayList<Element>();
+                                    List<Element> instOrgnames = new ArrayList<Element>();
+                                    for (int k = orgnames.getLength() - 1; k >= 0; k--) {
+                                        if (orgnames.item(k).getNodeType() == Node.ELEMENT_NODE) {
+                                            if (((Element) orgnames.item(k)).getAttribute("type").equals("laboratory")) {
+                                                labOrgnames.add((Element) orgnames.item(k).cloneNode(true));
+                                            } else if (((Element) orgnames.item(k)).getAttribute("type").equals("department")) {
+                                                deptOrgnames.add((Element) orgnames.item(k).cloneNode(true));
+                                            } else if (((Element) orgnames.item(k)).getAttribute("type").equals("institution")) {
+                                                instOrgnames.add((Element) orgnames.item(k).cloneNode(true));
+                                            }
+                                        }
+                                    }
+                                    
+//                                    List<Element> labOrgs = new ArrayList<Element>();
+//                                    List<Element> deptOrgs = new ArrayList<Element>();
+//                                    List<Element> instOrgs = new ArrayList<Element>();
+                                    if (labOrgnames.size() > 0) {
+                                        Element aff = null;
+                                        Element org = null;
+                                        for(Element labOrgname:labOrgnames){
+                                            aff = teiCorpusDoc.createElement("affiliation");
+                                            org = teiCorpusDoc.createElement("org");
+                                            org.setAttribute("type", "laboratory");
+                                            org.appendChild(teiCorpusDoc.importNode(labOrgname, true));
+                                            if(desc !=null)
+                                                org.appendChild((Element) desc.cloneNode(true));
+                                            aff.appendChild(org);
+                                            
+                                            person.appendChild(aff);
+//                                            labOrgs.add(aff);
+                                        }
+                                    }
+                                    if (deptOrgnames.size() > 0) {
+                                        Element aff = null;
+                                        Element org = null;
+                                        for(Element deptOrgname:deptOrgnames){
+                                            aff = teiCorpusDoc.createElement("affiliation");
+                                            org = teiCorpusDoc.createElement("org");
+                                            org.setAttribute("type", "department");
+                                            org.appendChild(teiCorpusDoc.importNode(deptOrgname, true));
+                                            if(desc !=null)
+                                                org.appendChild((Element) desc.cloneNode(true));
+                                            aff.appendChild(org);
+                                            person.appendChild(aff);
+//                                            deptOrgs.add(aff);
+                                        }
+                                    }
+                                    if (instOrgnames.size() > 0) {
+                                        Element aff = null;
+                                        Element org = null;
+                                        for(Element instOrgname:instOrgnames){
+                                            aff = teiCorpusDoc.createElement("affiliation");
+                                            org = teiCorpusDoc.createElement("org");
+                                            org.setAttribute("type", "institution");
+                                            org.appendChild(teiCorpusDoc.importNode(instOrgname, true));
+                                            if(desc !=null)
+                                                org.appendChild((Element) desc.cloneNode(true));
+                                            aff.appendChild(org);
+                                            person.appendChild(aff);
+//                                            instOrgs.add(aff);
+                                        }
+                                    }
+                                    
+                                }
+                            }
+                        }
+                    }
+                    
+
+                                    System.out.println(Utilities.innerXmlToString(person));
+                }
+                
+            }
+
         }
     }
 }

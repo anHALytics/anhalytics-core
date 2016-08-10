@@ -3,7 +3,6 @@ package fr.inria.anhalytics.kb.datamine;
 import fr.inria.anhalytics.commons.exceptions.NumberOfCoAuthorsExceededException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
-import fr.inria.anhalytics.commons.utilities.JaroWinkler;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.AbstractDAOFactory;
 import fr.inria.anhalytics.dao.AddressDAO;
@@ -345,21 +344,23 @@ public class KnowledgeBaseFeeder {
         }
     }
 
-    private static Organisation parseOrg(Node orgNode, Organisation org, Document_Organisation document_organisation, Date pubDate) throws SQLException {
+    private static Organisation parseOrg(Node orgNode, Organisation org, Document_Organisation document_organisation, Date pubDate, Document doc) throws SQLException {
         LocationDAO ld = (LocationDAO) adf.getLocationDAO();
         AddressDAO ad = (AddressDAO) adf.getAddressDAO();
         OrganisationDAO od = (OrganisationDAO) adf.getOrganisationDAO();
         Organisation organisationParent = new Organisation();
         List<Organisation_Identifier> ois = new ArrayList<Organisation_Identifier>();
         Location locationParent = null;
-        Address addrParent = null;
         PART_OF part_of = new PART_OF();
         if (orgNode.getNodeType() == Node.ELEMENT_NODE) {
             Element orgElt = (Element) orgNode;
-            ois.add(new Organisation_Identifier(orgElt.getAttribute("xml:id"), "halId"));
             organisationParent.setType(orgElt.getAttribute("type"));
-
-            organisationParent.setStatus(orgElt.getAttribute("status"));
+            if (orgElt.hasAttribute("xml:id")) {
+                ois.add(new Organisation_Identifier(orgElt.getAttribute("xml:id"), "halId"));
+            }
+            if (orgElt.hasAttribute("status")) {
+                organisationParent.setStatus(orgElt.getAttribute("status"));
+            }
             NodeList nlorg = orgElt.getChildNodes();
             for (int o = nlorg.getLength() - 1; o >= 0; o--) {
                 Node ndorg = nlorg.item(o);
@@ -374,26 +375,8 @@ public class KnowledgeBaseFeeder {
                             if (descChild.getNodeType() == Node.ELEMENT_NODE) {
                                 Element descChildElt = (Element) descChild;
                                 if (descChildElt.getNodeName().equals("address")) {
-                                    NodeList addressChilds = descChildElt.getChildNodes();
-                                    addrParent = new Address();
-                                    locationParent = new Location();
-                                    for (int x = addressChilds.getLength() - 1; x >= 0; x--) {
-                                        Node addrorgnode = addressChilds.item(x);
-                                        if (addrorgnode.getNodeType() == Node.ELEMENT_NODE) {
-                                            Element addrChildElt = (Element) addrorgnode;
-                                            if (addrChildElt.getNodeName().equals("addrLine")) {
-                                                addrParent.setAddrLine(addrChildElt.getTextContent());
-                                            } else if (addrChildElt.getNodeName().equals("country")) {
-                                                addrParent.setCountry(new Country(null, addrChildElt.getAttribute("key")));
-                                            } else if (addrChildElt.getNodeName().equals("settlement")) {
-                                                addrParent.setSettlement(addrChildElt.getTextContent());
-                                            } else if (addrChildElt.getNodeName().equals("postCode")) {
-                                                addrParent.setPostCode(addrChildElt.getTextContent());
-                                            } else if (addrChildElt.getNodeName().equals("region")) {
-                                                addrParent.setRegion(addrChildElt.getTextContent());
-                                            }
-                                        }
-                                    }
+                                    locationParent = processAddress(descChildElt);
+
                                 } else if (descChildElt.getNodeName().equals("ref")) {
                                     String type = descChildElt.getAttribute("type");
                                     if (type.equals("url")) {
@@ -403,7 +386,12 @@ public class KnowledgeBaseFeeder {
                             }
                         }
                     } else if (orgChildElt.getNodeName().equals("org")) {
-                        organisationParent = parseOrg(orgChildElt, organisationParent, document_organisation, pubDate);
+                        organisationParent = parseOrg(orgChildElt, organisationParent, document_organisation, pubDate, doc);
+                    } else if (orgChildElt.getNodeName().equals("ref")) {
+                        String descReftype = orgChildElt.getAttribute("type");
+                        if (descReftype.equals("url")) {
+                            organisationParent.setUrl(orgChildElt.getTextContent());
+                        }
                     } else if (orgChildElt.getNodeName().equals("idno")) {
                         String id_type = orgChildElt.getAttribute("type");
                         String id_value = orgChildElt.getTextContent();
@@ -415,7 +403,6 @@ public class KnowledgeBaseFeeder {
                     }
                 }
             }
-
             organisationParent.setOrganisation_identifiers(ois);
             part_of.setBeginDate(pubDate);
             od.create(organisationParent);
@@ -423,97 +410,103 @@ public class KnowledgeBaseFeeder {
             part_of.setOrganisation_mother(organisationParent);
             org.addRel(part_of);
 
-            if (addrParent != null) {
-                ad.create(addrParent);
-                locationParent.setAddress(addrParent);
+            if (locationParent != null && locationParent.getAddress() != null) {
+                if (locationParent.getAddress().getAddressId() == null) {
+                    ad.create(locationParent.getAddress());
+                }
                 locationParent.setBegin_date(pubDate);
                 locationParent.setOrganisation(organisationParent);
                 ld.create(locationParent);
             }
 
+            // how to handle it for grobid case ?
+            Element idno = doc.createElement("idno");
+            idno.setAttribute("type", "anhalyticsID");
+            idno.setTextContent(Long.toString(organisationParent.getOrganisationId()));
+            orgNode.appendChild(idno);
         }
         return org;
     }
 
-    private static void curateAffiliation(Affiliation affiliation, Publication pub, Element affiliationElt, boolean isGrobid) throws SQLException {
+    private static void parseAffiliationOrg(Affiliation affiliation, Publication pub, Element orgElt, Document doc) throws SQLException {
         Document_Organisation document_organisation = new Document_Organisation();
         Document_OrganisationDAO d_o = (Document_OrganisationDAO) adf.getDocument_OrganisationDAO();
         document_organisation.setDoc(pub.getDocument());
-        List<Organisation> organisations = new ArrayList<Organisation>();
         Organisation organisation = new Organisation();
         OrganisationDAO od = (OrganisationDAO) adf.getOrganisationDAO();
         Location location = null;
         LocationDAO ld = (LocationDAO) adf.getLocationDAO();
         AddressDAO ad = (AddressDAO) adf.getAddressDAO();
-        NodeList nodes = affiliationElt.getChildNodes();
+        NodeList nodes = orgElt.getChildNodes();
 
         for (int o = nodes.getLength() - 1; o >= 0; o--) {
 
             Node ndorg = nodes.item(o);
             if (ndorg.getNodeType() == Node.ELEMENT_NODE) {
                 Element childElt = (Element) ndorg;
-                if (childElt.getNodeName().equals("org")) {
-                    organisation = parseOrg(childElt, organisation, document_organisation, pub.getDate_printed());
-                } else if (childElt.getNodeName().equals("address")) {
-
-                    location = processAddress(childElt);
+                if (childElt.getNodeName().equals("orgName")) {
+                    organisation.addName(new Organisation_Name(null, childElt.getTextContent(), pub.getDate_printed()));
+                } else if (childElt.getNodeName().equals("desc")) {
+                    NodeList descorgChilds = ndorg.getChildNodes();
+                    for (int l = descorgChilds.getLength() - 1; l >= 0; l--) {
+                        Node descChild = descorgChilds.item(l);
+                        if (descChild.getNodeType() == Node.ELEMENT_NODE) {
+                            Element descChildElt = (Element) descChild;
+                            if (descChildElt.getNodeName().equals("address")) {
+                                location = processAddress(descChildElt);
+                            } else if (descChildElt.getNodeName().equals("ref")) {
+                                String type = descChildElt.getAttribute("type");
+                                if (type.equals("url")) {
+                                    organisation.setUrl(descChildElt.getTextContent());
+                                }
+                            }
+                        }
+                    }
+                } else if (childElt.getNodeName().equals("org")) {
+                    organisation = parseOrg(childElt, organisation, document_organisation, pub.getDate_printed(), doc);
                 } else if (childElt.getNodeName().equals("ref")) {
                     String descReftype = childElt.getAttribute("type");
                     if (descReftype.equals("url")) {
                         organisation.setUrl(childElt.getTextContent());
-
-                    }
-                } else if (childElt.getNodeName().equals("orgName")) {
-
-                    if (isGrobid) {
-                        Organisation organisation1 = new Organisation();
-                        if (organisation.getType().isEmpty() && childElt.hasAttribute("type")) {
-                            organisation1.setUrl(organisation.getUrl());
-                            organisation1.setType(childElt.getAttribute("type"));
-                            organisation1.addName(new Organisation_Name(null, childElt.getTextContent(), pub.getDate_printed()));
-                        }
-                        organisations.add(organisation1);
-                    } else {
-                        organisation.addName(new Organisation_Name(null, childElt.getTextContent(), pub.getDate_printed()));
                     }
                 } else if (childElt.getNodeName().equals("idno")) {
                     String id_type = childElt.getAttribute("type");
                     String id_value = childElt.getTextContent();
                     if (id_type.equals("anhalyticsID")) {
-                        affiliationElt.removeChild(childElt);
+                        orgElt.removeChild(childElt);
                     } else {
                         organisation.getOrganisation_identifiers().add(new Organisation_Identifier(id_value, id_type));
                     }
                 }
             }
         }
-        // how to handle it for grobid case ?
-//        Element idno = doc.createElement("idno");
-//                        idno.setAttribute("type", "anhalyticsID");
-//                        idno.setTextContent(Long.toString(prs.getPersonId()));
-//                        affiliationElt.appendChild(idno);
-        if (!isGrobid) {
-            organisation.setType(affiliationElt.getAttribute("type"));
-            organisation.getOrganisation_identifiers().add(new Organisation_Identifier(affiliationElt.getAttribute("xml:id"), "halId"));
-            organisation.setStatus(affiliationElt.getAttribute("status"));
-            organisations.add(organisation);
+        organisation.setType(orgElt.getAttribute("type"));
+        if (orgElt.hasAttribute("xml:id")) {
+            organisation.getOrganisation_identifiers().add(new Organisation_Identifier(orgElt.getAttribute("xml:id"), "halId"));
         }
-        for (Organisation org : organisations) {
-            od.create(org);
+        if (orgElt.hasAttribute("status")) {
+            organisation.setStatus(orgElt.getAttribute("status"));
+        }
+        od.create(organisation);
 
-            document_organisation.addOrg(org);
-            affiliation.addOrganisation(org);
-            affiliation.setBegin_date(pub.getDate_printed());
-            if (location != null && location.getAddress() != null) {
-                if (location.getAddress().getAddressId() == null) {
-                    ad.create(location.getAddress());
-                }
-                location.setBegin_date(pub.getDate_printed());
-                location.setOrganisation(org);
-                ld.create(location);
+        document_organisation.addOrg(organisation);
+        affiliation.addOrganisation(organisation);
+        affiliation.setBegin_date(pub.getDate_printed());
+        if (location != null && location.getAddress() != null) {
+            if (location.getAddress().getAddressId() == null) {
+                ad.create(location.getAddress());
             }
+            location.setBegin_date(pub.getDate_printed());
+            location.setOrganisation(organisation);
+            ld.create(location);
         }
         d_o.create(document_organisation);
+
+        // how to handle it for grobid case ?
+        Element idno = doc.createElement("idno");
+        idno.setAttribute("type", "anhalyticsID");
+        idno.setTextContent(Long.toString(organisation.getOrganisationId()));
+        orgElt.appendChild(idno);
     }
 
     private static void processPersons(NodeList persons, String type, Publication pub, Document doc, NodeList authorsFromfulltextTeiHeader) throws SQLException {
@@ -536,7 +529,6 @@ public class KnowledgeBaseFeeder {
                         List<Person_Name> prs_names = new ArrayList<Person_Name>();
                         List<Person_Identifier> pis = new ArrayList<Person_Identifier>();
                         NodeList nodes = null;
-                        boolean isAffiliated = false;
                         for (int y = theNodes.getLength() - 1; y >= 0; y--) {
                             Node node = theNodes.item(y);
                             if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -579,10 +571,8 @@ public class KnowledgeBaseFeeder {
                                                 break;
                                             }
                                         }
-
                                     }
-                                    curateAffiliation(affiliation, pub, org, false);
-                                    isAffiliated = true;
+                                    parseAffiliationOrg(affiliation, pub, org, doc);
                                 } else if (personChildElt.getNodeName().equals("idno")) {
                                     Person_Identifier pi = new Person_Identifier();
                                     String id_type = personChildElt.getAttribute("type");
@@ -599,23 +589,6 @@ public class KnowledgeBaseFeeder {
                             }
                         }
                         prs.setPerson_names(prs_names);
-
-                        if (!isAffiliated && type.equals("author")) {
-                            NodeList affs = null;
-                            Element authorElt = matchAuthor(prs, authorsFromfulltextTeiHeader);
-                            if (authorElt != null) {
-                                affs = authorElt.getElementsByTagName("affiliation");
-                                if (affs != null) {
-                                    for (int y = affs.getLength() - 1; y >= 0; y--) {
-                                        if (affs.item(y).getNodeType() == Node.ELEMENT_NODE) {
-                                            curateAffiliation(affiliation, pub, (Element) affs.item(y), true);
-                                        }
-                                    }
-                                }
-                            }
-                            //email
-                            //ptr//
-                        }
 
                         prs.setPerson_identifiers(pis);
 
@@ -642,43 +615,8 @@ public class KnowledgeBaseFeeder {
 
     }
 
-    private static Element matchAuthor(Person person, NodeList authorsFromfulltextTeiHeader) {
-        Element author = null;
-        JaroWinkler jw = new JaroWinkler();
-        String fullname = person.getPerson_names().get(0).getFullname();
-        NodeList nodes = null;
-        for (int y = authorsFromfulltextTeiHeader.getLength() - 1; y >= 0; y--) {
-            Node personChildElt = authorsFromfulltextTeiHeader.item(y);
-            if (personChildElt.getNodeType() == Node.ELEMENT_NODE) {
-                String forename = "", lastname = "";
-                NodeList personChildEltNL = personChildElt.getChildNodes();
-                for (int i = personChildEltNL.getLength() - 1; i >= 0; i--) {
-                    Node personChildEltElt = personChildEltNL.item(i);
-                    if (personChildEltElt.getNodeType() == Node.ELEMENT_NODE) {
-                        if (personChildEltElt.getNodeName().equals("persName")) {
-                            nodes = personChildEltElt.getChildNodes();
-                            for (int z = nodes.getLength() - 1; z >= 0; z--) {
-                                if (nodes.item(z).getNodeName().equals("forename")) {
-                                    boolean first = forename.isEmpty();
-                                    forename += (first ? "" : " ") + nodes.item(z).getTextContent();
-                                } else if (nodes.item(z).getNodeName().equals("surname")) {
-                                    boolean first = lastname.isEmpty();
-                                    lastname += (first ? "" : " ") + nodes.item(z).getTextContent();
-                                }
-                            }
-                        }
-                    }
-                }
-                if (jw.similarity(fullname, forename + " " + lastname) > 0.7) {
-                    author = (Element) personChildElt;
-                    break;
-                }
-            }
-        }
-        return author;
-    }
-
     private static Location processAddress(Element addressElt) {
+
         Location location = new Location();
         Address addr = new Address();
         NodeList address = addressElt.getChildNodes();
