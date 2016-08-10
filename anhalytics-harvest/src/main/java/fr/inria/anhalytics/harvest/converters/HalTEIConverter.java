@@ -388,16 +388,11 @@ public class HalTEIConverter implements MetadataConverter {
                                 if (affs.item(y).getNodeType() == Node.ELEMENT_NODE) {
                                     affiliation = (Element) affs.item(y);
                                     address = (Element) authorElt.getElementsByTagName("address").item(0);
-                                    
-                                    
                                     if (address != null) {
                                         address = (Element) (teiCorpusDoc.importNode(address.cloneNode(true), true));
                                         desc = teiCorpusDoc.createElement("desc");
                                         desc.appendChild(address);
                                     }
-                                    
-                                                
-                                    System.out.println(Utilities.innerXmlToString(authorElt));
                                     orgnames = authorElt.getElementsByTagName("orgName");
                                     List<Element> labOrgnames = new ArrayList<Element>();
                                     List<Element> deptOrgnames = new ArrayList<Element>();
@@ -468,9 +463,6 @@ public class HalTEIConverter implements MetadataConverter {
                             }
                         }
                     }
-                    
-
-                                    System.out.println(Utilities.innerXmlToString(person));
                 }
                 
             }
