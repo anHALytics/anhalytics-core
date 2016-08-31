@@ -170,8 +170,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             if (date != null) {
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
             }
-            if(teiCollection.equals(MongoCollectionsInterface.FINAL_TEIS))
+            if (teiCollection.equals(MongoCollectionsInterface.FINAL_TEIS)) {
                 bdbo.append("isWithFulltext", withFulltext);
+            }
             cursor = gfs.getFileList(bdbo);
             cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT);
             indexFile = 0;
@@ -238,24 +239,24 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     public boolean initIdentifiersWithoutPdfUrl() {
         collection = getCollection(MongoCollectionsInterface.IDENTIFIERS);
-        
+
         BasicDBObject query = new BasicDBObject("doi", new BasicDBObject("$ne", ""));
         query.append("pdfUrl", "");
         cursor = collection.find(query);
         indexFile = 0;
         //181974 init
-        logger.debug("Found "+cursor.size()+" doi elements.");
+        logger.debug("Found " + cursor.size() + " doi elements.");
         return true;
     }
-    
-        public boolean initIdentifiers() {
+
+    public boolean initIdentifiers() {
         collection = getCollection(MongoCollectionsInterface.IDENTIFIERS);
         cursor = collection.find();
         indexFile = 0;
         System.out.println(cursor.size());
         return true;
     }
-    
+
     public boolean hasMoreIdentifiers() {
         if (indexFile < cursor.size()) {
             return true;
@@ -295,10 +296,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             return false;
         }
     }
-    
+
     public String nextIdentifier() {
         String doi = null;
-        BasicDBObject obj = (BasicDBObject)cursor.next();
+        BasicDBObject obj = (BasicDBObject) cursor.next();
         doi = (String) obj.get("doi");
         currentRepositoryDocId = (String) obj.get("repositoryDocId");
         currentAnhalyticsId = (String) obj.getObjectId("_id").toString();
@@ -453,7 +454,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             logger.error(e.getMessage(), e.getCause());
         }
     }
-    
+
     public boolean insertCrossRefMetadata(String currentAnhalyticsId, String currentRepositoryDocId, String crossRefMetadata) {
         boolean done = false;
         try {
@@ -485,7 +486,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             return false;
         }
     }
-    
+
     public String getDocumentDoi(String anhalyticsId) {
         DBCollection collection = db.getCollection(MongoCollectionsInterface.IDENTIFIERS);
         DBObject query = new BasicDBObject("_id", new ObjectId(anhalyticsId));
@@ -509,10 +510,15 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             collection.ensureIndex(index, "index", true);
          */
         document.put("repositoryDocId", repositoryDocId);
-        document.put("doi", doi);
-        document.put("pdfUrl", pdfUrl);
-        collection.insert(document);
-        currentAnhalyticsId = document.getObjectId("_id").toString();
+        BasicDBObject temp = (BasicDBObject) collection.findOne(document);
+        if (temp != null) {
+            currentAnhalyticsId = temp.getObjectId("_id").toString();
+        } else {
+            document.put("doi", doi);
+            document.put("pdfUrl", pdfUrl);
+            collection.insert(document);
+            currentAnhalyticsId = document.getObjectId("_id").toString();
+        }
         return currentAnhalyticsId;
     }
 
@@ -945,7 +951,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             logger.error(e.getMessage(), e.getCause());
         }
     }
-    
+
     public void removeIdentifier() {
         try {
             BasicDBObject whereQuery = new BasicDBObject();
