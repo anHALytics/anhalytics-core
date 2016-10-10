@@ -7,7 +7,7 @@ import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
 import fr.inria.anhalytics.harvest.crossref.CrossRef;
 import fr.inria.anhalytics.harvest.crossref.OpenUrl;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
-import fr.inria.anhalytics.harvest.properties.HarvestProperties;
+import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.harvest.teibuild.TeiBuilderProcess;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
@@ -43,7 +43,7 @@ public class Main {
 
     public static void main(String[] args) throws UnknownHostException {
         try {
-            HarvestProperties.init("harvest.properties");
+            HarvestProperties.init("anhalytics.properties");
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file of harvest properties harvest.properties", exp);
         }
@@ -164,6 +164,10 @@ public class Main {
                     HarvestProperties.setCollection(command);
                     i++;
                         continue;
+                } else if (currArg.equals("--reset")) {
+                    HarvestProperties.setReset(true);
+                    i++;
+                    continue;
                 } else {
                     result = false;
                     break;
@@ -182,6 +186,7 @@ public class Main {
         help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-dUntilDate: filter until date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-exe: gives the command to execute. The value should be one of these : \n");
+        help.append("--reset: skip items that are already processed(beware about versions/updates) : \n");
         help.append("\t" + availableCommands + "\n");
         return help.toString();
     }

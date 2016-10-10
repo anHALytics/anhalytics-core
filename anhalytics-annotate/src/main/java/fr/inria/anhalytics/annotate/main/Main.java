@@ -2,7 +2,7 @@ package fr.inria.anhalytics.annotate.main;
 
 import fr.inria.anhalytics.annotate.Annotator;
 import fr.inria.anhalytics.annotate.Annotator.Annotator_Type;
-import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
+import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
@@ -36,7 +36,7 @@ public class Main {
 
     public static void main(String[] args) throws UnknownHostException {
         try {
-            AnnotateProperties.init("annotate.properties");
+            AnnotateProperties.init("anhalytics.properties");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,7 +70,7 @@ public class Main {
             String todayDate = dateFormat.format(cal.getTime());
             Utilities.updateDates(todayDate, todayDate);
             annotator.annotate(Annotator_Type.KEYTERM);
-        }else if (process.equals("annotateDaily")) {
+        } else if (process.equals("annotateDaily")) {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DATE, -1);
@@ -78,7 +78,7 @@ public class Main {
             Utilities.updateDates(todayDate, todayDate);
             annotator.annotate(Annotator_Type.NERD);
             annotator.annotate(Annotator_Type.KEYTERM);
-        }else if (process.equals("annotateAllNerd")) {
+        } else if (process.equals("annotateAllNerd")) {
             annotator.annotate(Annotator_Type.NERD);
         } else if (process.equals("annotateAllKeyTerm")) {
             annotator.annotate(Annotator_Type.KEYTERM);
@@ -138,6 +138,10 @@ public class Main {
                     result = false;
                     break;
                 }
+            } else if (currArg.equals("--reset")) {
+                AnnotateProperties.setReset(true);
+                i++;
+                continue;
             } else {
                 result = false;
             }
@@ -153,6 +157,7 @@ public class Main {
         help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-dUntilDate: filter until date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-exe: gives the command to execute. The value should be one of these : \n");
+        help.append("--reset: skip items that are already processed(beware about versions/updates) : \n");
         help.append("\t" + availableCommands + "\n");
         return help.toString();
     }

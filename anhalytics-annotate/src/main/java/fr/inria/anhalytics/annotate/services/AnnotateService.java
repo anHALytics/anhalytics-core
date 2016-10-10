@@ -1,7 +1,7 @@
 package fr.inria.anhalytics.annotate.services;
 
 import fr.inria.anhalytics.annotate.Annotator;
-import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
+import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.exceptions.UnreachableAnnotateServiceException;
 import java.net.HttpURLConnection;
 import java.net.URL;

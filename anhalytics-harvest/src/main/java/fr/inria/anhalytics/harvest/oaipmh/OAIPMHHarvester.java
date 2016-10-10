@@ -6,7 +6,7 @@ import fr.inria.anhalytics.commons.exceptions.BinaryNotAvailableException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.HarvesterItf;
-import fr.inria.anhalytics.harvest.properties.HarvestProperties;
+import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;

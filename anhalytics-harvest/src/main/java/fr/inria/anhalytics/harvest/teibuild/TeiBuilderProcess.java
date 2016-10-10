@@ -2,7 +2,7 @@ package fr.inria.anhalytics.harvest.teibuild;
 
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.properties.HarvestProperties;
+import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.UnknownHostException;

@@ -4,7 +4,7 @@ import fr.inria.anhalytics.commons.exceptions.GrobidTimeoutException;
 import fr.inria.anhalytics.commons.exceptions.UnreachableGrobidServiceException;
 import fr.inria.anhalytics.commons.utilities.KeyGen;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.properties.HarvestProperties;
+import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import java.io.*;
 import java.io.IOException;
 import java.io.OutputStream;

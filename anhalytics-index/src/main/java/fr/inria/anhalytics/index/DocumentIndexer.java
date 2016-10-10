@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.json.JsonTapasML;
 import org.json.JSONObject;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.index.properties.IndexProperties;
+import fr.inria.anhalytics.commons.properties.IndexProperties;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
@@ -92,6 +92,7 @@ public class DocumentIndexer extends Indexer {
                         // beware the document type bellow and corresponding mapping!
                         bulkRequest.add(client.prepareIndex(IndexProperties.getMetadataTeisIndexName(), "npl", anhalyticsId).setSource(jsonStr));
 
+                        nb++;
                         if (nb % bulkSize == 0) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                             if (bulkResponse.hasFailures()) {
@@ -102,7 +103,6 @@ public class DocumentIndexer extends Indexer {
                             bulkRequest.setRefresh(true);
                             logger.debug("\n Bulk number : " + nb / bulkSize);
                         }
-                        nb++;
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -168,7 +168,7 @@ public class DocumentIndexer extends Indexer {
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
                         bulkRequest.add(client.prepareIndex(IndexProperties.getFulltextTeisIndexName(), "npl", anhalyticsId).setSource(jsonStr));
-
+                        nb++;
                         if (nb % bulkSize == 0) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                             if (bulkResponse.hasFailures()) {
@@ -179,7 +179,6 @@ public class DocumentIndexer extends Indexer {
                             bulkRequest.setRefresh(true);
                             logger.debug("\n Bulk number : " + nb / bulkSize);
                         }
-                        nb++;
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -230,6 +229,7 @@ public class DocumentIndexer extends Indexer {
                                 IndexProperties.getKeytermAnnotsIndexName(), "annotation_keyterm",
                                 anhalyticsId).setSource(json));
 
+                        nb++;
                         if (nb % bulkSize == 0) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                             if (bulkResponse.hasFailures()) {
@@ -240,8 +240,6 @@ public class DocumentIndexer extends Indexer {
                             bulkRequest.setRefresh(true);
                             logger.debug("\n Bulk number : " + nb / bulkSize);
                         }
-                        nb++;
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -324,6 +322,8 @@ public class DocumentIndexer extends Indexer {
                             // beware the document type bellow and corresponding mapping!
                             bulkRequest.add(client.prepareIndex(
                                     IndexProperties.getNerdAnnotsIndexName(), "annotation_nerd", xmlID).setSource(annotJson));
+                            
+                        nb++;
                             if (nb % bulkSize == 0) {
                                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                                 if (bulkResponse.hasFailures()) {
@@ -334,8 +334,6 @@ public class DocumentIndexer extends Indexer {
                                 bulkRequest.setRefresh(true);
                                 logger.debug("\n Bulk number : " + nb / bulkSize);
                             }
-                            nb++;
-
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

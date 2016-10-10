@@ -3,7 +3,7 @@ package fr.inria.anhalytics.index.main;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.index.DocumentIndexer;
 import fr.inria.anhalytics.index.KnowledgeBaseIndexer;
-import fr.inria.anhalytics.index.properties.IndexProperties;
+import fr.inria.anhalytics.commons.properties.IndexProperties;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -33,7 +33,7 @@ public class Main {
         if (processArgs(args)) {
             //process name is needed to set properties.
             try {
-                IndexProperties.init("index.properties");
+                IndexProperties.init("anhalytics.properties");
             } catch (Exception e) {
                 logger.error(e.getMessage());
             }
@@ -95,7 +95,13 @@ public class Main {
                 }
                 i++;
                 continue;
-            } else {
+            } 
+//            else if (currArg.equals("--reset")) {
+//                IndexProperties.setReset(true);
+//                i++;
+//                continue;
+//            } 
+            else {
                 result = false;
             }
             i++;
@@ -184,7 +190,7 @@ public class Main {
             }
         } else if (process.equals("indexKB")) {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
-            reponse = sc.nextLine().charAt(0);
+//            reponse = sc.nextLine().charAt(0);
 
             if (reponse != 'N') {
                 mi.setUpIndex(IndexProperties.getKbIndexName());
@@ -210,6 +216,7 @@ public class Main {
         help.append("HELP ANHALYTICS_INDEX \n");
         help.append("-h: displays help\n");
         help.append("-exe: followed by either :\n");
+        help.append("--reset: skip items that are already processed(beware about versions/updates) : \n");
         help.append("\t" + availableCommands + "\n");
         return help.toString();
     }

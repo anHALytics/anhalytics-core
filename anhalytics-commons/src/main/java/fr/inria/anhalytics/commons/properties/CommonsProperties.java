@@ -28,7 +28,7 @@ public class CommonsProperties {
             if (!isTest) {
                 Properties prop = new Properties();
                 File file = new File(System.getProperty("user.dir"));
-                prop.load(new FileInputStream(file.getParent() + File.separator + "config" + File.separator + "local" + File.separator + properties_filename));
+                prop.load(new FileInputStream(file.getParent() + File.separator + "config" + File.separator + properties_filename));
                 setMongodbServer(prop.getProperty("commons.mongodb_host"));
                 setMongodbPort(Integer.parseInt(prop.getProperty("commons.mongodb_port")));
                 setMongodbDb(prop.getProperty("commons.mongodb_db"));

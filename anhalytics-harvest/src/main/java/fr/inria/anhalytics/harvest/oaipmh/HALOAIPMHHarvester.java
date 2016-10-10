@@ -3,7 +3,7 @@ package fr.inria.anhalytics.harvest.oaipmh;
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.properties.HarvestProperties;
+import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import java.io.*;
 import java.net.UnknownHostException;
 import java.text.DateFormat;

@@ -1,6 +1,6 @@
 package fr.inria.anhalytics.annotate;
 
-import fr.inria.anhalytics.annotate.properties.AnnotateProperties;
+import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.exceptions.UnreachableAnnotateServiceException;
 import fr.inria.anhalytics.annotate.exceptions.AnnotatorNotAvailableException;
 import fr.inria.anhalytics.annotate.services.AnnotateService;

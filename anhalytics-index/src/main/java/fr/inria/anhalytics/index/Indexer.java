@@ -1,7 +1,7 @@
 package fr.inria.anhalytics.index;
 
 import fr.inria.anhalytics.commons.exceptions.ElasticSearchConfigurationException;
-import fr.inria.anhalytics.index.properties.IndexProperties;
+import fr.inria.anhalytics.commons.properties.IndexProperties;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -147,9 +147,11 @@ abstract class Indexer {
 
         String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + indexName;
         if (indexName.equals(IndexProperties.getNerdAnnotsIndexName())) {
-            urlStr += "/annotation_nerd/_mapping";
+            urlStr += "/"+IndexProperties.getNerdAnnotsIndexName()+"/_mapping";
         } else if (indexName.equals(IndexProperties.getKeytermAnnotsIndexName())) {
-            urlStr += "/annotation_keyterm/_mapping";
+            urlStr += "/"+IndexProperties.getKeytermAnnotsIndexName()+"/_mapping";
+        } else if(indexName.equals(IndexProperties.getKbIndexName())) {
+            urlStr += "/authors/_mapping";
         } else {
             urlStr += "/npl/_mapping";
         }
@@ -167,7 +169,9 @@ abstract class Indexer {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_nerd.json"));
             } else if (indexName.contains(IndexProperties.getKeytermAnnotsIndexName())) {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_keyterm.json"));
-            } else {
+            } else if(indexName.equals(IndexProperties.getKbIndexName())) {
+            mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kb.json"));
+        } else {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl.json"));
             }
         } catch (Exception e) {
@@ -183,7 +187,7 @@ abstract class Indexer {
         out.close();
 
         logger.info("ElasticSearch mapping for " + indexName + " : status is "
-                + httpCon.getResponseCode());
+                + httpCon.getResponseCode() + " "+ httpCon.getResponseMessage());
         if (httpCon.getResponseCode() == 200) {
             val = true;
         }

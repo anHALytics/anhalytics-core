@@ -44,7 +44,7 @@ import fr.inria.anhalytics.kb.entities.Person_Name;
 import fr.inria.anhalytics.kb.entities.Publication;
 import fr.inria.anhalytics.kb.entities.Publisher;
 import fr.inria.anhalytics.kb.entities.Serial_Identifier;
-import fr.inria.anhalytics.kb.properties.KbProperties;
+import fr.inria.anhalytics.commons.properties.KbProperties;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;

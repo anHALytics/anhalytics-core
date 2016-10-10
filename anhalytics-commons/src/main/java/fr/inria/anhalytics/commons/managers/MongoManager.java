@@ -29,7 +29,7 @@ abstract class MongoManager {
     public MongoManager(boolean isTest) {
         try {
             try {
-                CommonsProperties.init("commons.properties", isTest);
+                CommonsProperties.init("anhalytics.properties", isTest);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
             }

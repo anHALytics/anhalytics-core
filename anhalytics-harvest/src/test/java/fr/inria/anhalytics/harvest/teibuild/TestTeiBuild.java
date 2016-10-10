@@ -2,7 +2,7 @@ package fr.inria.anhalytics.harvest.teibuild;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.properties.HarvestProperties;
+import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,7 +36,7 @@ public class TestTeiBuild extends XMLTestCase {
     @Test
     public void testMetadataAppend() throws FileNotFoundException, IOException, XPathExpressionException {
         try {
-            HarvestProperties.init("harvest.properties");
+            HarvestProperties.init("anhalytics.test.properties");
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file of harvest properties harvest.properties", exp);
         }
@@ -59,9 +59,10 @@ public class TestTeiBuild extends XMLTestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        TeiBuilder teiBuilder = new TeiBuilder(); 
+        TeiBuilder teiBuilder = new TeiBuilder();
         Document corpusTei = teiBuilder.createTEICorpus(new FileInputStream(metadata));
         String corpusTeiString = Utilities.toString(corpusTei);
+        
         String result = Utilities.toString(teiBuilder.addGrobidTEIToTEICorpus(corpusTeiString, FileUtils.readFileToString(fullTextFile)));
         // some test here...
         try {
@@ -103,6 +104,7 @@ public class TestTeiBuild extends XMLTestCase {
         }
         corpusTei = teiBuilder.createTEICorpus(new FileInputStream(metadata));
         String corpusTeiStream1 = (Utilities.toString(corpusTei));
+        System.out.println("hal-00576900");
         result = Utilities.toString(teiBuilder.addGrobidTEIToTEICorpus(corpusTeiStream1, FileUtils.readFileToString(fullTextFile)));
 
         try {

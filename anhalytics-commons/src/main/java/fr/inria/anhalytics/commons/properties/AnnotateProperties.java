@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.annotate.properties;
+package fr.inria.anhalytics.commons.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import java.io.File;
@@ -43,7 +43,7 @@ public class AnnotateProperties {
         Properties props = new Properties();
         try {
             File file = new File(System.getProperty("user.dir"));
-            props.load(new FileInputStream(file.getParent()+File.separator+"config"+File.separator+"local"+File.separator+properties_filename));
+            props.load(new FileInputStream(file.getParent()+File.separator+"config"+File.separator+properties_filename));
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file " + properties_filename, exp);
         }
@@ -65,8 +65,6 @@ public class AnnotateProperties {
         } catch (java.lang.NumberFormatException e) {
             e.printStackTrace();
         }
-        setReset(Boolean.valueOf(props.getProperty("annotate.reset")));
-        //exceptions if a necessary propertry is not set..
     }
 
     private static void checkPath(String path) {

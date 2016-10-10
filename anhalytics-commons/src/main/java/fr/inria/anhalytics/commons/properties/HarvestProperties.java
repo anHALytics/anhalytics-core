@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.harvest.properties;
+package fr.inria.anhalytics.commons.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import java.io.File;
@@ -47,7 +47,7 @@ public class HarvestProperties {
         Properties props = new Properties();
         try {
             File file = new File(System.getProperty("user.dir"));
-            props.load(new FileInputStream(file.getParent()+File.separator+"config"+File.separator+"local"+File.separator+properties_filename));
+            props.load(new FileInputStream(file.getParent()+File.separator+"config"+File.separator+properties_filename));
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file "+properties_filename, exp);
         }
@@ -58,16 +58,12 @@ public class HarvestProperties {
         setGrobidPort(props.getProperty("harvest.grobid_port"));
         setGrobidHome(props.getProperty("harvest.grobid_home"));
         setGrobidProperties(props.getProperty("harvest.grobid_properties"));
-        //check path
-        setTmpPath(props.getProperty("harvest.tmpPath"));
-        // As grobid process may take a long time we can continue on previous works
-        setReset(Boolean.valueOf(props.getProperty("harvest.reset")));
         setTmpPath(props.getProperty("harvest.tmpPath"));
         String threads = props.getProperty("harvest.nbThreads");
         
-                setCrossrefId(props.getProperty("harvest.crossref_id"));
-                setCrossrefPwd(props.getProperty("harvest.crossref_pw"));
-                setCrossrefHost(props.getProperty("harvest.crossref_host"));
+        setCrossrefId(props.getProperty("harvest.crossref_id"));
+        setCrossrefPwd(props.getProperty("harvest.crossref_pw"));
+        setCrossrefHost(props.getProperty("harvest.crossref_host"));
         try {
             setNbThreads(Integer.parseInt(threads));
         } catch (java.lang.NumberFormatException e) {

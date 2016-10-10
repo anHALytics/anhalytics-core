@@ -3,7 +3,7 @@ package fr.inria.anhalytics.kb.main;
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.kb.datamine.KnowledgeBaseFeeder;
-import fr.inria.anhalytics.kb.properties.KbProperties;
+import fr.inria.anhalytics.commons.properties.KbProperties;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -21,7 +21,7 @@ public class Main {
 
     private static List<String> availableCommands = new ArrayList<String>() {
         {
-            
+
             add("initKnowledgeBase");
             add("initKnowledgeBaseDaily");
             add("initCitationKnowledgeBase");
@@ -31,9 +31,9 @@ public class Main {
 
     public static void main(String[] args) throws UnknownHostException, SQLException {
         try {
-            KbProperties.init("kb.properties");
+            KbProperties.init("anhalytics.properties");
         } catch (Exception exp) {
-            throw new PropertyException("Cannot open file of harvest properties ingest.properties", exp);
+            throw new PropertyException("Cannot open file of harvest properties anhalytics.properties", exp);
         }
 
         if (processArgs(args)) {
@@ -64,7 +64,7 @@ public class Main {
             //Initiates HAL knowledge base and creates working corpus TEI.
             Utilities.updateDates(todayDate, todayDate);
             kbf.initKnowledgeBase();
-        }  else if (process.equals("initCitationKnowledgeBase")) {
+        } else if (process.equals("initCitationKnowledgeBase")) {
             kbf.processCitations();
         }
         return;
@@ -121,6 +121,10 @@ public class Main {
                         result = false;
                         break;
                     }
+                } else if (currArg.equals("--reset")) {
+                    KbProperties.setReset(true);
+                    i++;
+                    continue;
                 } else {
                     result = false;
                     break;
@@ -138,6 +142,7 @@ public class Main {
         help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-dUntilDate: filter until date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-exe: gives the command to execute. The value should be one of these : \n");
+        help.append("--reset: skip items that are already processed(beware about versions/updates) : \n");
         help.append("\t" + availableCommands + "\n");
         return help.toString();
     }

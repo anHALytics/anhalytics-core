@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.index.properties;
+package fr.inria.anhalytics.commons.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import java.io.File;
@@ -20,7 +20,7 @@ public class IndexProperties {
 
     private static String nerdAnnotsIndexName = "annotations_nerd";
     private static String keytermAnnotsIndexName = "annotations_keyterm";
-    private static String fulltextTeisIndexName  = "anhalytics_fulltextteis";
+    private static String fulltextTeisIndexName  = "anhalytics_fulltextteis_in";
     private static String metadataTeisIndexName  = "anhalytics_metadatateis";
     private static String kbIndexName = "anhalytics_kb"; // to be rename, it's not metadata but KB
 
@@ -34,17 +34,18 @@ public class IndexProperties {
         Properties props = new Properties();
         try {
             File file = new File(System.getProperty("user.dir"));
-            props.load(new FileInputStream(file.getParent()+File.separator+"config"+File.separator+"local"+File.separator+properties_filename));
+            props.load(new FileInputStream(file.getParent()+File.separator+"config"+File.separator+properties_filename));
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file " + properties_filename, exp);
         }
         setElasticSearch_host(props.getProperty("index.elasticSearch_host"));
         setElasticSearch_port(props.getProperty("index.elasticSearch_port"));
         setElasticSearchClusterName(props.getProperty("index.elasticSearch_cluster"));
-        /*setTeisIndexName(props.getProperty("index.elasticSearch_teisIndexName"));
         setNerdAnnotsIndexName(props.getProperty("index.elasticSearch_nerdAnnotsIndexName"));
-		setKeytermAnnotsIndexName(props.getProperty("index.elasticSearch_keytermAnnotsIndexName"));
-        setMetadataIndexName(props.getProperty("index.elasticSearch_mtdsIndexName"));*/
+        setKeytermAnnotsIndexName(props.getProperty("index.elasticSearch_keytermAnnotsIndexName"));
+        setFulltextTeisIndexName(props.getProperty("index.elasticSearch_fulltextTeisIndexName"));
+        setMetadataTeisIndexName(props.getProperty("index.elasticSearch_metadataTeisIndexName"));
+        setKbIndexName(props.getProperty("index.elasticSearch_kbIndexName"));
     }
 
     private static void checkPath(String path) {

@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.kb.properties;
+package fr.inria.anhalytics.commons.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import java.io.File;
@@ -26,12 +26,10 @@ public class KbProperties {
         Properties props = new Properties();
         try {
             File file = new File(System.getProperty("user.dir"));
-            props.load(new FileInputStream(file.getParent()+File.separator+"config"+File.separator+"local"+File.separator+properties_filename));
+            props.load(new FileInputStream(file.getParent()+File.separator+"config"+File.separator+properties_filename));
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file " + properties_filename, exp);
         }
-        // As grobid process may take a long time we can continue on previous works
-        setReset(Boolean.valueOf(props.getProperty("kb.reset")));
     }
 
     /**
