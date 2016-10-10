@@ -9,7 +9,7 @@ import fr.inria.anhalytics.dao.In_SerialDAO;
 import fr.inria.anhalytics.dao.MonographDAO;
 import fr.inria.anhalytics.dao.PersonDAO;
 import fr.inria.anhalytics.dao.PublicationDAO;
-import fr.inria.anhalytics.index.properties.IndexProperties;
+import fr.inria.anhalytics.commons.properties.IndexProperties;
 import fr.inria.anhalytics.kb.dao.anhalytics.DAOFactory;
 import fr.inria.anhalytics.kb.dao.anhalytics.OrganisationDAO;
 import fr.inria.anhalytics.kb.dao.biblio.AbstractBiblioDAOFactory;
@@ -18,6 +18,7 @@ import fr.inria.anhalytics.kb.entities.Address;
 import fr.inria.anhalytics.kb.entities.Affiliation;
 import fr.inria.anhalytics.kb.entities.Conference_Event;
 import fr.inria.anhalytics.kb.entities.Document;
+import fr.inria.anhalytics.kb.entities.Document_Organisation;
 import fr.inria.anhalytics.kb.entities.In_Serial;
 import fr.inria.anhalytics.kb.entities.Organisation;
 import fr.inria.anhalytics.kb.entities.PART_OF;
@@ -56,8 +57,9 @@ public class KnowledgeBaseIndexer extends Indexer {
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
         AddressDAO adao = (AddressDAO) adf.getAddressDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
+        PublicationDAO pubdao = (PublicationDAO) adf.getPublicationDAO();
         Map<Long, Person> persons = pdao.findAllAuthors();
-        int nb = 0 ;
+        int nb = 0;
         int bulkSize = 100;
         Iterator it = persons.entrySet().iterator();
         BulkRequestBuilder bulkRequest = client.prepareBulk();
@@ -70,7 +72,8 @@ public class KnowledgeBaseIndexer extends Indexer {
             List<Affiliation> affs = odao.getAffiliationByPersonID(pers);
             List<Map<String, Object>> organisations = new ArrayList<Map<String, Object>>();
             for (Affiliation aff : affs) {
-                Map<String, Object> orgDocument = aff.getOrganisations().get(0).getOrganisationDocument();
+                Organisation org = aff.getOrganisations().get(0);
+                Map<String, Object> orgDocument = org.getOrganisationDocument();
 
                 orgDocument.put("begin_date", Utilities.formatDate(aff.getBegin_date()));
                 orgDocument.put("end_date", Utilities.formatDate(aff.getBegin_date()));
@@ -83,14 +86,51 @@ public class KnowledgeBaseIndexer extends Indexer {
                 organisations.add(orgDocument);
             }
             List<Map<String, Object>> publications = new ArrayList<Map<String, Object>>();
+            Map<String, Object> documentDoc = null;
+            Publication publication = null;
+            Address addr = null;
+            Document_Organisation dorg = null;
+            Map<String, Object> orgDoc = null;
+            List<Map<String, Object>> document_organisations = null;
+            List<Map<String, Object>> coauthors_documents = new ArrayList<Map<String, Object>>();
+            Map<Long, Person> coauthors = null;
             for (Document doc : ddao.getDocumentsByAuthorId(personId)) {
-                publications.add(doc.getDocumentDocument());
+                document_organisations = new ArrayList<Map<String, Object>>();
+                documentDoc = doc.getDocumentDocument();
+                publication = pubdao.findByDocId(doc.getDocID()).get(0);
+                documentDoc.put("publication", publication.getPublicationDocument());
+                dorg = odao.getOrganisationByDocumentID(doc.getDocID());
+                for (Organisation org : dorg.getOrgs()) {
+                    orgDoc = org.getOrganisationDocument();
+                    addr = adao.getOrganisationAddress(org.getOrganisationId());
+                    if (addr != null) {
+                        orgDoc.put("address", addr.getAddressDocument());
+                    }
+                    document_organisations.add(orgDoc);
+                }
+                documentDoc.put("organisations", document_organisations);
+                //authors/publication ?
+                publications.add(documentDoc);
+                coauthors = pdao.getAuthorsByDocId(doc.getDocID());
+
+                coauthors.remove(personId);
+
+                Iterator it2 = coauthors.entrySet().iterator();
+                while (it2.hasNext()) {
+                    Map.Entry pair1 = (Map.Entry) it2.next();
+                    Map<String, Object> personDoc = ((Person) pair1.getValue()).getPersonDocument();
+                    personDoc.put("date_coauthorship", publication.getDate_printed());
+                    coauthors_documents.add(personDoc);
+                }
+                //Get authors ids(except the actual one) + get pub date + with fullname
             }
+            jsonDocument.put("coauthors", coauthors_documents);
             jsonDocument.put("publications", publications);
             jsonDocument.put("affiliations", organisations);
             // index the json in ElasticSearch
             // beware the document type bellow and corresponding mapping!
             bulkRequest.add(client.prepareIndex(IndexProperties.getKbIndexName(), "authors", "" + personId).setSource(jsonDocument));
+            nb++;
             if (nb % bulkSize == 0) {
                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                 if (bulkResponse.hasFailures()) {
@@ -101,7 +141,6 @@ public class KnowledgeBaseIndexer extends Indexer {
                 bulkRequest.setRefresh(true);
                 logger.debug("\n Bulk number : " + nb / bulkSize);
             }
-            nb++;
         }
         // last bulk
         if (nb % bulkSize != 0) {
@@ -119,6 +158,7 @@ public class KnowledgeBaseIndexer extends Indexer {
         int nb = 0;
         int bulkSize = 100;
         PublicationDAO pubdao = (PublicationDAO) adf.getPublicationDAO();
+        OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
         PublicationDAO bibliopubdao = (PublicationDAO) biblioadf.getPublicationDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
         DocumentDAO biblioddao = (DocumentDAO) biblioadf.getDocumentDAO();
@@ -151,6 +191,13 @@ public class KnowledgeBaseIndexer extends Indexer {
             if (conf != null) {
                 monographDocument.put("conference", conf.getConference_EventDocument());
             }
+            List<Map<String, Object>> document_organisations = new ArrayList<Map<String, Object>>();
+            Document_Organisation dorg = odao.getOrganisationByDocumentID(doc.getDocID());
+            for (Organisation org : dorg.getOrgs()) {
+                document_organisations.add(org.getOrganisationDocument());
+            }
+            documentDocument.put("organisations", document_organisations);
+
             documentDocument.put("publication", publicationDocument);
             Map<Long, Person> editors = pdao.getEditorsByPubId(pubs.get(0).getPublicationID());//suppose one-one relation..
             List<Map<String, Object>> editorsDocument = new ArrayList<Map<String, Object>>();
@@ -199,6 +246,8 @@ public class KnowledgeBaseIndexer extends Indexer {
             // index the json in ElasticSearch
             // beware the document type bellow and corresponding mapping!
             bulkRequest.add(client.prepareIndex(IndexProperties.getKbIndexName(), "publications", "" + doc.getDocID()).setSource(documentDocument));
+
+            nb++;
             if (nb % bulkSize == 0) {
                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                 if (bulkResponse.hasFailures()) {
@@ -209,7 +258,6 @@ public class KnowledgeBaseIndexer extends Indexer {
                 bulkRequest.setRefresh(true);
                 logger.debug("\n Bulk number : " + nb / bulkSize);
             }
-            nb++;
         }
         // last bulk
         if (nb % bulkSize != 0) {
@@ -276,6 +324,8 @@ public class KnowledgeBaseIndexer extends Indexer {
             // index the json in ElasticSearch
             // beware the document type bellow and corresponding mapping!
             bulkRequest.add(client.prepareIndex(IndexProperties.getKbIndexName(), "organisations", "" + org.getOrganisationId()).setSource(organisationDocument));
+
+            nb++;
             if (nb % bulkSize == 0) {
                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                 if (bulkResponse.hasFailures()) {
@@ -286,7 +336,6 @@ public class KnowledgeBaseIndexer extends Indexer {
                 bulkRequest.setRefresh(true);
                 logger.debug("\n Bulk number : " + nb / bulkSize);
             }
-            nb++;
         }
         // last bulk
         if (nb % bulkSize != 0) {

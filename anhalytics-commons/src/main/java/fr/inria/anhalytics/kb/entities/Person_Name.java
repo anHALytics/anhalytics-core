@@ -152,5 +152,18 @@ public class Person_Name {
     public void setPublication_date(Date publication_date) {
         this.publication_date = publication_date;
     }
+    
+    @Override
+public boolean equals(Object object)
+{
+    boolean isEqual= false;
+
+    if (object != null && object instanceof Person_Name)
+    {
+        isEqual = (this.fullname.equals(((Person_Name) object).fullname)) ;
+    }
+
+    return isEqual;
+}
 
 }

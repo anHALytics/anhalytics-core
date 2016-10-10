@@ -55,7 +55,7 @@ public class PersonDAO extends DAO<Person, Long> {
             = "SELECT * FROM PERSON p WHERE p.personID = ?";
 
     private static final String READ_QUERY_PERSON_NAME_BY_ID
-            = "SELECT * FROM PERSON_NAME pn WHERE pn.personID = ? GROUP BY pn.publication_date";
+            = "SELECT * FROM PERSON_NAME pn WHERE pn.personID = ? GROUP BY pn.publication_date ORDER BY pn.publication_date DESC";
     private static final String READ_QUERY_AUTHORS
             = "SELECT DISTINCT personID FROM AUTHORSHIP";
 
@@ -279,9 +279,12 @@ public class PersonDAO extends DAO<Person, Long> {
                 
                 preparedStatement1.setLong(1, id);
                 ResultSet rs1 = preparedStatement1.executeQuery();
+                Person_Name pn = null;
                 while (rs1.next()) {
                     try {
-                        person_names.add(new Person_Name(rs1.getLong("pn.person_nameID"), id, rs1.getString("pn.fullname"), rs1.getString("pn.forename"), rs1.getString("pn.middlename"), rs1.getString("pn.surname"), rs1.getString("pn.title"), Utilities.parseStringDate(rs1.getString("pn.publication_date"))));
+                        pn = new Person_Name(rs1.getLong("pn.person_nameID"), id, rs1.getString("pn.fullname"), rs1.getString("pn.forename"), rs1.getString("pn.middlename"), rs1.getString("pn.surname"), rs1.getString("pn.title"), Utilities.parseStringDate(rs1.getString("pn.publication_date")));
+                        if(!person_names.contains(pn))
+                        person_names.add(pn);
                     } catch (ParseException ex) {
                         Logger.getLogger(PersonDAO.class.getName()).log(Level.SEVERE, null, ex);
                     }

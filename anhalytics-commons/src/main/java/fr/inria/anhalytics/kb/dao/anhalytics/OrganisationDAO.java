@@ -4,6 +4,8 @@ import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationExceptio
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.dao.DAO;
 import fr.inria.anhalytics.kb.entities.Affiliation;
+import fr.inria.anhalytics.kb.entities.Document;
+import fr.inria.anhalytics.kb.entities.Document_Organisation;
 import fr.inria.anhalytics.kb.entities.Organisation;
 import fr.inria.anhalytics.kb.entities.Organisation_Identifier;
 import fr.inria.anhalytics.kb.entities.Organisation_Name;
@@ -66,6 +68,11 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
     private static final String UPDATE_ORGANISATION = "UPDATE ORGANISATION SET type = ? ,struct = ? ,url = ?, status = ? WHERE organisationID = ?";
 
     private static final String UPDATE_ORGANISATION_NAME = "UPDATE ORGANISATION_NAME SET publication_date = ? WHERE organisation_nameID = ?";
+    
+    
+    
+    private static final String SQL_SELECT_ORGANISATIONS_BY_DOCUMENT
+            = "SELECT * from DOCUMENT_ORGANISATION WHERE docID = ?";
     
     public OrganisationDAO(Connection conn) {
         super(conn);
@@ -529,6 +536,26 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             ps.close();
         }
         return affiliations;
+    }
+    
+    public Document_Organisation getOrganisationByDocumentID(String docID) throws SQLException {
+    Document_Organisation dorg = new Document_Organisation();
+    dorg.setDoc(new Document(docID, null,null,null));
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_ORGANISATIONS_BY_DOCUMENT);
+        try {
+            //preparedStatement.setFetchSize(Integer.MIN_VALUE);
+            preparedStatement.setString(1, docID);
+            ResultSet result = preparedStatement.executeQuery();
+            while (result.next()) {
+                    dorg.addOrg(find(result.getLong("organisationID")));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            preparedStatement.close();
+        }
+    
+    return dorg;
     }
 
 }
