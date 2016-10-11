@@ -38,7 +38,8 @@ public class Main {
         try {
             AnnotateProperties.init("anhalytics.properties");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+                return;
         }
 
         if (processArgs(args)) {

@@ -17,7 +17,8 @@ public class CommonsProperties {
     private static String mongodbUser;
     private static String mongodbPass;
 
-    private static String mysql_url;
+    private static String mysql_host;
+    private static String mysql_port;
     private static String mysql_db;
     private static String mysql_bibliodb;
     private static String mysql_user = "";
@@ -35,7 +36,8 @@ public class CommonsProperties {
                 setMongodbUser(prop.getProperty("commons.mongodb_user"));
                 setMongodbPass(prop.getProperty("commons.mongodb_pass"));
 
-                setMysql_url(prop.getProperty("kb.mysql_url"));
+                setMysql_host(prop.getProperty("kb.mysql_host"));
+                setMysql_port(prop.getProperty("kb.mysql_port"));
                 setMysql_db(prop.getProperty("kb.mysql_db"));
                 setMysql_bibliodb(prop.getProperty("kb.mysql_bibliodb"));
                 setMysql_user(prop.getProperty("kb.mysql_user"));
@@ -119,15 +121,15 @@ public class CommonsProperties {
     /**
      * @return the mysql_url
      */
-    public static String getMysql_url() {
-        return mysql_url;
+    public static String getMysql_host() {
+        return mysql_host;
     }
 
     /**
      * @param aMysql_url the mysql_url to set
      */
-    public static void setMysql_url(String aMysql_url) {
-        mysql_url = aMysql_url;
+    public static void setMysql_host(String aMysql_host) {
+        mysql_host = aMysql_host;
     }
 
     /**
@@ -184,6 +186,20 @@ public class CommonsProperties {
      */
     public static void setMysql_pass(String aMysql_pass) {
         mysql_pass = aMysql_pass;
+    }
+
+    /**
+     * @return the mysql_port
+     */
+    public static String getMysql_port() {
+        return mysql_port;
+    }
+
+    /**
+     * @param aMysql_port the mysql_port to set
+     */
+    public static void setMysql_port(String aMysql_port) {
+        mysql_port = aMysql_port;
     }
 
 }

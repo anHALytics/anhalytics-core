@@ -22,7 +22,8 @@ public class DatabaseConnection {
         try {
             if (connectDB == null ) {
 
-                connectDB = DriverManager.getConnection(CommonsProperties.getMysql_url() + CommonsProperties.getMysql_db(), CommonsProperties.getMysql_user(), CommonsProperties.getMysql_pass());
+                connectDB = DriverManager.getConnection("jdbc:mysql://"+CommonsProperties.getMysql_host() +
+                (CommonsProperties.getMysql_port().isEmpty() ? "":":" + CommonsProperties.getMysql_port())+"/"+ CommonsProperties.getMysql_db(), CommonsProperties.getMysql_user(), CommonsProperties.getMysql_pass());
 
             }
         } catch (SQLException e) {
@@ -35,7 +36,8 @@ public class DatabaseConnection {
         try {
             if (connectBiblioDB == null ) {
 
-                connectBiblioDB = DriverManager.getConnection(CommonsProperties.getMysql_url() + CommonsProperties.getMysql_bibliodb(), CommonsProperties.getMysql_user(), CommonsProperties.getMysql_pass());
+                connectBiblioDB = DriverManager.getConnection("jdbc:mysql://"+CommonsProperties.getMysql_host() +
+                (CommonsProperties.getMysql_port().isEmpty() ? "":":" + CommonsProperties.getMysql_port())+"/"+ CommonsProperties.getMysql_bibliodb(), CommonsProperties.getMysql_user(), CommonsProperties.getMysql_pass());
 
             }
         } catch (SQLException e) {
