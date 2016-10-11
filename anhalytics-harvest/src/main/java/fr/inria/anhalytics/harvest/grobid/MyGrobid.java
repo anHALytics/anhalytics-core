@@ -1,6 +1,6 @@
 package fr.inria.anhalytics.harvest.grobid;
 
-import fr.inria.anhalytics.harvest.properties.HarvestProperties;
+import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import java.util.List;
 import org.grobid.core.data.Affiliation;
 
