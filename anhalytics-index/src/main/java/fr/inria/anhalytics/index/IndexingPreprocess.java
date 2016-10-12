@@ -127,12 +127,94 @@ public class IndexingPreprocess {
                     }
                     // we add the full name in order to index it directly without more time consuming
                     // script and concatenation at facet creation time
-                    if (field.equals("$persName")) {
-                        JsonNode theChild = subJson.path("$persName");
+                    if (field.equals("$author")) {
+                        JsonNode theChild = subJson.path("$author");
                         // this child is an array
-                        addFullName(theChild, mapper);
+                        String content = "";
+                        if (theChild.isArray()) {
+                            String fullname = "";
+                            String authorAnhalyticsId = "";
+                            Iterator<JsonNode> ite = theChild.getElements();
+                            String idnoType = "";
+                            while (ite.hasNext()) {
+                                JsonNode temp = ite.next();
 
-                        return subJson;
+                                if (temp.isObject()) {
+                                    if (temp.getFieldNames().next().equals("$persName")) {
+                                        JsonNode persName = temp.path("$persName");
+                                        // this child is an array
+                                        fullname = addFullName(persName, mapper);
+                                    } else if (temp.getFieldNames().next().equals("type")) {
+                                        idnoType = temp.path("type").getTextValue();
+
+                                        if (idnoType.equals("anhalyticsID")) {
+                                            authorAnhalyticsId = temp.path("$idno").getElements().next().getTextValue();
+                                        }
+                                    }
+                                }
+                            }
+                            if (!authorAnhalyticsId.isEmpty() && !fullname.isEmpty()) {
+                                content = authorAnhalyticsId + "_" + fullname;
+                            }
+                        }
+                        if (!content.isEmpty()) {
+                            JsonNode newIdNode = mapper.createObjectNode();
+                            JsonNode newIdNode1 = mapper.createObjectNode();
+                            JsonNode newtextNode = mapper.createArrayNode();
+                            JsonNode tcontentnode = new TextNode(content);
+                            ((ArrayNode) newtextNode).add(tcontentnode);
+                            ((ObjectNode) newIdNode).put("$type_authorAnhalyticsID", tcontentnode);
+                            JsonNode arrayNode = mapper.createArrayNode();
+                            ((ArrayNode) arrayNode).add(newIdNode);
+                            ((ObjectNode) newIdNode1).put("$idno", arrayNode); // update value
+                            ((ArrayNode) theChild).add(newIdNode1);
+                        }
+                    } else if (field.equals("$org")) {
+                        JsonNode theChild = subJson.path("$org");
+                        // this child is an array
+                        String content = "";
+                        if (theChild.isArray()) {
+                            String orgName = "";
+                            String orgAnhalyticsId = "";
+                            Iterator<JsonNode> ite = theChild.getElements();
+                            String idnoType = "";
+                            while (ite.hasNext()) {
+                                JsonNode temp = ite.next();
+
+                                if (temp.isObject()) {
+                                    if (temp.getFieldNames().next().equals("$orgName")) {
+                                        JsonNode persName = temp.path("$orgName");
+                                        // this child is an array
+                                        if (!orgName.isEmpty()) {
+                                            orgName += "_" + persName.getElements().next().getTextValue();
+                                        } else {
+                                            orgName += persName.getElements().next().getTextValue();
+                                        }
+                                    } else if (temp.getFieldNames().next().equals("type")) {
+                                        idnoType = temp.path("type").getTextValue();
+
+                                        if (idnoType.equals("anhalyticsID")) {
+                                            orgAnhalyticsId = temp.path("$idno").getElements().next().getTextValue();
+                                        }
+                                    }
+                                }
+                            }
+                            if (!orgAnhalyticsId.isEmpty() && !orgName.isEmpty()) {
+                                content = orgAnhalyticsId + "_" + orgName;
+                            }
+                        }
+                        if (!content.isEmpty()) {
+                            JsonNode newIdNode = mapper.createObjectNode();
+                            JsonNode newIdNode1 = mapper.createObjectNode();
+                            JsonNode newtextNode = mapper.createArrayNode();
+                            JsonNode tcontentnode = new TextNode(content);
+                            ((ArrayNode) newtextNode).add(tcontentnode);
+                            ((ObjectNode) newIdNode).put("$type_orgAnhalyticsID", tcontentnode);
+                            JsonNode arrayNode = mapper.createArrayNode();
+                            ((ArrayNode) arrayNode).add(newIdNode);
+                            ((ObjectNode) newIdNode1).put("$idno", arrayNode); // update value
+                            ((ArrayNode) theChild).add(newIdNode1);
+                        }
                     } else if (field.equals("$classCode")) {
                         theClassCodeNode = subJson.path("$classCode");
                     } else if (field.equals("level")) {
@@ -156,6 +238,7 @@ public class IndexingPreprocess {
                         ((ArrayNode) textNode).add(tnode);
                         ((ObjectNode) newNode).put("$title-first", textNode);
                         ((ArrayNode) theTitleNode).add(newNode);
+                        //same for abstract
                         //return subJson;
                     } else if (field.equals("n")) {
                         theNNode = subJson.path("n");
@@ -167,6 +250,7 @@ public class IndexingPreprocess {
                         theItemNode = subJson.path("$item");
                     } else if (field.equals("$date")) {
                         theDateNode = subJson.path("$date");
+                        //} else if (field.equals("$orgname")) {
                     } else if (field.equals("$keywords")) {
                         theKeywordsNode = subJson.path("$keywords");
                         String keywords = "";
@@ -285,7 +369,7 @@ public class IndexingPreprocess {
                     JsonNode typeNode = mapper.createObjectNode();
                     if (theWhenNode != null) {
                         JsonNode theWhenNode2 = mapper.createArrayNode();
-                        
+
                         ((ArrayNode) theWhenNode2).add(theWhenNode);
                         ((ObjectNode) typeNode).put("$type_" + theTypeNode.getTextValue(), process(theWhenNode2, mapper, currentLang, false, expandLang, true, anhalyticsId));
                         ((ObjectNode) subJson).remove("when");
@@ -719,7 +803,7 @@ public class IndexingPreprocess {
     /**
      * adds fullname node.
      */
-    private void addFullName(JsonNode theChild, ObjectMapper mapper) {
+    private String addFullName(JsonNode theChild, ObjectMapper mapper) {
         String fullName = "";
         if (theChild.isArray()) {
             String forename = "";
@@ -728,33 +812,27 @@ public class IndexingPreprocess {
             while (ite.hasNext()) {
                 JsonNode temp = ite.next();
                 if (temp.isObject()) {
-                    Iterator<String> subfields = ((ObjectNode) temp).getFieldNames();
+                    // get the text value of the array
+                    Iterator<JsonNode> ite2 = temp.path("$forename").getElements();
+                    while (ite2.hasNext()) {
+                        JsonNode temp2 = ite2.next();
 
-                    while (subfields.hasNext()) {
-                        String subfield = subfields.next();
-                        if (subfield.equals("$forename")) {
-                            // get the text value of the array
-                            Iterator<JsonNode> ite2 = temp.path(subfield).getElements();
-                            while (ite2.hasNext()) {
-                                JsonNode temp2 = ite2.next();
-
-                                if (forename != null) {
-                                    forename += " " + temp2.getTextValue();
-                                } else {
-                                    forename = temp2.getTextValue();
-                                }
-                                break;
-                            }
-                        } else if (subfield.equals("$surname")) {
-                            // get the text value of the array
-                            Iterator<JsonNode> ite2 = temp.path(subfield).getElements();
-                            while (ite2.hasNext()) {
-                                JsonNode temp2 = ite2.next();
-                                surname = temp2.getTextValue();
-                                break;
-                            }
+                        if (forename != null) {
+                            forename += " " + temp2.getTextValue();
+                        } else {
+                            forename = temp2.getTextValue();
                         }
+                        break;
                     }
+
+                    // get the text value of the array
+                    ite2 = temp.path("$surname").getElements();
+                    while (ite2.hasNext()) {
+                        JsonNode temp2 = ite2.next();
+                        surname = temp2.getTextValue();
+                        break;
+                    }
+
                 }
             }
             if (forename != null) {
@@ -774,6 +852,7 @@ public class IndexingPreprocess {
                 ((ArrayNode) theChild).add(newNode);
             }
         }
+        return fullName;
     }
 
 }
