@@ -36,6 +36,7 @@ public class Main {
                 IndexProperties.init("anhalytics.properties");
             } catch (Exception e) {
                 logger.error(e.getMessage());
+                return;
             }
             if (IndexProperties.getFromDate() != null || IndexProperties.getUntilDate() != null) {
                 Utilities.updateDates(IndexProperties.getUntilDate(), IndexProperties.getFromDate());

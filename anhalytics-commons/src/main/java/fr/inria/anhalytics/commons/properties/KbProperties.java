@@ -26,7 +26,7 @@ public class KbProperties {
         Properties props = new Properties();
         try {
             File file = new File(System.getProperty("user.dir"));
-            props.load(new FileInputStream(file.getParent()+File.separator+"config"+File.separator+properties_filename));
+            props.load(new FileInputStream(file.getAbsolutePath()+File.separator+"config"+File.separator+properties_filename));
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file " + properties_filename, exp);
         }

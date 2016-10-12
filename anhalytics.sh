@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # OPTIONS:
 #    -help                        print command line options
@@ -55,7 +55,7 @@ array_contains2 () {
 
 check_dates_option(){
     dates=("-dFromDate" "-dUntilDate")
-    if array_contains2 arr "$1" || [ -z "$1" ] 
+    if array_contains2 dates "$1" || [ -z "$1" ] 
         then return 0 
     else return 1
     fi
@@ -84,6 +84,12 @@ do
     elif [[ $m == *"index"* ]]
         then
             modules[2]=$m
+elif [[ $m == *"commons"* ]]
+        then
+            modules[3]=$m
+    elif [[ $m == *"kb"* ]]
+        then
+            modules[4]=$m
     fi
 done
 
@@ -95,11 +101,19 @@ do
             usage
             exit 0
             ;;
-        -harvestDaily)
+--configure)
+"$JAVA" -Xmx2048m -jar "${modules[3]}" --configure
+            exit 0
+            ;;
+--prepare)
+"$JAVA" -Xmx2048m -jar "${modules[3]}" --prepare
+            exit 0
+            ;;
+        --harvestDaily)
             "$JAVA" -Xmx2048m -jar "${modules[0]}" -exe harvestDaily
             exit 0
             ;;
-        -harvest)
+        --harvest)
             if check_dates_option "$2" || check_dates_option "$4"
                 then
             "$JAVA" -Xmx2048m -jar "${modules[0]}" -exe harvestAll $2 $3 $4 $5
@@ -107,7 +121,7 @@ do
             fi
             exit 0
             ;;
-        -grobid)
+        --processGrobid)
             if check_dates_option "$2" || check_dates_option "$4"
                 then
             "$JAVA" -Xmx2048m -jar "${modules[0]}" -exe processGrobid $2 $3 $4 $5
@@ -115,11 +129,15 @@ do
             fi
             exit 0
             ;;
-        -mineData)
-            "$JAVA" -Xmx2048m -jar "${modules[0]}" -exe seedKnowledgeBase
+        --harvestDOI)
+if check_dates_option "$2" || check_dates_option "$4"
+                then
+            "$JAVA" -Xmx2048m -jar "${modules[0]}" -exe harvestDOI $2 $3 $4 $5
+else usage
+            fi
             exit 0
             ;;
-        -generateTei)
+        --generateTei)
             if check_dates_option "$2" || check_dates_option "$4"
                 then
             "$JAVA" -Xmx2048m -jar "${modules[0]}" -exe generateTei $2 $3 $4 $5
@@ -127,19 +145,52 @@ do
             fi
             exit 0
             ;;
-        -annotate)
+        --annotate)
             if check_dates_option "$2" || check_dates_option "$4"
                 then
-            "$JAVA" -Xmx2048m -jar "${modules[1]}" -multiThread $2 $3 $4 $5
+            "$JAVA" -Xmx2048m -jar "${modules[1]}" -exe annotateAll -multiThread $2 $3 $4 $5
             else usage
             fi
             exit 0
             ;;
-        -index)
-            arr=( "tei" "annotation" )
+--annotateNerd)
+            if check_dates_option "$2" || check_dates_option "$4"
+                then
+            "$JAVA" -Xmx2048m -jar "${modules[1]}" -exe annotateAllNerd -multiThread $2 $3 $4 $5
+            else usage
+            fi
+            exit 0
+            ;;
+--annotateKeyterm)
+            if check_dates_option "$2" || check_dates_option "$4"
+                then
+            "$JAVA" -Xmx2048m -jar "${modules[1]}" -exe annotateAllKeyTerm -multiThread $2 $3 $4 $5
+            else usage
+            fi
+            exit 0
+            ;;
+
+--buildKb)
+            if check_dates_option "$2" || check_dates_option "$4"
+                then
+            "$JAVA" -Xmx2048m -jar "${modules[4]}" -exe initKnowledgeBase $2 $3 $4 $5
+            else usage
+            fi
+            exit 0
+            ;;
+--buildBiblioKb)
+            if check_dates_option "$2" || check_dates_option "$4"
+                then
+            "$JAVA" -Xmx2048m -jar "${modules[4]}" -exe initCitationKnowledgeBase $2 $3 $4 $5
+            else usage
+            fi
+            exit 0
+            ;;
+        --index)
+            arr=("Metadata" "Fulltext" "Annotations" "KB")
             if array_contains2 arr "$2"
                 then
-                    "$JAVA" -Xmx2048m -jar "${modules[2]}" -index $2
+                    "$JAVA" -Xmx2048m -jar "${modules[2]}" -exe index$2
             else usage
             fi
             exit 0

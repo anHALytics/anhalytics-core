@@ -15,6 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Main class that implements commands for harvesting, extracting, inserting in
@@ -23,6 +25,8 @@ import java.util.List;
  * @author Achraf
  */
 public class Main {
+    
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands = new ArrayList<String>() {
         {
@@ -45,7 +49,8 @@ public class Main {
         try {
             HarvestProperties.init("anhalytics.properties");
         } catch (Exception exp) {
-            throw new PropertyException("Cannot open file of harvest properties harvest.properties", exp);
+            logger.error(exp.getMessage());
+                return;
         }
 
         if (processArgs(args)) {
