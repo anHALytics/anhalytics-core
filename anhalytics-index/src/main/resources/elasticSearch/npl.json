@@ -152,10 +152,10 @@
                                                                         }
                                                                     },
                                                                     "xml:id": {
-                                                        "index": "not_analyzed",
-                                                        "type": "string",
-                                                        "include_in_all": false
-                                                    }
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string",
+                                                                        "include_in_all": false
+                                                                    }
                                                                 }
                                                             },
                                                             "$idno": {
@@ -264,11 +264,12 @@
                                                                                 "term_vector": "with_positions_offsets"
                                                                             }
                                                                         }
-                                                                    },"xml:id": {
-                                                        "index": "not_analyzed",
-                                                        "type": "string",
-                                                        "include_in_all": false
-                                                    },
+                                                                    },
+                                                                    "xml:id": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string",
+                                                                        "include_in_all": false
+                                                                    },
                                                                     "$meeting": {
                                                                         "properties": {
                                                                             "$title": {
@@ -301,10 +302,10 @@
                                                                                 }
                                                                             },
                                                                             "xml:id": {
-                                                        "index": "not_analyzed",
-                                                        "type": "string",
-                                                        "include_in_all": false
-                                                    },
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string",
+                                                                                "include_in_all": false
+                                                                            },
                                                                             "date": {
                                                                                 "properties": {
                                                                                     "$type_start": {
@@ -377,7 +378,7 @@
                                                         "type": "string",
                                                         "include_in_all": false
                                                     }
-                                                    
+
                                                 }
                                             }
                                         }
@@ -411,18 +412,18 @@
                                                             }
                                                         }
                                                     },
-                                                            "xml:id": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string",
-                                                                "include_in_all": false
-                                                            }
+                                                    "xml:id": {
+                                                        "index": "not_analyzed",
+                                                        "type": "string",
+                                                        "include_in_all": false
+                                                    }
                                                 }
                                             },
-                                                            "xml:id": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string",
-                                                                "include_in_all": false
-                                                            },
+                                            "xml:id": {
+                                                "index": "not_analyzed",
+                                                "type": "string",
+                                                "include_in_all": false
+                                            },
                                             "$textClass": {
                                                 "properties": {
                                                     "$keywords": {
@@ -576,11 +577,12 @@
                                                                                                 "type": "string"
                                                                                             }
                                                                                         }
-                                                                                    },"xml:id": {
-                                                        "index": "not_analyzed",
-                                                        "type": "string",
-                                                        "include_in_all": false
-                                                    },
+                                                                                    },
+                                                                                    "xml:id": {
+                                                                                        "index": "not_analyzed",
+                                                                                        "type": "string",
+                                                                                        "include_in_all": false
+                                                                                    },
                                                                                     "id": {
                                                                                         "index": "not_analyzed",
                                                                                         "type": "string"
@@ -670,11 +672,12 @@
                                                                                                 "term_vector": "with_positions_offsets"
                                                                                             }
                                                                                         }
-                                                                                    },"xml:id": {
-                                                        "index": "not_analyzed",
-                                                        "type": "string",
-                                                        "include_in_all": false
-                                                    },
+                                                                                    },
+                                                                                    "xml:id": {
+                                                                                        "index": "not_analyzed",
+                                                                                        "type": "string",
+                                                                                        "include_in_all": false
+                                                                                    },
                                                                                     "$title-first": {
                                                                                         "type": "string"
                                                                                     },
@@ -1060,6 +1063,14 @@
                                                                                         "properties": {
                                                                                             "$type_RNSR": {
                                                                                                 "type": "string"
+                                                                                            },
+                                                                                            "$type_anhalyticsID": {
+                                                                                                "index": "not_analyzed",
+                                                                                                "type": "string"
+                                                                                            },
+                                                                                            "$type_orgAnhalyticsID": {
+                                                                                                "index": "not_analyzed",
+                                                                                                "type": "string"
                                                                                             }
                                                                                         }
                                                                                     },
@@ -1324,6 +1335,10 @@
                                                                             "$type_anhalyticsID": {
                                                                                 "index": "not_analyzed",
                                                                                 "type": "string"
+                                                                            },
+                                                                            "$type_authorAnhalyticsID": {
+                                                                                "index": "not_analyzed",
+                                                                                "type": "string"
                                                                             }
                                                                         }
                                                                     },
@@ -1478,11 +1493,12 @@
                                                                         "term_vector": "with_positions_offsets"
                                                                     }
                                                                 }
-                                                            },"xml:id": {
-                                                        "index": "not_analyzed",
-                                                        "type": "string",
-                                                        "include_in_all": false
-                                                    },
+                                                            },
+                                                            "xml:id": {
+                                                                "index": "not_analyzed",
+                                                                "type": "string",
+                                                                "include_in_all": false
+                                                            },
                                                             "$meeting": {
                                                                 "properties": {
                                                                     "$title": {
@@ -1513,11 +1529,12 @@
                                                                                 "term_vector": "with_positions_offsets"
                                                                             }
                                                                         }
-                                                                    },"xml:id": {
-                                                        "index": "not_analyzed",
-                                                        "type": "string",
-                                                        "include_in_all": false
-                                                    },
+                                                                    },
+                                                                    "xml:id": {
+                                                                        "index": "not_analyzed",
+                                                                        "type": "string",
+                                                                        "include_in_all": false
+                                                                    },
                                                                     "$date": {
                                                                         "properties": {
                                                                             "$type_start": {
@@ -1616,11 +1633,11 @@
                                             }
                                         }
                                     },
-                                                            "xml:id": {
-                                                                "index": "not_analyzed",
-                                                                "type": "string",
-                                                                "include_in_all": false
-                                                            },
+                                    "xml:id": {
+                                        "index": "not_analyzed",
+                                        "type": "string",
+                                        "include_in_all": false
+                                    },
                                     "$langUsage": {
                                         "properties": {
                                             "$language": {
