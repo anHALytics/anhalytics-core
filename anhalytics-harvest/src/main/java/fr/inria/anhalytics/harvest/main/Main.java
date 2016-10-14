@@ -188,6 +188,7 @@ public class Main {
         help.append("-h: displays help\n");
         help.append("-set: oai pmh set\n");
         help.append("-dOAI: url of the OAI-PMH service\n");
+        help.append("-set: select a specific set (INRIA, CNRS..), the available sets are for instance : https://api.archives-ouvertes.fr/oai/hal/?verb=ListSets \n");
         help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-dUntilDate: filter until date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-exe: gives the command to execute. The value should be one of these : \n");
