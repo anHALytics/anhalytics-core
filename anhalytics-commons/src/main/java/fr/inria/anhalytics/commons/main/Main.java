@@ -14,9 +14,12 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -100,7 +103,12 @@ public class Main {
         File file = new File(System.getProperty("user.dir"));
 
         FileInputStream in = new FileInputStream(file.getAbsolutePath() + File.separator + "config" + File.separator + "anhalytics.default.properties");
-        Properties defaultprops = new Properties();
+        Properties defaultprops = new Properties() {
+            @Override
+            public synchronized Enumeration<Object> keys() {
+                return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+            }
+        };
         defaultprops.load(in);
         in.close();
 
