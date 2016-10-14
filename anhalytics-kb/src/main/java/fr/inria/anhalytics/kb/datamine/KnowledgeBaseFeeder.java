@@ -4,46 +4,46 @@ import fr.inria.anhalytics.commons.exceptions.NumberOfCoAuthorsExceededException
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.dao.AbstractDAOFactory;
-import fr.inria.anhalytics.dao.AddressDAO;
-import fr.inria.anhalytics.kb.dao.anhalytics.AffiliationDAO;
-import fr.inria.anhalytics.dao.Conference_EventDAO;
-import fr.inria.anhalytics.kb.dao.anhalytics.LocationDAO;
-import fr.inria.anhalytics.dao.DocumentDAO;
-import fr.inria.anhalytics.dao.Document_OrganisationDAO;
-import fr.inria.anhalytics.dao.In_SerialDAO;
-import fr.inria.anhalytics.dao.MonographDAO;
-import fr.inria.anhalytics.kb.dao.anhalytics.OrganisationDAO;
-import fr.inria.anhalytics.dao.PersonDAO;
-import fr.inria.anhalytics.dao.PublicationDAO;
-import fr.inria.anhalytics.dao.PublisherDAO;
-import fr.inria.anhalytics.kb.dao.anhalytics.DAOFactory;
-import fr.inria.anhalytics.kb.dao.biblio.AbstractBiblioDAOFactory;
-import fr.inria.anhalytics.kb.dao.biblio.BiblioDAOFactory;
-import fr.inria.anhalytics.kb.entities.Address;
-import fr.inria.anhalytics.kb.entities.Affiliation;
-import fr.inria.anhalytics.kb.entities.Author;
-import fr.inria.anhalytics.kb.entities.Collection;
-import fr.inria.anhalytics.kb.entities.Conference;
-import fr.inria.anhalytics.kb.entities.Conference_Event;
-import fr.inria.anhalytics.kb.entities.Country;
-import fr.inria.anhalytics.kb.entities.Document_Identifier;
-import fr.inria.anhalytics.kb.entities.Document_Organisation;
-import fr.inria.anhalytics.kb.entities.Editor;
-import fr.inria.anhalytics.kb.entities.In_Serial;
-import fr.inria.anhalytics.kb.entities.Journal;
-import fr.inria.anhalytics.kb.entities.Location;
-import fr.inria.anhalytics.kb.entities.Monograph;
-import fr.inria.anhalytics.kb.entities.Organisation;
-import fr.inria.anhalytics.kb.entities.Organisation_Identifier;
-import fr.inria.anhalytics.kb.entities.Organisation_Name;
-import fr.inria.anhalytics.kb.entities.PART_OF;
-import fr.inria.anhalytics.kb.entities.Person;
-import fr.inria.anhalytics.kb.entities.Person_Identifier;
-import fr.inria.anhalytics.kb.entities.Person_Name;
-import fr.inria.anhalytics.kb.entities.Publication;
-import fr.inria.anhalytics.kb.entities.Publisher;
-import fr.inria.anhalytics.kb.entities.Serial_Identifier;
+import fr.inria.anhalytics.commons.dao.AbstractDAOFactory;
+import fr.inria.anhalytics.commons.dao.AddressDAO;
+import fr.inria.anhalytics.commons.dao.anhalytics.AffiliationDAO;
+import fr.inria.anhalytics.commons.dao.Conference_EventDAO;
+import fr.inria.anhalytics.commons.dao.anhalytics.LocationDAO;
+import fr.inria.anhalytics.commons.dao.DocumentDAO;
+import fr.inria.anhalytics.commons.dao.Document_OrganisationDAO;
+import fr.inria.anhalytics.commons.dao.In_SerialDAO;
+import fr.inria.anhalytics.commons.dao.MonographDAO;
+import fr.inria.anhalytics.commons.dao.anhalytics.OrganisationDAO;
+import fr.inria.anhalytics.commons.dao.PersonDAO;
+import fr.inria.anhalytics.commons.dao.PublicationDAO;
+import fr.inria.anhalytics.commons.dao.PublisherDAO;
+import fr.inria.anhalytics.commons.dao.anhalytics.DAOFactory;
+import fr.inria.anhalytics.commons.dao.biblio.AbstractBiblioDAOFactory;
+import fr.inria.anhalytics.commons.dao.biblio.BiblioDAOFactory;
+import fr.inria.anhalytics.commons.entities.Address;
+import fr.inria.anhalytics.commons.entities.Affiliation;
+import fr.inria.anhalytics.commons.entities.Author;
+import fr.inria.anhalytics.commons.entities.Collection;
+import fr.inria.anhalytics.commons.entities.Conference;
+import fr.inria.anhalytics.commons.entities.Conference_Event;
+import fr.inria.anhalytics.commons.entities.Country;
+import fr.inria.anhalytics.commons.entities.Document_Identifier;
+import fr.inria.anhalytics.commons.entities.Document_Organisation;
+import fr.inria.anhalytics.commons.entities.Editor;
+import fr.inria.anhalytics.commons.entities.In_Serial;
+import fr.inria.anhalytics.commons.entities.Journal;
+import fr.inria.anhalytics.commons.entities.Location;
+import fr.inria.anhalytics.commons.entities.Monograph;
+import fr.inria.anhalytics.commons.entities.Organisation;
+import fr.inria.anhalytics.commons.entities.Organisation_Identifier;
+import fr.inria.anhalytics.commons.entities.Organisation_Name;
+import fr.inria.anhalytics.commons.entities.PART_OF;
+import fr.inria.anhalytics.commons.entities.Person;
+import fr.inria.anhalytics.commons.entities.Person_Identifier;
+import fr.inria.anhalytics.commons.entities.Person_Name;
+import fr.inria.anhalytics.commons.entities.Publication;
+import fr.inria.anhalytics.commons.entities.Publisher;
+import fr.inria.anhalytics.commons.entities.Serial_Identifier;
 import fr.inria.anhalytics.commons.properties.KbProperties;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -148,7 +148,7 @@ public class KnowledgeBaseFeeder {
                                 throw new NumberOfCoAuthorsExceededException("Number of authors exceed 30 co-authors for this publication.");
                             }
 
-                            fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId, new ArrayList<Document_Identifier>());
+                            fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId, new ArrayList<Document_Identifier>());
 
                             processIdentifiers(ids, doc, repositoryDocId);
                             dd.create(doc);
@@ -189,7 +189,7 @@ public class KnowledgeBaseFeeder {
         logger.info("DONE.");
     }
 
-    private static void processIdentifiers(NodeList ids, fr.inria.anhalytics.kb.entities.Document doc, String halId) throws SQLException {
+    private static void processIdentifiers(NodeList ids, fr.inria.anhalytics.commons.entities.Document doc, String halId) throws SQLException {
         String type = null;
         String id = null;
         List<Document_Identifier> dis = new ArrayList<Document_Identifier>();
@@ -673,7 +673,7 @@ public class KnowledgeBaseFeeder {
                             Node citations = (Node) xPath.compile("/teiCorpus/TEI/text/back/div[@type='references']/listBibl").evaluate(teiDoc, XPathConstants.NODE);
                             if (citations != null) {
                                 NodeList references = citations.getChildNodes();
-                                fr.inria.anhalytics.kb.entities.Document doc = new fr.inria.anhalytics.kb.entities.Document(anhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId, new ArrayList<Document_Identifier>());
+                                fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(anhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId, new ArrayList<Document_Identifier>());
                                 dd.create(doc);
 
                                 for (int j = 0; j < references.getLength() - 1; j++) {
@@ -698,7 +698,7 @@ public class KnowledgeBaseFeeder {
         BiblioDAOFactory.closeConnection();
     }
 
-    private void processBiblStruct(Element reference, fr.inria.anhalytics.kb.entities.Document doc) throws SQLException {
+    private void processBiblStruct(Element reference, fr.inria.anhalytics.commons.entities.Document doc) throws SQLException {
         PublicationDAO pd = (PublicationDAO) abdf.getPublicationDAO();
         MonographDAO md = (MonographDAO) abdf.getMonographDAO();
         In_SerialDAO isd = (In_SerialDAO) abdf.getIn_SerialDAO();
