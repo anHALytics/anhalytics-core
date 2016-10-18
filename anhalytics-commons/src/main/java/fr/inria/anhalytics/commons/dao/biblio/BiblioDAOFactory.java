@@ -34,7 +34,7 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
     public static void initConnection() {
         if (conn == null) {
             try {
-                CommonsProperties.init("commons.properties", false);
+                CommonsProperties.init("anhalytics.properties", false);
             } catch (Exception exp) {
                 throw new PropertyException("Cannot open file of harvest properties ingest.properties", exp);
             }
