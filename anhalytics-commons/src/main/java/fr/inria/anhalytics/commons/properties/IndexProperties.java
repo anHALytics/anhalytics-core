@@ -33,8 +33,10 @@ public class IndexProperties {
     public static void init(String properties_filename) {
         Properties props = new Properties();
         try {
+            System.out.println(File.separator+"config"+File.separator+properties_filename);
             File file = new File(System.getProperty("user.dir"));
-            props.load(new FileInputStream(file.getAbsolutePath()+File.separator+"config"+File.separator+properties_filename));
+            System.out.println(file.getParentFile()+File.separator+"config"+File.separator+properties_filename);
+            props.load(new FileInputStream(file.getParentFile()+File.separator+"config"+File.separator+properties_filename));
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file " + properties_filename, exp);
         }

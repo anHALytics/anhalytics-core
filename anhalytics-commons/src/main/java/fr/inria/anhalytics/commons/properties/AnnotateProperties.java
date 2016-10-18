@@ -43,7 +43,7 @@ public class AnnotateProperties {
         Properties props = new Properties();
         try {
             File file = new File(System.getProperty("user.dir"));
-            props.load(new FileInputStream(file.getAbsoluteFile()+File.separator+"config"+File.separator+properties_filename));
+            props.load(new FileInputStream(file.getParentFile()+File.separator+"config"+File.separator+properties_filename));
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file " + properties_filename, exp);
         }
