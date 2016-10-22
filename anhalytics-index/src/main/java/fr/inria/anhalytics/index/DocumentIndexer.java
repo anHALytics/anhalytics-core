@@ -90,7 +90,7 @@ public class DocumentIndexer extends Indexer {
 
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
-                        bulkRequest.add(client.prepareIndex(IndexProperties.getMetadataTeisIndexName(), "npl", anhalyticsId).setSource(jsonStr));
+                        bulkRequest.add(client.prepareIndex(IndexProperties.getMetadataTeisIndexName(), IndexProperties.getFulltextTeisTypeName(), anhalyticsId).setSource(jsonStr));
 
                         nb++;
                         if (nb % bulkSize == 0) {
@@ -167,7 +167,7 @@ public class DocumentIndexer extends Indexer {
 
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
-                        bulkRequest.add(client.prepareIndex(IndexProperties.getFulltextTeisIndexName(), "npl", anhalyticsId).setSource(jsonStr));
+                        bulkRequest.add(client.prepareIndex(IndexProperties.getFulltextTeisIndexName(), IndexProperties.getFulltextTeisTypeName(), anhalyticsId).setSource(jsonStr));
                         nb++;
                         if (nb % bulkSize == 0) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -216,6 +216,7 @@ public class DocumentIndexer extends Indexer {
             if (mm.initAnnotations(date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS)) {
                 while (mm.hasMoreAnnotations()) {
                     String json = mm.nextAnnotation();
+                    json = json.replaceAll("_id", "id");
                     String id = mm.getCurrentRepositoryDocId();
                     String anhalyticsId = mm.getCurrentAnhalyticsId();
                     if (anhalyticsId == null || anhalyticsId.isEmpty()) {
@@ -226,7 +227,7 @@ public class DocumentIndexer extends Indexer {
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
                         bulkRequest.add(client.prepareIndex(
-                                IndexProperties.getKeytermAnnotsIndexName(), "annotation_keyterm",
+                                IndexProperties.getKeytermAnnotsIndexName(), IndexProperties.getKeytermAnnotsTypeName(),
                                 anhalyticsId).setSource(json));
 
                         nb++;
@@ -321,7 +322,7 @@ public class DocumentIndexer extends Indexer {
                             // index the json in ElasticSearch
                             // beware the document type bellow and corresponding mapping!
                             bulkRequest.add(client.prepareIndex(
-                                    IndexProperties.getNerdAnnotsIndexName(), "annotation_nerd", xmlID).setSource(annotJson));
+                                    IndexProperties.getNerdAnnotsIndexName(), IndexProperties.getNerdAnnotsTypeName(), xmlID).setSource(annotJson));
                             
                         nb++;
                             if (nb % bulkSize == 0) {

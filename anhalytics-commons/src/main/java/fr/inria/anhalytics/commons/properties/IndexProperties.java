@@ -19,11 +19,16 @@ public class IndexProperties {
     private static String elasticSearchClusterName;
 
     private static String nerdAnnotsIndexName = "annotations_nerd";
+    private static String nerdAnnotsTypeName = "nerd";
     private static String keytermAnnotsIndexName = "annotations_keyterm";
+    private static String keytermAnnotsTypeName = "keyterm";
     private static String fulltextTeisIndexName  = "anhalytics_fulltextteis_in";
+    private static String fulltextTeisTypeName = "npl";
     private static String metadataTeisIndexName  = "anhalytics_metadatateis";
     private static String kbIndexName = "anhalytics_kb"; // to be rename, it's not metadata but KB
-
+private static String kbAuthorsTypeName = "authors"; // to be rename, it's not metadata but KB
+    
+    
     private static String fromDate;
 
     private static String untilDate;
@@ -227,6 +232,62 @@ public class IndexProperties {
      */
     public static void setKbIndexName(String aKbIndexName) {
         kbIndexName = aKbIndexName;
+    }
+
+    /**
+     * @return the nerdAnnotsTypeName
+     */
+    public static String getNerdAnnotsTypeName() {
+        return nerdAnnotsTypeName;
+    }
+
+    /**
+     * @param aNerdAnnotsTypeName the nerdAnnotsTypeName to set
+     */
+    public static void setNerdAnnotsTypeName(String aNerdAnnotsTypeName) {
+        nerdAnnotsTypeName = aNerdAnnotsTypeName;
+    }
+
+    /**
+     * @return the keytermAnnotsTypeName
+     */
+    public static String getKeytermAnnotsTypeName() {
+        return keytermAnnotsTypeName;
+    }
+
+    /**
+     * @param aKeytermAnnotsTypeName the keytermAnnotsTypeName to set
+     */
+    public static void setKeytermAnnotsTypeName(String aKeytermAnnotsTypeName) {
+        keytermAnnotsTypeName = aKeytermAnnotsTypeName;
+    }
+
+    /**
+     * @return the fulltextTeisTypeName
+     */
+    public static String getFulltextTeisTypeName() {
+        return fulltextTeisTypeName;
+    }
+
+    /**
+     * @param aFulltextTeisTypeName the fulltextTeisTypeName to set
+     */
+    public static void setFulltextTeisTypeName(String aFulltextTeisTypeName) {
+        fulltextTeisTypeName = aFulltextTeisTypeName;
+    }
+
+    /**
+     * @return the kbAuthorsTypeName
+     */
+    public static String getKbAuthorsTypeName() {
+        return kbAuthorsTypeName;
+    }
+
+    /**
+     * @param aKbAuthorsTypeName the kbAuthorsTypeName to set
+     */
+    public static void setKbAuthorsTypeName(String aKbAuthorsTypeName) {
+        kbAuthorsTypeName = aKbAuthorsTypeName;
     }
     
 
