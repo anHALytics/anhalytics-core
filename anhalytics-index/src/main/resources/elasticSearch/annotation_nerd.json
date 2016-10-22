@@ -1,9 +1,8 @@
 {
-    "annotation_nerd": {
+    "nerd": {
         "_all": {
             "enabled": false,
-            "store": true,
-            "dynamic": "false"
+            "store": true
         },
         "properties": {
             "annotation": {

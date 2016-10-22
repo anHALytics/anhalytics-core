@@ -5,6 +5,7 @@ import fr.inria.anhalytics.commons.properties.IndexProperties;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -12,7 +13,6 @@ import java.util.logging.Level;
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.slf4j.Logger;
@@ -29,10 +29,10 @@ abstract class Indexer {
     protected Client client;
     
     public Indexer(){
-    Settings settings = ImmutableSettings.settingsBuilder()
+    Settings settings = Settings.settingsBuilder()
                 .put("cluster.name", IndexProperties.getElasticSearchClusterName()).build();
-        this.client = new TransportClient(settings)
-                .addTransportAddress(new InetSocketTransportAddress(IndexProperties.getElasticSearch_host(), 9300));
+        this.client = TransportClient.builder().settings(settings).build()
+                .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(IndexProperties.getElasticSearch_host(), 9300)));
     }
     
     public void close() {
@@ -147,13 +147,13 @@ abstract class Indexer {
 
         String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + indexName;
         if (indexName.equals(IndexProperties.getNerdAnnotsIndexName())) {
-            urlStr += "/"+IndexProperties.getNerdAnnotsIndexName()+"/_mapping";
+            urlStr += "/"+IndexProperties.getNerdAnnotsTypeName()+"/_mapping";
         } else if (indexName.equals(IndexProperties.getKeytermAnnotsIndexName())) {
-            urlStr += "/"+IndexProperties.getKeytermAnnotsIndexName()+"/_mapping";
+            urlStr += "/"+IndexProperties.getKeytermAnnotsTypeName()+"/_mapping";
         } else if(indexName.equals(IndexProperties.getKbIndexName())) {
-            urlStr += "/authors/_mapping";
+            urlStr += "/"+IndexProperties.getKbAuthorsTypeName()+"/_mapping";
         } else {
-            urlStr += "/npl/_mapping";
+            urlStr += "/"+IndexProperties.getFulltextTeisTypeName()+"/_mapping";
         }
 
         URL url = new URL(urlStr);

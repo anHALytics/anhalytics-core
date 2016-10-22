@@ -2,8 +2,7 @@
     "npl": {
         "_all": {
             "enabled": true,
-            "store": true,
-            "dynamic": "false"
+            "store": true
         },
         "properties": {
             "$teiCorpus": {
@@ -484,51 +483,6 @@
                                                                 "include_in_all": false
                                                             }
 
-                                                        },
-                                                        "$figure": {
-                                                            "dynamic": "false",
-                                                            "properties": {
-                                                                "$figDesc": {
-                                                                    "properties": {
-                                                                        "$lang_en": {
-                                                                            "type": "string",
-                                                                            "index": "analyzed",
-                                                                            "analyzer": "english",
-                                                                            "store": "yes",
-                                                                            "term_vector": "with_positions_offsets"
-                                                                        }
-                                                                    }
-                                                                },
-                                                                "$head": {
-                                                                    "dynamic": "false",
-                                                                    "properties": {
-                                                                        "$lang_en": {
-                                                                            "type": "string",
-                                                                            "index": "analyzed",
-                                                                            "analyzer": "english",
-                                                                            "store": "yes",
-                                                                            "term_vector": "with_positions_offsets"
-                                                                        }
-                                                                    }
-                                                                },
-                                                                "xml:id": {
-                                                                    "index": "not_analyzed",
-                                                                    "type": "string",
-                                                                    "include_in_all": false
-                                                                }
-                                                            }
-                                                        },
-                                                        "$head": {
-                                                            "dynamic": "false",
-                                                            "properties": {
-                                                                "$lang_en": {
-                                                                    "type": "string",
-                                                                    "index": "analyzed",
-                                                                    "analyzer": "english",
-                                                                    "store": "yes",
-                                                                    "term_vector": "with_positions_offsets"
-                                                                }
-                                                            }
                                                         }
                                                     },
                                                     "$type_references": {

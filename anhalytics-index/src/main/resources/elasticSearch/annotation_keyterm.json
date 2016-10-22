@@ -1,9 +1,8 @@
 {
-    "annotation_keyterm": {
+    "keyterm": {
         "_all": {
             "enabled": false,
-            "store": true,
-            "dynamic": "false"
+            "store": true
         },
         "properties": {
             "repositoryDocId": {
@@ -90,8 +89,7 @@
                                         }
                                     }
                                 }
-                            }
-                        },
+                            },
                         "term": {
                             "type": "string",
                             "index": "not_analyzed"
@@ -100,7 +98,7 @@
                             "type": "string",
                             "index": "not_analyzed"
                         }
-
+                        }
                     },
                     "language": {
                         "properties": {

@@ -3,8 +3,7 @@
     "authors": {
         "_all": {
             "enabled": true,
-            "store": true,
-            "dynamic": "false"
+            "store": true
         },
     "properties": {
       "identifers": {
