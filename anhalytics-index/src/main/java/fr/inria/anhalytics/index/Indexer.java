@@ -49,6 +49,7 @@ abstract class Indexer {
             deleteIndex(indexName);
 
             // create new index and load the appropriate mapping
+            if(!indexName.equals(IndexProperties.getKbIndexName()))
             createIndex(indexName);
             loadMapping(indexName);
         } catch (Exception e) {
@@ -151,7 +152,7 @@ abstract class Indexer {
         } else if (indexName.equals(IndexProperties.getKeytermAnnotsIndexName())) {
             urlStr += "/"+IndexProperties.getKeytermAnnotsTypeName()+"/_mapping";
         } else if(indexName.equals(IndexProperties.getKbIndexName())) {
-            urlStr += "/"+IndexProperties.getKbAuthorsTypeName()+"/_mapping";
+            urlStr += "?pretty";
         } else {
             urlStr += "/"+IndexProperties.getFulltextTeisTypeName()+"/_mapping";
         }

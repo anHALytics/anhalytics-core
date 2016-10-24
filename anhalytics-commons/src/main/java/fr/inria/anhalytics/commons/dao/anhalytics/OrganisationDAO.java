@@ -47,8 +47,6 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
 
     private static final String SQL_SELECT_AFFILIATION_BY_PERSONID = "SELECT * FROM AFFILIATION WHERE personID = ? GROUP BY begin_date, end_date, organisationID";
 
-    private static final String SQL_SELECT_MOTHERID_BY_ORGID = "SELECT * FROM PART_OF WHERE organisationID = ?";
-
     private static final String SQL_SELECT_ORGNAME_BY_ORGID = "SELECT * FROM ORGANISATION_NAME WHERE organisationID = ?";
 
     private static final String SQL_SELECT_AUTHORSID_BY_DOCID = "SELECT personID FROM AUTHOR WHERE docID = ?";
@@ -60,6 +58,8 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
     private static final String SQL_SELECT_ORGNAMES_BY_ID = "SELECT * FROM ORGANISATION_NAME orgname WHERE orgname.organisationID = ? GROUP BY orgname.publication_date, orgname.name";
 
     private static final String SQL_SELECT_ORGIDENTIFIERS_BY_ID = "SELECT * FROM ORGANISATION_IDENTIFIER org_id WHERE org_id.organisationID = ?";
+    
+    private static final String SQL_SELECT_ORGPARENTS_BY_ID = "SELECT * FROM PART_OF part_of WHERE part_of.organisationID = ?";
 
     private static final String SQL_SELECTALL = "SELECT * FROM ORGANISATION org";
 
@@ -68,12 +68,10 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
     private static final String UPDATE_ORGANISATION = "UPDATE ORGANISATION SET type = ? ,struct = ? ,url = ?, status = ? WHERE organisationID = ?";
 
     private static final String UPDATE_ORGANISATION_NAME = "UPDATE ORGANISATION_NAME SET publication_date = ? WHERE organisation_nameID = ?";
-    
-    
-    
+
     private static final String SQL_SELECT_ORGANISATIONS_BY_DOCUMENT
             = "SELECT * from DOCUMENT_ORGANISATION WHERE docID = ?";
-    
+
     public OrganisationDAO(Connection conn) {
         super(conn);
     }
@@ -325,10 +323,11 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                             rs.getString("org.url"),
                             rs.getString("org.struct"),
                             (new ArrayList<Organisation_Name>()),
-                            findMothers(id),
+                            new ArrayList<PART_OF>(),
                             (new ArrayList<Organisation_Identifier>())
                     );
 
+                    
                     preparedStatement1.setLong(1, id);
                     ResultSet rs1 = preparedStatement1.executeQuery();
 
@@ -343,6 +342,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                     while (rs2.next()) {
                         organisation.getOrganisation_identifiers().add(new Organisation_Identifier(rs2.getString("org_id.ID"), rs2.getString("org_id.Type")));
                     }
+                    organisation = setOrganisationParents(organisation);
                 }
             } catch (ParseException ex) {
                 Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -356,11 +356,42 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
         }
         return organisation;
     }
+    
+        private Organisation setOrganisationParents(Organisation org) throws SQLException {
+        
+        PreparedStatement preparedStatement2 = this.connect.prepareStatement(SQL_SELECT_ORGPARENTS_BY_ID);
+        
+        try {
+            preparedStatement2.setLong(1, org.getOrganisationId());
+            // process the results
+            ResultSet rs = preparedStatement2.executeQuery();
+            Organisation parentOrg = null;
+            int i = 0;
+            while (rs.next()) {
+                PART_OF part_of = new PART_OF();
+                if(org.getOrganisationId() == 245)
+                i++;
+                parentOrg = find(rs.getLong("organisation_motherID"));
+                
+                part_of.setOrganisation_mother(parentOrg);
+//                part_of.setBeginDate(beginDate);
+//                part_of.setBeginDate(beginDate);
+                org.addRel(part_of);
+            }
+            if(org.getOrganisationId() == 245 )System.out.println("azerty"+i);
+            
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            preparedStatement2.close();
+        }
+        return org;
+    }
 
     public List<PART_OF> findMothers(Long id) throws SQLException {
         List<PART_OF> rels = new ArrayList<PART_OF>();
         Organisation org = null;
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_MOTHERID_BY_ORGID),
+        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_ORGPARENTS_BY_ID),
                 preparedStatement1 = this.connect.prepareStatement(SQL_SELECT_ORG_BY_ID);
 
         PreparedStatement preparedStatement2 = this.connect.prepareStatement(SQL_SELECT_ORGNAMES_BY_ID);
@@ -509,12 +540,12 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
         List<Affiliation> affiliations = new ArrayList<Affiliation>();
 
         Affiliation affiliation = null;
-        Organisation organisation = null;
         PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_AFFILIATION_BY_PERSONID);
         try {
             ps.setLong(1, person.getPersonId());
             // process the results
             ResultSet rs = ps.executeQuery();
+            Organisation org = null;
             while (rs.next()) {
                 try {
                     affiliation = new Affiliation(
@@ -524,7 +555,8 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                             Utilities.parseStringDate(rs.getString("begin_date")),
                             Utilities.parseStringDate(rs.getString("end_date"))
                     );
-                    affiliation.addOrganisation(find(rs.getLong("organisationID")));
+                    org = find(rs.getLong("organisationID"));
+                    affiliation.addOrganisation(org);
                 } catch (ParseException ex) {
                     Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -537,25 +569,25 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
         }
         return affiliations;
     }
-    
+
     public Document_Organisation getOrganisationByDocumentID(String docID) throws SQLException {
-    Document_Organisation dorg = new Document_Organisation();
-    dorg.setDoc(new Document(docID, null,null,null));
+        Document_Organisation dorg = new Document_Organisation();
+        dorg.setDoc(new Document(docID, null, null, null));
         PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_ORGANISATIONS_BY_DOCUMENT);
         try {
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setString(1, docID);
             ResultSet result = preparedStatement.executeQuery();
             while (result.next()) {
-                    dorg.addOrg(find(result.getLong("organisationID")));
+                dorg.addOrg(find(result.getLong("organisationID")));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
             preparedStatement.close();
         }
-    
-    return dorg;
+
+        return dorg;
     }
 
 }

@@ -481,7 +481,7 @@ public class IndexingPreprocess {
         }
     }
 
-    private JsonNode getStandoffNerd(ObjectMapper mapper, String anhalyticsId) throws Exception {
+    public JsonNode getStandoffNerd(ObjectMapper mapper, String anhalyticsId) throws Exception {
         JsonNode standoffNode = null;
         String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.NERD_ANNOTATIONS);
         if ((annotation != null) && (annotation.trim().length() > 0)) {
@@ -557,7 +557,7 @@ public class IndexingPreprocess {
         return standoffNode;
     }
 
-    private JsonNode getStandoffKeyTerm(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
+    public JsonNode getStandoffKeyTerm(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
         String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
         if ((annotation != null) && (annotation.trim().length() > 0)) {
             JsonNode jsonAnnotation = mapper.readTree(annotation);

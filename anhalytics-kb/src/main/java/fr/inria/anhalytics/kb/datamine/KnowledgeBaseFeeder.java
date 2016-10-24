@@ -357,6 +357,7 @@ public class KnowledgeBaseFeeder {
             organisationParent.setType(orgElt.getAttribute("type"));
             if (orgElt.hasAttribute("xml:id")) {
                 ois.add(new Organisation_Identifier(orgElt.getAttribute("xml:id"), "halId"));
+                org.setStructure(orgElt.getAttribute("xml:id"));
             }
             if (orgElt.hasAttribute("status")) {
                 organisationParent.setStatus(orgElt.getAttribute("status"));
@@ -412,13 +413,13 @@ public class KnowledgeBaseFeeder {
 
             if (locationParent != null && locationParent.getAddress() != null) {
                 if (locationParent.getAddress().getAddressId() == null) {
+                    
                     ad.create(locationParent.getAddress());
                 }
                 locationParent.setBegin_date(pubDate);
                 locationParent.setOrganisation(organisationParent);
                 ld.create(locationParent);
             }
-
             // how to handle it for grobid case ?
             Element idno = doc.createElement("idno");
             idno.setAttribute("type", "anhalyticsID");
@@ -630,6 +631,7 @@ public class KnowledgeBaseFeeder {
                     addr.setAddrLine(addrChildElt.getTextContent());
                 } else if (addrChildElt.getNodeName().equals("country")) {
                     addr.setCountry(new Country(null, addrChildElt.getAttribute("key")));
+                    addr.setCountryStr(addrChildElt.getAttribute("key"));
                 } else if (addrChildElt.getNodeName().equals("settlement")) {
                     addr.setSettlement(addrChildElt.getTextContent());
                 } else if (addrChildElt.getNodeName().equals("postCode")) {

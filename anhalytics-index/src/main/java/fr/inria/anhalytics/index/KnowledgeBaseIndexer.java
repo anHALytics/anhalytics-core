@@ -24,12 +24,18 @@ import fr.inria.anhalytics.commons.entities.Organisation;
 import fr.inria.anhalytics.commons.entities.PART_OF;
 import fr.inria.anhalytics.commons.entities.Person;
 import fr.inria.anhalytics.commons.entities.Publication;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
+import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.slf4j.Logger;
@@ -52,10 +58,37 @@ public class KnowledgeBaseIndexer extends Indexer {
         BiblioDAOFactory.initConnection();
     }
 
-    public int indexAuthors() throws SQLException {
+    private static void getAffiliations(List<Map<String, Object>> organisations, Organisation org, Date begin_date, Date end_date) throws SQLException {
+
+        if (org != null) {
+            AddressDAO adao = (AddressDAO) adf.getAddressDAO();
+            Map<String, Object> orgDocument = org.getOrganisationDocument();
+
+            orgDocument.put("begin_date", Utilities.formatDate(begin_date));
+            orgDocument.put("end_date", Utilities.formatDate(end_date));
+            Address addr = (adao.getOrganisationAddress(org.getOrganisationId()));
+            Map<String, Object> orgAddress = null;
+            if (addr != null) {
+                orgAddress = addr.getAddressDocument();
+            }
+            orgDocument.put("address", orgAddress);
+            organisations.add(orgDocument);
+            for (PART_OF part_of : org.getRels()) {
+                Organisation org1 = part_of.getOrganisation_mother();
+                getAffiliations(organisations, org1, begin_date, end_date);
+
+            }
+        }
+
+    }
+
+    public int indexAuthors() throws SQLException, UnknownHostException {
+        IndexingPreprocess indexingPreprocess = new IndexingPreprocess(MongoFileManager.getInstance(false));
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode standoffNode = null;
         PersonDAO pdao = (PersonDAO) adf.getPersonDAO();
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
-        AddressDAO adao = (AddressDAO) adf.getAddressDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
         PublicationDAO pubdao = (PublicationDAO) adf.getPublicationDAO();
         Map<Long, Person> persons = pdao.findAllAuthors();
@@ -72,19 +105,10 @@ public class KnowledgeBaseIndexer extends Indexer {
             List<Affiliation> affs = odao.getAffiliationByPersonID(pers);
             List<Map<String, Object>> organisations = new ArrayList<Map<String, Object>>();
             for (Affiliation aff : affs) {
-                Organisation org = aff.getOrganisations().get(0);
-                Map<String, Object> orgDocument = org.getOrganisationDocument();
-
-                orgDocument.put("begin_date", Utilities.formatDate(aff.getBegin_date()));
-                orgDocument.put("end_date", Utilities.formatDate(aff.getBegin_date()));
-                Address addr = (adao.getOrganisationAddress(aff.getOrganisations().get(0).getOrganisationId()));
-                Map<String, Object> orgAddress = null;
-                if (addr != null) {
-                    orgAddress = addr.getAddressDocument();
-                }
-                orgDocument.put("address", orgAddress);
-                organisations.add(orgDocument);
+                getAffiliations(organisations, aff.getOrganisations().get(0), aff.getBegin_date(), aff.getBegin_date());
             }
+            jsonDocument.put("affiliations", organisations);
+
             List<Map<String, Object>> publications = new ArrayList<Map<String, Object>>();
             Map<String, Object> documentDoc = null;
             Publication publication = null;
@@ -99,34 +123,43 @@ public class KnowledgeBaseIndexer extends Indexer {
                 documentDoc = doc.getDocumentDocument();
                 publication = pubdao.findByDocId(doc.getDocID()).get(0);
                 documentDoc.put("publication", publication.getPublicationDocument());
-                dorg = odao.getOrganisationByDocumentID(doc.getDocID());
-                for (Organisation org : dorg.getOrgs()) {
-                    orgDoc = org.getOrganisationDocument();
-                    addr = adao.getOrganisationAddress(org.getOrganisationId());
-                    if (addr != null) {
-                        orgDoc.put("address", addr.getAddressDocument());
-                    }
-                    document_organisations.add(orgDoc);
-                }
-                documentDoc.put("organisations", document_organisations);
+//                dorg = odao.getOrganisationByDocumentID(doc.getDocID());
+//                for (Organisation org : dorg.getOrgs()) {
+//                    orgDoc = org.getOrganisationDocument();
+//                    addr = adao.getOrganisationAddress(org.getOrganisationId());
+//                    if (addr != null) {
+//                        orgDoc.put("address", addr.getAddressDocument());
+//                    }
+//                    document_organisations.add(orgDoc);
+//                }
+//                documentDoc.put("organisations", document_organisations);
                 //authors/publication ?
-                publications.add(documentDoc);
-                coauthors = pdao.getAuthorsByDocId(doc.getDocID());
-
-                coauthors.remove(personId);
-
-                Iterator it2 = coauthors.entrySet().iterator();
-                while (it2.hasNext()) {
-                    Map.Entry pair1 = (Map.Entry) it2.next();
-                    Map<String, Object> personDoc = ((Person) pair1.getValue()).getPersonDocument();
-                    personDoc.put("date_coauthorship", publication.getDate_printed());
-                    coauthors_documents.add(personDoc);
+                try {
+                    standoffNode = indexingPreprocess.getStandoffNerd(mapper, doc.getDocID());
+                    standoffNode = indexingPreprocess.getStandoffKeyTerm(mapper, doc.getDocID(), standoffNode);
+                    if (standoffNode != null) {
+                        Map<String, Object> result = mapper.convertValue(standoffNode, Map.class);
+                        documentDoc.put("annotations", result);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+                publications.add(documentDoc);
+//                coauthors = pdao.getAuthorsByDocId(doc.getDocID());
+//
+//                coauthors.remove(personId);
+//
+//                Iterator it2 = coauthors.entrySet().iterator();
+//                while (it2.hasNext()) {
+//                    Map.Entry pair1 = (Map.Entry) it2.next();
+//                    Map<String, Object> personDoc = ((Person) pair1.getValue()).getPersonDocument();
+//                    personDoc.put("date_coauthorship", publication.getDate_printed());
+//                    coauthors_documents.add(personDoc);
+//                }
                 //Get authors ids(except the actual one) + get pub date + with fullname
             }
-            jsonDocument.put("coauthors", coauthors_documents);
+            //jsonDocument.put("coauthors", coauthors_documents);
             jsonDocument.put("publications", publications);
-            jsonDocument.put("affiliations", organisations);
             // index the json in ElasticSearch
             // beware the document type bellow and corresponding mapping!
             bulkRequest.add(client.prepareIndex(IndexProperties.getKbIndexName(), "authors", "" + personId).setSource(jsonDocument));
@@ -154,11 +187,17 @@ public class KnowledgeBaseIndexer extends Indexer {
         return nb;
     }
 
-    public int indexPublications() throws SQLException {
+    public int indexPublications() throws SQLException, UnknownHostException {
         int nb = 0;
         int bulkSize = 100;
+
+        IndexingPreprocess indexingPreprocess = new IndexingPreprocess(MongoFileManager.getInstance(false));
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode standoffNode = null;
         PublicationDAO pubdao = (PublicationDAO) adf.getPublicationDAO();
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
+        AddressDAO adao = (AddressDAO) adf.getAddressDAO();
         PublicationDAO bibliopubdao = (PublicationDAO) biblioadf.getPublicationDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
         DocumentDAO biblioddao = (DocumentDAO) biblioadf.getDocumentDAO();
@@ -183,6 +222,7 @@ public class KnowledgeBaseIndexer extends Indexer {
                 Map<String, Object> jsonDocument = pers.getPersonDocument();
                 authorsDocument.add(jsonDocument);
             }
+            //see how to reference other objects...would be better.
             documentDocument.put("authors", authorsDocument);
             List<Publication> pubs = pubdao.findByDocId(doc.getDocID());
             Map<String, Object> publicationDocument = pubs.get(0).getPublicationDocument();
@@ -191,14 +231,23 @@ public class KnowledgeBaseIndexer extends Indexer {
             if (conf != null) {
                 monographDocument.put("conference", conf.getConference_EventDocument());
             }
+
+            documentDocument.put("publication", publicationDocument);
+
             List<Map<String, Object>> document_organisations = new ArrayList<Map<String, Object>>();
             Document_Organisation dorg = odao.getOrganisationByDocumentID(doc.getDocID());
             for (Organisation org : dorg.getOrgs()) {
-                document_organisations.add(org.getOrganisationDocument());
+                Map<String, Object> orgDocument = org.getOrganisationDocument();
+                Address addr = (adao.getOrganisationAddress(org.getOrganisationId()));
+                Map<String, Object> orgAddress = null;
+                if (addr != null) {
+                    orgAddress = addr.getAddressDocument();
+                }
+                orgDocument.put("address", orgAddress);
+                document_organisations.add(orgDocument);
             }
             documentDocument.put("organisations", document_organisations);
 
-            documentDocument.put("publication", publicationDocument);
             Map<Long, Person> editors = pdao.getEditorsByPubId(pubs.get(0).getPublicationID());//suppose one-one relation..
             List<Map<String, Object>> editorsDocument = new ArrayList<Map<String, Object>>();
             Iterator it1 = editors.entrySet().iterator();
@@ -243,6 +292,18 @@ public class KnowledgeBaseIndexer extends Indexer {
                 }
             }
             documentDocument.put("references", referencesPubDocument);
+            try {
+                standoffNode = indexingPreprocess.getStandoffNerd(mapper, doc.getDocID());
+                standoffNode = indexingPreprocess.getStandoffKeyTerm(mapper, doc.getDocID(), standoffNode);
+                if (standoffNode != null) {
+                    Map<String, Object> result = mapper.convertValue(standoffNode, Map.class);
+                    documentDocument.put("annotations", result);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //HAL domains
+
             // index the json in ElasticSearch
             // beware the document type bellow and corresponding mapping!
             bulkRequest.add(client.prepareIndex(IndexProperties.getKbIndexName(), "publications", "" + doc.getDocID()).setSource(documentDocument));
@@ -275,6 +336,7 @@ public class KnowledgeBaseIndexer extends Indexer {
         int nb = 0;
         int bulkSize = 100;
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
+        PublicationDAO pubdao = (PublicationDAO) adf.getPublicationDAO();
         List<Organisation> organisations = odao.findAllOrganisations();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
         AddressDAO adao = (AddressDAO) adf.getAddressDAO();
@@ -304,10 +366,16 @@ public class KnowledgeBaseIndexer extends Indexer {
             organisationDocument.put("relations", orgRelationsDocument);
             List<Document> docs = ddao.getDocumentsByOrgId(org.getOrganisationId());
             List<Map<String, Object>> orgDocumentsDocument = new ArrayList<Map<String, Object>>();
+            Map<String, Object> documentDocument = null;
             for (Document doc : docs) {
-                orgDocumentsDocument.add(doc.getDocumentDocument());
+                List<Publication> pubs = pubdao.findByDocId(doc.getDocID());
+                Map<String, Object> publicationDocument = pubs.get(0).getPublicationDocument();
+                documentDocument = doc.getDocumentDocument();
+                documentDocument.put("publication", publicationDocument);
+                orgDocumentsDocument.add(documentDocument);
             }
-            organisationDocument.put("publications", orgDocumentsDocument);
+            organisationDocument.put("docCount", docs.size());
+            organisationDocument.put("documents", orgDocumentsDocument);
 
             Map<Long, Person> authors = pdao.getPersonsByOrgID(org.getOrganisationId());
             List<Map<String, Object>> authorsDocument = new ArrayList<Map<String, Object>>();

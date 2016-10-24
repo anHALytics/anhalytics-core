@@ -32,6 +32,7 @@ public class Organisation {
         this.url = url;
         this.structure = structure;
         this.names = names;
+        this.status = status;
         this.rels = rels;
         this.organisation_identifiers = organisation_identifiers;
     }
