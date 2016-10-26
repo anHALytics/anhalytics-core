@@ -134,16 +134,17 @@ public class KnowledgeBaseIndexer extends Indexer {
 //                }
 //                documentDoc.put("organisations", document_organisations);
                 //authors/publication ?
+                Map<String, Object> result = new HashMap<String, Object>();
                 try {
                     standoffNode = indexingPreprocess.getStandoffNerd(mapper, doc.getDocID());
                     standoffNode = indexingPreprocess.getStandoffKeyTerm(mapper, doc.getDocID(), standoffNode);
                     if (standoffNode != null) {
-                        Map<String, Object> result = mapper.convertValue(standoffNode, Map.class);
-                        documentDoc.put("annotations", result);
+                        result = mapper.convertValue(standoffNode, Map.class);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                documentDoc.put("annotations", result);
                 publications.add(documentDoc);
 //                coauthors = pdao.getAuthorsByDocId(doc.getDocID());
 //
@@ -292,16 +293,19 @@ public class KnowledgeBaseIndexer extends Indexer {
                 }
             }
             documentDocument.put("references", referencesPubDocument);
+            
+            Map<String, Object> result = new HashMap<String, Object>();
             try {
                 standoffNode = indexingPreprocess.getStandoffNerd(mapper, doc.getDocID());
                 standoffNode = indexingPreprocess.getStandoffKeyTerm(mapper, doc.getDocID(), standoffNode);
                 if (standoffNode != null) {
-                    Map<String, Object> result = mapper.convertValue(standoffNode, Map.class);
-                    documentDocument.put("annotations", result);
+                    result = mapper.convertValue(standoffNode, Map.class);
+                    
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            documentDocument.put("annotations", result);
             //HAL domains
 
             // index the json in ElasticSearch
