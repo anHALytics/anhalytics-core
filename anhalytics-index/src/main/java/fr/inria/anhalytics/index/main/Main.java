@@ -191,7 +191,7 @@ public class Main {
             }
         } else if (process.equals("indexKB")) {
             System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
-//            reponse = sc.nextLine().charAt(0);
+            reponse = sc.nextLine().charAt(0);
 
             if (reponse != 'N') {
                 mi.setUpIndex(IndexProperties.getKbIndexName());
