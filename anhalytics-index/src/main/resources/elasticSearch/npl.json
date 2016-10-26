@@ -1388,8 +1388,8 @@
                                                                     "$date": {
                                                                         "properties": {
                                                                             "$type_datePub": {
-                                                                                "format": "dateOptionalTime",
-                                                                                "type": "date"
+                                                                                "type": "date",
+                                                                                "format": "yyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
                                                                             },
                                                                             "$type_dateDefended": {
                                                                                 "format": "dateOptionalTime",
