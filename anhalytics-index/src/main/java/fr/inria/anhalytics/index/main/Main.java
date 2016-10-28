@@ -217,7 +217,7 @@ public class Main {
         help.append("HELP ANHALYTICS_INDEX \n");
         help.append("-h: displays help\n");
         help.append("-exe: followed by either :\n");
-        help.append("--reset: skip items that are already processed(beware about versions/updates) : \n");
+        help.append("--reset: updates all the documents (beware about versions/updates) : \n");
         help.append("\t" + availableCommands + "\n");
         return help.toString();
     }
