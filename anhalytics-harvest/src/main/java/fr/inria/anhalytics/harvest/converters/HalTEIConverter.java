@@ -71,27 +71,41 @@ public class HalTEIConverter implements MetadataConverter {
     }
 
     public void updatePublicationDate(Element teiHeader, Document newTEICorpus) {
-        String date = "";
         try {
             Element dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"datePub\"]").evaluate(newTEICorpus, XPathConstants.NODE);
-            if (dateElt == null) {
-                dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"dateDefended\"]").evaluate(newTEICorpus, XPathConstants.NODE);
-            }
+
+            Element defendingElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"dateDefended\"]").evaluate(newTEICorpus, XPathConstants.NODE);
+
             Element submissionDateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/editionStmt/edition[@type=\"current\"]/date[@type=\"whenSubmitted\"]").evaluate(newTEICorpus, XPathConstants.NODE);
             String pubDate = "";
             if (dateElt != null) {
                 pubDate = Utilities.completeDate(dateElt.getTextContent());
             }
-            if (dateElt == null || dateElt.getTextContent().contains("0000") || !pubDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                date = submissionDateElt.getTextContent().split(" ")[0];
+            if (pubDate.isEmpty()) {
+                String date = "";
+                if (defendingElt != null) {
+                    String defendedDate = Utilities.completeDate(defendingElt.getTextContent());
+                    if (!defendedDate.isEmpty()) {
+                        date = defendedDate;
+                    }
+                }
+                if (date.isEmpty()) {
+                    date = submissionDateElt.getTextContent().split(" ")[0];
+                }
+                pubDate = date;
+            }
+
+            if (dateElt == null) {
                 Element newPubDate = newTEICorpus.createElement("date");
                 newPubDate.setAttribute("type", "datePub");
-                newPubDate.setTextContent(date);
+                newPubDate.setTextContent(pubDate);
                 Element eltMonogr = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr").evaluate(newTEICorpus, XPathConstants.NODE);
                 Element eltImprint = (Element) eltMonogr.getElementsByTagName("imprint").item(0);
                 eltImprint = (eltImprint == null) ? newTEICorpus.createElement("imprint") : eltImprint;
                 eltImprint.appendChild(newPubDate);
                 eltMonogr.appendChild(eltImprint);
+            } else {
+                dateElt.setTextContent(pubDate);
             }
         } catch (XPathExpressionException e) {
             e.printStackTrace();
@@ -326,21 +340,15 @@ public class HalTEIConverter implements MetadataConverter {
     public void fillPubDate(Document doc, Document teiCorpusDoc) throws XPathExpressionException {
         try {
             Element dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"datePub\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
-            if (dateElt == null) {
-                dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"dateDefended\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
-            }
-
-            String date = "";
             Element grobidDateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/publicationStmt/date[@type=\"published\"]").evaluate(doc, XPathConstants.NODE);
+            
+                
             if (grobidDateElt != null) {
-                String grobidDate = grobidDateElt.getAttribute("when");
-                if (!grobidDate.contains("0000")) {
-                    grobidDate = Utilities.completeDate(grobidDate);
-                    date = grobidDate;
+                String grobidDate = Utilities.completeDate(grobidDateElt.getAttribute("when"));
+                //if (!grobidDate.contains("0000")) {
+                if (!grobidDate.isEmpty()) {
+                    dateElt.setTextContent(grobidDate);
                 }
-            }
-            if (date.matches("\\d{4}-\\d{2}-\\d{2}") && Utilities.isValidDate(date)) {
-                dateElt.setTextContent(date);
             }
         } catch (XPathExpressionException e) {
             e.printStackTrace();
@@ -348,7 +356,7 @@ public class HalTEIConverter implements MetadataConverter {
     }
 
     public void fillAuthors(Document grobidDoc, Document teiCorpusDoc) throws XPathExpressionException {
-        
+
         // email & ptr to be done
         Element teiHeader = (Element) xPath.compile("/teiCorpus/teiHeader").evaluate(teiCorpusDoc, XPathConstants.NODE);
         NodeList authorsFromfulltextTeiHeader = (NodeList) xPath.compile("/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/analytic/author").evaluate(grobidDoc, XPathConstants.NODESET);
@@ -408,22 +416,23 @@ public class HalTEIConverter implements MetadataConverter {
                                             }
                                         }
                                     }
-                                    
+
 //                                    List<Element> labOrgs = new ArrayList<Element>();
 //                                    List<Element> deptOrgs = new ArrayList<Element>();
 //                                    List<Element> instOrgs = new ArrayList<Element>();
                                     if (labOrgnames.size() > 0) {
                                         Element aff = null;
                                         Element org = null;
-                                        for(Element labOrgname:labOrgnames){
+                                        for (Element labOrgname : labOrgnames) {
                                             aff = teiCorpusDoc.createElement("affiliation");
                                             org = teiCorpusDoc.createElement("org");
                                             org.setAttribute("type", "laboratory");
                                             org.appendChild(teiCorpusDoc.importNode(labOrgname, true));
-                                            if(desc !=null)
+                                            if (desc != null) {
                                                 org.appendChild((Element) desc.cloneNode(true));
+                                            }
                                             aff.appendChild(org);
-                                            
+
                                             person.appendChild(aff);
 //                                            labOrgs.add(aff);
                                         }
@@ -431,13 +440,14 @@ public class HalTEIConverter implements MetadataConverter {
                                     if (deptOrgnames.size() > 0) {
                                         Element aff = null;
                                         Element org = null;
-                                        for(Element deptOrgname:deptOrgnames){
+                                        for (Element deptOrgname : deptOrgnames) {
                                             aff = teiCorpusDoc.createElement("affiliation");
                                             org = teiCorpusDoc.createElement("org");
                                             org.setAttribute("type", "department");
                                             org.appendChild(teiCorpusDoc.importNode(deptOrgname, true));
-                                            if(desc !=null)
+                                            if (desc != null) {
                                                 org.appendChild((Element) desc.cloneNode(true));
+                                            }
                                             aff.appendChild(org);
                                             person.appendChild(aff);
 //                                            deptOrgs.add(aff);
@@ -446,25 +456,26 @@ public class HalTEIConverter implements MetadataConverter {
                                     if (instOrgnames.size() > 0) {
                                         Element aff = null;
                                         Element org = null;
-                                        for(Element instOrgname:instOrgnames){
+                                        for (Element instOrgname : instOrgnames) {
                                             aff = teiCorpusDoc.createElement("affiliation");
                                             org = teiCorpusDoc.createElement("org");
                                             org.setAttribute("type", "institution");
                                             org.appendChild(teiCorpusDoc.importNode(instOrgname, true));
-                                            if(desc !=null)
+                                            if (desc != null) {
                                                 org.appendChild((Element) desc.cloneNode(true));
+                                            }
                                             aff.appendChild(org);
                                             person.appendChild(aff);
 //                                            instOrgs.add(aff);
                                         }
                                     }
-                                    
+
                                 }
                             }
                         }
                     }
                 }
-                
+
             }
 
         }

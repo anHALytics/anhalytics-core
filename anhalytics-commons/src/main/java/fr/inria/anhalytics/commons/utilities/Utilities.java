@@ -69,10 +69,14 @@ public class Utilities {
     public static String getTmpPath() {
         return tmpPath;
     }
+    
+    static Calendar toDay = Calendar.getInstance();
+    
+    static int todayYear = toDay.get(Calendar.YEAR);
+    
+    static int minYear = 1900;
 
     static {
-        Calendar toDay = Calendar.getInstance();
-        int todayYear = toDay.get(Calendar.YEAR);
         int todayMonth = toDay.get(Calendar.MONTH) + 1;
         for (int year = 1960; year <= todayYear; year++) {
             int monthYear = (year == todayYear) ? todayMonth : 12;
@@ -144,22 +148,24 @@ public class Utilities {
     }
 
     public static String completeDate(String date) {
-        String val = null;
+        String val = "";
         if (date.length() == 4) {
             val = date + "-12-31";
         } else if ((date.length() == 7) || (date.length() == 6)) {
             int ind = date.indexOf("-");
-            String month = date.substring(ind + 1, date.length());
-            if (month.length() == 1) {
-                month = "0" + month;
+            String monthStr = date.substring(ind + 1, date.length());
+            if (monthStr.length() == 1) {
+                monthStr = "0" + monthStr;
             }
-            if (month.equals("02")) {
-                val = date.substring(0, 4) + "-" + month + "-28";
-            } else if ((month.equals("04")) || (month.equals("06")) || (month.equals("09"))
-                    || (month.equals("11"))) {
-                val = date.substring(0, 4) + "-" + month + "-30";
+            if (monthStr.equals("02")) {
+                val = date.substring(0, 4) + "-" + monthStr + "-28";
+            } else if ((monthStr.equals("04")) || (monthStr.equals("06")) || (monthStr.equals("09"))
+                    || (monthStr.equals("11"))) {
+                val = date.substring(0, 4) + "-" + monthStr + "-30";
             } else {
-                val = date.substring(0, 4) + "-" + month + "-31";
+                int month = Integer.parseInt(monthStr);
+                if (month > 12 || month < 1) monthStr = "12";
+                val = date.substring(0, 4) + "-" + monthStr + "-31";
             }
         } else {
 
@@ -185,7 +191,10 @@ public class Utilities {
             ///val = val.replace("-00-", "-12-");
         }
         val = val.replace(" ", "T"); // this is for the dateOptionalTime elasticSearch format 
-
+        
+        if (!val.matches("\\d{4}-\\d{2}-\\d{2}") || (Integer.parseInt(val.substring(0, 4)) < minYear || todayYear < Integer.parseInt(val.substring(0, 4))) ) {
+            val = "";
+        }
         return val;
     }
 
@@ -674,8 +683,7 @@ public class Utilities {
         }
         return null;
     }
-    
-    
+
     public static Element matchAuthor(String fullname, NodeList authorsFromfulltextTeiHeader) {
         Element author = null;
         JaroWinkler jw = new JaroWinkler();
