@@ -80,7 +80,6 @@ public class AddressDAO extends DAO<Address, Long> {
             statement.setString(3, obj.getPostCode());
             statement.setString(4, obj.getSettlement());
             statement.setString(5, obj.getRegion());
-            statement.setString(6, obj.getCountryStr());
             if (obj.getCountry() == null) {
                 statement.setNull(7, java.sql.Types.INTEGER);
             } else {
@@ -127,7 +126,6 @@ public class AddressDAO extends DAO<Address, Long> {
                         result.getString("postCode"),
                         result.getString("settlement"),
                         result.getString("region"),
-                        result.getString("country"),
                         new Country(result.getLong("COUNTRY.countryID"), result.getString("COUNTRY.ISO"))
                 );
             }
@@ -192,7 +190,6 @@ public class AddressDAO extends DAO<Address, Long> {
             ps.setString(3, obj.getPostCode());
             ps.setString(4, obj.getSettlement());
             ps.setString(5, obj.getRegion());
-            ps.setString(6, obj.getCountryStr());
             // process the results
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -204,7 +201,6 @@ public class AddressDAO extends DAO<Address, Long> {
                         rs.getString("addr.postCode"),
                         rs.getString("addr.settlement"),
                         rs.getString("addr.region"),
-                        rs.getString("addr.country"),
                         new Country(rs.getLong("country.countryID"), rs.getString("COUNTRY.ISO"))
                 );
             }

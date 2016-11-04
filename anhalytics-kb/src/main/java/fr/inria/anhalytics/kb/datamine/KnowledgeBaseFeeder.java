@@ -310,7 +310,6 @@ public class KnowledgeBaseFeeder {
                                     addr.setSettlement(meetingChildElt.getTextContent());
                                 } else if (meetingChildElt.getNodeName().equals("country")) {
                                     Country c = new Country();
-                                    addr.setCountryStr(meetingChildElt.getTextContent());
                                     c.setIso(meetingChildElt.getAttribute("key"));
                                     addr.setCountry(c);
                                 } else if (meetingChildElt.getNodeName().equals("region")) {
@@ -631,7 +630,6 @@ public class KnowledgeBaseFeeder {
                     addr.setAddrLine(addrChildElt.getTextContent());
                 } else if (addrChildElt.getNodeName().equals("country")) {
                     addr.setCountry(new Country(null, addrChildElt.getAttribute("key")));
-                    addr.setCountryStr(addrChildElt.getAttribute("key"));
                 } else if (addrChildElt.getNodeName().equals("settlement")) {
                     addr.setSettlement(addrChildElt.getTextContent());
                 } else if (addrChildElt.getNodeName().equals("postCode")) {
@@ -882,7 +880,6 @@ public class KnowledgeBaseFeeder {
                                     addr.setSettlement(meetingChildElt.getTextContent());
                                 } else if (meetingChildElt.getNodeName().equals("country")) {
                                     Country country = new Country();
-                                    addr.setCountryStr(meetingChildElt.getTextContent());
                                     country.setIso(meetingChildElt.getAttribute("key"));
                                     addr.setCountry(country);
                                 } else if (meetingChildElt.getNodeName().equals("region")) {

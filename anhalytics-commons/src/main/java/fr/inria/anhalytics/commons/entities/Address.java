@@ -17,12 +17,10 @@ public class Address {
     private String region = "";
     private Country country;
 
-    private String countryStr = "";
-
     public Address() {
     }
 
-    public Address(Long addressId, String addrLine, String postBox, String postCode, String settlement, String region, String countryStr, Country country) {
+    public Address(Long addressId, String addrLine, String postBox, String postCode, String settlement, String region, Country country) {
         this.addressId = addressId;
         this.addrLine = addrLine;
         this.postBox = postBox;
@@ -30,7 +28,6 @@ public class Address {
         this.settlement = settlement;
         this.region = region;
         this.country = country;
-        this.countryStr = countryStr;
     }
 
     /**
@@ -141,27 +138,11 @@ public class Address {
         this.country = country;
     }
 
-    /**
-     * @return the countryStr
-     */
-    public String getCountryStr() {
-        return countryStr;
-    }
-
-    /**
-     * @param countryStr the countryStr to set
-     */
-    public void setCountryStr(String countryStr) {
-        if(countryStr.length() > 45)
-            countryStr = countryStr.substring(0, 44);
-        this.countryStr = countryStr;
-    }
-
     public Map<String, Object> getAddressDocument() {
         Map<String, Object> addressDocument = new HashMap<String, Object>();
         addressDocument.put("addressId", this.getAddressId());
         addressDocument.put("addrLine", this.getAddrLine());
-        addressDocument.put("country", this.getCountryStr());
+        addressDocument.put("country", this.getCountry().getIso());
         addressDocument.put("postBox", this.getPostBox());
         addressDocument.put("postCode", this.getPostCode());
         addressDocument.put("region", this.getRegion());
