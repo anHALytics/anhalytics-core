@@ -64,6 +64,8 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
     private static final String SQL_SELECTALL = "SELECT * FROM ORGANISATION org";
 
     private static final String READ_QUERY_ORG_BY_IDENTIFIER = "SELECT org_id.organisationID FROM ORGANISATION_IDENTIFIER org_id WHERE org_id.ID = ? AND  org_id.Type = ?";
+    
+    private static final String READ_QUERY_ORG_BY_NAME = "SELECT organisationID FROM ORGANISATION_NAME WHERE name = ?";
 
     private static final String UPDATE_ORGANISATION = "UPDATE ORGANISATION SET type = ? ,struct = ? ,url = ?, status = ? WHERE organisationID = ?";
 
@@ -518,6 +520,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
     private Long getOrgEntityIfAlreadyStored(Organisation obj) throws SQLException {
         Long orgId = null;
         PreparedStatement statement = connect.prepareStatement(READ_QUERY_ORG_BY_IDENTIFIER);
+        PreparedStatement statement1 = connect.prepareStatement(READ_QUERY_ORG_BY_NAME);
         try {
             for (int i = 0; i < obj.getOrganisation_identifiers().size(); i++) {
                 statement.setString(1, obj.getOrganisation_identifiers().get(i).getId());
@@ -525,6 +528,15 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 ResultSet rs = statement.executeQuery();
                 if (rs.first()) {
                     orgId = rs.getLong("org_id.organisationID");
+                    return orgId;
+                }
+            }
+            
+            for (int i = 0; i < obj.getNames().size(); i++) {
+                statement1.setString(1, obj.getNames().get(i).getName());
+                ResultSet rs = statement1.executeQuery();
+                if (rs.first()) {
+                    orgId = rs.getLong("organisationID");
                     return orgId;
                 }
             }
