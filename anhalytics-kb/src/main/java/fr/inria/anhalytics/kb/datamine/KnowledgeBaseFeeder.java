@@ -157,7 +157,7 @@ public class KnowledgeBaseFeeder {
                             // for some pub types we just keep the submission date.
                             pub.setDate_eletronic(submission_date.getTextContent());
                             pub.setDate_printed(Utilities.parseStringDate(submission_date.getTextContent()));
-                            pub.setDoc_title(title.getTextContent());
+                            pub.setDoc_title(title.getTextContent().trim());
                             pub.setType(type.getTextContent());
                             pub.setLanguage(language.getTextContent());
                             processMonogr(monogr, pub);
@@ -198,7 +198,7 @@ public class KnowledgeBaseFeeder {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element identifierElt = (Element) node;
                 type = identifierElt.getAttribute("type");
-                id = node.getTextContent();
+                id = node.getTextContent().trim();
             }
             Document_Identifier di = new Document_Identifier(id, type);
             dis.add(di);
@@ -227,15 +227,15 @@ public class KnowledgeBaseFeeder {
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     Element monogrChildElt = (Element) node;
                     if (monogrChildElt.getNodeName().equals("idno")) {
-                        serial_identifiers.add(new Serial_Identifier(null, monogrChildElt.getTextContent(), monogrChildElt.getAttribute("type"), journal, collection));
+                        serial_identifiers.add(new Serial_Identifier(null, monogrChildElt.getTextContent().trim(), monogrChildElt.getAttribute("type"), journal, collection));
                     } else if (monogrChildElt.getNodeName().equals("title")) {
                         String type = monogrChildElt.getAttribute("level");
-                        mn.setTitle(monogrChildElt.getTextContent());
+                        mn.setTitle(monogrChildElt.getTextContent().trim());
                         mn.setType(type);
                         if (type.equals("j")) {
-                            journal.setTitle(monogrChildElt.getTextContent());
+                            journal.setTitle(monogrChildElt.getTextContent().trim());
                         } else {
-                            collection.setTitle(monogrChildElt.getTextContent());
+                            collection.setTitle(monogrChildElt.getTextContent().trim());
                         }
                     } else if (monogrChildElt.getNodeName().equals("imprint")) {
                         NodeList imprint = monogrChildElt.getChildNodes();
@@ -245,10 +245,10 @@ public class KnowledgeBaseFeeder {
                             if (entry.getNodeType() == Node.ELEMENT_NODE) {
                                 Element imprintChildElt = (Element) entry;
                                 if (imprintChildElt.getNodeName().equals("publisher")) {
-                                    pls.setName(imprintChildElt.getTextContent());
+                                    pls.setName(imprintChildElt.getTextContent().trim());
                                 } else if (imprintChildElt.getNodeName().equals("date")) {
                                     String type = imprintChildElt.getAttribute("type");
-                                    String date = imprintChildElt.getTextContent();
+                                    String date = imprintChildElt.getAttribute("when");
                                     if (type.equals("datePub") || type.equals("dateDefended")) {
                                         pub.setDate_eletronic(date);
                                         date = Utilities.completeDate(date);
@@ -261,16 +261,16 @@ public class KnowledgeBaseFeeder {
                                 } else if (imprintChildElt.getNodeName().equals("biblScope")) {
                                     String unit = imprintChildElt.getAttribute("unit");
                                     if (unit.equals("serie")) {
-                                        collection.setTitle(imprintChildElt.getTextContent());
+                                        collection.setTitle(imprintChildElt.getTextContent().trim());
                                         if (journal.getTitle().isEmpty()) {
-                                            journal.setTitle(imprintChildElt.getTextContent());
+                                            journal.setTitle(imprintChildElt.getTextContent().trim());
                                         }
                                     } else if (unit.equals("volume")) {
-                                        is.setVolume(imprintChildElt.getTextContent());
+                                        is.setVolume(imprintChildElt.getTextContent().trim());
                                     } else if (unit.equals("issue")) {
-                                        is.setIssue(imprintChildElt.getTextContent());
+                                        is.setIssue(imprintChildElt.getTextContent().trim());
                                     } else if (unit.equals("pp")) {
-                                        String pp = imprintChildElt.getTextContent();
+                                        String pp = imprintChildElt.getTextContent().trim();
                                         if (pp.length() < 10) {
                                             if (pp.contains("-") && pp.length() > 3) {
                                                 String[] pages = pp.split("-");
@@ -298,22 +298,22 @@ public class KnowledgeBaseFeeder {
                             if (meeting.item(m).getNodeType() == Node.ELEMENT_NODE) {
                                 Element meetingChildElt = (Element) meetingChild;
                                 if (meetingChildElt.getNodeName().equals("title")) {
-                                    ce.getConference().setTitle(meetingChildElt.getTextContent());
+                                    ce.getConference().setTitle(meetingChildElt.getTextContent().trim());
                                 } else if (meetingChildElt.getNodeName().equals("date")) {
                                     String type = meetingChildElt.getAttribute("type");
                                     if (type.equals("start")) {
-                                        ce.setStart_date(meetingChildElt.getTextContent());
+                                        ce.setStart_date(meetingChildElt.getTextContent().trim());
                                     } else if (type.equals("end")) {
-                                        ce.setEnd_date(meetingChildElt.getTextContent());
+                                        ce.setEnd_date(meetingChildElt.getTextContent().trim());
                                     }
                                 } else if (meetingChildElt.getNodeName().equals("settlement")) {
-                                    addr.setSettlement(meetingChildElt.getTextContent());
+                                    addr.setSettlement(meetingChildElt.getTextContent().trim());
                                 } else if (meetingChildElt.getNodeName().equals("country")) {
                                     Country c = new Country();
                                     c.setIso(meetingChildElt.getAttribute("key"));
                                     addr.setCountry(c);
                                 } else if (meetingChildElt.getNodeName().equals("region")) {
-                                    addr.setRegion(meetingChildElt.getTextContent());
+                                    addr.setRegion(meetingChildElt.getTextContent().trim());
                                 }
                             }
                         }
@@ -367,7 +367,7 @@ public class KnowledgeBaseFeeder {
                 if (ndorg.getNodeType() == Node.ELEMENT_NODE) {
                     Element orgChildElt = (Element) ndorg;
                     if (orgChildElt.getNodeName().equals("orgName")) {
-                        organisationParent.addName(new Organisation_Name(null, orgChildElt.getTextContent(), pubDate));
+                        organisationParent.addName(new Organisation_Name(null, orgChildElt.getTextContent().trim(), pubDate));
                     } else if (orgChildElt.getNodeName().equals("desc")) {
                         NodeList descorgChilds = ndorg.getChildNodes();
                         for (int l = descorgChilds.getLength() - 1; l >= 0; l--) {
@@ -380,7 +380,7 @@ public class KnowledgeBaseFeeder {
                                 } else if (descChildElt.getNodeName().equals("ref")) {
                                     String type = descChildElt.getAttribute("type");
                                     if (type.equals("url")) {
-                                        organisationParent.setUrl(descChildElt.getTextContent());
+                                        organisationParent.setUrl(descChildElt.getTextContent().trim());
                                     }
                                 }
                             }
@@ -390,11 +390,11 @@ public class KnowledgeBaseFeeder {
                     } else if (orgChildElt.getNodeName().equals("ref")) {
                         String descReftype = orgChildElt.getAttribute("type");
                         if (descReftype.equals("url")) {
-                            organisationParent.setUrl(orgChildElt.getTextContent());
+                            organisationParent.setUrl(orgChildElt.getTextContent().trim());
                         }
                     } else if (orgChildElt.getNodeName().equals("idno")) {
                         String id_type = orgChildElt.getAttribute("type");
-                        String id_value = orgChildElt.getTextContent();
+                        String id_value = orgChildElt.getTextContent().trim();
                         if (id_type.equals("anhalyticsID")) {
                             orgNode.removeChild(orgChildElt);
                         } else {
@@ -445,7 +445,7 @@ public class KnowledgeBaseFeeder {
             if (ndorg.getNodeType() == Node.ELEMENT_NODE) {
                 Element childElt = (Element) ndorg;
                 if (childElt.getNodeName().equals("orgName")) {
-                    organisation.addName(new Organisation_Name(null, childElt.getTextContent(), pub.getDate_printed()));
+                    organisation.addName(new Organisation_Name(null, childElt.getTextContent().trim(), pub.getDate_printed()));
                 } else if (childElt.getNodeName().equals("desc")) {
                     NodeList descorgChilds = ndorg.getChildNodes();
                     for (int l = descorgChilds.getLength() - 1; l >= 0; l--) {
@@ -457,7 +457,7 @@ public class KnowledgeBaseFeeder {
                             } else if (descChildElt.getNodeName().equals("ref")) {
                                 String type = descChildElt.getAttribute("type");
                                 if (type.equals("url")) {
-                                    organisation.setUrl(descChildElt.getTextContent());
+                                    organisation.setUrl(descChildElt.getTextContent().trim());
                                 }
                             }
                         }
@@ -467,11 +467,11 @@ public class KnowledgeBaseFeeder {
                 } else if (childElt.getNodeName().equals("ref")) {
                     String descReftype = childElt.getAttribute("type");
                     if (descReftype.equals("url")) {
-                        organisation.setUrl(childElt.getTextContent());
+                        organisation.setUrl(childElt.getTextContent().trim());
                     }
                 } else if (childElt.getNodeName().equals("idno")) {
                     String id_type = childElt.getAttribute("type");
-                    String id_value = childElt.getTextContent();
+                    String id_value = childElt.getTextContent().trim();
                     if (id_type.equals("anhalyticsID")) {
                         orgElt.removeChild(childElt);
                     } else {
@@ -538,9 +538,9 @@ public class KnowledgeBaseFeeder {
                                     nodes = personChildElt.getChildNodes();
                                     for (int z = nodes.getLength() - 1; z >= 0; z--) {
                                         if (nodes.item(z).getNodeName().equals("forename")) {
-                                            prs_name.setForename(nodes.item(z).getTextContent());
+                                            prs_name.setForename(nodes.item(z).getTextContent().trim());
                                         } else if (nodes.item(z).getNodeName().equals("surname")) {
-                                            prs_name.setSurname(nodes.item(z).getTextContent());
+                                            prs_name.setSurname(nodes.item(z).getTextContent().trim());
                                         }
                                     }
                                     String fullname = prs_name.getForename();
@@ -554,7 +554,7 @@ public class KnowledgeBaseFeeder {
                                     prs_name.setPublication_date(pubDate);
                                     prs_names.add(prs_name);
                                 } else if (personChildElt.getNodeName().equals("email")) {
-                                    prs.setEmail(personChildElt.getTextContent());
+                                    prs.setEmail(personChildElt.getTextContent().trim());
                                 } else if (personChildElt.getNodeName().equals("ptr")) {
                                     if (personChildElt.getAttribute("type").equals("url")) {
                                         prs.setUrl(personChildElt.getAttribute("target"));
@@ -576,7 +576,7 @@ public class KnowledgeBaseFeeder {
                                 } else if (personChildElt.getNodeName().equals("idno")) {
                                     Person_Identifier pi = new Person_Identifier();
                                     String id_type = personChildElt.getAttribute("type");
-                                    String id_value = personChildElt.getTextContent();
+                                    String id_value = personChildElt.getTextContent().trim();
                                     if (id_type.equals("anhalyticsID")) {
                                         person.removeChild(personChildElt);
                                     } else {
@@ -627,15 +627,15 @@ public class KnowledgeBaseFeeder {
             if (addrChild.getNodeType() == Node.ELEMENT_NODE) {
                 Element addrChildElt = (Element) addrChild;
                 if (addrChildElt.getNodeName().equals("addrLine")) {
-                    addr.setAddrLine(addrChildElt.getTextContent());
+                    addr.setAddrLine(addrChildElt.getTextContent().trim());
                 } else if (addrChildElt.getNodeName().equals("country")) {
                     addr.setCountry(new Country(null, addrChildElt.getAttribute("key")));
                 } else if (addrChildElt.getNodeName().equals("settlement")) {
-                    addr.setSettlement(addrChildElt.getTextContent());
+                    addr.setSettlement(addrChildElt.getTextContent().trim());
                 } else if (addrChildElt.getNodeName().equals("postCode")) {
-                    addr.setPostCode(addrChildElt.getTextContent());
+                    addr.setPostCode(addrChildElt.getTextContent().trim());
                 } else if (addrChildElt.getNodeName().equals("region")) {
-                    addr.setRegion(addrChildElt.getTextContent());
+                    addr.setRegion(addrChildElt.getTextContent().trim());
                 }
             }
         }
@@ -723,7 +723,7 @@ public class KnowledgeBaseFeeder {
                 if (analyticChild.getNodeType() == Node.ELEMENT_NODE) {
                     Element analyticChildElt = (Element) analyticChild;
                     if (analyticChildElt.getNodeName().equals("title")) {
-                        pub.setDoc_title(analyticChildElt.getTextContent());
+                        pub.setDoc_title(analyticChildElt.getTextContent().trim());
                         pub.setType(analyticChildElt.getAttribute("level"));
                     } else if (analyticChildElt.getNodeName().equals("author")) {
                         if (analyticChildElt.getElementsByTagName("persName").getLength() > 0) {
@@ -743,9 +743,9 @@ public class KnowledgeBaseFeeder {
                                             if (persNameChild.getNodeType() == Node.ELEMENT_NODE) {
                                                 Element persNameChildElt = (Element) persNameChild;
                                                 if (persNameChildElt.getNodeName().equals("forename")) {
-                                                    prs_name.setForename(persNameChildElt.getTextContent());
+                                                    prs_name.setForename(persNameChildElt.getTextContent().trim());
                                                 } else if (persNameChildElt.getNodeName().equals("surname")) {
-                                                    prs_name.setSurname(persNameChildElt.getTextContent());
+                                                    prs_name.setSurname(persNameChildElt.getTextContent().trim());
                                                 }
                                             }
                                         }
@@ -760,7 +760,7 @@ public class KnowledgeBaseFeeder {
                                         //prs_name.setPublication_date(pubDate);
                                         prs_names.add(prs_name);
                                     } else if (authorChildElt.getNodeName().equals("email")) {
-                                        prs.setEmail(authorChildElt.getTextContent());
+                                        prs.setEmail(authorChildElt.getTextContent().trim());
                                     } else if (authorChildElt.getNodeName().equals("ptr")) {
                                         if (authorChildElt.getAttribute("type").equals("url")) {
                                             prs.setUrl(authorChildElt.getAttribute("type"));
@@ -768,7 +768,7 @@ public class KnowledgeBaseFeeder {
                                     } else if (authorChildElt.getNodeName().equals("idno")) {
                                         Person_Identifier pi = new Person_Identifier();
                                         String id_type = authorChildElt.getAttribute("type");
-                                        String id_value = authorChildElt.getTextContent();
+                                        String id_value = authorChildElt.getTextContent().trim();
                                         pi.setId(id_value);
                                         pi.setType(id_type);
                                         pis.add(pi);
@@ -794,23 +794,23 @@ public class KnowledgeBaseFeeder {
                 if (monogrChild.getNodeType() == Node.ELEMENT_NODE) {
                     Element monogrChildElt = (Element) monogrChild;
                     if (monogrChildElt.getNodeName().equals("title")) {
-                        mn.setTitle(monogrChildElt.getTextContent());
+                        mn.setTitle(monogrChildElt.getTextContent().trim());
                         if (analytic == null) {
-                            pub.setDoc_title(monogrChildElt.getTextContent());
+                            pub.setDoc_title(monogrChildElt.getTextContent().trim());
                         }
                         mn.setType(monogrChildElt.getAttribute("level"));
                         if (analytic == null) {
                             pub.setType(monogrChildElt.getAttribute("level"));
                         }
-                        if (monogrChildElt.getTextContent() != null) {
+                        if (monogrChildElt.getTextContent().trim() != null) {
                             if (monogrChildElt.getAttribute("level").equals("j")) {
-                                journal = new Journal(null, monogrChildElt.getTextContent());
+                                journal = new Journal(null, monogrChildElt.getTextContent().trim());
                             } else {
-                                collection = new Collection(null, monogrChildElt.getTextContent());
+                                collection = new Collection(null, monogrChildElt.getTextContent().trim());
                             }
                         }
                     } else if (monogrChildElt.getNodeName().equals("idno")) {
-                        serial_identifiers.add(new Serial_Identifier(null, monogrChildElt.getTextContent(), monogrChildElt.getAttribute("type"), journal, collection));
+                        serial_identifiers.add(new Serial_Identifier(null, monogrChildElt.getTextContent().trim(), monogrChildElt.getAttribute("type"), journal, collection));
                     } else if (monogrChildElt.getNodeName().equals("imprint")) {
                         NodeList imprintChilds = monogrChildElt.getChildNodes();
                         is = new In_Serial();
@@ -819,7 +819,7 @@ public class KnowledgeBaseFeeder {
                             if (imprintChild.getNodeType() == Node.ELEMENT_NODE) {
                                 Element imprintChildElt = (Element) imprintChild;
                                 if (imprintChildElt.getNodeName().equals("publisher")) {
-                                    Publisher pls = new Publisher(null, imprintChildElt.getTextContent());
+                                    Publisher pls = new Publisher(null, imprintChildElt.getTextContent().trim());
                                     abdf.getPublisherDAO().create(pls);
                                     pub.setPublisher(pls);
                                 } else if (imprintChildElt.getNodeName().equals("date")) {
@@ -841,11 +841,11 @@ public class KnowledgeBaseFeeder {
                                 } else if (imprintChildElt.getNodeName().equals("biblScope")) {
                                     String unit = imprintChildElt.getAttribute("unit");
                                     if (unit.equals("serie")) {
-                                        collection.setTitle(imprintChildElt.getTextContent());
+                                        collection.setTitle(imprintChildElt.getTextContent().trim());
                                     } else if (unit.equals("volume")) {
-                                        is.setVolume(imprintChildElt.getTextContent());
+                                        is.setVolume(imprintChildElt.getTextContent().trim());
                                     } else if (unit.equals("issue")) {
-                                        is.setIssue(imprintChildElt.getTextContent());
+                                        is.setIssue(imprintChildElt.getTextContent().trim());
                                     } else if (unit.equals("page")) {
                                         String start = imprintChildElt.getAttribute("from");
                                         String end = imprintChildElt.getAttribute("to");
@@ -867,7 +867,7 @@ public class KnowledgeBaseFeeder {
                             if (meetingChild.getNodeType() == Node.ELEMENT_NODE) {
                                 Element meetingChildElt = (Element) meetingChild;
                                 if (meetingChildElt.getNodeName().equals("title")) {
-                                    ce.getConference().setTitle(meetingChildElt.getTextContent());
+                                    ce.getConference().setTitle(meetingChildElt.getTextContent().trim());
                                 } else if (meetingChildElt.getNodeName().equals("date")) {
                                     String type = meetingChildElt.getAttribute("type");
                                     String date = meetingChildElt.getAttribute("when");
@@ -877,13 +877,13 @@ public class KnowledgeBaseFeeder {
                                         ce.setEnd_date(date);
                                     }
                                 } else if (meetingChildElt.getNodeName().equals("settlement")) {
-                                    addr.setSettlement(meetingChildElt.getTextContent());
+                                    addr.setSettlement(meetingChildElt.getTextContent().trim());
                                 } else if (meetingChildElt.getNodeName().equals("country")) {
                                     Country country = new Country();
                                     country.setIso(meetingChildElt.getAttribute("key"));
                                     addr.setCountry(country);
                                 } else if (meetingChildElt.getNodeName().equals("region")) {
-                                    addr.setRegion(meetingChildElt.getTextContent());
+                                    addr.setRegion(meetingChildElt.getTextContent().trim());
                                 }
                             }
                         }
