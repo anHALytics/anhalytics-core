@@ -18,7 +18,7 @@ public class AddressDAO extends DAO<Address, Long> {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AddressDAO.class);
 
     private static final String SQL_INSERT
-            = "INSERT INTO ADDRESS (addrLine, postBox, postCode, settlement, region, country, countryID) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            = "INSERT INTO ADDRESS (addrLine, postBox, postCode, settlement, region, countryID) VALUES (?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_INSERT_COUNTRY
             = "INSERT INTO COUNTRY (ISO) VALUES (?)";
@@ -26,7 +26,7 @@ public class AddressDAO extends DAO<Address, Long> {
     private static final String SQL_SELECT_LOCATIONSID_BY_ORGID
             = "SELECT addressID FROM LOCATION WHERE organisationID = ?";
     private static final String SQL_SELECT_ADDR_BY_FIELDS
-            = "SELECT * FROM ADDRESS addr, COUNTRY country WHERE addr.addrLine = ? AND addr.postBox = ? AND addr.postCode = ? AND addr.settlement = ? AND addr.region = ? AND addr.country = ? AND addr.countryID = country.countryID";
+            = "SELECT * FROM ADDRESS addr, COUNTRY country WHERE addr.addrLine = ? AND addr.postBox = ? AND addr.postCode = ? AND addr.settlement = ? AND addr.region = ? AND addr.countryID = country.countryID";
 
     private static final String SQL_SELECT_ADDR_BY_ID
             = "SELECT * FROM ADDRESS, COUNTRY WHERE addressID = ? AND ADDRESS.countryID = COUNTRY.countryID";
@@ -81,9 +81,9 @@ public class AddressDAO extends DAO<Address, Long> {
             statement.setString(4, obj.getSettlement());
             statement.setString(5, obj.getRegion());
             if (obj.getCountry() == null) {
-                statement.setNull(7, java.sql.Types.INTEGER);
+                statement.setNull(6, java.sql.Types.INTEGER);
             } else {
-                statement.setLong(7, obj.getCountry().getCountryID());
+                statement.setLong(6, obj.getCountry().getCountryID());
             }
 
             int code = statement.executeUpdate();
