@@ -156,7 +156,7 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
                         rs.getString("end_date"),
                         new Monograph(),
                         new Conference(rs.getLong("conferenceID"), rs.getString("title")),
-                        new Address(rs.getLong("addressID"), rs.getString("addrLine"), rs.getString("postBox"), rs.getString("postCode"), rs.getString("settlement"), rs.getString("region"), rs.getString("country"), new Country())
+                        new Address(rs.getLong("addressID"), rs.getString("addrLine"), rs.getString("postBox"), rs.getString("postCode"), rs.getString("settlement"), rs.getString("region"), new Country())
                 );
             }
         } catch (SQLException sqle) {

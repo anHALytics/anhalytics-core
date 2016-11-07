@@ -290,13 +290,13 @@ public class PersonDAO extends DAO<Person, Long> {
                     }
                 }
 
+                person.setPerson_names(person_names);
                 preparedStatement2.setLong(1, id);
                 ResultSet rs2 = preparedStatement2.executeQuery();
                 while (rs2.next()) {
                     person_identifiers.add(new Person_Identifier(rs2.getString("pi.ID"), rs2.getString("pi.Type")));
 
                 }
-                person.setPerson_names(person_names);
                 person.setPerson_identifiers(person_identifiers);
             }
 
