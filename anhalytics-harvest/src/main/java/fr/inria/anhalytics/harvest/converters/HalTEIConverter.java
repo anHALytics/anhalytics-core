@@ -76,7 +76,6 @@ public class HalTEIConverter implements MetadataConverter {
 
             Element defendingElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"dateDefended\"]").evaluate(newTEICorpus, XPathConstants.NODE);
 
-            Element submissionDateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/editionStmt/edition[@type=\"current\"]/date[@type=\"whenSubmitted\"]").evaluate(newTEICorpus, XPathConstants.NODE);
             String pubDate = "";
             if (dateElt != null) {
                 pubDate = Utilities.completeDate(dateElt.getTextContent());
@@ -89,14 +88,12 @@ public class HalTEIConverter implements MetadataConverter {
                         date = defendedDate;
                     }
                 }
-                if (date.isEmpty()) {
-                    date = submissionDateElt.getTextContent().split(" ")[0];
-                }
                 pubDate = date;
             }
 
             if (dateElt == null) {
                 Element newPubDate = newTEICorpus.createElement("date");
+                newPubDate.setAttribute("when", pubDate);
                 newPubDate.setAttribute("type", "datePub");
                 newPubDate.setTextContent(pubDate);
                 Element eltMonogr = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr").evaluate(newTEICorpus, XPathConstants.NODE);
@@ -105,8 +102,9 @@ public class HalTEIConverter implements MetadataConverter {
                 eltImprint.appendChild(newPubDate);
                 eltMonogr.appendChild(eltImprint);
             } else {
-                dateElt.setTextContent(pubDate);
+                dateElt.setAttribute("when", pubDate);
             }
+            System.out.println(pubDate);
         } catch (XPathExpressionException e) {
             e.printStackTrace();
 
@@ -341,15 +339,29 @@ public class HalTEIConverter implements MetadataConverter {
         try {
             Element dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"datePub\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
             Element grobidDateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/publicationStmt/date[@type=\"published\"]").evaluate(doc, XPathConstants.NODE);
-            
+            Element submissionDateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/editionStmt/edition[@type=\"current\"]/date[@type=\"whenSubmitted\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
+
+            String dateRaw = "";
+            String dateFormatted = dateElt.getAttribute("when");
+
+            //and check again if the content is not ok (create a new function and reuse it)
+            System.out.println(dateFormatted);
+            if (dateFormatted.isEmpty()) {
+                if (grobidDateElt != null) {
+                    dateRaw = grobidDateElt.getAttribute("when");
+                    if (!dateRaw.isEmpty()) {
+                        dateFormatted = Utilities.completeDate(dateRaw);
+                    }
+                } 
                 
-            if (grobidDateElt != null) {
-                String grobidDate = Utilities.completeDate(grobidDateElt.getAttribute("when"));
-                //if (!grobidDate.contains("0000")) {
-                if (!grobidDate.isEmpty()) {
-                    dateElt.setTextContent(grobidDate);
+                if(dateFormatted.isEmpty()) {
+                    dateFormatted = submissionDateElt.getTextContent().split(" ")[0];
                 }
+
+                dateElt.setTextContent(dateFormatted);
+                dateElt.setAttribute("when", dateFormatted);
             }
+
         } catch (XPathExpressionException e) {
             e.printStackTrace();
         }
