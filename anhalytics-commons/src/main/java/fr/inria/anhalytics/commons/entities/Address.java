@@ -55,8 +55,9 @@ public class Address {
      * @param addrLine the addrLine to set
      */
     public void setAddrLine(String addrLine) {
-        if(addrLine.length() > 150)
+        if (addrLine.length() > 150) {
             addrLine = addrLine.substring(0, 149);
+        }
         this.addrLine = addrLine;
     }
 
@@ -71,8 +72,9 @@ public class Address {
      * @param postBox the postBox to set
      */
     public void setPostBox(String postBox) {
-        if(postBox.length() > 45)
+        if (postBox.length() > 45) {
             postBox = postBox.substring(0, 44);
+        }
         this.postBox = postBox;
     }
 
@@ -87,8 +89,9 @@ public class Address {
      * @param postCode the postCode to set
      */
     public void setPostCode(String postCode) {
-        if(postCode.length() > 45)
+        if (postCode.length() > 45) {
             postCode = postCode.substring(0, 44);
+        }
         this.postCode = postCode;
     }
 
@@ -103,8 +106,9 @@ public class Address {
      * @param Settlement the Settlement to set
      */
     public void setSettlement(String settlement) {
-        if(settlement.length() > 45)
+        if (settlement.length() > 45) {
             settlement = settlement.substring(0, 44);
+        }
         this.settlement = settlement;
     }
 
@@ -119,8 +123,9 @@ public class Address {
      * @param region the region to set
      */
     public void setRegion(String region) {
-        if(region.length() > 45)
+        if (region.length() > 45) {
             region = region.substring(0, 44);
+        }
         this.region = region;
     }
 
@@ -142,7 +147,11 @@ public class Address {
         Map<String, Object> addressDocument = new HashMap<String, Object>();
         addressDocument.put("addressId", this.getAddressId());
         addressDocument.put("addrLine", this.getAddrLine());
-        addressDocument.put("country", this.getCountry().getIso());
+        if (this.getCountry() != null) {
+            addressDocument.put("country", this.getCountry().getIso());
+        } else {
+            addressDocument.put("country", "");
+        }
         addressDocument.put("postBox", this.getPostBox());
         addressDocument.put("postCode", this.getPostCode());
         addressDocument.put("region", this.getRegion());
