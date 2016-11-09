@@ -43,8 +43,8 @@ public class LocationDAO extends DAO<Location, Long> {
         Location location = null;
         PreparedStatement statement = connect.prepareStatement(SQL_SELECT_LOCATION_BY_orgID_addrID);
         try {
-            statement.setLong(1, obj.getAddress().getAddressId());
-            statement.setLong(2, obj.getOrganisation().getOrganisationId());
+            statement.setLong(1, obj.getOrganisation().getOrganisationId());
+            statement.setLong(2, obj.getAddress().getAddressId());
             ResultSet rs = statement.executeQuery();
             if (rs.first()) {
                 try {
