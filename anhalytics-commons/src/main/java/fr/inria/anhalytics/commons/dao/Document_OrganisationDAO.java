@@ -28,19 +28,21 @@ public class Document_OrganisationDAO extends DAO<Document_Organisation, Long> {
             throw new IllegalArgumentException("No Document nor organisation is already created, the Affiliation ID is not null.");
         }
 
-        PreparedStatement statement;
-        try {
-            statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-            for (Organisation org : obj.getOrgs()) {
+        PreparedStatement statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+
+        for (Organisation org : obj.getOrgs()) {
+            try {
                 statement.setString(1, obj.getDoc().getDocID());
                 statement.setLong(2, org.getOrganisationId());
                 statement.setString(3, org.getType());
                 int code = statement.executeUpdate();
+
                 result = true;
+            } catch (MySQLIntegrityConstraintViolationException e) {
             }
-            statement.close();
-        } catch (MySQLIntegrityConstraintViolationException e) {
         }
+        statement.close();
+
         return result;
     }
 
