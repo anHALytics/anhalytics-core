@@ -148,7 +148,7 @@ public class KnowledgeBaseFeeder {
                                 throw new NumberOfCoAuthorsExceededException("Number of authors exceed 30 co-authors for this publication.");
                             }
 
-                            fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(currentAnhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId, new ArrayList<Document_Identifier>());
+                            fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(currentAnhalyticsId, "", repositoryDocId, new ArrayList<Document_Identifier>());
 
                             processIdentifiers(ids, doc, repositoryDocId);
                             dd.create(doc);
