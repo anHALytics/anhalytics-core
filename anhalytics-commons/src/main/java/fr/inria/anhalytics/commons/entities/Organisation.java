@@ -62,8 +62,9 @@ public class Organisation {
      * @param type the type to set
      */
     public void setType(String type) {
-        if(type.length() > 45)
+        if (type.length() > 45) {
             type = type.substring(0, 44);
+        }
         this.type = type;
     }
 
@@ -78,8 +79,9 @@ public class Organisation {
      * @param url the url to set
      */
     public void setUrl(String url) {
-        if(url.length() > 255)
+        if (url.length() > 255) {
             url = url.substring(0, 254);
+        }
         this.url = url;
     }
 
@@ -94,8 +96,9 @@ public class Organisation {
      * @param structure the structure to set
      */
     public void setStructure(String structure) {
-        if(structure.length() > 45)
+        if (structure.length() > 45) {
             structure = structure.substring(0, 44);
+        }
         this.structure = structure;
     }
 
@@ -116,8 +119,9 @@ public class Organisation {
         if (this.names == null) {
             this.names = new ArrayList<Organisation_Name>();
         }
-        if(name.getName().length() > 150)
+        if (name.getName().length() > 150) {
             name.setName(name.getName().substring(0, 149));
+        }
         this.names.add(name);
     }
 
@@ -146,7 +150,7 @@ public class Organisation {
         List<Map<String, Object>> organisationNamesDocument = new ArrayList<Map<String, Object>>();
         organisationDocument.put("organisationId", this.getOrganisationId());
         List<Map<String, Object>> organisationIdentifiersDocument = new ArrayList<Map<String, Object>>();
-        for(Organisation_Name name:getNames()){
+        for (Organisation_Name name : getNames()) {
             organisationNamesDocument.add(name.getOrganisationNameDocument());
         }
         organisationDocument.put("names", organisationNamesDocument);
@@ -195,6 +199,17 @@ public class Organisation {
      */
     public void setOrganisation_identifiers(List<Organisation_Identifier> organisation_identifiers) {
         this.organisation_identifiers = organisation_identifiers;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        boolean isEqual = false;
+
+        if (object != null && object instanceof Organisation) {
+            isEqual = (this.organisationId.equals(((Organisation) object).organisationId));
+        }
+
+        return isEqual;
     }
 
 }

@@ -8,17 +8,19 @@ import java.util.List;
  * @author achraf
  */
 public class Document_Organisation {
+
     private Document doc = null;
     private String type = "";
     private List<Organisation> orgs = null;
-    
+
     public Document_Organisation(Document doc, String type, List<Organisation> orgs) {
         this.doc = doc;
         this.type = type;
         this.orgs = orgs;
     }
-    
-    public Document_Organisation(){}
+
+    public Document_Organisation() {
+    }
 
     /**
      * @return the doc
@@ -45,8 +47,9 @@ public class Document_Organisation {
      * @param type the type to set
      */
     public void setType(String type) {
-        if(type.length() > 55)
+        if (type.length() > 55) {
             type = type.substring(0, 54);
+        }
         this.type = type;
     }
 
@@ -54,8 +57,9 @@ public class Document_Organisation {
      * @return the orgs
      */
     public List<Organisation> getOrgs() {
-        if(this.orgs == null)
+        if (this.orgs == null) {
             this.orgs = new ArrayList<Organisation>();
+        }
         return orgs;
     }
 
@@ -63,9 +67,12 @@ public class Document_Organisation {
      * @param orgs the doc_orgs to set
      */
     public void addOrg(Organisation doc_org) {
-        if(this.orgs == null)
+        if (this.orgs == null) {
             this.orgs = new ArrayList<Organisation>();
-        this.orgs.add(doc_org);
+        }
+        if (!this.orgs.contains(doc_org)) {
+            this.orgs.add(doc_org);
+        }
     }
 
 }
