@@ -105,7 +105,7 @@ public class KnowledgeBaseIndexer extends Indexer {
             List<Affiliation> affs = odao.getAffiliationByPersonID(pers);
             List<Map<String, Object>> organisations = new ArrayList<Map<String, Object>>();
             for (Affiliation aff : affs) {
-                getAffiliations(organisations, aff.getOrganisations().get(0), aff.getBegin_date(), aff.getBegin_date());
+                getAffiliations(organisations, aff.getOrganisations().get(0), aff.getFrom_date(), aff.getUntil_date());
             }
             jsonDocument.put("affiliations", organisations);
 
@@ -293,14 +293,14 @@ public class KnowledgeBaseIndexer extends Indexer {
                 }
             }
             documentDocument.put("references", referencesPubDocument);
-            
+
             Map<String, Object> result = new HashMap<String, Object>();
             try {
                 standoffNode = indexingPreprocess.getStandoffNerd(mapper, doc.getDocID());
                 standoffNode = indexingPreprocess.getStandoffKeyTerm(mapper, doc.getDocID(), standoffNode);
                 if (standoffNode != null) {
                     result = mapper.convertValue(standoffNode, Map.class);
-                    
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -336,9 +336,14 @@ public class KnowledgeBaseIndexer extends Indexer {
         return nb;
     }
 
-    public int indexOrganisations() throws SQLException {
+    public int indexOrganisations() throws SQLException, UnknownHostException {
         int nb = 0;
         int bulkSize = 100;
+        IndexingPreprocess indexingPreprocess = new IndexingPreprocess(MongoFileManager.getInstance(false));
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode standoffNode = null;
+
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
         PublicationDAO pubdao = (PublicationDAO) adf.getPublicationDAO();
         List<Organisation> organisations = odao.findAllOrganisations();
@@ -377,6 +382,20 @@ public class KnowledgeBaseIndexer extends Indexer {
                 documentDocument = doc.getDocumentDocument();
                 documentDocument.put("publication", publicationDocument);
                 orgDocumentsDocument.add(documentDocument);
+
+                Map<String, Object> result = new HashMap<String, Object>();
+                try {
+                    standoffNode = indexingPreprocess.getStandoffNerd(mapper, doc.getDocID());
+                    standoffNode = indexingPreprocess.getStandoffKeyTerm(mapper, doc.getDocID(), standoffNode);
+                    if (standoffNode != null) {
+                        result = mapper.convertValue(standoffNode, Map.class);
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                documentDocument.put("annotations", result);
+
             }
             organisationDocument.put("docCount", docs.size());
             organisationDocument.put("documents", orgDocumentsDocument);
