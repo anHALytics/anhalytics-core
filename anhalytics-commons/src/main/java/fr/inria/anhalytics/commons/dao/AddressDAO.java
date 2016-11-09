@@ -25,8 +25,8 @@ public class AddressDAO extends DAO<Address, Long> {
 
     private static final String SQL_SELECT_LOCATIONSID_BY_ORGID
             = "SELECT addressID FROM LOCATION WHERE organisationID = ?";
-    private static final String SQL_SELECT_ADDR_BY_FIELDS
-            = "SELECT * FROM ADDRESS addr, COUNTRY country WHERE addr.addrLine = ? AND addr.postBox = ? AND addr.postCode = ? AND addr.settlement = ? AND addr.region = ? AND addr.countryID = country.countryID";
+    private static String SQL_SELECT_ADDR_BY_FIELDS
+            = "SELECT * FROM ADDRESS addr WHERE addr.addrLine = ? AND addr.postBox = ? AND addr.postCode = ? AND addr.settlement = ? AND addr.region = ?";
 
     private static final String SQL_SELECT_ADDR_BY_ID
             = "SELECT * FROM ADDRESS, COUNTRY WHERE addressID = ? AND ADDRESS.countryID = COUNTRY.countryID";
@@ -44,36 +44,16 @@ public class AddressDAO extends DAO<Address, Long> {
         if (obj.getAddressId() != null) {
             throw new IllegalArgumentException("Address is already created, the Address ID is not null.");
         }
+
+        obj = createCountry(obj);
+
         Address foundObj = findAddressIfAlreadyStored(obj);
         if (foundObj != null) {
             obj.setAddressId(foundObj.getAddressId());
         } else {
 
             PreparedStatement statement;
-            PreparedStatement statement1;
-            if (obj.getCountry() != null) {
-                Country country = null;
-                if (obj.getCountry().getIso() != null) {
-                    country = findCountry(obj.getCountry().getIso());
-                }
-                if (country == null) {
-                    statement1 = connect.prepareStatement(SQL_INSERT_COUNTRY, Statement.RETURN_GENERATED_KEYS);
-                    if (obj.getCountry().getIso() == null) {
-                        statement1.setNull(1, java.sql.Types.VARCHAR);
-                    } else {
-                        statement1.setString(1, obj.getCountry().getIso());
-                    }
-                    int code1 = statement1.executeUpdate();
-                    ResultSet rs1 = statement1.getGeneratedKeys();
 
-                    if (rs1.next()) {
-                        obj.getCountry().setCountryID(rs1.getLong(1));
-                    }
-                    statement1.close();
-                } else {
-                    obj.getCountry().setCountryID(country.getCountryID());
-                }
-            }
             statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, obj.getAddrLine());
             statement.setString(2, obj.getPostBox());
@@ -183,13 +163,23 @@ public class AddressDAO extends DAO<Address, Long> {
 
     private Address findAddressIfAlreadyStored(Address obj) throws SQLException {
         Address address = null;
-        PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_FIELDS);
+        PreparedStatement ps;
+
+        if (obj.getCountry() == null || obj.getCountry().getCountryID() == null) {
+            ps = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_FIELDS + "AND addr.countryID IS NULL");
+        } else {
+            ps = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_FIELDS + "AND addr.countryID = ?");
+        }
+
         try {
             ps.setString(1, obj.getAddrLine());
             ps.setString(2, obj.getPostBox());
             ps.setString(3, obj.getPostCode());
             ps.setString(4, obj.getSettlement());
             ps.setString(5, obj.getRegion());
+            if (!(obj.getCountry() == null || obj.getCountry().getCountryID() == null)) {
+                ps.setLong(6, obj.getCountry().getCountryID());
+            }
             // process the results
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -201,7 +191,7 @@ public class AddressDAO extends DAO<Address, Long> {
                         rs.getString("addr.postCode"),
                         rs.getString("addr.settlement"),
                         rs.getString("addr.region"),
-                        new Country(rs.getLong("country.countryID"), rs.getString("COUNTRY.ISO"))
+                        obj.getCountry()
                 );
             }
         } catch (SQLException ex) {
@@ -210,5 +200,33 @@ public class AddressDAO extends DAO<Address, Long> {
             ps.close();
         }
         return address;
+    }
+
+    public Address createCountry(Address obj) throws SQLException {
+        PreparedStatement statement1;
+        if (obj.getCountry() != null) {
+            Country country = null;
+            if (obj.getCountry().getIso() != null) {
+                country = findCountry(obj.getCountry().getIso());
+            }
+            if (country == null) {
+                statement1 = connect.prepareStatement(SQL_INSERT_COUNTRY, Statement.RETURN_GENERATED_KEYS);
+                if (obj.getCountry().getIso() == null) {
+                    statement1.setNull(1, java.sql.Types.VARCHAR);
+                } else {
+                    statement1.setString(1, obj.getCountry().getIso());
+                }
+                int code1 = statement1.executeUpdate();
+                ResultSet rs1 = statement1.getGeneratedKeys();
+
+                if (rs1.next()) {
+                    obj.getCountry().setCountryID(rs1.getLong(1));
+                }
+                statement1.close();
+            } else {
+                obj.getCountry().setCountryID(country.getCountryID());
+            }
+        }
+        return obj;
     }
 }
