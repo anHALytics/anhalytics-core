@@ -395,13 +395,16 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             ResultSet rs = preparedStatement2.executeQuery();
             Organisation parentOrg = null;
             while (rs.next()) {
-                PART_OF part_of = new PART_OF();
-                parentOrg = find(rs.getLong("organisation_motherID"));
+                Long motherID = rs.getLong("organisation_motherID");
+                if (!org.getOrganisationId().equals(motherID) && org.getRels() == null) {
+                    PART_OF part_of = new PART_OF();
+                    parentOrg = find(motherID);
 
-                part_of.setOrganisation_mother(parentOrg);
+                    part_of.setOrganisation_mother(parentOrg);
 //                part_of.setBeginDate(beginDate);
 //                part_of.setBeginDate(beginDate);
-                org.addRel(part_of);
+                    org.addRel(part_of);
+                }
             }
 
         } catch (SQLException ex) {

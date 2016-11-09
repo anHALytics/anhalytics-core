@@ -404,16 +404,16 @@ public class KnowledgeBaseFeeder {
                 }
             }
             organisationParent.setOrganisation_identifiers(ois);
-            part_of.setFromDate(pubDate);
-            part_of.setUntilDate(pubDate);
             od.create(organisationParent);
             document_organisation.addOrg(organisationParent);
             part_of.setOrganisation_mother(organisationParent);
+            part_of.setFromDate(pubDate);
+            part_of.setUntilDate(pubDate);
             org.addRel(part_of);
 
             if (locationParent != null && locationParent.getAddress() != null) {
                 if (locationParent.getAddress().getAddressId() == null) {
-                    
+
                     ad.create(locationParent.getAddress());
                 }
                 locationParent.setFrom_date(pubDate);

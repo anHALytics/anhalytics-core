@@ -64,4 +64,15 @@ public class PART_OF {
     public void setUntilDate(Date untilDate) {
         this.untilDate = untilDate;
     }
+    
+    @Override
+    public boolean equals(Object object) {
+        boolean isEqual = false;
+
+        if (object != null && object instanceof PART_OF) {
+            isEqual = (this.getOrganisation_mother().getOrganisationId().equals(((PART_OF) object).getOrganisation_mother().getOrganisationId()));
+        }
+
+        return isEqual;
+    }
 }
