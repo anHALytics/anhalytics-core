@@ -61,6 +61,7 @@ public class DocumentDAO extends DAO<Document, String> {
 
                 int code3 = statement1.executeUpdate();
             } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e) {
+                //e.printStackTrace();
             }
         }
         statement1.close();
