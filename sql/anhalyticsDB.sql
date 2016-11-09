@@ -592,7 +592,7 @@ DEFAULT CHARACTER SET = utf8;
 CREATE TABLE IF NOT EXISTS `anhalytics`.`SERIAL_IDENTIFIER` (
   `serial_identifierID` INT(11) NOT NULL AUTO_INCREMENT,
   `ID` VARCHAR(45) NULL DEFAULT NULL,
-  `Type` ENUM('hal', 'arxiv', 'doi') NULL DEFAULT NULL COMMENT 'journal \nproceedings\ncollection\nbook\nphd_thesis\nmaster_thesis\nreport\narchive',
+  `Type` VARCHAR(45) NULL DEFAULT NULL,
   `journalID` INT(11) NULL DEFAULT NULL,
   `collectionID` INT(11) NULL DEFAULT NULL,
   PRIMARY KEY (`serial_identifierID`),
