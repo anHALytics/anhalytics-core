@@ -19,6 +19,7 @@ public class Serial_Identifier {
             id = id.substring(0, 44);
         this.id = id;
         this.serial_IdentifierID = serial_IdentifierID;
+        this.type = type;
         this.journal = journal;
         this.collection = collection;
     }
