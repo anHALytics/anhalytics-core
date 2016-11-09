@@ -27,11 +27,44 @@ public class LocationDAO extends DAO<Location, Long> {
     private static final String SQL_SELECT_LOCATION_BY_ID
             = "SELECT * FROM LOCATION WHERE locationID = ? ";
 
+    private static final String SQL_SELECT_LOCATION_BY_orgID_addrID
+            = "SELECT * FROM LOCATION WHERE organisationID = ? AND addressID = ?";
+
     private static final String SQL_SELECT_LOCATION_BY_ORGID
             = "SELECT addressID FROM LOCATION WHERE organisationID = ?";
 
+    private static final String UPDATE_LOCATION = "UPDATE LOCATION SET begin_date = ? ,end_date = ? WHERE locationID = ?";
+
     public LocationDAO(Connection conn) {
         super(conn);
+    }
+
+    private Location getLocationIfAlreadyStored(Location obj) throws SQLException {
+        Location location = null;
+        PreparedStatement statement = connect.prepareStatement(SQL_SELECT_LOCATION_BY_orgID_addrID);
+        try {
+            statement.setLong(1, obj.getAddress().getAddressId());
+            statement.setLong(2, obj.getOrganisation().getOrganisationId());
+            ResultSet rs = statement.executeQuery();
+            if (rs.first()) {
+                try {
+                    location = new Location(
+                            rs.getLong("locationID"),
+                            obj.getOrganisation(),
+                            obj.getAddress(),
+                            Utilities.parseStringDate(rs.getString("begin_date")),
+                            Utilities.parseStringDate(rs.getString("end_date"))
+                    );
+                } catch (ParseException ex) {
+                    Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            statement.close();
+        }
+        return location;
     }
 
     @Override
@@ -40,31 +73,48 @@ public class LocationDAO extends DAO<Location, Long> {
         if (obj.getLocationId() != null) {
             throw new IllegalArgumentException("Location is already created, the Location ID is not null.");
         }
+
         PreparedStatement statement;
-        statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-        try {
-            //if (!isLocationExists(obj)) {
-
-            statement.setLong(1, obj.getOrganisation().getOrganisationId());
-            statement.setLong(2, obj.getAddress().getAddressId());
-
-            if (obj.getBegin_date() == null) {
-                statement.setDate(3, new java.sql.Date(00000000L));
-            } else {
-                statement.setDate(3, new java.sql.Date(obj.getBegin_date().getTime()));
+        Location existingLocation = getLocationIfAlreadyStored(obj);
+        if (existingLocation != null) {
+            statement = connect.prepareStatement(UPDATE_LOCATION, Statement.RETURN_GENERATED_KEYS);
+            if (obj.getBegin_date().before(existingLocation.getBegin_date())) {
+                existingLocation.setBegin_date(obj.getBegin_date());
+            } else if (obj.getBegin_date().after(existingLocation.getBegin_date())) {
+                existingLocation.setEnd_date(obj.getBegin_date());
             }
+            statement.setDate(1, new java.sql.Date(existingLocation.getBegin_date().getTime()));
 
-            if (obj.getEnd_date() == null) {
-                statement.setDate(4, new java.sql.Date(00000000L));
-            } else {
-                statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
-            }
+            statement.setDate(2, new java.sql.Date(existingLocation.getEnd_date().getTime()));
+            statement.setLong(3, existingLocation.getLocationId());
             int code = statement.executeUpdate();
             result = true;
-        } catch (MySQLIntegrityConstraintViolationException e) {
-            //e.printStackTrace();
-        } finally {
-            statement.close();
+        } else {
+            statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+            try {
+                //if (!isLocationExists(obj)) {
+
+                statement.setLong(1, obj.getOrganisation().getOrganisationId());
+                statement.setLong(2, obj.getAddress().getAddressId());
+
+                if (obj.getBegin_date() == null) {
+                    statement.setDate(3, new java.sql.Date(00000000L));
+                } else {
+                    statement.setDate(3, new java.sql.Date(obj.getBegin_date().getTime()));
+                }
+
+                if (obj.getEnd_date() == null) {
+                    statement.setDate(4, new java.sql.Date(00000000L));
+                } else {
+                    statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
+                }
+                int code = statement.executeUpdate();
+                result = true;
+            } catch (MySQLIntegrityConstraintViolationException e) {
+                //e.printStackTrace();
+            } finally {
+                statement.close();
+            }
         }
         //}
         return result;
