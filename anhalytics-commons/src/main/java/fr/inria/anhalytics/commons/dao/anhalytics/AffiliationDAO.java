@@ -30,8 +30,43 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
 
     private static final String SQL_SELECT_AFF_BY_ID = "SELECT * FROM AFFILIATION WHERE affiliationID = ?";
 
+    private static final String SQL_SELECT_AFF_BY_PERSONID_ORGID
+            = "SELECT * FROM AFFILIATION WHERE personID = ? AND organisationID = ?";
+
+    private static final String UPDATE_AFFILIATION = "UPDATE AFFILIATION SET begin_date = ? ,end_date = ? WHERE affiliationID = ?";
+
     public AffiliationDAO(Connection conn) {
         super(conn);
+    }
+
+    private Affiliation getAffiliationIfAlreadyStored(Person pers, Organisation org) throws SQLException {
+        Affiliation affiliation = null;
+        PreparedStatement statement = connect.prepareStatement(SQL_SELECT_AFF_BY_PERSONID_ORGID);
+        try {
+            statement.setLong(1, pers.getPersonId());
+            statement.setLong(2, org.getOrganisationId());
+            ResultSet rs = statement.executeQuery();
+            if (rs.first()) {
+                try {
+                    affiliation = new Affiliation(
+                            rs.getLong("affiliationID"),
+                            new ArrayList<Organisation>(),
+                            pers,
+                            Utilities.parseStringDate(rs.getString("begin_date")),
+                            Utilities.parseStringDate(rs.getString("end_date"))
+                    );
+                    affiliation.addOrganisation(org);
+
+                } catch (ParseException ex) {
+                    Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            statement.close();
+        }
+        return affiliation;
     }
 
     @Override
@@ -41,38 +76,57 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
             throw new IllegalArgumentException("Affiliation is already created, the Affiliation ID is not null.");
         }
 
-        PreparedStatement statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement statement;
 
         for (Organisation org : obj.getOrganisations()) {
-            try {
-                statement.setLong(1, org.getOrganisationId());
-                statement.setLong(2, obj.getPerson().getPersonId());
-                if (obj.getBegin_date() == null) {
-                    statement.setDate(3, new java.sql.Date(00000000L));
-                } else {
-                    statement.setDate(3, new java.sql.Date(obj.getBegin_date().getTime()));
-                }
 
-                if (obj.getEnd_date() == null) {
-                    statement.setDate(4, new java.sql.Date(00000000L));
-                } else {
-                    statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
+            Affiliation existingAff = getAffiliationIfAlreadyStored(obj.getPerson(), org);
+            if (existingAff != null) {
+                statement = connect.prepareStatement(UPDATE_AFFILIATION, Statement.RETURN_GENERATED_KEYS);
+                if (obj.getBegin_date().before(existingAff.getBegin_date())) {
+                    existingAff.setBegin_date(obj.getBegin_date());
+                } else if (obj.getBegin_date().after(existingAff.getBegin_date())) {
+                    existingAff.setEnd_date(obj.getBegin_date());
                 }
+                statement.setDate(1, new java.sql.Date(existingAff.getBegin_date().getTime()));
+
+                statement.setDate(2, new java.sql.Date(existingAff.getEnd_date().getTime()));
+                statement.setLong(3, existingAff.getAffiliationId());
                 int code = statement.executeUpdate();
-                ResultSet rs = statement.getGeneratedKeys();
-
-                if (rs.next()) {
-                    obj.setAffiliationId(rs.getLong(1));
-                }
-
                 result = true;
-
-            } catch (MySQLIntegrityConstraintViolationException e) {
-                //e.printStackTrace();
-            } 
-        }
                 statement.close();
-            
+            } else {
+                statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                try {
+                    statement.setLong(1, org.getOrganisationId());
+                    statement.setLong(2, obj.getPerson().getPersonId());
+                    if (obj.getBegin_date() == null) {
+                        statement.setDate(3, new java.sql.Date(00000000L));
+                    } else {
+                        statement.setDate(3, new java.sql.Date(obj.getBegin_date().getTime()));
+                    }
+
+                    if (obj.getEnd_date() == null) {
+                        statement.setDate(4, new java.sql.Date(00000000L));
+                    } else {
+                        statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
+                    }
+                    int code = statement.executeUpdate();
+                    ResultSet rs = statement.getGeneratedKeys();
+
+                    if (rs.next()) {
+                        obj.setAffiliationId(rs.getLong(1));
+                    }
+
+                    result = true;
+
+                } catch (MySQLIntegrityConstraintViolationException e) {
+                    //e.printStackTrace();
+                }
+            }
+
+            statement.close();
+        }
         return result;
     }
 
