@@ -168,9 +168,9 @@ public class KnowledgeBaseFeeder {
 
                             logger.debug("#################################################################");
                         } catch (Exception xpe) {
+                            xpe.printStackTrace();
                             adf.rollback();
                             teiDoc = null;
-                            xpe.printStackTrace();
                         }
                         adf.endTransaction();
                         if (teiDoc != null) {
@@ -416,6 +416,7 @@ public class KnowledgeBaseFeeder {
                     ad.create(locationParent.getAddress());
                 }
                 locationParent.setBegin_date(pubDate);
+                locationParent.setEnd_date(pubDate);
                 locationParent.setOrganisation(organisationParent);
                 ld.create(locationParent);
             }
@@ -488,19 +489,20 @@ public class KnowledgeBaseFeeder {
             organisation.setStatus(orgElt.getAttribute("status"));
         }
         od.create(organisation);
-
         document_organisation.addOrg(organisation);
+        d_o.create(document_organisation);
         affiliation.addOrganisation(organisation);
         affiliation.setBegin_date(pub.getDate_printed());
+        affiliation.setEnd_date(pub.getDate_printed());
         if (location != null && location.getAddress() != null) {
             if (location.getAddress().getAddressId() == null) {
                 ad.create(location.getAddress());
             }
             location.setBegin_date(pub.getDate_printed());
+            location.setEnd_date(pub.getDate_printed());
             location.setOrganisation(organisation);
             ld.create(location);
         }
-        d_o.create(document_organisation);
 
         // how to handle it for grobid case ?
         Element idno = doc.createElement("idno");
