@@ -13,14 +13,14 @@ import java.util.Date;
  */
 public class PART_OF {
     private Organisation organisation_mother;
-    private Date beginDate;
-    private Date endDate;
+    private Date fromDate;
+    private Date untilDate;
     
     public PART_OF(){}
-    public PART_OF(Organisation organisation_mother, Date beginDate, Date endDate){
+    public PART_OF(Organisation organisation_mother, Date fromDate, Date untilDate){
         this.organisation_mother = organisation_mother;
-        this.beginDate = beginDate;
-        this.endDate = endDate;
+        this.fromDate = fromDate;
+        this.untilDate = untilDate;
     }
 
     /**
@@ -38,30 +38,30 @@ public class PART_OF {
     }
 
     /**
-     * @return the beginDate
+     * @return the fromDate
      */
-    public Date getBeginDate() {
-        return beginDate;
+    public Date getFromDate() {
+        return fromDate;
     }
 
     /**
-     * @param beginDate the beginDate to set
+     * @param fromDate the fromDate to set
      */
-    public void setBeginDate(Date beginDate) {
-        this.beginDate = beginDate;
+    public void setFromDate(Date fromDate) {
+        this.fromDate = fromDate;
     }
 
     /**
-     * @return the endDate
+     * @return the untilDate
      */
-    public Date getEndDate() {
-        return endDate;
+    public Date getUntilDate() {
+        return untilDate;
     }
 
     /**
-     * @param endDate the endDate to set
+     * @param untilDate the untilDate to set
      */
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setUntilDate(Date untilDate) {
+        this.untilDate = untilDate;
     }
 }

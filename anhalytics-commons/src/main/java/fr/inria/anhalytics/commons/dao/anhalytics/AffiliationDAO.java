@@ -26,14 +26,14 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AffiliationDAO.class);
 
     private static final String SQL_INSERT
-            = "INSERT INTO AFFILIATION (organisationID, personID, begin_date, end_date) VALUES (?, ?, ?, ?)";
+            = "INSERT INTO AFFILIATION (organisationID, personID, from_date, until_date) VALUES (?, ?, ?, ?)";
 
     private static final String SQL_SELECT_AFF_BY_ID = "SELECT * FROM AFFILIATION WHERE affiliationID = ?";
 
     private static final String SQL_SELECT_AFF_BY_PERSONID_ORGID
             = "SELECT * FROM AFFILIATION WHERE personID = ? AND organisationID = ?";
 
-    private static final String UPDATE_AFFILIATION = "UPDATE AFFILIATION SET begin_date = ? ,end_date = ? WHERE affiliationID = ?";
+    private static final String UPDATE_AFFILIATION = "UPDATE AFFILIATION SET from_date = ? ,until_date = ? WHERE affiliationID = ?";
 
     public AffiliationDAO(Connection conn) {
         super(conn);
@@ -52,8 +52,8 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
                             rs.getLong("affiliationID"),
                             new ArrayList<Organisation>(),
                             pers,
-                            Utilities.parseStringDate(rs.getString("begin_date")),
-                            Utilities.parseStringDate(rs.getString("end_date"))
+                            Utilities.parseStringDate(rs.getString("from_date")),
+                            Utilities.parseStringDate(rs.getString("until_date"))
                     );
                     affiliation.addOrganisation(org);
 
@@ -83,14 +83,14 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
             Affiliation existingAff = getAffiliationIfAlreadyStored(obj.getPerson(), org);
             if (existingAff != null) {
                 statement = connect.prepareStatement(UPDATE_AFFILIATION, Statement.RETURN_GENERATED_KEYS);
-                if (obj.getBegin_date().before(existingAff.getBegin_date())) {
-                    existingAff.setBegin_date(obj.getBegin_date());
-                } else if (obj.getBegin_date().after(existingAff.getBegin_date())) {
-                    existingAff.setEnd_date(obj.getBegin_date());
+                if (obj.getFrom_date().before(existingAff.getFrom_date())) {
+                    existingAff.setFrom_date(obj.getFrom_date());
+                } else if (obj.getFrom_date().after(existingAff.getUntil_date())) {
+                    existingAff.setUntil_date(obj.getFrom_date());
                 }
-                statement.setDate(1, new java.sql.Date(existingAff.getBegin_date().getTime()));
+                statement.setDate(1, new java.sql.Date(existingAff.getFrom_date().getTime()));
 
-                statement.setDate(2, new java.sql.Date(existingAff.getEnd_date().getTime()));
+                statement.setDate(2, new java.sql.Date(existingAff.getUntil_date().getTime()));
                 statement.setLong(3, existingAff.getAffiliationId());
                 int code = statement.executeUpdate();
                 result = true;
@@ -100,16 +100,16 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
                 try {
                     statement.setLong(1, org.getOrganisationId());
                     statement.setLong(2, obj.getPerson().getPersonId());
-                    if (obj.getBegin_date() == null) {
+                    if (obj.getFrom_date()== null) {
                         statement.setDate(3, new java.sql.Date(00000000L));
                     } else {
-                        statement.setDate(3, new java.sql.Date(obj.getBegin_date().getTime()));
+                        statement.setDate(3, new java.sql.Date(obj.getFrom_date().getTime()));
                     }
 
-                    if (obj.getEnd_date() == null) {
+                    if (obj.getUntil_date()== null) {
                         statement.setDate(4, new java.sql.Date(00000000L));
                     } else {
-                        statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
+                        statement.setDate(4, new java.sql.Date(obj.getUntil_date().getTime()));
                     }
                     int code = statement.executeUpdate();
                     ResultSet rs = statement.getGeneratedKeys();
@@ -155,7 +155,7 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
                             new ArrayList<Organisation>(),
                             new Person(),
                             Utilities.parseStringDate(result.getString("begin_date")),
-                            Utilities.parseStringDate(result.getString("end_date"))
+                            Utilities.parseStringDate(result.getString("until_date"))
                     );
                 } catch (ParseException ex) {
                     Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);

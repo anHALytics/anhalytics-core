@@ -404,7 +404,8 @@ public class KnowledgeBaseFeeder {
                 }
             }
             organisationParent.setOrganisation_identifiers(ois);
-            part_of.setBeginDate(pubDate);
+            part_of.setFromDate(pubDate);
+            part_of.setUntilDate(pubDate);
             od.create(organisationParent);
             document_organisation.addOrg(organisationParent);
             part_of.setOrganisation_mother(organisationParent);
@@ -415,8 +416,8 @@ public class KnowledgeBaseFeeder {
                     
                     ad.create(locationParent.getAddress());
                 }
-                locationParent.setBegin_date(pubDate);
-                locationParent.setEnd_date(pubDate);
+                locationParent.setFrom_date(pubDate);
+                locationParent.setUntil_date(pubDate);
                 locationParent.setOrganisation(organisationParent);
                 ld.create(locationParent);
             }
@@ -492,14 +493,14 @@ public class KnowledgeBaseFeeder {
         document_organisation.addOrg(organisation);
         d_o.create(document_organisation);
         affiliation.addOrganisation(organisation);
-        affiliation.setBegin_date(pub.getDate_printed());
-        affiliation.setEnd_date(pub.getDate_printed());
+        affiliation.setFrom_date(pub.getDate_printed());
+        affiliation.setUntil_date(pub.getDate_printed());
         if (location != null && location.getAddress() != null) {
             if (location.getAddress().getAddressId() == null) {
                 ad.create(location.getAddress());
             }
-            location.setBegin_date(pub.getDate_printed());
-            location.setEnd_date(pub.getDate_printed());
+            location.setFrom_date(pub.getDate_printed());
+            location.setUntil_date(pub.getDate_printed());
             location.setOrganisation(organisation);
             ld.create(location);
         }
@@ -553,7 +554,7 @@ public class KnowledgeBaseFeeder {
                                         fullname += " " + prs_name.getSurname();
                                     }
                                     prs_name.setFullname(fullname);
-                                    prs_name.setPublication_date(pubDate);
+                                    prs_name.setLastupdate_date(pubDate);
                                     prs_names.add(prs_name);
                                 } else if (personChildElt.getNodeName().equals("email")) {
                                     prs.setEmail(personChildElt.getTextContent().trim());
@@ -923,7 +924,7 @@ public class KnowledgeBaseFeeder {
         pd.create(pub);
         for (Person p : prss) {
             for (Person_Name pn : p.getPerson_names()) {
-                pn.setPublication_date(pub.getDate_printed());
+                pn.setLastupdate_date(pub.getDate_printed());
             }
             persd.createEditor(new Editor(0, p, pub));
         }

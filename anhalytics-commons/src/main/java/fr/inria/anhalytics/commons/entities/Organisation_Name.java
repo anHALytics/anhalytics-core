@@ -13,13 +13,13 @@ public class Organisation_Name {
 
     private Long organisation_nameid;
     private String name = "";
-    private Date publication_date;
+    private Date lastupdate_date;
 
      public Organisation_Name(){};
-    public Organisation_Name(Long organisation_nameid, String name, Date publication_date) {
+    public Organisation_Name(Long organisation_nameid, String name, Date lastupdate_date) {
         this.organisation_nameid = organisation_nameid;
         this.name = name;
-        this.publication_date = publication_date;
+        this.lastupdate_date = lastupdate_date;
     }
 
     /**
@@ -37,22 +37,22 @@ public class Organisation_Name {
     }
 
     /**
-     * @return the publication_date
+     * @return the lastupdate_date
      */
-    public Date getPublication_date() {
-        return publication_date;
+    public Date getLastupdate_date() {
+        return lastupdate_date;
     }
 
     /**
-     * @param publication_date the publication_date to set
+     * @param lastupdate_date the lastupdate_date to set
      */
-    public void setPublication_date(Date publication_date) {
-        this.publication_date = publication_date;
+    public void setLastupdate_date(Date publication_date) {
+        this.lastupdate_date = publication_date;
     }
     
     public Map<String, Object> getOrganisationNameDocument() {
         Map<String, Object> organisationNameDocument = new HashMap<String, Object>();
-        organisationNameDocument.put("date", Utilities.formatDate(this.getPublication_date()));
+        organisationNameDocument.put("date", Utilities.formatDate(this.getLastupdate_date()));
         organisationNameDocument.put("name", this.getName());
         return organisationNameDocument;
 

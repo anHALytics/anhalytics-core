@@ -170,7 +170,7 @@ public class Person {
         for (Person_Name pn : this.getPerson_names()) {
             Map<String, Object> name = new HashMap<String, Object>();
             name.put("fullname", pn.getFullname());
-            name.put("date", Utilities.formatDate(pn.getPublication_date()));
+            name.put("date", Utilities.formatDate(pn.getLastupdate_date()));
             name.put("title", pn.getTitle());
             names.add(name);
         }

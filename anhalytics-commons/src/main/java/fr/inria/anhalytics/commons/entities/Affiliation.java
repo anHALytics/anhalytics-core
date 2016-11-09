@@ -12,16 +12,16 @@ public class Affiliation {
     private Long affiliationId;
     private List<Organisation> organisations;
     private Person person;
-    private Date begin_date;
-    private Date end_date;
+    private Date from_date;
+    private Date until_date;
     
     public Affiliation(){}
-    public Affiliation(Long affiliationId ,List<Organisation> organisations ,Person person ,Date begin_date ,Date end_date){ 
+    public Affiliation(Long affiliationId ,List<Organisation> organisations ,Person person ,Date from_date ,Date until_date){ 
         this.affiliationId = affiliationId;
         this.organisations = organisations;
         this.person = person;
-        this.begin_date = begin_date;
-        this.end_date = end_date;
+        this.from_date = from_date;
+        this.until_date = until_date;
     }
 
     /**
@@ -76,30 +76,30 @@ public class Affiliation {
     }
 
     /**
-     * @return the begin_date
+     * @return the from_date
      */
-    public Date getBegin_date() {
-        return begin_date;
+    public Date getFrom_date() {
+        return from_date;
     }
 
     /**
-     * @param begin_date the begin_date to set
+     * @param from_date the from_date to set
      */
-    public void setBegin_date(Date begin_date) {
-        this.begin_date = begin_date;
+    public void setFrom_date(Date from_date) {
+        this.from_date = from_date;
     }
 
     /**
-     * @return the end_date
+     * @return the until_date
      */
-    public Date getEnd_date() {
-        return end_date;
+    public Date getUntil_date() {
+        return until_date;
     }
 
     /**
-     * @param end_date the end_date to set
+     * @param until_date the until_date to set
      */
-    public void setEnd_date(Date end_date) {
-        this.end_date = end_date;
+    public void setUntil_date(Date until_date) {
+        this.until_date = until_date;
     }
 }

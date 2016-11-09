@@ -15,12 +15,12 @@ public class Person_Name {
     private String forename = "";
     private String middlename = "";
     private String surname = "";
-    private Date publication_date;
+    private Date lastupdate_date;
 
     
     public Person_Name() {
     }
-    public Person_Name(Long personNameId, Long personId, String fullname, String forename, String middlename, String surname, String title, Date publication_date) {
+    public Person_Name(Long personNameId, Long personId, String fullname, String forename, String middlename, String surname, String title, Date lastupdate_date) {
         this.personNameId = personNameId;
         this.personId = personId;
         this.title = title;
@@ -28,7 +28,7 @@ public class Person_Name {
         this.forename = forename;
         this.middlename = middlename;
         this.surname = surname;
-        this.publication_date = publication_date;
+        this.lastupdate_date = lastupdate_date;
     }
     
     /**
@@ -140,17 +140,17 @@ public class Person_Name {
     }
 
     /**
-     * @return the publication_date
+     * @return the lastupdate_date
      */
-    public Date getPublication_date() {
-        return publication_date;
+    public Date getLastupdate_date() {
+        return lastupdate_date;
     }
 
     /**
-     * @param publication_date the publication_date to set
+     * @param lastupdate_date the lastupdate_date to set
      */
-    public void setPublication_date(Date publication_date) {
-        this.publication_date = publication_date;
+    public void setLastupdate_date(Date lastupdate_date) {
+        this.lastupdate_date = lastupdate_date;
     }
     
     @Override

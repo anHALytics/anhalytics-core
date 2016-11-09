@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 public class LocationDAO extends DAO<Location, Long> {
 
     private static final String SQL_INSERT
-            = "INSERT INTO LOCATION (organisationID, addressID, begin_date, end_date) VALUES (?, ?, ?, ?)";
+            = "INSERT INTO LOCATION (organisationID, addressID, from_date, until_date) VALUES (?, ?, ?, ?)";
 
     private static final String SQL_SELECT_LOCATION_BY_ID
             = "SELECT * FROM LOCATION WHERE locationID = ? ";
@@ -33,7 +33,7 @@ public class LocationDAO extends DAO<Location, Long> {
     private static final String SQL_SELECT_LOCATION_BY_ORGID
             = "SELECT addressID FROM LOCATION WHERE organisationID = ?";
 
-    private static final String UPDATE_LOCATION = "UPDATE LOCATION SET begin_date = ? ,end_date = ? WHERE locationID = ?";
+    private static final String UPDATE_LOCATION = "UPDATE LOCATION SET from_date = ? ,until_date = ? WHERE locationID = ?";
 
     public LocationDAO(Connection conn) {
         super(conn);
@@ -52,8 +52,8 @@ public class LocationDAO extends DAO<Location, Long> {
                             rs.getLong("locationID"),
                             obj.getOrganisation(),
                             obj.getAddress(),
-                            Utilities.parseStringDate(rs.getString("begin_date")),
-                            Utilities.parseStringDate(rs.getString("end_date"))
+                            Utilities.parseStringDate(rs.getString("from_date")),
+                            Utilities.parseStringDate(rs.getString("until_date"))
                     );
                 } catch (ParseException ex) {
                     Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -78,14 +78,14 @@ public class LocationDAO extends DAO<Location, Long> {
         Location existingLocation = getLocationIfAlreadyStored(obj);
         if (existingLocation != null) {
             statement = connect.prepareStatement(UPDATE_LOCATION, Statement.RETURN_GENERATED_KEYS);
-            if (obj.getBegin_date().before(existingLocation.getBegin_date())) {
-                existingLocation.setBegin_date(obj.getBegin_date());
-            } else if (obj.getBegin_date().after(existingLocation.getBegin_date())) {
-                existingLocation.setEnd_date(obj.getBegin_date());
+            if (obj.getFrom_date().before(existingLocation.getFrom_date())) {
+                existingLocation.setFrom_date(obj.getFrom_date());
+            } else if (obj.getFrom_date().after(existingLocation.getUntil_date())) {
+                existingLocation.setUntil_date(obj.getFrom_date());
             }
-            statement.setDate(1, new java.sql.Date(existingLocation.getBegin_date().getTime()));
+            statement.setDate(1, new java.sql.Date(existingLocation.getFrom_date().getTime()));
 
-            statement.setDate(2, new java.sql.Date(existingLocation.getEnd_date().getTime()));
+            statement.setDate(2, new java.sql.Date(existingLocation.getUntil_date().getTime()));
             statement.setLong(3, existingLocation.getLocationId());
             int code = statement.executeUpdate();
             result = true;
@@ -97,16 +97,16 @@ public class LocationDAO extends DAO<Location, Long> {
                 statement.setLong(1, obj.getOrganisation().getOrganisationId());
                 statement.setLong(2, obj.getAddress().getAddressId());
 
-                if (obj.getBegin_date() == null) {
+                if (obj.getFrom_date()== null) {
                     statement.setDate(3, new java.sql.Date(00000000L));
                 } else {
-                    statement.setDate(3, new java.sql.Date(obj.getBegin_date().getTime()));
+                    statement.setDate(3, new java.sql.Date(obj.getFrom_date().getTime()));
                 }
 
-                if (obj.getEnd_date() == null) {
+                if (obj.getUntil_date()== null) {
                     statement.setDate(4, new java.sql.Date(00000000L));
                 } else {
-                    statement.setDate(4, new java.sql.Date(obj.getEnd_date().getTime()));
+                    statement.setDate(4, new java.sql.Date(obj.getUntil_date().getTime()));
                 }
                 int code = statement.executeUpdate();
                 result = true;
@@ -144,8 +144,8 @@ public class LocationDAO extends DAO<Location, Long> {
                             id,
                             new Organisation(),
                             new Address(),
-                            Utilities.parseStringDate(result.getString("begin_date")),
-                            Utilities.parseStringDate(result.getString("end_date"))
+                            Utilities.parseStringDate(result.getString("from_date")),
+                            Utilities.parseStringDate(result.getString("until_date"))
                     );
                 } catch (ParseException ex) {
                     Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);

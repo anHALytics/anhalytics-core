@@ -32,7 +32,7 @@ public class PersonDAO extends DAO<Person, Long> {
             = "INSERT INTO PERSON (title, photo, url, email, phone) VALUES (?, ?, ?, ?, ?)";
 
     private static final String SQL_INSERT_PERSON_NAME
-            = "INSERT INTO PERSON_NAME (personID, fullname, forename ,middlename , surname, title, publication_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            = "INSERT INTO PERSON_NAME (personID, fullname, forename ,middlename , surname, title, lastupdate_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_INSERT_PERSON_IDENTIFIER
             = "INSERT INTO PERSON_IDENTIFIER (personID, ID, type) VALUES (?, ?, ?)";
@@ -55,7 +55,7 @@ public class PersonDAO extends DAO<Person, Long> {
             = "SELECT * FROM PERSON p WHERE p.personID = ?";
 
     private static final String READ_QUERY_PERSON_NAME_BY_ID
-            = "SELECT * FROM PERSON_NAME pn WHERE pn.personID = ? GROUP BY pn.publication_date ORDER BY pn.publication_date DESC";
+            = "SELECT * FROM PERSON_NAME pn WHERE pn.personID = ? GROUP BY pn.lastupdate_date ORDER BY pn.lastupdate_date DESC";
     private static final String READ_QUERY_AUTHORS
             = "SELECT DISTINCT personID FROM AUTHORSHIP";
 
@@ -152,10 +152,10 @@ public class PersonDAO extends DAO<Person, Long> {
                 statement1.setString(4, pn.getMiddlename());
                 statement1.setString(5, pn.getSurname());
                 statement1.setString(6, pn.getTitle());
-                if (pn.getPublication_date() == null) {
+                if (pn.getLastupdate_date()== null) {
                     statement1.setDate(7, new java.sql.Date(00000000L));
                 } else {
-                    statement1.setDate(7, new java.sql.Date(pn.getPublication_date().getTime()));
+                    statement1.setDate(7, new java.sql.Date(pn.getLastupdate_date().getTime()));
                 }
 
                 int code1 = statement1.executeUpdate();
@@ -213,10 +213,10 @@ public class PersonDAO extends DAO<Person, Long> {
                 preparedStatement2.setString(4, pn.getMiddlename());
                 preparedStatement2.setString(5, pn.getSurname());
                 preparedStatement2.setString(6, pn.getTitle());
-                if (pn.getPublication_date() == null) {
+                if (pn.getLastupdate_date()== null) {
                     preparedStatement2.setDate(7, new java.sql.Date(00000000L));
                 } else {
-                    preparedStatement2.setDate(7, new java.sql.Date(pn.getPublication_date().getTime()));
+                    preparedStatement2.setDate(7, new java.sql.Date(pn.getLastupdate_date().getTime()));
                 }
                 int code2 = preparedStatement2.executeUpdate();
                 } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e) {
@@ -282,7 +282,7 @@ public class PersonDAO extends DAO<Person, Long> {
                 Person_Name pn = null;
                 while (rs1.next()) {
                     try {
-                        pn = new Person_Name(rs1.getLong("pn.person_nameID"), id, rs1.getString("pn.fullname"), rs1.getString("pn.forename"), rs1.getString("pn.middlename"), rs1.getString("pn.surname"), rs1.getString("pn.title"), Utilities.parseStringDate(rs1.getString("pn.publication_date")));
+                        pn = new Person_Name(rs1.getLong("pn.person_nameID"), id, rs1.getString("pn.fullname"), rs1.getString("pn.forename"), rs1.getString("pn.middlename"), rs1.getString("pn.surname"), rs1.getString("pn.title"), Utilities.parseStringDate(rs1.getString("pn.lastupdate_date")));
                         if(!person_names.contains(pn))
                         person_names.add(pn);
                     } catch (ParseException ex) {

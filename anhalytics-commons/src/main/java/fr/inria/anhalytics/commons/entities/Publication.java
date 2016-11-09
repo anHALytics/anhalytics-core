@@ -19,13 +19,13 @@ public class Publication {
     private String doc_title = "";
     private Date date_printed;
     private String date_eletronic = "";
-    private String start_page = "";
-    private String end_page = "";
+    private String first_page = "";
+    private String last_page = "";
     private String language = "";
 
     public Publication(){}
     public Publication(Long publicationID, Document document, Monograph monograph, Publisher publisher, String type, String doc_title,
-            Date date_printed, String date_eletronic, String start_page, String end_page, String language) {
+            Date date_printed, String date_eletronic, String first_page, String last_page, String language) {
         this.publicationID = publicationID;
         this.document = document;
         this.monograph = monograph;
@@ -34,8 +34,8 @@ public class Publication {
         this.doc_title = doc_title;
         this.date_printed = date_printed;
         this.date_eletronic = date_eletronic;
-        this.start_page = start_page;
-        this.end_page = end_page;
+        this.first_page = first_page;
+        this.last_page = last_page;
         this.language = language;
     }
 
@@ -160,33 +160,33 @@ public class Publication {
     /**
      * @return the start_page
      */
-    public String getStart_page() {
-        return start_page;
+    public String getFirst_page() {
+        return first_page;
     }
 
     /**
      * @param start_page the start_page to set
      */
-    public void setStart_page(String start_page) {
-        if(start_page.length() > 45)
-            start_page = start_page.substring(0, 44);
-        this.start_page = start_page;
+    public void setStart_page(String first_page) {
+        if(first_page.length() > 45)
+            first_page = first_page.substring(0, 44);
+        this.first_page = first_page;
     }
 
     /**
      * @return the end_page
      */
-    public String getEnd_page() {
-        return end_page;
+    public String getLast_page() {
+        return last_page;
     }
 
     /**
      * @param end_page the end_page to set
      */
-    public void setEnd_page(String end_page) {
-        if(end_page.length() > 45)
-            end_page = end_page.substring(0, 44);
-        this.end_page = end_page;
+    public void setEnd_page(String last_page) {
+        if(last_page.length() > 45)
+            last_page = last_page.substring(0, 44);
+        this.last_page = last_page;
     }
 
     /**
@@ -212,8 +212,8 @@ public class Publication {
         publicationDocument.put("doc_title", this.getDoc_title());
         publicationDocument.put("date_printed", Utilities.formatDate(this.getDate_printed()));
         publicationDocument.put("date_electronic", this.getDate_eletronic());
-        publicationDocument.put("start_page", this.getStart_page());
-        publicationDocument.put("end_page", this.getEnd_page());
+        publicationDocument.put("first_page", this.getFirst_page());
+        publicationDocument.put("end_page", this.getLast_page());
         publicationDocument.put("publisher", this.getPublisher().getPublisherDocument());
         publicationDocument.put("monograph", this.getMonograph().getMonographDocument());
         return publicationDocument;

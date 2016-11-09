@@ -41,18 +41,20 @@ public class TestTeiBuild extends XMLTestCase {
             System.err.println(exp.getMessage());
             return;
         }
+        
+        
         XPath xPath = XPathFactory.newInstance().newXPath();
         xPath.setNamespaceContext(new MyNamespaceContext());
 
         File metadata = null, fullTextFile = null;
         try {
             metadata = new File(this.getResourceDir("src/test/resources/").getAbsoluteFile()
-                    + "/hal-00576900.tei.xml");
+                    + "/inria-00362844.tei.xml");
             /*if (!metadata.exists()) {
             throw new Exception("Cannot start test, because test resource folder is not correctly set.");
         }*/
             fullTextFile = new File(this.getResourceDir("src/test/resources/").getAbsoluteFile()
-                    + "/hal-00576900.fulltext.tei.xml");
+                    + "/inria-00362844.fulltext.tei.xml");
             /*if (!fullTextFile.exists()) {
             throw new Exception("Cannot start test, because test resource folder is not correctly set.");
         }
@@ -66,6 +68,8 @@ public class TestTeiBuild extends XMLTestCase {
         
         String result = Utilities.toString(teiBuilder.addGrobidTEIToTEICorpus(corpusTeiString, FileUtils.readFileToString(fullTextFile)));
         // some test here...
+        
+        System.out.println(result);
         try {
             String expected = FileUtils.readFileToString(new File(this.getResourceDir("src/test/resources/").getAbsoluteFile()
                     + "/hal-00576900.corpus.tei.xml"), "UTF-8");

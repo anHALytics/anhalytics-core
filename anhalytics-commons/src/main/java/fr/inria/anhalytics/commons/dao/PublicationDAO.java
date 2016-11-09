@@ -27,7 +27,7 @@ public class PublicationDAO extends DAO<Publication, Long> {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PublicationDAO.class);
 
     private static final String SQL_INSERT
-            = "INSERT INTO PUBLICATION (docID, monographID, publisherID, type, doc_title, date_printed, date_electronic, start_page, end_page, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            = "INSERT INTO PUBLICATION (docID, monographID, publisherID, type, doc_title, date_printed, date_electronic, first_page, last_page, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_SELECT
             = "SELECT * FROM DOCUMENT ,MONOGRAPH ,PUBLISHER, PUBLICATION WHERE publicationID = ? AND DOCUMENT.docID = PUBLICATION.docID AND MONOGRAPH.monographID = PUBLICATION.monographID AND PUBLISHER.publisherID = PUBLICATION.publisherID";
@@ -36,7 +36,7 @@ public class PublicationDAO extends DAO<Publication, Long> {
             = "SELECT * FROM DOCUMENT, PUBLICATION LEFT JOIN PUBLISHER ON PUBLISHER.publisherID = PUBLICATION.publisherID LEFT JOIN MONOGRAPH  ON MONOGRAPH.monographID = PUBLICATION.monographID WHERE PUBLICATION.docID = ? AND DOCUMENT.docID = ?";
 
     private static final String SQL_UPDATE
-            = "UPDATE PUBLICATION SET type = ? ,doc_title = ? ,date_printed = ?,date_electronic = ?,start_page = ?,end_page = ? WHERE publicationID = ?";
+            = "UPDATE PUBLICATION SET type = ? ,doc_title = ? ,date_printed = ?,date_electronic = ?,first_page = ?,last_page = ? WHERE publicationID = ?";
 
     private static final String SQL_DELETE
             = "DELETE PUBLICATION WHERE publicationID = ?";
@@ -74,9 +74,9 @@ public class PublicationDAO extends DAO<Publication, Long> {
 
         statement.setString(7, obj.getDate_eletronic());
 
-        statement.setString(8, obj.getStart_page());
+        statement.setString(8, obj.getFirst_page());
 
-        statement.setString(9, obj.getEnd_page());
+        statement.setString(9, obj.getLast_page());
 
         statement.setString(10, obj.getLanguage());
 
@@ -125,8 +125,8 @@ public class PublicationDAO extends DAO<Publication, Long> {
                             rs.getString("doc_title"),
                             Utilities.parseStringDate(rs.getString("date_printed")),
                             rs.getString("date_eletronic"),
-                            rs.getString("start_page"),
-                            rs.getString("end_page"),
+                            rs.getString("first_page"),
+                            rs.getString("last_page"),
                             rs.getString("language")
                     );
                 } catch (ParseException ex) {
@@ -159,8 +159,8 @@ public class PublicationDAO extends DAO<Publication, Long> {
                             rs.getString("doc_title"),
                             Utilities.parseStringDate(rs.getString("date_printed")),
                             rs.getString("date_electronic"),
-                            rs.getString("start_page"),
-                            rs.getString("end_page"),
+                            rs.getString("first_page"),
+                            rs.getString("last_page"),
                             rs.getString("language")
                     )
                     );
