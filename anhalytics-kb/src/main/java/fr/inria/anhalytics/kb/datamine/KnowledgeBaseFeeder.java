@@ -356,7 +356,6 @@ public class KnowledgeBaseFeeder {
             organisationParent.setType(orgElt.getAttribute("type"));
             if (orgElt.hasAttribute("xml:id")) {
                 ois.add(new Organisation_Identifier(orgElt.getAttribute("xml:id"), "halId"));
-                org.setStructure(orgElt.getAttribute("xml:id"));
             }
             if (orgElt.hasAttribute("status")) {
                 organisationParent.setStatus(orgElt.getAttribute("status"));

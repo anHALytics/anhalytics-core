@@ -73,7 +73,6 @@ CREATE TABLE IF NOT EXISTS `anhalytics`.`ORGANISATION` (
   `organisationID` INT(11) NOT NULL AUTO_INCREMENT,
   `type` ENUM('institution', 'department', 'laboratory', 'researchteam') NULL DEFAULT NULL,
   `url` VARCHAR(255) NULL DEFAULT NULL,
-  `struct` VARCHAR(45) NULL DEFAULT NULL,
   `status` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`organisationID`))
 ENGINE = InnoDB

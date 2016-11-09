@@ -17,7 +17,7 @@ public class Organisation {
     private Long organisationId;
     private String type = "";
     private String url = "";
-    private String structure = "";
+//    private String structure = "";
     private String status = "";
     private List<Organisation_Name> names = null;
     private List<PART_OF> rels = null;
@@ -26,11 +26,11 @@ public class Organisation {
     public Organisation() {
     }
 
-    public Organisation(Long organisationId, String type, String status, String url, String structure, List<Organisation_Name> names, List<PART_OF> rels, List<Organisation_Identifier> organisation_identifiers) {
+    public Organisation(Long organisationId, String type, String status, String url, List<Organisation_Name> names, List<PART_OF> rels, List<Organisation_Identifier> organisation_identifiers) {
         this.organisationId = organisationId;
         this.type = type;
         this.url = url;
-        this.structure = structure;
+//        this.structure = structure;
         this.names = names;
         this.status = status;
         this.rels = rels;
@@ -85,22 +85,22 @@ public class Organisation {
         this.url = url;
     }
 
-    /**
-     * @return the structure
-     */
-    public String getStructure() {
-        return structure;
-    }
-
-    /**
-     * @param structure the structure to set
-     */
-    public void setStructure(String structure) {
-        if (structure.length() > 45) {
-            structure = structure.substring(0, 44);
-        }
-        this.structure = structure;
-    }
+//    /**
+//     * @return the structure
+//     */
+//    public String getStructure() {
+//        return structure;
+//    }
+//
+//    /**
+//     * @param structure the structure to set
+//     */
+//    public void setStructure(String structure) {
+//        if (structure.length() > 45) {
+//            structure = structure.substring(0, 44);
+//        }
+//        this.structure = structure;
+//    }
 
     /**
      * @return the name
@@ -156,7 +156,7 @@ public class Organisation {
         organisationDocument.put("names", organisationNamesDocument);
         organisationDocument.put("type", this.getType());
         organisationDocument.put("status", this.getStatus());
-        organisationDocument.put("structId", this.getStructure());
+//        organisationDocument.put("structId", this.getStructure());
         organisationDocument.put("url", this.getUrl());
         for (Organisation_Identifier oi : this.getOrganisation_identifiers()) {
             Map<String, Object> id = new HashMap<String, Object>();
