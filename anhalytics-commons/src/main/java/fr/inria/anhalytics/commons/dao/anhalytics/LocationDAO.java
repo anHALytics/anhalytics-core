@@ -80,11 +80,10 @@ public class LocationDAO extends DAO<Location, Long> {
             statement = connect.prepareStatement(UPDATE_LOCATION, Statement.RETURN_GENERATED_KEYS);
             if (obj.getFrom_date().before(existingLocation.getFrom_date())) {
                 existingLocation.setFrom_date(obj.getFrom_date());
-            } else if (obj.getFrom_date().after(existingLocation.getUntil_date())) {
-                existingLocation.setUntil_date(obj.getFrom_date());
+            } else if (obj.getUntil_date().after(existingLocation.getUntil_date())) {
+                existingLocation.setUntil_date(obj.getUntil_date());
             }
             statement.setDate(1, new java.sql.Date(existingLocation.getFrom_date().getTime()));
-
             statement.setDate(2, new java.sql.Date(existingLocation.getUntil_date().getTime()));
             statement.setLong(3, existingLocation.getLocationId());
             int code = statement.executeUpdate();
