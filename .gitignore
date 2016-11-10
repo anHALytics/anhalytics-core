@@ -1,10 +1,5 @@
-/anhalytics-harvest/target/
-/anhalytics-index/target/
-/anhalytics-annotate/target/
-/anhalytics-commons/target/
-/anhalytics-test/target/
-/anhalytics-kb/target/
-config/anhalytics.properties
+**/target/*
+config/local
 tempPDF/*
 tempTEI/*
 tempPdf/*
@@ -14,3 +9,7 @@ tempPdf/*
 *.old
 *.bak
 *nb-configuration.xml
+*.iml
+**/*.iml
+.idea
+config/anhalytics.properties
