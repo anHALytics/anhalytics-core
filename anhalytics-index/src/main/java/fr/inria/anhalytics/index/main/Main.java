@@ -1,5 +1,7 @@
 package fr.inria.anhalytics.index.main;
 
+import fr.inria.anhalytics.index.exceptions.IndexNotCreatedException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.index.DocumentIndexer;
 import fr.inria.anhalytics.index.KnowledgeBaseIndexer;
@@ -26,7 +28,7 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands
-            = Arrays.asList("indexAll", "indexDaily", "indexMetadata", "indexFulltext", "indexAnnotations", "indexKB");
+            = Arrays.asList("setup", "indexAll", "indexDaily", "indexMetadata", "indexFulltext", "indexAnnotations", "indexKB");
 
     public static void main(String[] args) throws UnknownHostException {
 
@@ -96,12 +98,11 @@ public class Main {
                 }
                 i++;
                 continue;
-            } 
-//            else if (currArg.equals("--reset")) {
-//                IndexProperties.setReset(true);
-//                i++;
-//                continue;
-//            } 
+            } //            else if (currArg.equals("--reset")) {
+            //                IndexProperties.setReset(true);
+            //                i++;
+            //                continue;
+            //            } 
             else {
                 result = false;
             }
@@ -115,100 +116,146 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         char reponse = ' ';
         String process = IndexProperties.getProcessName();
-        DocumentIndexer esm = new DocumentIndexer();
-        KnowledgeBaseIndexer mi = new KnowledgeBaseIndexer(); // this is the KB in fact !
+        try {
+            DocumentIndexer esm = new DocumentIndexer();
+            if (process.equals("setup")) {
+                System.out.println("The existing index (" + IndexProperties.getFulltextTeisIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
+                reponse = sc.nextLine().charAt(0);
+                if (reponse != 'N') {
+                    esm.setUpIndex(IndexProperties.getFulltextTeisIndexName());
+                }
 
-        if (process.equals("indexAll")) {
-            System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
-            reponse = sc.nextLine().charAt(0);
-            if (reponse != 'N') {
-                esm.setUpIndex(IndexProperties.getFulltextTeisIndexName());
-                esm.setUpIndex(IndexProperties.getNerdAnnotsIndexName());
-                esm.setUpIndex(IndexProperties.getKeytermAnnotsIndexName());
-                //mi.setUpIndex(IndexProperties.getMetadataIndexName());
+                System.out.println("The existing index (" + IndexProperties.getNerdAnnotsIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
+                reponse = sc.nextLine().charAt(0);
+                if (reponse != 'N') {
+                    esm.setUpIndex(IndexProperties.getNerdAnnotsIndexName());
+                }
 
-                int nbDoc = esm.indexTeiFulltextCollection();
-                logger.info("Total: " + nbDoc + " TEI documents indexed.");
-                int nbNerdAnnot = esm.indexNerdAnnotations();
-                logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
-                int nbKeytermAnnot = esm.indexKeytermAnnotations();
-                logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
-            }
+                System.out.println("The existing index (" + IndexProperties.getKeytermAnnotsIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
+                reponse = sc.nextLine().charAt(0);
+                if (reponse != 'N') {
+                    esm.setUpIndex(IndexProperties.getKeytermAnnotsIndexName());
+                }
 
-            // TBD: counters would be nice
-            //mi.indexAuthors();
-            //mi.indexPublications();
-            //mi.indexOrganisations();
-        } else if (process.equals("indexDaily")) {
-            if (esm.isIndexExists()) {
+                System.out.println("The existing index (" + IndexProperties.getKbIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
+                reponse = sc.nextLine().charAt(0);
+                if (reponse != 'N') {
+                    esm.setUpIndex(IndexProperties.getKbIndexName());
+                }
+            } else if (process.equals("indexAll")) {
+                try {
+                    int nbDoc = esm.indexTeiFulltextCollection();
+                    logger.info("Total: " + nbDoc + " fulltext documents indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getFulltextTeisIndexName() + " not found, setup the index.");
+                }
+
+                try {
+                    int nbDoc1 = esm.indexTeiMetadataCollection();
+                    logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
+
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getMetadataTeisIndexName() + " not found, setup the index.");
+                }
+                try {
+                    int nbNerdAnnot = esm.indexNerdAnnotations();
+                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
+                }
+
+                try {
+                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
+                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
+                }
+//KB indexing
+            } else if (process.equals("indexDaily")) {
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Calendar cal = Calendar.getInstance();
                 cal.add(Calendar.DATE, -1);
                 String todayDate = dateFormat.format(cal.getTime());
                 Utilities.updateDates(todayDate, todayDate);
-            } else {
-                System.err.println("Make sure both TEI index or annotations index are configured, you can choose re-init option to configure indexes.");
-                esm.close();
-                return;
-            }
-            int nbDoc = esm.indexTeiFulltextCollection();
-            logger.info("Total: " + nbDoc + " fulltext documents indexed.");
-            int nbDoc1 = esm.indexTeiMetadataCollection();
-            logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
-            int nbNerdAnnot = esm.indexNerdAnnotations();
-            logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
-            int nbKeytermAnnot = esm.indexKeytermAnnotations();
-            logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+                try {
+                    int nbDoc = esm.indexTeiFulltextCollection();
+                    logger.info("Total: " + nbDoc + " fulltext documents indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getFulltextTeisIndexName() + " not found, setup the index.");
+                }
 
-            // TBD: daily KB refresh and indexing ?
-        } else if (process.equals("indexFulltext")) {
-            System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
-            reponse = sc.nextLine().charAt(0);
-            if (reponse != 'N') {
-                esm.setUpIndex(IndexProperties.getFulltextTeisIndexName());
-                int nbDoc = esm.indexTeiFulltextCollection();
-                logger.info("Total: " + nbDoc + " TEI documents indexed.");
-            }
-        } else if (process.equals("indexMetadata")) {
-            System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
-            reponse = sc.nextLine().charAt(0);
-            if (reponse != 'N') {
-                esm.setUpIndex(IndexProperties.getMetadataTeisIndexName());
-                int nbDoc = esm.indexTeiMetadataCollection();
-                logger.info("Total: " + nbDoc + " TEI documents indexed.");
-            }
-        } else if (process.equals("indexAnnotations")) {
-            System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
-            reponse = sc.nextLine().charAt(0);
-            if (reponse != 'N') {
-                esm.setUpIndex(IndexProperties.getNerdAnnotsIndexName());
-                esm.setUpIndex(IndexProperties.getKeytermAnnotsIndexName());
+                try {
+                    int nbDoc1 = esm.indexTeiMetadataCollection();
+                    logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
 
-                int nbNerdAnnot = esm.indexNerdAnnotations();
-                logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
-                int nbKeytermAnnot = esm.indexKeytermAnnotations();
-                logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
-            }
-        } else if (process.equals("indexKB")) {
-            System.out.println("The existing indices will be deleted and reseted, continue ?(Y/N)");
-            reponse = sc.nextLine().charAt(0);
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getMetadataTeisIndexName() + " not found, setup the index.");
+                }
+                try {
+                    int nbNerdAnnot = esm.indexNerdAnnotations();
+                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
+                }
 
-            if (reponse != 'N') {
-                mi.setUpIndex(IndexProperties.getKbIndexName());
+                try {
+                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
+                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
+                }
+                // TBD: daily KB refresh and indexing ?
+            } else if (process.equals("indexFulltext")) {
+                try {
+                    int nbDoc = esm.indexTeiFulltextCollection();
+                    logger.info("Total: " + nbDoc + " fulltext documents indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getFulltextTeisIndexName() + " not found, setup the index.");
+                }
+            } else if (process.equals("indexMetadata")) {
+                try {
+                    int nbDoc1 = esm.indexTeiMetadataCollection();
+                    logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
+
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getMetadataTeisIndexName() + " not found, setup the index.");
+                }
+            } else if (process.equals("indexAnnotations")) {
+                try {
+                    int nbNerdAnnot = esm.indexNerdAnnotations();
+                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
+                }
+
+                try {
+                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
+                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
+                }
+            } else if (process.equals("indexKB")) {
+                KnowledgeBaseIndexer mi = new KnowledgeBaseIndexer(); // this is the KB in fact !
+                try {
+                    int nbAuthtors = mi.indexAuthors();
+                    logger.info("Total: " + nbAuthtors + " authors indexed.");
+                    int nbPubs = mi.indexPublications();
+                    logger.info("Total: " + nbPubs + " publications indexed.");
+                    int nbOrgs = mi.indexOrganisations();
+                    logger.info("Total: " + nbOrgs + " organisations indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
+                } catch (SQLException sqle) {
+                    sqle.printStackTrace();
+                }
+                mi.close();
             }
-            try {
-                int nbAuthtors = mi.indexAuthors();
-                logger.info("Total: " + nbAuthtors + " authors indexed.");
-                int nbPubs = mi.indexPublications();
-                logger.info("Total: " + nbPubs + " publications indexed.");
-                int nbOrgs = mi.indexOrganisations();
-                logger.info("Total: " + nbOrgs + " organisations indexed.");
-            } catch (SQLException sqle) {
-                sqle.printStackTrace();
-            }
+            esm.close();
+
+        } catch (ServiceException se) {
+            logger.error(se.getMessage());
         }
-        esm.close();
-        mi.close();
+
         return;
     }
 
