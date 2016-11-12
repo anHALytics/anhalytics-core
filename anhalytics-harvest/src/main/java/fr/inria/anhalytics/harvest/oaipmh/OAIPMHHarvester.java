@@ -2,7 +2,9 @@ package fr.inria.anhalytics.harvest.oaipmh;
 
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
-import fr.inria.anhalytics.commons.exceptions.BinaryNotAvailableException;
+import fr.inria.anhalytics.harvest.exceptions.BinaryNotAvailableException;
+import fr.inria.anhalytics.commons.exceptions.PropertyException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.HarvesterItf;
@@ -13,6 +15,8 @@ import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import javax.sql.rowset.serial.SerialException;
 import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +34,15 @@ abstract class OAIPMHHarvester implements HarvesterItf {
 
     protected String oai_url = null;
     
-    public OAIPMHHarvester() throws UnknownHostException {
-        this.mm = MongoFileManager.getInstance(false);
+    public OAIPMHHarvester() {
+        try {
+            this.mm = MongoFileManager.getInstance(false);
+        } catch (ServiceException ex) {
+            throw new ServiceException("MongoDB is not UP, the process will be halted.");
+        }
         this.oai_url = HarvestProperties.getApiUrl();
+//        if(this.oai_url.isEmpty() || this.oai_url == null)
+//            throw new PropertyException("No API URL is found, check the properties file.");
     }
 
     protected MongoFileManager mm;
@@ -75,8 +85,9 @@ abstract class OAIPMHHarvester implements HarvesterItf {
                     logger.info("\t\t\t No TEI metadata !!!");
                 }
             } catch (BinaryNotAvailableException bna) {
+                logger.error(bna.getMessage());
                 mm.save(tei.getRepositoryDocId(), "harvestProcess", "file not downloaded", date);
-            } catch (Exception e) {
+            } catch (ParseException | IOException e) {
                 e.printStackTrace();
                 mm.save(tei.getRepositoryDocId(), "harvestProcess", "harvest error", date);
                 logger.error("\t\t Error occured while processing TEI for " + tei.getRepositoryDocId());
@@ -114,7 +125,7 @@ abstract class OAIPMHHarvester implements HarvesterItf {
                 } else {
                     int n = file.getUrl().lastIndexOf("/");
                     String filename = file.getUrl().substring(n + 1);
-                    logger.debug("\t\t\t\t Getting annex file " + filename + " for pub ID :" + repositoryDocId);
+                    logger.info("\t\t\t\t Getting annex file " + filename + " for pub ID :" + repositoryDocId);
                     mm.insertAnnexDocument(inBinary, HarvestProperties.getSource(), repositoryDocId, filename, date);
                 }
             }

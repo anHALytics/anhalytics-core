@@ -1,6 +1,8 @@
 package fr.inria.anhalytics.harvest.crossref;
 
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -21,8 +23,12 @@ public class OpenUrl {
     private static final String IstexURL
             = "http://api.istex.fr/document/openurl?url_ver=rft_id=info:doi/%s";
 
-    public OpenUrl() throws UnknownHostException {
-        this.mm = MongoFileManager.getInstance(false);
+    public OpenUrl() {
+        try {
+            this.mm = MongoFileManager.getInstance(false);
+        } catch (ServiceException ex) {
+            throw new ServiceException("MongoDB is not UP, the process will be halted.");
+        }
     }
 
     public void getIstexUrl() {
@@ -31,9 +37,9 @@ public class OpenUrl {
                 try {
                     String doi = mm.nextIdentifier();
                     String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
-                    logger.debug("################################" + currentAnhalyticsId+"####################");
+                    logger.info("################################" + currentAnhalyticsId+"####################");
                     URL url = new URL(String.format(IstexURL, doi));
-                    logger.debug("Sending: " + url.toString());
+                    logger.info("Sending: " + url.toString());
                     HttpURLConnection urlConn = null;
                     try {
                         urlConn = (HttpURLConnection) url.openConnection();
@@ -54,7 +60,7 @@ public class OpenUrl {
                             urlConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                             if (urlConn.getResponseCode() == 200) {
                                 String foundurl = urlConn.getURL().toString();
-                                logger.debug("URL found : " + foundurl);
+                                logger.info("URL found : " + foundurl);
                                 //mm.updateIdentifier(doi);
                                 //mm.insertBinary();
                             }
@@ -68,7 +74,7 @@ public class OpenUrl {
                     e.printStackTrace();
                 }
             }
-            logger.debug("Done.");
+            logger.info("Done.");
         }
     }
 }

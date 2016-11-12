@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.commons.dao;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.CommonsProperties;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,7 +28,7 @@ public class DatabaseConnection {
 
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new ServiceException("Can't connect to MySQL. ", e);
         }
         return connectDB;
     }
@@ -41,7 +42,7 @@ public class DatabaseConnection {
 
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new ServiceException("Can't connect to MySQL. ", e);
         }
         return connectBiblioDB;
     }

@@ -2,6 +2,8 @@ package fr.inria.anhalytics.annotate.main;
 
 import fr.inria.anhalytics.annotate.Annotator;
 import fr.inria.anhalytics.annotate.Annotator.Annotator_Type;
+import fr.inria.anhalytics.commons.exceptions.PropertyException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.net.UnknownHostException;
@@ -37,9 +39,9 @@ public class Main {
     public static void main(String[] args) throws UnknownHostException {
         try {
             AnnotateProperties.init("anhalytics.properties");
-        } catch (Exception e) {
+        } catch (PropertyException e) {
             logger.error(e.getMessage());
-                return;
+            return;
         }
 
         if (processArgs(args)) {
@@ -56,36 +58,41 @@ public class Main {
 
     private void processCommand() throws UnknownHostException {
         String process = AnnotateProperties.getProcessName();
-        Annotator annotator = new Annotator();
-        if (process.equals("annotateNerdDaily")) {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, -1);
-            String todayDate = dateFormat.format(cal.getTime());
-            Utilities.updateDates(todayDate, todayDate);
-            annotator.annotate(Annotator_Type.NERD);
-        } else if (process.equals("annotateKeyTermDaily")) {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, -1);
-            String todayDate = dateFormat.format(cal.getTime());
-            Utilities.updateDates(todayDate, todayDate);
-            annotator.annotate(Annotator_Type.KEYTERM);
-        } else if (process.equals("annotateDaily")) {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, -1);
-            String todayDate = dateFormat.format(cal.getTime());
-            Utilities.updateDates(todayDate, todayDate);
-            annotator.annotate(Annotator_Type.NERD);
-            annotator.annotate(Annotator_Type.KEYTERM);
-        } else if (process.equals("annotateAllNerd")) {
-            annotator.annotate(Annotator_Type.NERD);
-        } else if (process.equals("annotateAllKeyTerm")) {
-            annotator.annotate(Annotator_Type.KEYTERM);
-        } else if (process.equals("annotateAll")) {
-            annotator.annotate(Annotator_Type.NERD);
-            annotator.annotate(Annotator_Type.KEYTERM);
+
+        try {
+            Annotator annotator = new Annotator();
+            if (process.equals("annotateNerdDaily")) {
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DATE, -1);
+                String todayDate = dateFormat.format(cal.getTime());
+                Utilities.updateDates(todayDate, todayDate);
+                annotator.annotate(Annotator_Type.NERD);
+            } else if (process.equals("annotateKeyTermDaily")) {
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DATE, -1);
+                String todayDate = dateFormat.format(cal.getTime());
+                Utilities.updateDates(todayDate, todayDate);
+                annotator.annotate(Annotator_Type.KEYTERM);
+            } else if (process.equals("annotateDaily")) {
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DATE, -1);
+                String todayDate = dateFormat.format(cal.getTime());
+                Utilities.updateDates(todayDate, todayDate);
+                annotator.annotate(Annotator_Type.NERD);
+                annotator.annotate(Annotator_Type.KEYTERM);
+            } else if (process.equals("annotateAllNerd")) {
+                annotator.annotate(Annotator_Type.NERD);
+            } else if (process.equals("annotateAllKeyTerm")) {
+                annotator.annotate(Annotator_Type.KEYTERM);
+            } else if (process.equals("annotateAll")) {
+                annotator.annotate(Annotator_Type.NERD);
+                annotator.annotate(Annotator_Type.KEYTERM);
+            }
+        } catch (ServiceException se) {
+            logger.error(se.getMessage());
         }
     }
 

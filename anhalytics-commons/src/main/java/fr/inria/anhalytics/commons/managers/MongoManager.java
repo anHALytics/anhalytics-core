@@ -4,12 +4,12 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.CommonsProperties;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Properties;
-import java.util.Set;
+import java.net.ConnectException;
+import java.net.UnknownHostException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,18 +28,19 @@ abstract class MongoManager {
 
     public MongoManager(boolean isTest) {
         try {
-            try {
-                CommonsProperties.init("anhalytics.properties", isTest);
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage());
-            }
-            mongo = new MongoClient(CommonsProperties.getMongodbServer(), CommonsProperties.getMongodbPort());
-            if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
-                LOGGER.debug("MongoDB database " + CommonsProperties.getMongodbDb() + " does not exist and will be created");
-            }
+            CommonsProperties.init("anhalytics.properties", isTest);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+        }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        try {
+            mongo = new MongoClient(CommonsProperties.getMongodbServer(), CommonsProperties.getMongodbPort());
+        
+        if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
+            LOGGER.info("MongoDB database " + CommonsProperties.getMongodbDb() + " does not exist and will be created");
+        }
+        } catch (MongoException|IOException ex) {
+            throw new ServiceException("MongoDB is not UP, the process will be halted.");
         }
     }
 

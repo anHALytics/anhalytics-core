@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.harvest.auxiliaries;
 
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
@@ -34,8 +35,12 @@ public class IstexHarvester {
     private MongoFileManager mm = null;
     private String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
 
-    public IstexHarvester() throws UnknownHostException {
-        this.mm = MongoFileManager.getInstance(false);
+    public IstexHarvester() {
+        try {
+            this.mm = MongoFileManager.getInstance(false);
+        } catch (ServiceException ex) {
+            throw new ServiceException("MongoDB is not UP, the process will be halted.");
+        }
     }
 
     public List<String> harvest() {

@@ -2,6 +2,7 @@ package fr.inria.anhalytics.harvest.oaipmh;
 
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import java.io.*;
@@ -19,9 +20,9 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
 
     private static String OAI_FORMAT = "xml-tei";
 
-    protected HALOAIPMHDomParser oaiDom;
-    
-    public HALOAIPMHHarvester() throws UnknownHostException {
+    private HALOAIPMHDomParser oaiDom;
+
+    public HALOAIPMHHarvester() {
         super();
         this.oaiDom = new HALOAIPMHDomParser();
     }
@@ -31,11 +32,12 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
         boolean stop = false;
         String tokenn = null;
         while (!stop) {
-            String request = String.format("%s/?verb=ListRecords&metadataPrefix=%s&from=%s&until=%s", 
-						this.oai_url, OAI_FORMAT, date, date);
-            if(HarvestProperties.getCollection() != null)
+            String request = String.format("%s/?verb=ListRecords&metadataPrefix=%s&from=%s&until=%s",
+                    this.oai_url, OAI_FORMAT, date, date);
+            if (HarvestProperties.getCollection() != null) {
                 request += String.format("&set=collection:%s", HarvestProperties.getCollection());
-            
+            }
+
             if (tokenn != null) {
                 request = String.format("%s/?verb=ListRecords&resumptionToken=%s", this.oai_url, tokenn);
             }
@@ -53,16 +55,20 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
             try {
                 in.close();
             } catch (IOException ioex) {
-                ioex.printStackTrace();
+                throw new ServiceException("Couldn't close opened harvesting stream source.", ioex);
             }
         }
     }
 
     @Override
     public void fetchAllDocuments() {
-        for (String date : Utilities.getDates()) {
-            logger.info("Extracting publications TEIs for : " + date);
-            fetchDocumentsByDate(date);
+        try {
+            for (String date : Utilities.getDates()) {
+                logger.info("Extracting publications TEIs for : " + date);
+                fetchDocumentsByDate(date);
+            }
+        } catch (ServiceException se) {
+            logger.error(se.getMessage());
         }
     }
 
@@ -79,7 +85,7 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
                 PublicationFile pf = file.getPdfdocument();
                 String id = file.getRepositoryDocId();
                 String type = file.getDocumentType();
-                
+
                 System.out.println(id + "   " + pf.isAnnexFile());
                 try {
                     logger.info("\t\t Processing TEI for " + id);
@@ -95,5 +101,12 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
             }
 
         }
+    }
+
+    /**
+     * @param oaiDom the oaiDom to set
+     */
+    public void setOaiDom(HALOAIPMHDomParser oaiDom) {
+        this.oaiDom = oaiDom;
     }
 }

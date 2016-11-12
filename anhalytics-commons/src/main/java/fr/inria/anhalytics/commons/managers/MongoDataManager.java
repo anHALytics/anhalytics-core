@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.commons.managers;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 
 /**
@@ -14,7 +15,7 @@ public class MongoDataManager extends MongoManager {
      */
     private static MongoDataManager mongoManager = null;
 
-    public MongoDataManager(boolean isTest) throws UnknownHostException {
+    public MongoDataManager(boolean isTest) throws IOException {
         super(isTest);
         initDatabase();
     }
@@ -25,7 +26,7 @@ public class MongoDataManager extends MongoManager {
      *
      * @return
      */
-    public static MongoDataManager getInstance(boolean isTest) throws UnknownHostException {
+    public static MongoDataManager getInstance(boolean isTest) throws IOException {
         if (mongoManager == null) {
             return getNewInstance(isTest);
         } else {
@@ -39,7 +40,7 @@ public class MongoDataManager extends MongoManager {
      *
      * @return MongoFilesManager
      */
-    protected static synchronized MongoDataManager getNewInstance(boolean isTest) throws UnknownHostException {
+    protected static synchronized MongoDataManager getNewInstance(boolean isTest) throws IOException {
         mongoManager = new MongoDataManager(isTest);
         return mongoManager;
     }

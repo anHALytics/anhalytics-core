@@ -1,5 +1,5 @@
 
-package fr.inria.anhalytics.commons.exceptions;
+package fr.inria.anhalytics.kb.exceptions;
 
 /**
  *

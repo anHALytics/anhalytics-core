@@ -3,6 +3,7 @@ package fr.inria.anhalytics.harvest.grobid;
 import java.io.File;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Process publications annex with grobid.
@@ -11,7 +12,7 @@ import java.net.UnknownHostException;
  */
 public class GrobidAnnexWorker extends GrobidWorker {
 
-    public GrobidAnnexWorker(InputStream content, String id, String anhalyticsId, String date, int start, int end) throws UnknownHostException {
+    public GrobidAnnexWorker(InputStream content, String id, String anhalyticsId, String date, int start, int end) throws ParserConfigurationException {
         super(content, id, anhalyticsId, date, start, end);
     }
 

@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.harvest.main;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.oaipmh.HALOAIPMHHarvester;
 import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
@@ -15,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author Achraf
  */
 public class Main {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands = new ArrayList<String>() {
@@ -48,13 +50,13 @@ public class Main {
     public static void main(String[] args) throws UnknownHostException {
         try {
             HarvestProperties.init("anhalytics.properties");
-        } catch (Exception exp) {
+        } catch (PropertyException exp) {
             logger.error(exp.getMessage());
-                return;
+            return;
         }
 
         if (processArgs(args)) {
-            if(HarvestProperties.isProcessByDate()){
+            if (HarvestProperties.isProcessByDate()) {
                 if (HarvestProperties.getFromDate() != null || HarvestProperties.getUntilDate() != null) {
                     Utilities.updateDates(HarvestProperties.getUntilDate(), HarvestProperties.getFromDate());
                 }
@@ -68,45 +70,52 @@ public class Main {
         }
     }
 
-    private void processCommand() throws UnknownHostException {
+    private void processCommand() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
         String todayDate = dateFormat.format(cal.getTime());
         String process = HarvestProperties.getProcessName();
-        GrobidProcess gp = new GrobidProcess();
-        TeiBuilderProcess tb = new TeiBuilderProcess();
-        HALOAIPMHHarvester oai = new HALOAIPMHHarvester();
-        IstexHarvester ih = new IstexHarvester();
-        CrossRef cr = new CrossRef();
-        OpenUrl ou = new OpenUrl();
-        if (process.equals("harvestAll")) {
-            oai.fetchAllDocuments();
-        } else if (process.equals("harvestDaily")) {
-            Utilities.updateDates(todayDate, todayDate);
-            oai.fetchAllDocuments();
-        } else if (process.equals("generateTei")) {
-            tb.buildTEICorpus();
-        } else if (process.equals("generateTeiDaily")) {
-            Utilities.updateDates(todayDate, todayDate);
-            tb.buildTEICorpus();
-        } else if (process.equals("processGrobid")) {
-            gp.processFulltexts();
-        } else if (process.equals("processGrobidDaily")) {
-            Utilities.updateDates(todayDate, todayDate);
-            gp.processFulltexts();
-        } else if (process.equals("fetchEmbargoPublications")) {
-            oai.fetchEmbargoPublications();
-        } else if (process.equals("harvestDOI")) {
-            cr.findDois();
-        } else if (process.equals("harvestDOIDaily")) {
-            Utilities.updateDates(todayDate, todayDate);
-            cr.findDois();
-        } else if (process.equals("assetLegend")) {
-            gp.addAssetsLegend();
-        } else if (process.equals("openUrl")) {
-            ou.getIstexUrl();
+        try {
+            GrobidProcess gp = new GrobidProcess();
+            TeiBuilderProcess tb = new TeiBuilderProcess();
+            HALOAIPMHHarvester oai = new HALOAIPMHHarvester();
+            IstexHarvester ih = new IstexHarvester();
+            CrossRef cr = new CrossRef();
+            OpenUrl ou = new OpenUrl();
+            if (process.equals("harvestAll")) {
+                oai.fetchAllDocuments();
+            } else if (process.equals("harvestDaily")) {
+                Utilities.updateDates(todayDate, todayDate);
+                oai.fetchAllDocuments();
+            } else if (process.equals("generateTei")) {
+                tb.buildTEICorpus();
+            } else if (process.equals("generateTeiDaily")) {
+                Utilities.updateDates(todayDate, todayDate);
+                tb.buildTEICorpus();
+            } else if (process.equals("processGrobid")) {
+                gp.processFulltexts();
+            } else if (process.equals("processGrobidDaily")) {
+                Utilities.updateDates(todayDate, todayDate);
+                gp.processFulltexts();
+            } else if (process.equals("fetchEmbargoPublications")) {
+                oai.fetchEmbargoPublications();
+            } else if (process.equals("harvestDOI")) {
+                cr.findDois();
+            } else if (process.equals("harvestDOIDaily")) {
+                Utilities.updateDates(todayDate, todayDate);
+                cr.findDois();
+            } else if (process.equals("assetLegend")) {
+                gp.addAssetsLegend();
+            } else if (process.equals("openUrl")) {
+                ou.getIstexUrl();
+            }
+        } catch (ServiceException e) {
+            logger.error(e.getMessage());
+        } catch (ParserConfigurationException e) {
+            logger.error(e.getMessage(), e);
         }
+        
         return;
     }
 
@@ -163,12 +172,11 @@ public class Main {
                     }
                 } else if (currArg.equals("-set")) {
                     String command = pArgs[i + 1];
-                    
+
                     //check collection exists
-                    
                     HarvestProperties.setCollection(command);
                     i++;
-                        continue;
+                    continue;
                 } else if (currArg.equals("--reset")) {
                     HarvestProperties.setReset(true);
                     i++;

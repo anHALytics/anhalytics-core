@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.harvest.grobid;
 
-import fr.inria.anhalytics.commons.exceptions.GrobidTimeoutException;
+import fr.inria.anhalytics.harvest.exceptions.GrobidTimeoutException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.ByteArrayInputStream;
@@ -10,6 +11,7 @@ import java.io.InputStream;
 import java.net.UnknownHostException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -43,9 +45,13 @@ abstract class GrobidWorker implements Runnable {
 
     protected XPath xPath = XPathFactory.newInstance().newXPath();
 
-    public GrobidWorker(InputStream content, String currentRepositoryDocId, String currentAnhalyticsId, String date, int start, int end) throws UnknownHostException {
+    public GrobidWorker(InputStream content, String currentRepositoryDocId, String currentAnhalyticsId, String date, int start, int end) throws ParserConfigurationException {
         this.content = content;
-        this.mm = MongoFileManager.getInstance(false);
+        try {
+            this.mm = MongoFileManager.getInstance(false);
+        } catch (ServiceException ex) {
+            throw new ServiceException("MongoDB is not UP, the process will be halted.");
+        }
         this.date = date;
         this.repositoryDocId = currentRepositoryDocId;
         this.anhalyticsId = currentAnhalyticsId;
@@ -55,11 +61,7 @@ abstract class GrobidWorker implements Runnable {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
         //docFactory.setNamespaceAware(true);
-        try {
-            docBuilder = docFactory.newDocumentBuilder();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        docBuilder = docFactory.newDocumentBuilder();
     }
 
     @Override
@@ -85,7 +87,7 @@ abstract class GrobidWorker implements Runnable {
                 saveExtractions(resultPath);
 
                 FileUtils.deleteDirectory(new File(resultPath));
-                logger.debug("\t\t " + repositoryDocId + " processed.");
+                logger.info("\t\t " + repositoryDocId + " processed.");
             } else {
                 logger.info("\t\t can't extract tei for : " + repositoryDocId + "size too large : " + mb + "mb");
             }
@@ -134,7 +136,7 @@ abstract class GrobidWorker implements Runnable {
                         .evaluate(grobidRootElement, XPathConstants.NODE);
                 if (doiNode != null) {
                     mm.updateDoi(anhalyticsId, doiNode.getTextContent());
-                    logger.debug("\t\t DOI of " + repositoryDocId + " saved.");
+                    logger.info("\t\t DOI of " + repositoryDocId + " saved.");
                 }
                 grobidStream.close();
             } catch (SAXException ex) {

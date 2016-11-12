@@ -1,8 +1,10 @@
 package fr.inria.anhalytics.annotate.services;
 
+import com.sun.org.apache.xerces.internal.util.URI;
 import fr.inria.anhalytics.annotate.Annotator;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
-import fr.inria.anhalytics.commons.exceptions.UnreachableAnnotateServiceException;
+import fr.inria.anhalytics.annotate.exceptions.UnreachableAnnotateServiceException;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import org.slf4j.Logger;
@@ -45,14 +47,12 @@ public abstract class AnnotateService {
             conn.setDoOutput(true);
             conn.setRequestMethod("GET");
             responseCode = conn.getResponseCode();
-            System.out.println(url.getHost());
-            System.out.println(responseCode);
-        } catch (Exception e) {
-            throw new UnreachableAnnotateServiceException(annotator_type+" service is not reachable, check host and port parameters.");
+        } catch (IOException e) {
+            throw new UnreachableAnnotateServiceException(responseCode, annotator_type.toString());
         }
         if (responseCode != 200) {
             logger.error(annotator_type+"  service is not alive.");
-            throw new UnreachableAnnotateServiceException(annotator_type+" service is not alive.");
+            throw new UnreachableAnnotateServiceException(responseCode, annotator_type.toString());
         }
         conn.disconnect();
         logger.info(annotator_type+"  service is ok and can be used.");

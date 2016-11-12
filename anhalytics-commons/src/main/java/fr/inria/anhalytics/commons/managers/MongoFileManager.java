@@ -7,11 +7,13 @@ import com.mongodb.*;
 import com.mongodb.util.JSON;
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
+import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.exceptions.FileNotFoundException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -68,7 +70,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      *
      * @return
      */
-    public static MongoFileManager getInstance(boolean isTest) throws UnknownHostException {
+    public static MongoFileManager getInstance(boolean isTest) {
         if (mongoManager == null) {
             return getNewInstance(isTest);
         } else {
@@ -82,7 +84,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      *
      * @return MongoFilesManager
      */
-    protected static synchronized MongoFileManager getNewInstance(boolean isTest) throws UnknownHostException {
+    protected static synchronized MongoFileManager getNewInstance(boolean isTest) {
         mongoManager = new MongoFileManager(isTest);
         return mongoManager;
     }
@@ -244,7 +246,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         cursor = collection.find(query);
         indexFile = 0;
         //181974 init
-        logger.debug("Found " + cursor.size() + " doi elements.");
+        logger.info("Found " + cursor.size() + " doi elements.");
         return true;
     }
 
@@ -870,7 +872,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             tei = IOUtils.toString(teiStream);
             teiStream.close();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e.getCause());
+            throw new DataException(e);
         }
         return tei;
     }

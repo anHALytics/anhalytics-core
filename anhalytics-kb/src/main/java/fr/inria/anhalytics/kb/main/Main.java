@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.kb.main;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.kb.datamine.KnowledgeBaseFeeder;
 import fr.inria.anhalytics.commons.properties.KbProperties;
@@ -21,26 +22,26 @@ import org.slf4j.LoggerFactory;
  */
 public class Main {
     
-     private static final Logger logger = LoggerFactory.getLogger(Main.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    
     private static List<String> availableCommands = new ArrayList<String>() {
         {
-
+            
             add("initKnowledgeBase");
             add("initKnowledgeBaseDaily");
             add("initCitationKnowledgeBase");
             add("deduplicate");
         }
     };
-
+    
     public static void main(String[] args) throws UnknownHostException, SQLException {
         try {
             KbProperties.init("anhalytics.properties");
         } catch (Exception exp) {
             logger.error(exp.getMessage());
-                return;
+            return;
         }
-
+        
         if (processArgs(args)) {
             if (KbProperties.getFromDate() != null || KbProperties.getUntilDate() != null) {
                 Utilities.updateDates(KbProperties.getUntilDate(), KbProperties.getFromDate());
@@ -52,7 +53,7 @@ public class Main {
             return;
         }
     }
-
+    
     private void processCommand() throws UnknownHostException, SQLException {
         Scanner sc = new Scanner(System.in);
         char reponse = ' ';
@@ -61,20 +62,24 @@ public class Main {
         cal.add(Calendar.DATE, -1);
         String todayDate = dateFormat.format(cal.getTime());
         String process = KbProperties.getProcessName();
-        KnowledgeBaseFeeder kbf = new KnowledgeBaseFeeder();
-        if (process.equals("initKnowledgeBase")) {
-            //Initiates HAL knowledge base and creates working corpus TEI.
-            kbf.initKnowledgeBase();
-        } else if (process.equals("initKnowledgeBaseDaily")) {
-            //Initiates HAL knowledge base and creates working corpus TEI.
-            Utilities.updateDates(todayDate, todayDate);
-            kbf.initKnowledgeBase();
-        } else if (process.equals("initCitationKnowledgeBase")) {
-            kbf.processCitations();
+        try {
+            KnowledgeBaseFeeder kbf = new KnowledgeBaseFeeder();
+            if (process.equals("initKnowledgeBase")) {
+                //Initiates HAL knowledge base and creates working corpus TEI.
+                kbf.initKnowledgeBase();
+            } else if (process.equals("initKnowledgeBaseDaily")) {
+                //Initiates HAL knowledge base and creates working corpus TEI.
+                Utilities.updateDates(todayDate, todayDate);
+                kbf.initKnowledgeBase();
+            } else if (process.equals("initCitationKnowledgeBase")) {
+                kbf.processCitations();
+            }
+        } catch (ServiceException se) {
+            logger.error(se.getMessage());
         }
         return;
     }
-
+    
     protected static boolean processArgs(final String[] pArgs) {
         boolean result = true;
         if (pArgs.length == 0) {
@@ -138,7 +143,7 @@ public class Main {
         }
         return result;
     }
-
+    
     protected static String getHelp() {
         final StringBuffer help = new StringBuffer();
         help.append("HELP ANHALYTICS_HARVEST\n");

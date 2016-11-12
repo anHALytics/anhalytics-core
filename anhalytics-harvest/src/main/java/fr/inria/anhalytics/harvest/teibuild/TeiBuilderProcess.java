@@ -1,11 +1,15 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
+import fr.inria.anhalytics.commons.exceptions.DataException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -22,8 +26,13 @@ public class TeiBuilderProcess {
     private MongoFileManager mm;
 
     private TeiBuilder tb;
-    public TeiBuilderProcess() throws UnknownHostException {
-        this.mm = MongoFileManager.getInstance(false);
+
+    public TeiBuilderProcess() throws ParserConfigurationException {
+        try {
+            this.mm = MongoFileManager.getInstance(false);
+        } catch (ServiceException ex) {
+            throw new ServiceException("MongoDB is not UP, the process will be halted.");
+        }
         this.tb = new TeiBuilder();
     }
 
@@ -49,10 +58,12 @@ public class TeiBuilderProcess {
                     logger.info("\t Building TEI for: " + currentRepositoryDocId);
                     metadataString = Utilities.trimEncodedCharaters(metadataString);
                     generatedTEIcorpus = createTEICorpus(metadataString);
-                    String grobidTei = getGrobidTei(currentAnhalyticsId);
-                    if (grobidTei != null) {
+                    try {
+                        String grobidTei = getGrobidTei(currentAnhalyticsId);
                         generatedTEIcorpus = tb.addGrobidTEIToTEICorpus(Utilities.toString(generatedTEIcorpus), grobidTei);
                         fulltextAvailable = true;
+                    } catch (DataException de) {
+                        logger.error("No corresponding fulltext TEI was found.");
                     }
                     String teiCorpus = Utilities.toString(generatedTEIcorpus);
                     mm.insertTei(teiCorpus, currentRepositoryDocId, currentAnhalyticsId, fulltextAvailable, date);

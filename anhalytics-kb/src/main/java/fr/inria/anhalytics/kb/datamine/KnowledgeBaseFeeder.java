@@ -1,6 +1,6 @@
 package fr.inria.anhalytics.kb.datamine;
 
-import fr.inria.anhalytics.commons.exceptions.NumberOfCoAuthorsExceededException;
+import fr.inria.anhalytics.kb.exceptions.NumberOfCoAuthorsExceededException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
@@ -44,6 +44,7 @@ import fr.inria.anhalytics.commons.entities.Person_Name;
 import fr.inria.anhalytics.commons.entities.Publication;
 import fr.inria.anhalytics.commons.entities.Publisher;
 import fr.inria.anhalytics.commons.entities.Serial_Identifier;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.KbProperties;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -85,8 +86,12 @@ public class KnowledgeBaseFeeder {
 
     protected MongoFileManager mm = null;
 
-    public KnowledgeBaseFeeder() throws UnknownHostException {
-        this.mm = MongoFileManager.getInstance(false);
+    public KnowledgeBaseFeeder() {
+        try {
+            this.mm = MongoFileManager.getInstance(false);
+        } catch (ServiceException ex) {
+            throw new ServiceException("MongoDB is not UP, the process will be halted.");
+        }
     }
 
     /**
@@ -166,7 +171,7 @@ public class KnowledgeBaseFeeder {
                             processPersons(authors, "author", pub, teiDoc, authorsFromfulltextTeiHeader);
                             processPersons(editors, "editor", pub, teiDoc, authorsFromfulltextTeiHeader);
 
-                            logger.debug("#################################################################");
+                            logger.info("#################################################################");
                         } catch (Exception xpe) {
                             xpe.printStackTrace();
                             adf.rollback();

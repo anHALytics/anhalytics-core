@@ -2,7 +2,7 @@ package fr.inria.anhalytics.annotate.services;
 
 import fr.inria.anhalytics.annotate.Annotator;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
-import fr.inria.anhalytics.commons.exceptions.UnreachableAnnotateServiceException;
+import fr.inria.anhalytics.annotate.exceptions.UnreachableAnnotateServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;

@@ -4,6 +4,7 @@ import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.File;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ public class GrobidFulltextWorker extends GrobidWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(GrobidFulltextWorker.class);
     
-    public GrobidFulltextWorker(InputStream content, String id, String anhalyticsId, String date, int start, int end) throws UnknownHostException {
+    public GrobidFulltextWorker(InputStream content, String id, String anhalyticsId, String date, int start, int end) throws ParserConfigurationException {
         super(content, id, anhalyticsId, date, start, end);
     }
     

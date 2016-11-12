@@ -1,5 +1,9 @@
 package fr.inria.anhalytics.harvest.grobid;
 
+import com.mongodb.MongoException;
+import fr.inria.anhalytics.commons.exceptions.DataException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
+import fr.inria.anhalytics.harvest.exceptions.UnreachableGrobidServiceException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
@@ -7,11 +11,12 @@ import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.UnknownHostException;
+import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +30,12 @@ public class GrobidProcess {
 
     private MongoFileManager mm;
 
-    public GrobidProcess() throws UnknownHostException {
-        this.mm = MongoFileManager.getInstance(false);
+    public GrobidProcess() {
+        try {
+            this.mm = MongoFileManager.getInstance(false);
+        } catch (ServiceException ex) {
+            throw new ServiceException("MongoDB is not UP, the process will be halted.");
+        }
     }
 
     static final public List<String> toBeGrobidified
@@ -68,11 +77,15 @@ public class GrobidProcess {
                                     }
                                     Runnable worker = new GrobidSimpleFulltextWorker(content, currentRepositoryDocId, currentAnhalyticsId, date, start, end);
                                     executor.execute(worker);
-                                } catch (final Exception exp) {
+                                } catch (ParserConfigurationException exp) {
                                     logger.error("An error occured while processing the file " + currentRepositoryDocId
                                             + ". Continuing the process for the other files" + exp.getMessage());
                                 }
-                                content.close();
+                                try {
+                                    content.close();
+                                } catch (IOException ex) {
+                                    throw new DataException("File stream can't be closed.", ex);
+                                }
                             }
                         }
                     }
@@ -84,10 +97,10 @@ public class GrobidProcess {
                 while (!executor.isTerminated()) {
                 }
             }
-        } catch (IOException ioex) {
-            logger.error(ioex.getMessage(), ioex.getCause());
+            logger.info("Finished all threads");
+        } catch (UnreachableGrobidServiceException ugse) {
+            logger.error(ugse.getMessage());
         }
-        logger.info("Finished all threads");
     }
 
     public void processAnnexes() throws IOException {

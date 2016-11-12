@@ -1,10 +1,12 @@
-package fr.inria.anhalytics.commons.exceptions;
+package fr.inria.anhalytics.harvest.exceptions;
+
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 
 /**
  *
  * @author Achraf
  */
-public class BinaryNotAvailableException extends RuntimeException {
+public class BinaryNotAvailableException extends ServiceException {
 
     private static final long serialVersionUID = -3337770841815682150L;
 

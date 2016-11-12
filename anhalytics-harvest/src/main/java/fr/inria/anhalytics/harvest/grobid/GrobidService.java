@@ -1,7 +1,7 @@
 package fr.inria.anhalytics.harvest.grobid;
 
-import fr.inria.anhalytics.commons.exceptions.GrobidTimeoutException;
-import fr.inria.anhalytics.commons.exceptions.UnreachableGrobidServiceException;
+import fr.inria.anhalytics.harvest.exceptions.GrobidTimeoutException;
+import fr.inria.anhalytics.harvest.exceptions.UnreachableGrobidServiceException;
 import fr.inria.anhalytics.commons.utilities.KeyGen;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
@@ -30,21 +30,22 @@ import org.slf4j.LoggerFactory;
  * @author Patrice
  */
 public class GrobidService {
+
     private static final Logger logger = LoggerFactory.getLogger(GrobidService.class);
-    
+
     private int start = -1;
     private int end = -1;
     private boolean generateIDs = false;
     private String date;
-    
+
     int TIMEOUT_VALUE = 30000;
-    
+
     public GrobidService(int start, int end, boolean generateIDs, String date) {
         this.start = start;
         this.end = end;
         this.generateIDs = generateIDs;
         this.date = date;
-        
+
     }
 
     /**
@@ -54,7 +55,7 @@ public class GrobidService {
      * @return the resulting TEI document as a String or null if the service
      * failed
      */
-       /**
+    /**
      * Call the Grobid full text extraction service on server.
      *
      * @param pdfBinary InputStream of the PDF file to be processed
@@ -65,8 +66,8 @@ public class GrobidService {
         String tei = null;
         File zipFolder = null;
         try {
-            URL url = new URL("http://" + HarvestProperties.getGrobidHost() +
-                    (HarvestProperties.getGrobidPort().isEmpty() ? "":":" + HarvestProperties.getGrobidPort()) + "/processFulltextDocument");
+            URL url = new URL("http://" + HarvestProperties.getGrobidHost()
+                    + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/processFulltextDocument");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             //conn.setConnectTimeout(TIMEOUT_VALUE);
             //conn.setReadTimeout(TIMEOUT_VALUE);
@@ -75,7 +76,7 @@ public class GrobidService {
             FileBody fileBody = new FileBody(new File(filepath));
             MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.STRICT);
             multipartEntity.addPart("input", fileBody);
-            
+
             if (start != -1) {
                 StringBody contentString = new StringBody("" + start);
                 multipartEntity.addPart("start", contentString);
@@ -88,7 +89,7 @@ public class GrobidService {
                 StringBody contentString = new StringBody("1");
                 multipartEntity.addPart("generateIDs", contentString);
             }*/
-            
+
             conn.setRequestProperty("Content-Type", multipartEntity.getContentType().getValue());
             OutputStream out = conn.getOutputStream();
             try {
@@ -96,7 +97,7 @@ public class GrobidService {
             } finally {
                 out.close();
             }
-            
+
             if (conn.getResponseCode() == HttpURLConnection.HTTP_UNAVAILABLE) {
                 throw new HttpRetryException("Failed : HTTP error code : "
                         + conn.getResponseCode(), conn.getResponseCode());
@@ -105,15 +106,15 @@ public class GrobidService {
             //int status = connection.getResponseCode();
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode()+ " " +IOUtils.toString(conn.getErrorStream(), "UTF-8"));
+                        + conn.getResponseCode() + " " + IOUtils.toString(conn.getErrorStream(), "UTF-8"));
             }
-            
+
             InputStream in = conn.getInputStream();
             tei = IOUtils.toString(in, "UTF-8");
             IOUtils.closeQuietly(in);
-                        
+
             conn.disconnect();
-            
+
         } catch (ConnectException e) {
             logger.error(e.getMessage(), e.getCause());
             try {
@@ -130,24 +131,23 @@ public class GrobidService {
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
-        } catch(SocketTimeoutException e){
+        } catch (SocketTimeoutException e) {
             throw new GrobidTimeoutException("Grobid processing timed out.");
         } catch (MalformedURLException e) {
             logger.error(e.getMessage(), e.getCause());
-        } catch(IOException e){
+        } catch (IOException e) {
             logger.error(e.getMessage(), e.getCause());
         }
-        return tei;        
+        return tei;
     }
-
 
     public String runFullTextAssetGrobid(String filepath) {
         String zipDirectoryPath = null;
         String tei = null;
         File zipFolder = null;
         try {
-            URL url = new URL("http://" + HarvestProperties.getGrobidHost() +
-                    (HarvestProperties.getGrobidPort().isEmpty() ? "":":" + HarvestProperties.getGrobidPort()) + "/processFulltextAssetDocument");
+            URL url = new URL("http://" + HarvestProperties.getGrobidHost()
+                    + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/processFulltextAssetDocument");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             //conn.setConnectTimeout(TIMEOUT_VALUE);
             //conn.setReadTimeout(TIMEOUT_VALUE);
@@ -156,7 +156,7 @@ public class GrobidService {
             FileBody fileBody = new FileBody(new File(filepath));
             MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.STRICT);
             multipartEntity.addPart("input", fileBody);
-            
+
             if (start != -1) {
                 StringBody contentString = new StringBody("" + start);
                 multipartEntity.addPart("start", contentString);
@@ -169,7 +169,7 @@ public class GrobidService {
                 StringBody contentString = new StringBody("1");
                 multipartEntity.addPart("generateIDs", contentString);
             }*/
-            
+
             conn.setRequestProperty("Content-Type", multipartEntity.getContentType().getValue());
             OutputStream out = conn.getOutputStream();
             try {
@@ -177,7 +177,7 @@ public class GrobidService {
             } finally {
                 out.close();
             }
-            
+
             if (conn.getResponseCode() == HttpURLConnection.HTTP_UNAVAILABLE) {
                 throw new HttpRetryException("Failed : HTTP error code : "
                         + conn.getResponseCode(), conn.getResponseCode());
@@ -186,9 +186,9 @@ public class GrobidService {
             //int status = connection.getResponseCode();
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode()+ " " +IOUtils.toString(conn.getErrorStream(), "UTF-8"));
+                        + conn.getResponseCode() + " " + IOUtils.toString(conn.getErrorStream(), "UTF-8"));
             }
-            
+
             InputStream in = conn.getInputStream();
             zipDirectoryPath = HarvestProperties.getTmpPath() + "/" + KeyGen.getKey();
             zipFolder = new File(zipDirectoryPath);
@@ -199,11 +199,11 @@ public class GrobidService {
             IOUtils.copy(in, zipStream);
             zipStream.close();
             in.close();
-            
+
             Utilities.unzipIt(zipDirectoryPath + "/" + "out.zip", zipDirectoryPath);
-            
+
             conn.disconnect();
-            
+
         } catch (ConnectException e) {
             logger.error(e.getMessage(), e.getCause());
             try {
@@ -220,39 +220,40 @@ public class GrobidService {
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
-        } catch(SocketTimeoutException e){
+        } catch (SocketTimeoutException e) {
             throw new GrobidTimeoutException("Grobid processing timed out.");
         } catch (MalformedURLException e) {
             logger.error(e.getMessage(), e.getCause());
-        } catch(IOException e){
+        } catch (IOException e) {
             logger.error(e.getMessage(), e.getCause());
         }
-        return zipDirectoryPath;        
+        return zipDirectoryPath;
     }
-    
+
     /**
      * Checks if Grobid service is responding and local tmp directory is
      * available.
      *
      * @return boolean
      */
-    public static boolean isGrobidOk() throws MalformedURLException, IOException {
+    public static boolean isGrobidOk() throws UnreachableGrobidServiceException {
         logger.info("Cheking Grobid service...");
-        URL url = new URL("http://" + HarvestProperties.getGrobidHost() +
-                (HarvestProperties.getGrobidPort().isEmpty() ? "":":" + HarvestProperties.getGrobidPort()) + "/isalive");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setDoOutput(true);
-        conn.setRequestMethod("GET");
+
         int responseCode = 0;
         try {
+            URL url = new URL("http://" + HarvestProperties.getGrobidHost()
+                    + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/isalive");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("GET");
             responseCode = conn.getResponseCode();
-        } catch (UnknownHostException e) {
+            conn.disconnect();
+        } catch (IOException e) {
+            throw new UnreachableGrobidServiceException("Grobid service is not alive.", e);
         }
         if (responseCode != 200) {
-            logger.error("Grobid service is not alive.");
-            throw new UnreachableGrobidServiceException("Grobid service is not alive.");
+            throw new UnreachableGrobidServiceException(responseCode);
         }
-        conn.disconnect();
 
         Utilities.checkPath(HarvestProperties.getTmpPath());
         logger.info("Grobid service is ok and can be used.");

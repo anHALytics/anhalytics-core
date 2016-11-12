@@ -2,35 +2,42 @@ package fr.inria.anhalytics.harvest.oaipmh;
 
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
+import fr.inria.anhalytics.commons.exceptions.DataException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
+import org.xml.sax.SAXException;
 
 /**
  * Extract and parse records from oai-pmh response.
- * 
+ *
  * @author Achraf
  */
 public class HALOAIPMHDomParser {
 
     protected static final Logger logger = LoggerFactory.getLogger(HALOAIPMHDomParser.class);
-    
+
     private List<TEI> teis = new ArrayList<TEI>();
     private Document doc;
     private String token;
@@ -43,34 +50,38 @@ public class HALOAIPMHDomParser {
     public List<TEI> getTeis(InputStream in) {
         teis = new ArrayList<TEI>();
         setDoc(parse(in));
-        Element rootElement = doc.getDocumentElement();
-        NodeList listRecords = getRecords(rootElement);
+        if (doc != null) {
+            Element rootElement = doc.getDocumentElement();
+            NodeList listRecords = getRecords(rootElement);
 
-        //XPath xPath = XPathFactory.newInstance().newXPath();//play with it  
-        //NodeList nodes = (NodeList)xPath.evaluate("/OAI-PMH/ListRecords/record/metadata", rootElement, XPathConstants.NODESET);
-        setToken(rootElement);
-        logger.info("\t \t "+listRecords.getLength() + " records found. processing...");
-        
-        if (listRecords.getLength() >= 1) {
-            for (int i = listRecords.getLength() - 1; i >= 0; i--) {
-                if ((listRecords.item(i) instanceof Element)) {
-                    Element record = (Element) listRecords.item(i);
-                    String type = getDocumentType(record.getElementsByTagName(OAIPMHPathsItf.TypeElement));
-                    if (isConsideredType(type)) {
-                        String tei = getTei(record.getElementsByTagName(OAIPMHPathsItf.TeiElement));
-                        String doi = getDoi(record);
-                        String repositoryDocId = getRepositoryDocId(record.getElementsByTagName(OAIPMHPathsItf.IdElement));
+            //XPath xPath = XPathFactory.newInstance().newXPath();//play with it  
+            //NodeList nodes = (NodeList)xPath.evaluate("/OAI-PMH/ListRecords/record/metadata", rootElement, XPathConstants.NODESET);
+            setToken(rootElement);
+            logger.info("\t \t " + listRecords.getLength() + " records found. processing...");
 
-                        PublicationFile file = getFile(record);
-                        List<PublicationFile> annexes = getAnnexes(record);
+            if (listRecords.getLength() >= 1) {
+                for (int i = listRecords.getLength() - 1; i >= 0; i--) {
+                    if ((listRecords.item(i) instanceof Element)) {
+                        Element record = (Element) listRecords.item(i);
+                        String type = getDocumentType(record.getElementsByTagName(OAIPMHPathsItf.TypeElement));
+                        if (isConsideredType(type)) {
+                            String tei = getTei(record.getElementsByTagName(OAIPMHPathsItf.TeiElement));
+                            String doi = getDoi(record);
+                            String repositoryDocId = getRepositoryDocId(record.getElementsByTagName(OAIPMHPathsItf.IdElement));
 
-                        String ref = getRef(record);
-                        teis.add(new TEI(Utilities.getHalIDFromHalDocID(repositoryDocId), file, annexes, doi, type, tei, ref));
-                        logger.debug("\t \t \t tei of "+repositoryDocId+" extracted.");
+                            PublicationFile file = getFile(record);
+                            List<PublicationFile> annexes = getAnnexes(record);
+
+                            String ref = getRef(record);
+                            teis.add(new TEI(Utilities.getHalIDFromHalDocID(repositoryDocId), file, annexes, doi, type, tei, ref));
+                            logger.info("\t \t \t tei of " + repositoryDocId + " extracted.");
+                        }
                     }
                 }
-            }
 
+            }
+        } else {
+            throw new ServiceException("No TEIs metadata found.");
         }
         return teis;
     }
@@ -80,9 +91,13 @@ public class HALOAIPMHDomParser {
         Node node = null;
         try {
             node = (Node) xPath.compile(OAIPMHPathsItf.RefPATH).evaluate(ref, XPathConstants.NODE);
-            reference = node.getTextContent();
-        } catch (Exception ex) {
-            logger.debug("\t \t \t \t hal ref not found");
+            if (node != null) {
+                reference = node.getTextContent();
+            } else {
+                throw new DataException();
+            }
+        } catch (DataException | XPathExpressionException | DOMException ex) {
+            logger.info("\t \t \t \t hal ref not found");
         }
         return reference;
     }
@@ -91,9 +106,13 @@ public class HALOAIPMHDomParser {
         String doi = null;
         try {
             Node node = (Node) xPath.compile(OAIPMHPathsItf.DoiPATH).evaluate(ref, XPathConstants.NODE);
-            doi = node.getTextContent();
-        } catch (Exception ex) {
-            logger.debug("\t \t \t \t doi not found");
+            if (node != null) {
+                doi = node.getTextContent();
+            } else {
+                throw new DataException();
+            }
+        } catch (DataException | XPathExpressionException | DOMException ex) {
+            logger.info("\t \t \t \t doi not found");
         }
         return doi;
     }
@@ -119,23 +138,31 @@ public class HALOAIPMHDomParser {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             return db.parse(in);
-        } catch (Exception e) {//IOException , Parseconfigurationexception
+        } catch (DataException | IOException | ParserConfigurationException | SAXException e) {//
             logger.error("Could not parse document because "
                     + e.getMessage());
         }
         return null;
     }
-    
+
     public PublicationFile getFile(Node record) {
         PublicationFile file = null;
         try {
             Element node = (Element) xPath.compile(OAIPMHPathsItf.FileElement).evaluate(record, XPathConstants.NODE);
-            //REMOVE version extension....
-            String url = node.getAttribute("target");
-            String embargoDate = ((Element) node.getChildNodes().item(1)).getAttribute("notBefore");
-            file = new PublicationFile(url, embargoDate, false);
-        } catch (Exception ex) {
-            logger.debug("\t \t \t \t No file attached .");
+            if (node != null) {
+
+                String url = node.getAttribute("target");
+                Element dateNode = (Element) node.getChildNodes().item(1);
+                String embargoDate = "";
+                if (dateNode != null) {
+                    embargoDate = dateNode.getAttribute("notBefore");
+                }
+                file = new PublicationFile(url, embargoDate, false);
+            } else {
+                throw new DataException();
+            }
+        } catch (DataException | XPathExpressionException ex) {
+            logger.info("\t \t \t \t No file attached .");
         }
         return file;
     }
@@ -145,8 +172,8 @@ public class HALOAIPMHDomParser {
         NodeList nodes = null;
         try {
             nodes = (NodeList) xPath.compile(OAIPMHPathsItf.AnnexesUrlsElement).evaluate(record, XPathConstants.NODESET);
-        } catch (Exception ex) {
-            logger.debug("\t \t \t \t No annex files attached .");
+        } catch (XPathExpressionException ex) {
+            logger.info("\t \t \t \t No annex files attached .");
         }
         String url = null;
         String embargoDate = null;
@@ -177,12 +204,15 @@ public class HALOAIPMHDomParser {
         try {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             teiDoc = docBuilder.parse(new ByteArrayInputStream(teiString.getBytes()));
-
-        } catch (Exception e) {
+        } catch (SAXException | ParserConfigurationException | IOException e) {
             e.printStackTrace();
         }
         Utilities.generateIDs(teiDoc);
-        teiString = Utilities.toString(teiDoc);
+        try {
+            teiString = Utilities.toString(teiDoc);
+        } catch (DataException de) {
+            de.printStackTrace();
+        }
         return teiString;
     }
 
@@ -235,9 +265,7 @@ public class HALOAIPMHDomParser {
         try {
             OAIPMHPathsItf.ConsideredTypes.valueOf(setSpec);
             return true;
-        } catch (IllegalArgumentException ex) {
-            return false;
-        } catch (NullPointerException ex) {
+        } catch (NullPointerException | IllegalArgumentException ex) {
             return false;
         }
     }

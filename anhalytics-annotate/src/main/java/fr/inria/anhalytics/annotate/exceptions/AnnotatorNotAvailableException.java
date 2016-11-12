@@ -1,24 +1,15 @@
 package fr.inria.anhalytics.annotate.exceptions;
 
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
+
 /**
  *
  * @author patrice
  */
-public class AnnotatorNotAvailableException extends RuntimeException {
-
-    public AnnotatorNotAvailableException() {
-        super();
-    }
+public class AnnotatorNotAvailableException extends ServiceException {
 
     public AnnotatorNotAvailableException(String message) {
         super(message);
     }
 
-    public AnnotatorNotAvailableException(Throwable cause) {
-        super(cause);
-    }
-
-    public AnnotatorNotAvailableException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

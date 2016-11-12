@@ -1,12 +1,14 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
-import fr.inria.anhalytics.commons.exceptions.UnreachableAnnotateServiceException;
+import fr.inria.anhalytics.annotate.exceptions.UnreachableAnnotateServiceException;
 import fr.inria.anhalytics.annotate.exceptions.AnnotatorNotAvailableException;
 import fr.inria.anhalytics.annotate.services.AnnotateService;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
+import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.UnknownHostException;
@@ -15,7 +17,7 @@ import java.util.concurrent.*;
 /**
  * Handles threads used to annotate the tei collection from MongoDB.
  *
- * @author Patrice
+ * @author Patrice, Achraf
  */
 public class Annotator {
 
@@ -39,8 +41,12 @@ public class Annotator {
         }
     }
 
-    public Annotator() throws UnknownHostException {
-        this.mm = MongoFileManager.getInstance(false);
+    public Annotator() {
+        try {
+            this.mm = MongoFileManager.getInstance(false);
+        } catch (ServiceException ex) {
+            throw new ServiceException("MongoDB is not UP, the process will be halted.");
+        }
     }
 
     public void annotate(Annotator_Type annotator_type) {
@@ -50,8 +56,8 @@ public class Annotator {
             } else {
                 annotateTeiCollection(annotator_type);
             }
-        } catch (Exception e) {
-            logger.error("Error when setting-up the annotator.");
+        } catch (UnreachableAnnotateServiceException | AnnotatorNotAvailableException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
     }
@@ -81,7 +87,7 @@ public class Annotator {
                         date = null;
                     }
                     if (mm.initTeis(date, true, teiCollection)) {
-                        logger.debug("processing teis for :" + date);
+                        logger.info("processing teis for :" + date);
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
                             String id = mm.getCurrentRepositoryDocId();
@@ -94,7 +100,7 @@ public class Annotator {
                             // check if the document is already annotated
                             if (!AnnotateProperties.isReset()) {
                                 if (mm.isAnnotated(annotationsCollection)) {
-                                    logger.debug("skipping " + id + ": already annotated");
+                                    logger.info("skipping " + id + ": already annotated");
                                     continue;
                                 }
                             }
@@ -102,7 +108,7 @@ public class Annotator {
                             // filter based on document size... we should actually annotate only 
                             // a given length and then stop
                             if (tei.length() > 300000) {
-                                logger.debug("skipping " + id + ": file too large");
+                                logger.info("skipping " + id + ": file too large");
                                 continue;
                             }
                             Runnable worker = null;
@@ -120,7 +126,7 @@ public class Annotator {
                     }
                 }
             }
-            logger.debug("Total: " + nb + " documents annotated.");
+            logger.info("Total: " + nb + " documents annotated.");
         } finally {
             mm.close();
         }
@@ -140,7 +146,7 @@ public class Annotator {
             annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
             teiCollection = MongoCollectionsInterface.GROBID_TEIS;
         } else {
-            throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
+            throw new AnnotatorNotAvailableException("type of annotations not supported: " + annotator_type);
         }
         try {
             if (AnnotateService.isAnnotateServiceReady(annotator_type)) {
@@ -150,7 +156,7 @@ public class Annotator {
                         date = null;
                     }
                     if (mm.initTeis(date, true, teiCollection)) {
-                        //logger.debug("processing teis for :" + date);
+                        //logger.info("processing teis for :" + date);
                         while (mm.hasMoreTeis()) {
                             String tei = mm.nextTeiDocument();
                             String repositoryDocId = mm.getCurrentRepositoryDocId();
@@ -163,7 +169,7 @@ public class Annotator {
                             // check if the document is already annotated
                             if (!AnnotateProperties.isReset()) {
                                 if (mm.isAnnotated(annotationsCollection)) {
-                                    logger.debug("skipping " + repositoryDocId + ": already annotated");
+                                    logger.info("skipping " + repositoryDocId + ": already annotated");
                                     continue;
                                 }
                             }
@@ -171,7 +177,7 @@ public class Annotator {
                             // filter based on document size... we should actually annotate only 
                             // a given length and then stop
                             if (tei.length() > 300000) {
-                                logger.debug("skipping " + repositoryDocId + ": file too large");
+                                logger.info("skipping " + repositoryDocId + ": file too large");
                                 continue;
                             }
                             Runnable worker = null;
@@ -193,7 +199,7 @@ public class Annotator {
                 while (!executor.isTerminated()) {
                 }
                 logger.info("Finished all threads");
-                logger.debug("Total: " + nb + " documents annotated.");
+                logger.info("Total: " + nb + " documents annotated.");
             }
         } finally {
             mm.close();

@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.UnknownHostException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
@@ -24,15 +25,11 @@ public class TeiBuilder {
 
     private DocumentBuilder docBuilder;
 
-    public TeiBuilder() {
+    public TeiBuilder() throws ParserConfigurationException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
         //docFactory.setNamespaceAware(true);
-        try {
-            docBuilder = docFactory.newDocumentBuilder();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        docBuilder = docFactory.newDocumentBuilder();
     }
 
     /**

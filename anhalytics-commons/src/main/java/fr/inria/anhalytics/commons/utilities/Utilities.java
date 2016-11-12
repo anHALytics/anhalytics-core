@@ -1,12 +1,14 @@
 package fr.inria.anhalytics.commons.utilities;
 
-import fr.inria.anhalytics.commons.exceptions.BinaryNotAvailableException;
+import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.exceptions.DirectoryNotFoundException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -26,20 +28,25 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.List;
 import java.util.Arrays;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -48,6 +55,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * All utilities are grouped here for managing dates, id generations, files DOM
@@ -69,11 +77,11 @@ public class Utilities {
     public static String getTmpPath() {
         return tmpPath;
     }
-    
+
     static Calendar toDay = Calendar.getInstance();
-    
+
     static int todayYear = toDay.get(Calendar.YEAR);
-    
+
     static int minYear = 1900;
 
     static {
@@ -164,7 +172,9 @@ public class Utilities {
                 val = date.substring(0, 4) + "-" + monthStr + "-30";
             } else {
                 int month = Integer.parseInt(monthStr);
-                if (month > 12 || month < 1) monthStr = "12";
+                if (month > 12 || month < 1) {
+                    monthStr = "12";
+                }
                 val = date.substring(0, 4) + "-" + monthStr + "-31";
             }
         } else {
@@ -191,8 +201,8 @@ public class Utilities {
             ///val = val.replace("-00-", "-12-");
         }
         val = val.replace(" ", "T"); // this is for the dateOptionalTime elasticSearch format 
-        
-        if (!val.matches("\\d{4}-\\d{2}-\\d{2}") || (Integer.parseInt(val.substring(0, 4)) < minYear || todayYear < Integer.parseInt(val.substring(0, 4))) ) {
+
+        if (!val.matches("\\d{4}-\\d{2}-\\d{2}") || (Integer.parseInt(val.substring(0, 4)) < minYear || todayYear < Integer.parseInt(val.substring(0, 4)))) {
             val = "";
         }
         return val;
@@ -209,8 +219,8 @@ public class Utilities {
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             transformer.transform(new DOMSource(doc), new StreamResult(sw));
             return sw.toString();
-        } catch (Exception ex) {
-            throw new RuntimeException("Error converting to String", ex);
+        } catch (IllegalArgumentException | TransformerException ex) {
+            throw new DataException("Error converting to String", ex);
         }
     }
 
@@ -293,30 +303,30 @@ public class Utilities {
         try {
             File tmpDirectory = new File(tmpPath);
             FileUtils.cleanDirectory(tmpDirectory);
-            logger.debug("Temporary directory is cleaned.");
-        } catch (Exception exp) {
+            logger.info("Temporary directory is cleaned.");
+        } catch (IOException exp) {
             logger.error("Error while deleting the temporary directory: " + exp);
         }
     }
 
     public static String storeTmpFile(InputStream inBinary) throws IOException {
         File f = File.createTempFile("tmp", ".pdf", new File(tmpPath));
-        // deletes file when the virtual machine terminate
-        f.deleteOnExit();
+            // deletes file when the virtual machine terminate
+            f.deleteOnExit();
         String filePath = f.getAbsolutePath();
-        if (inBinary == null) {
-            System.out.println("null");
-        }
-        getBinaryURLContent(f, inBinary);
+            if (inBinary == null) {
+                System.out.println("null");
+            }
+            getBinaryURLContent(f, inBinary);
         return filePath;
     }
 
     public static String storeToTmpXmlFile(InputStream inBinary) throws IOException {
-        File f = File.createTempFile("tmp", ".xml", new File(tmpPath));
-        // deletes file when the virtual machine terminate
-        f.deleteOnExit();
+            File f = File.createTempFile("tmp", ".xml", new File(tmpPath));
+            // deletes file when the virtual machine terminate
+            f.deleteOnExit();
         String filePath = f.getAbsolutePath();
-        getBinaryURLContent(f, inBinary);
+            getBinaryURLContent(f, inBinary);
         return filePath;
     }
 
@@ -324,8 +334,8 @@ public class Utilities {
      * Download binaries from a given URL
      */
     public static void getBinaryURLContent(File file, InputStream in) throws IOException {
-        FileOutputStream fos = new FileOutputStream(file);
-        DataOutputStream writer = new DataOutputStream(fos);
+            FileOutputStream fos = new FileOutputStream(file);
+            DataOutputStream writer = new DataOutputStream(fos);
         try {
             byte[] buf = new byte[4 * 1024]; // 4K buffer
             int bytesRead;
@@ -345,10 +355,10 @@ public class Utilities {
 
     public static Date parseStringDate(String dateString) throws ParseException {
         Date date = null;
-        if (dateString != null) {
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-            date = format.parse(dateString);
-        }
+            if (dateString != null) {
+                DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                date = format.parse(dateString);
+            }
         return date;
     }
 
@@ -413,8 +423,10 @@ public class Utilities {
 
             zis.closeEntry();
             zis.close();
-        } catch (Exception e) {
-
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -444,7 +456,6 @@ public class Utilities {
             in = conn.getInputStream();
             return in;
         } catch (UnknownHostException e) {
-            e.printStackTrace();
             if (retry) {
                 try {
                     Thread.sleep(900000); //take a nap.
@@ -453,10 +464,10 @@ public class Utilities {
                 }
                 in = request(request, true);
             } else {
-                throw new BinaryNotAvailableException("No stream found.");
+                throw new ServiceException("The service is not reachable.", e);
             }
         } catch (IOException e) {
-            throw new BinaryNotAvailableException("No stream found.");
+            throw new ServiceException("The service is not reachable.", e);
         }
         return in;
     }
@@ -490,7 +501,7 @@ public class Utilities {
             transformer.transform(new DOMSource(document), streamResult);
 
             formatedXml = stringWriter.toString();
-        } catch (Exception e) {
+        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException | DOMException | IllegalArgumentException | TransformerException e) {
             e.printStackTrace();
         }
         return formatedXml;

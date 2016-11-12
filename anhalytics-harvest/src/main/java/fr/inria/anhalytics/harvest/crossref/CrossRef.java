@@ -1,10 +1,12 @@
 package fr.inria.anhalytics.harvest.crossref;
 
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -14,6 +16,7 @@ import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -77,17 +80,17 @@ public class CrossRef {
 
     private XPath xPath = XPathFactory.newInstance().newXPath();
 
-    public CrossRef() throws UnknownHostException {
-        this.mm = MongoFileManager.getInstance(false);
+    public CrossRef() throws ParserConfigurationException {
+        try {
+            this.mm = MongoFileManager.getInstance(false);
+        } catch (ServiceException ex) {
+            throw new ServiceException("MongoDB is not UP, the process will be halted.");
+        }
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
         //docFactory.setNamespaceAware(true);
-        try {
             docBuilder = docFactory.newDocumentBuilder();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 
@@ -122,7 +125,7 @@ public class CrossRef {
                     Document metadata = null;
 
                     try {
-                        logger.debug("###################" + currentRepositoryDocId + "#######################");
+                        logger.info("###################" + currentRepositoryDocId + "#######################");
                         doi = mm.getDocumentDoi(currentAnhalyticsId);
                         if (doi == null || doi.isEmpty()) {
                             metadata = docBuilder.parse(metadataStream);
@@ -146,8 +149,8 @@ public class CrossRef {
 
                             if (StringUtils.isNotBlank(title)
                                     && StringUtils.isNotBlank(aut)) {
-                                logger.debug("test retrieval per title, author");
-                                logger.debug(String.format("persName=%s, title=%s", aut, title));
+                                logger.info("test retrieval per title, author");
+                                logger.info(String.format("persName=%s, title=%s", aut, title));
                                 subpath = String.format(TITLE_BASE_QUERY,
                                         HarvestProperties.getCrossrefId(),
                                         HarvestProperties.getCrossrefPwd(),
@@ -190,8 +193,8 @@ public class CrossRef {
                                     //&& StringUtils.isNotBlank(aut)
                                     && StringUtils.isNotBlank(firstPage)) {
                                 // retrieval per journal title, author, volume, first page
-                                logger.debug("test retrieval per journal title, author, volume, first page");
-                                logger.debug(String.format("aut=%s, firstPage=%s, journalTitle=%s, volume=%s",
+                                logger.info("test retrieval per journal title, author, volume, first page");
+                                logger.info(String.format("aut=%s, firstPage=%s, journalTitle=%s, volume=%s",
                                         aut, firstPage, journalTitle, volume));
                                 if (StringUtils.isNotBlank(aut)) {
                                     subpath = String.format(JOURNAL_AUTHOR_BASE_QUERY,
@@ -248,8 +251,8 @@ public class CrossRef {
         String metadata = "";
         ObjectMapper mapper = new ObjectMapper();
         URL url = new URL("http://api.crossref.org/works/" + doi);
-        logger.debug("Fetching for metadata: " + url.toString());
-        logger.debug("Sending: " + url.toString());
+        logger.info("Fetching for metadata: " + url.toString());
+        logger.info("Sending: " + url.toString());
         HttpURLConnection urlConn = null;
         try {
             urlConn = (HttpURLConnection) url.openConnection();
@@ -312,7 +315,7 @@ public class CrossRef {
 
         URL url = new URL("http://" + HarvestProperties.getCrossrefHost() + "/" + query);
 
-        logger.debug("Sending: " + url.toString());
+        logger.info("Sending: " + url.toString());
         HttpURLConnection urlConn = null;
         try {
             urlConn = (HttpURLConnection) url.openConnection();

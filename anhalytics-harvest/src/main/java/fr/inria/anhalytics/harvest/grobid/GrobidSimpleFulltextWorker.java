@@ -1,11 +1,12 @@
 package fr.inria.anhalytics.harvest.grobid;
 
-import fr.inria.anhalytics.commons.exceptions.GrobidTimeoutException;
+import fr.inria.anhalytics.harvest.exceptions.GrobidTimeoutException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
     private static final Logger logger = LoggerFactory.getLogger(GrobidSimpleFulltextWorker.class);
 
 
-    public GrobidSimpleFulltextWorker(InputStream content, String currentRepositoryDocId, String currentAnhalyticsId, String date, int start, int end) throws UnknownHostException {
+    public GrobidSimpleFulltextWorker(InputStream content, String currentRepositoryDocId, String currentAnhalyticsId, String date, int start, int end) throws ParserConfigurationException {
         super(content, currentRepositoryDocId, currentAnhalyticsId, date, start, end);
         
     }
@@ -40,7 +41,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
                 tei = generateIdsTeiDoc(tei);
                 mm.insertGrobidTei(tei, repositoryDocId, anhalyticsId, date);
                 this.saveDocumentDOI(tei);
-                logger.debug("\t\t " + repositoryDocId + " processed.");
+                logger.info("\t\t " + repositoryDocId + " processed.");
             } else {
                 logger.info("\t\t can't extract TEI for : " + repositoryDocId + "size too large : " + mb + "mb");
             }

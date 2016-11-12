@@ -4,6 +4,7 @@ package fr.inria.anhalytics.harvest.service;
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.Properties;
@@ -28,7 +29,7 @@ public class AnhalyticsAssetService {
 
     private static String KEY = null ; // :) 
     
-    public AnhalyticsAssetService() throws UnknownHostException {
+    public AnhalyticsAssetService() throws IOException {
         this.mm = MongoFileManager.getInstance(false);
         Properties prop = new Properties();
         try {
