@@ -1,0 +1,282 @@
+{"authors": {
+        "_all": {
+            "enabled": true,
+            "store": true
+        },
+        "properties": {
+            "identifers": {
+                "properties": {
+                    "id": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    },
+                    "type": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    }
+                }
+            },
+            "names": {
+                "properties": {
+                    "date": {
+                        "format": "dateOptionalTime",
+                        "type": "date"
+                    },
+                    "fullname": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    },
+                    "title": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    }
+                }
+            },
+            "phone": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "affiliations": {
+                "properties": {
+                    "end_date": {
+                        "format": "dateOptionalTime",
+                        "type": "date"
+                    },
+                    "identifers": {
+                        "properties": {
+                            "id": {
+                                "index": "not_analyzed",
+                                "type": "string"
+                            },
+                            "type": {
+                                "index": "not_analyzed",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "structId": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    },
+                    "address": {
+                        "properties": {
+                            "country": {
+                                "index": "not_analyzed",
+                                "type": "string"
+                            },
+                            "addrLine": {
+                                "index": "not_analyzed",
+                                "type": "string"
+                            },
+                            "postBox": {
+                                "type": "string"
+                            },
+                            "postCode": {
+                                "type": "string"
+                            },
+                            "region": {
+                                "index": "not_analyzed",
+                                "type": "string"
+                            },
+                            "addressId": {
+                                "type": "long"
+                            },
+                            "settlement": {
+                                "index": "not_analyzed",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "names": {
+                        "properties": {
+                            "date": {
+                                "format": "dateOptionalTime",
+                                "type": "date"
+                            },
+                            "name": {
+                                "index": "not_analyzed",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "organisationId": {
+                        "type": "long"
+                    },
+                    "begin_date": {
+                        "format": "dateOptionalTime",
+                        "type": "date"
+                    },
+                    "type": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    },
+                    "url": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    },
+                    "status": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    }
+                }
+            },
+            "photo": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "personId": {
+                "type": "long"
+            },
+            "title": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "email": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "url": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "coauthors": {
+                "type": "nested",
+                "properties": {
+                    "identifers": {
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "names": {
+                        "properties": {
+                            "date": {
+                                "format": "dateOptionalTime",
+                                "type": "date"
+                            },
+                            "fullname": {
+                                "type": "string"
+                            },
+                            "title": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "photo": {
+                        "type": "string"
+                    },
+                    "personId": {
+                        "type": "long"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "date_coauthorship": {
+                        "format": "dateOptionalTime",
+                        "type": "date"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                }
+            },
+            "names": {
+                "properties": {
+                    "date": {
+                        "format": "dateOptionalTime",
+                        "type": "date"
+                    },
+                    "fullname": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    }
+                }
+            },
+            "publications": {
+                "type": "nested",
+                "properties": {
+                    "docID": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    },
+                    "publication": {
+                        "properties": {
+                            "end_page": {
+                                "type": "string"
+                            },
+                            "start_page": {
+                                "type": "string"
+                            },
+                            "doc_title": {
+                                "index": "not_analyzed",
+                                "type": "string"
+                            },
+                            "monograph": {
+                                "properties": {
+                                    "monographID": {
+                                        "index": "not_analyzed",
+                                        "type": "string"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "shortname": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "publisher": {
+                                "properties": {
+                                    "publisherID": {
+                                        "type": "long"
+                                    },
+                                    "name": {
+                                        "index": "not_analyzed",
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "date_electronic": {
+                                "type": "string"
+                            },
+                            "date_printed": {
+                                "format": "dateOptionalTime",
+                                "type": "date"
+                            },
+                            "publicationID": {
+                                "type": "long"
+                            },
+                            "type": {
+                                "index": "not_analyzed",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "uri": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    },
+                    "version": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+    }

@@ -1,0 +1,263 @@
+{"organisations": {
+        "_all": {
+            "store": true,
+      "enabled": true
+        },
+        "properties": {
+            "identifers": {
+                "properties": {
+                    "id": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    },
+                    "type": {
+                        "index": "not_analyzed",
+                        "type": "string"
+                    }
+                }
+            },
+            "structId": {
+                "type": "string"
+            },
+            "address": {
+                "properties": {
+                    "country": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "addrLine": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "postBox": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "postCode": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "region": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "addressId": {
+                        "type": "long"
+                    },
+                    "settlement": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    }
+                }
+            },
+            "names": {
+                "properties": {
+                    "date": {
+                        "format": "dateOptionalTime",
+                        "type": "date"
+                    },
+                    "name": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    }
+                }
+            },
+            "organisationId": {
+                "type": "long"
+            },
+            "documents": {
+                "type": "nested",
+                "properties": {
+                    "docID": {
+                        "type": "string"
+                    },
+                    "publication": {
+                        "properties": {
+                            "end_page": {
+                                "type": "string"
+                            },
+                            "start_page": {
+                                "type": "string"
+                            },
+                            "doc_title": {
+                                "index": "not_analyzed",
+                                "type": "string"
+                            },
+                            "monograph": {
+                                "properties": {
+                                    "monographID": {
+                                        "index": "not_analyzed",
+                                        "type": "string"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "shortname": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "publisher": {
+                                "properties": {
+                                    "publisherID": {
+                                        "type": "long"
+                                    },
+                                    "name": {
+                                        "index": "not_analyzed",
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "date_electronic": {
+                                "type": "string"
+                            },
+                            "date_printed": {
+                                "format": "dateOptionalTime",
+                                "type": "date"
+                            },
+                            "publicationID": {
+                                "type": "long"
+                            },
+                            "type": {
+                                "index": "not_analyzed",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "uri": {
+                        "type": "string"
+                    },
+                    "version": {
+                        "type": "string"
+                    }
+                }
+            },
+            "relations": {
+                "properties": {
+                    "identifers": {
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "structId": {
+                        "type": "string"
+                    },
+                    "address": {
+                        "properties": {
+                            "country": {
+                                "type": "string"
+                            },
+                            "addrLine": {
+                                "type": "string"
+                            },
+                            "postBox": {
+                                "type": "string"
+                            },
+                            "postCode": {
+                                "type": "string"
+                            },
+                            "region": {
+                                "type": "string"
+                            },
+                            "addressId": {
+                                "type": "long"
+                            },
+                            "settlement": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "names": {
+                        "properties": {
+                            "date": {
+                                "format": "strict_date_optional_time||epoch_millis",
+                                "type": "date"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "organisationId": {
+                        "type": "long"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                }
+            },
+            "type": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "url": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "authors": {
+                "properties": {
+                    "identifers": {
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "names": {
+                        "properties": {
+                            "date": {
+                                "format": "strict_date_optional_time||epoch_millis",
+                                "type": "date"
+                            },
+                            "fullname": {
+                                "type": "string"
+                            },
+                            "title": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "photo": {
+                        "type": "string"
+                    },
+                    "personId": {
+                        "type": "long"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                }
+            },
+            "status": {
+                "type": "string",
+                "index": "not_analyzed"
+            }
+        }
+    }
+    }
