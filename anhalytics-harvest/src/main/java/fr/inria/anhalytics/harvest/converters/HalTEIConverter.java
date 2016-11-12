@@ -104,7 +104,6 @@ public class HalTEIConverter implements MetadataConverter {
             } else {
                 dateElt.setAttribute("when", pubDate);
             }
-            System.out.println(pubDate);
         } catch (XPathExpressionException e) {
             e.printStackTrace();
 
@@ -345,7 +344,6 @@ public class HalTEIConverter implements MetadataConverter {
             String dateFormatted = dateElt.getAttribute("when");
 
             //and check again if the content is not ok (create a new function and reuse it)
-            System.out.println(dateFormatted);
             if (dateFormatted.isEmpty()) {
                 if (grobidDateElt != null) {
                     dateRaw = grobidDateElt.getAttribute("when");

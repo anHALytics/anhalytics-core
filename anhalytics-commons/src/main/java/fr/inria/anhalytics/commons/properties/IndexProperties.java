@@ -26,7 +26,9 @@ public class IndexProperties {
     private static String fulltextTeisTypeName = "npl";
     private static String metadataTeisIndexName  = "anhalytics_metadatateis";
     private static String kbIndexName = "anhalytics_kb"; // to be rename, it's not metadata but KB
-private static String kbAuthorsTypeName = "authors"; // to be rename, it's not metadata but KB
+    private static String kbAuthorsTypeName = "authors"; // to be rename, it's not metadata but KB
+    private static String kbPublicationsTypeName = "publications"; // to be rename, it's not metadata but KB
+    private static String kbOrganisationsTypeName = "organisations"; // to be rename, it's not metadata but KB
     
     
     private static String fromDate;
@@ -38,9 +40,7 @@ private static String kbAuthorsTypeName = "authors"; // to be rename, it's not m
     public static void init(String properties_filename) {
         Properties props = new Properties();
         try {
-            System.out.println(File.separator+"config"+File.separator+properties_filename);
             File file = new File(System.getProperty("user.dir"));
-            System.out.println(file.getParentFile()+File.separator+"config"+File.separator+properties_filename);
             props.load(new FileInputStream(file.getParentFile()+File.separator+"config"+File.separator+properties_filename));
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file " + properties_filename, exp);
@@ -48,7 +48,6 @@ private static String kbAuthorsTypeName = "authors"; // to be rename, it's not m
         setElasticSearch_host(props.getProperty("index.elasticSearch_host"));
         setElasticSearch_port(props.getProperty("index.elasticSearch_port"));
         setElasticSearchClusterName(props.getProperty("index.elasticSearch_cluster"));
-        System.out.println(elasticSearchClusterName);
         setNerdAnnotsIndexName(props.getProperty("index.elasticSearch_nerdAnnotsIndexName"));
         setKeytermAnnotsIndexName(props.getProperty("index.elasticSearch_keytermAnnotsIndexName"));
         setFulltextTeisIndexName(props.getProperty("index.elasticSearch_fulltextTeisIndexName"));
@@ -288,6 +287,34 @@ private static String kbAuthorsTypeName = "authors"; // to be rename, it's not m
      */
     public static void setKbAuthorsTypeName(String aKbAuthorsTypeName) {
         kbAuthorsTypeName = aKbAuthorsTypeName;
+    }
+
+    /**
+     * @return the kbPublicationsTypeName
+     */
+    public static String getKbPublicationsTypeName() {
+        return kbPublicationsTypeName;
+    }
+
+    /**
+     * @param aKbPublicationsTypeName the kbPublicationsTypeName to set
+     */
+    public static void setKbPublicationsTypeName(String aKbPublicationsTypeName) {
+        kbPublicationsTypeName = aKbPublicationsTypeName;
+    }
+
+    /**
+     * @return the kbOrganisationsTypeName
+     */
+    public static String getKbOrganisationsTypeName() {
+        return kbOrganisationsTypeName;
+    }
+
+    /**
+     * @param aKbOrganisationsTypeName the kbOrganisationsTypeName to set
+     */
+    public static void setKbOrganisationsTypeName(String aKbOrganisationsTypeName) {
+        kbOrganisationsTypeName = aKbOrganisationsTypeName;
     }
     
 
