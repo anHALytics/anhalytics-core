@@ -43,7 +43,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
     protected void processCommand() {
         // get all the elements having an attribute id and annotate their text content
         mm.insertAnnotation(annotateDocument(), annotationsCollection);
-        logger.debug("\t\t " + Thread.currentThread().getName() + ": " + repositoryDocId + " annotated by the NERD service.");
+        logger.info("\t\t " + Thread.currentThread().getName() + ": " + repositoryDocId + " annotated by the NERD service.");
     }
 
     /**

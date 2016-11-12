@@ -18,7 +18,7 @@
                 </layout>
         </appender>
         <root>
-                <priority value="DEBUG"></priority>
+                <priority value="INFO"></priority>
                 <appender-ref ref="LOGFILE" />
                 <appender-ref ref="CONSOLE" />
         </root>

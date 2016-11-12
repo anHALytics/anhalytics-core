@@ -88,7 +88,7 @@ public class DAOFactory extends AbstractDAOFactory {
     public void openTransaction() {
         try {
             conn.setAutoCommit(false);
-            logger.debug("Storing entry");
+            logger.info("Storing entry");
         } catch (SQLException e) {
             logger.error("There was an error disabling autocommit");
         }
@@ -97,7 +97,7 @@ public class DAOFactory extends AbstractDAOFactory {
     public void endTransaction() {
         try {
             conn.commit();
-            logger.debug("Stored");
+            logger.info("Stored");
         } catch (SQLException ex) {
             logger.error("Error happened while commiting the changes.");
         }
@@ -107,7 +107,7 @@ public class DAOFactory extends AbstractDAOFactory {
         try {
             // We rollback the transaction, to the last SavePoint!
             conn.rollback();
-            logger.debug("The transaction was rollback.");
+            logger.info("The transaction was rollback.");
         } catch (SQLException e1) {
             logger.error("There was an error making a rollback");
 

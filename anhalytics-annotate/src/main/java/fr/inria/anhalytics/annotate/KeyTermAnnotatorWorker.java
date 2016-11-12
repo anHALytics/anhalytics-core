@@ -35,7 +35,7 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
     protected void processCommand() {
         try {
             mm.insertAnnotation(annotateDocument(), annotationsCollection);
-            logger.debug("\t\t " + Thread.currentThread().getName() + ": "+ repositoryDocId + " annotated by the KeyTerm extraction and disambiguation service.");
+            logger.info("\t\t " + Thread.currentThread().getName() + ": "+ repositoryDocId + " annotated by the KeyTerm extraction and disambiguation service.");
         } catch (Exception ex) {
             logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + repositoryDocId);
             ex.printStackTrace();
