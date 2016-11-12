@@ -24,7 +24,9 @@ import fr.inria.anhalytics.commons.entities.Organisation;
 import fr.inria.anhalytics.commons.entities.PART_OF;
 import fr.inria.anhalytics.commons.entities.Person;
 import fr.inria.anhalytics.commons.entities.Publication;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -51,9 +53,15 @@ public class KnowledgeBaseIndexer extends Indexer {
 
     private static final AbstractDAOFactory adf = AbstractDAOFactory.getFactory(AbstractDAOFactory.DAO_FACTORY);
     private static final AbstractBiblioDAOFactory biblioadf = AbstractBiblioDAOFactory.getFactory(AbstractBiblioDAOFactory.DAO_FACTORY);
+    private MongoFileManager mm;
 
     public KnowledgeBaseIndexer() {
         super();
+        try {
+            this.mm = MongoFileManager.getInstance(false);
+        } catch (ServiceException ex) {
+            throw new ServiceException("MongoDB is not UP, the process will be halted.");
+        }
         DAOFactory.initConnection();
         BiblioDAOFactory.initConnection();
     }
@@ -82,8 +90,8 @@ public class KnowledgeBaseIndexer extends Indexer {
 
     }
 
-    public int indexAuthors() throws SQLException, UnknownHostException {
-        IndexingPreprocess indexingPreprocess = new IndexingPreprocess(MongoFileManager.getInstance(false));
+    public int indexAuthors() throws SQLException {
+        IndexingPreprocess indexingPreprocess = new IndexingPreprocess(mm);
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode standoffNode = null;
@@ -173,13 +181,13 @@ public class KnowledgeBaseIndexer extends Indexer {
                 }
                 bulkRequest = client.prepareBulk();
                 bulkRequest.setRefresh(true);
-                logger.debug("\n Bulk number : " + nb / bulkSize);
+                logger.info("\n Bulk number : " + nb / bulkSize);
             }
         }
         // last bulk
         if (nb % bulkSize != 0) {
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            logger.debug("\n One Last Bulk.");
+            logger.info("\n One Last Bulk.");
             if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item	
                 logger.error(bulkResponse.buildFailureMessage());
@@ -188,11 +196,11 @@ public class KnowledgeBaseIndexer extends Indexer {
         return nb;
     }
 
-    public int indexPublications() throws SQLException, UnknownHostException {
+    public int indexPublications() throws SQLException {
         int nb = 0;
         int bulkSize = 100;
 
-        IndexingPreprocess indexingPreprocess = new IndexingPreprocess(MongoFileManager.getInstance(false));
+        IndexingPreprocess indexingPreprocess = new IndexingPreprocess(mm);
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode standoffNode = null;
@@ -321,13 +329,13 @@ public class KnowledgeBaseIndexer extends Indexer {
                 }
                 bulkRequest = client.prepareBulk();
                 bulkRequest.setRefresh(true);
-                logger.debug("\n Bulk number : " + nb / bulkSize);
+                logger.info("\n Bulk number : " + nb / bulkSize);
             }
         }
         // last bulk
         if (nb % bulkSize != 0) {
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            logger.debug("\n One Last Bulk.");
+            logger.info("\n One Last Bulk.");
             if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item	
                 logger.error(bulkResponse.buildFailureMessage());
@@ -336,10 +344,10 @@ public class KnowledgeBaseIndexer extends Indexer {
         return nb;
     }
 
-    public int indexOrganisations() throws SQLException, UnknownHostException {
+    public int indexOrganisations() throws SQLException {
         int nb = 0;
         int bulkSize = 100;
-        IndexingPreprocess indexingPreprocess = new IndexingPreprocess(MongoFileManager.getInstance(false));
+        IndexingPreprocess indexingPreprocess = new IndexingPreprocess(mm);
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode standoffNode = null;
@@ -425,13 +433,13 @@ public class KnowledgeBaseIndexer extends Indexer {
                 }
                 bulkRequest = client.prepareBulk();
                 bulkRequest.setRefresh(true);
-                logger.debug("\n Bulk number : " + nb / bulkSize);
+                logger.info("\n Bulk number : " + nb / bulkSize);
             }
         }
         // last bulk
         if (nb % bulkSize != 0) {
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            logger.debug("\n One Last Bulk.");
+            logger.info("\n One Last Bulk.");
             if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item	
                 logger.error(bulkResponse.buildFailureMessage());

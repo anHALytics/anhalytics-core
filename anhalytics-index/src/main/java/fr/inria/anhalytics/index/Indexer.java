@@ -1,20 +1,21 @@
 package fr.inria.anhalytics.index;
 
-import fr.inria.anhalytics.commons.exceptions.ElasticSearchConfigurationException;
+import fr.inria.anhalytics.index.exceptions.ElasticSearchConfigurationException;
+import fr.inria.anhalytics.index.exceptions.IndexingServiceException;
+import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.IndexProperties;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.util.logging.Level;
 import org.apache.commons.io.IOUtils;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.index.IndexNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,23 +24,38 @@ import org.slf4j.LoggerFactory;
  * @author azhar
  */
 abstract class Indexer {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(Indexer.class);
-    
-    protected Client client;
-    
-    public Indexer(){
-    Settings settings = Settings.settingsBuilder()
-                .put("cluster.name", IndexProperties.getElasticSearchClusterName()).build();
-        this.client = TransportClient.builder().settings(settings).build()
-                .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(IndexProperties.getElasticSearch_host(), 9300)));
+
+    protected TransportClient client;
+
+    public Indexer() {
+        try {
+            Settings settings = Settings.settingsBuilder()
+                    .put("cluster.name", IndexProperties.getElasticSearchClusterName()).build();
+            this.client = TransportClient.builder().settings(settings).build()
+                    .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(IndexProperties.getElasticSearch_host(), Integer.parseInt(IndexProperties.getElasticSearch_port()))));
+            int nodes = this.client.connectedNodes().size();
+            if (nodes == 0) {
+                throw new ServiceException("Cannot find elasticsearch cluster.");
+            }
+        } catch (ElasticsearchException e) {
+            throw new ServiceException("Cannot find elasticsearch cluster", e);
+        }
     }
-    
+
     public void close() {
-    this.client.close();
+        this.client.close();
     }
+
     
-        /**
+    
+
+    public boolean isIndexExists(String indexName) {
+        boolean exists = this.client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
+        return exists;
+    }
+    /**
      * set-up ElasticSearch by loading the mapping and river json for the HAL
      * document database
      */
@@ -47,11 +63,8 @@ abstract class Indexer {
         try {
             // delete previous index
             deleteIndex(indexName);
-
             // create new index and load the appropriate mapping
-            if(!indexName.equals(IndexProperties.getKbIndexName()))
             createIndex(indexName);
-            loadMapping(indexName);
         } catch (Exception e) {
             logger.error("Sep-up of ElasticSearch failed for HAL index.", e);
             e.printStackTrace();
@@ -61,26 +74,20 @@ abstract class Indexer {
     /**
      *
      */
-    private boolean deleteIndex(String indexName) throws Exception {
+    private boolean deleteIndex(String indexName) {
         boolean val = false;
         try {
-            String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":"
-                    + IndexProperties.getElasticSearch_port() + "/" + indexName;
-            URL url = new URL(urlStr);
-            HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-            httpCon.setDoOutput(true);
-            httpCon.setRequestProperty(
-                    "Content-Type", "application/x-www-form-urlencoded");
-            httpCon.setRequestMethod("DELETE");
-            httpCon.connect();
-            logger.info("ElasticSearch Index " + indexName + " deleted: status is "
-                    + httpCon.getResponseCode());
-            if (httpCon.getResponseCode() == 200) {
+            DeleteIndexResponse deleteResponse = this.client.admin().indices().delete(new DeleteIndexRequest(indexName)).actionGet();
+
+            if (deleteResponse.isAcknowledged()) {
+                logger.info("Index {} deleted", indexName);
                 val = true;
+            } else {
+                logger.error("Could not delete index " + indexName);
             }
-            httpCon.disconnect();
-        } catch (Exception e) {
-            throw new Exception("Cannot delete index for " + indexName);
+        } catch (IndexNotFoundException e) {
+            logger.info("Index " + indexName + " not found.");
+
         }
         return val;
     }
@@ -90,79 +97,43 @@ abstract class Indexer {
      */
     private boolean createIndex(String indexName) throws IOException {
         boolean val = false;
+        if (!client.admin().indices().prepareExists(indexName).execute().actionGet().isExists()) {
+            // load custom analyzer
+            String analyserStr = null;
+            try {
+                ClassLoader classLoader = DocumentIndexer.class.getClassLoader();
+                analyserStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/analyzer.json"));
+            } catch (Exception e) {
+                throw new ElasticSearchConfigurationException("Cannot read analyzer for " + indexName);
+            }
 
-        // create index
-        String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + indexName;
-        URL url = null;
-        try {
-            url = new URL(urlStr);
-        } catch (MalformedURLException ex) {
-            java.util.logging.Logger.getLogger(DocumentIndexer.class.getName()).log(Level.SEVERE, null, ex);
+            CreateIndexRequestBuilder createIndexRequestBuilder = this.client.admin().indices().prepareCreate(indexName).setSettings(analyserStr);
+
+            if (indexName.equals(IndexProperties.getNerdAnnotsIndexName())) {
+                createIndexRequestBuilder.addMapping(IndexProperties.getNerdAnnotsTypeName(), loadMapping(indexName, IndexProperties.getNerdAnnotsTypeName()));
+            } else if (indexName.equals(IndexProperties.getKeytermAnnotsIndexName())) {
+                createIndexRequestBuilder.addMapping(IndexProperties.getKeytermAnnotsTypeName(), loadMapping(indexName, IndexProperties.getKeytermAnnotsTypeName()));
+            } else if (indexName.equals(IndexProperties.getKbIndexName())) {
+                createIndexRequestBuilder.addMapping(IndexProperties.getKbAuthorsTypeName(), loadMapping(indexName, IndexProperties.getKbAuthorsTypeName()));
+                createIndexRequestBuilder.addMapping(IndexProperties.getKbOrganisationsTypeName(), loadMapping(indexName, IndexProperties.getKbOrganisationsTypeName()));
+                createIndexRequestBuilder.addMapping(IndexProperties.getKbPublicationsTypeName(), loadMapping(indexName, IndexProperties.getKbPublicationsTypeName()));
+            } else {
+                createIndexRequestBuilder.addMapping(IndexProperties.getFulltextTeisTypeName(), loadMapping(indexName, IndexProperties.getFulltextTeisTypeName()));
+            }
+
+            final CreateIndexResponse createResponse = createIndexRequestBuilder.execute().actionGet();
+            if (!createResponse.isAcknowledged()) {
+                throw new IndexingServiceException("Failed to create index <" + indexName + ">");
+            }
+            logger.info("Index {} created", indexName);
+        } else {
+            logger.info("Index {} already exists", indexName);
         }
-        HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-        httpCon.setDoOutput(true);
-        httpCon.setRequestProperty(
-                "Content-Type", "application/x-www-form-urlencoded");
-        try {
-            httpCon.setRequestMethod("PUT");
-        } catch (ProtocolException ex) {
-            java.util.logging.Logger.getLogger(DocumentIndexer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        /*System.out.println("ElasticSearch Index " + indexName + " creation: status is " + 
-         httpCon.getResponseCode());
-         if (httpCon.getResponseCode() == 200) {
-         val = true;
-         }*/
-        // load custom analyzer
-        String analyserStr = null;
-        try {
-            ClassLoader classLoader = DocumentIndexer.class.getClassLoader();
-            analyserStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/analyzer.json"));
-        } catch (Exception e) {
-            throw new ElasticSearchConfigurationException("Cannot read analyzer for " + indexName);
-        }
-
-        httpCon.setDoOutput(true);
-        httpCon.setRequestMethod("PUT");
-        httpCon.addRequestProperty("Content-Type", "text/json");
-        OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
-        out.write(analyserStr);
-        out.close();
-
-        logger.info("ElasticSearch analyzer for " + indexName + " : status is "
-                + httpCon.getResponseCode());
-        if (httpCon.getResponseCode() == 200) {
-            val = true;
-        }
-
-        httpCon.disconnect();
+        val = true;
         return val;
     }
 
-    /**
-     *
-     */
-    private boolean loadMapping(String indexName) throws Exception {
-        boolean val = false;
-
-        String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + indexName;
-        if (indexName.equals(IndexProperties.getNerdAnnotsIndexName())) {
-            urlStr += "/"+IndexProperties.getNerdAnnotsTypeName()+"/_mapping";
-        } else if (indexName.equals(IndexProperties.getKeytermAnnotsIndexName())) {
-            urlStr += "/"+IndexProperties.getKeytermAnnotsTypeName()+"/_mapping";
-        } else if(indexName.equals(IndexProperties.getKbIndexName())) {
-            urlStr += "?pretty";
-        } else {
-            urlStr += "/"+IndexProperties.getFulltextTeisTypeName()+"/_mapping";
-        }
-
-        URL url = new URL(urlStr);
-        HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-        httpCon.setDoOutput(true);
-        httpCon.setRequestProperty(
-                "Content-Type", "application/x-www-form-urlencoded");
-        httpCon.setRequestMethod("PUT");
+    private String loadMapping(String indexName, String type) throws ElasticSearchConfigurationException {
         String mappingStr = null;
         try {
             ClassLoader classLoader = DocumentIndexer.class.getClassLoader();
@@ -170,29 +141,21 @@ abstract class Indexer {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_nerd.json"));
             } else if (indexName.contains(IndexProperties.getKeytermAnnotsIndexName())) {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_keyterm.json"));
-            } else if(indexName.equals(IndexProperties.getKbIndexName())) {
-            mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kb.json"));
-        } else {
+            } else if (indexName.equals(IndexProperties.getKbIndexName())) {
+                if (type.equals(IndexProperties.getKbAuthorsTypeName())) {
+                    mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kbauthors.json"));
+                } else if (type.equals(IndexProperties.getKbOrganisationsTypeName())) {
+                    mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kborganisations.json"));
+                } else {
+                    mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kbpublications.json"));
+                }
+            } else {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl.json"));
             }
         } catch (Exception e) {
             throw new ElasticSearchConfigurationException("Cannot read mapping for " + indexName);
         }
-        logger.info(urlStr);
-
-        httpCon.setDoOutput(true);
-        httpCon.setRequestMethod("PUT");
-        httpCon.addRequestProperty("Content-Type", "text/json");
-        OutputStreamWriter out = new OutputStreamWriter(httpCon.getOutputStream());
-        out.write(mappingStr);
-        out.close();
-
-        logger.info("ElasticSearch mapping for " + indexName + " : status is "
-                + httpCon.getResponseCode() + " "+ httpCon.getResponseMessage());
-        if (httpCon.getResponseCode() == 200) {
-            val = true;
-        }
-        return val;
+        return mappingStr;
     }
 
 }
