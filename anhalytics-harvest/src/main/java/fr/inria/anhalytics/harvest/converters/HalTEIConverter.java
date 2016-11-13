@@ -76,12 +76,22 @@ public class HalTEIConverter implements MetadataConverter {
 
             Element defendingElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"dateDefended\"]").evaluate(newTEICorpus, XPathConstants.NODE);
 
+            Element startDateConferenceElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/meeting/date[@type=\"start\"]").evaluate(newTEICorpus, XPathConstants.NODE);
+
             String pubDate = "";
             if (dateElt != null) {
                 pubDate = Utilities.completeDate(dateElt.getTextContent());
             }
             if (pubDate.isEmpty()) {
                 String date = "";
+
+                if (startDateConferenceElt != null) {
+                    String confDate = Utilities.completeDate(startDateConferenceElt.getTextContent());
+                    if (!confDate.isEmpty()) {
+                        date = confDate;
+                    }
+                }
+
                 if (defendingElt != null) {
                     String defendedDate = Utilities.completeDate(defendingElt.getTextContent());
                     if (!defendedDate.isEmpty()) {
@@ -350,9 +360,9 @@ public class HalTEIConverter implements MetadataConverter {
                     if (!dateRaw.isEmpty()) {
                         dateFormatted = Utilities.completeDate(dateRaw);
                     }
-                } 
-                
-                if(dateFormatted.isEmpty()) {
+                }
+
+                if (dateFormatted.isEmpty()) {
                     dateFormatted = submissionDateElt.getTextContent().split(" ")[0];
                 }
 
