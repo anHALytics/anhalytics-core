@@ -1,6 +1,5 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
-import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import java.io.ByteArrayInputStream;
@@ -8,12 +7,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -23,9 +23,6 @@ import org.apache.commons.io.FileUtils;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 /**
  *
@@ -62,7 +59,12 @@ public class TestTeiBuild extends XMLTestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        TeiBuilder teiBuilder = new TeiBuilder();
+        TeiBuilder teiBuilder = null;
+        try {
+            teiBuilder = new TeiBuilder();
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(TestTeiBuild.class.getName()).log(Level.SEVERE, null, ex);
+        }
         Document corpusTei = teiBuilder.createTEICorpus(new FileInputStream(metadata));
         String corpusTeiString = Utilities.toString(corpusTei);
         
@@ -108,7 +110,6 @@ public class TestTeiBuild extends XMLTestCase {
         }
         corpusTei = teiBuilder.createTEICorpus(new FileInputStream(metadata));
         String corpusTeiStream1 = (Utilities.toString(corpusTei));
-        System.out.println("hal-00576900");
         result = Utilities.toString(teiBuilder.addGrobidTEIToTEICorpus(corpusTeiStream1, FileUtils.readFileToString(fullTextFile)));
 
         try {
