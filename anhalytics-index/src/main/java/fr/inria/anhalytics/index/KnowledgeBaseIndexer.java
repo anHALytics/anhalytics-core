@@ -91,10 +91,10 @@ public class KnowledgeBaseIndexer extends Indexer {
     }
 
     public int indexAuthors() throws SQLException {
-        IndexingPreprocess indexingPreprocess = new IndexingPreprocess(mm);
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode standoffNode = null;
+//        IndexingPreprocess indexingPreprocess = new IndexingPreprocess(mm);
+//
+//        ObjectMapper mapper = new ObjectMapper();
+//        JsonNode standoffNode = null;
         PersonDAO pdao = (PersonDAO) adf.getPersonDAO();
         OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
         DocumentDAO ddao = (DocumentDAO) adf.getDocumentDAO();
@@ -142,17 +142,17 @@ public class KnowledgeBaseIndexer extends Indexer {
 //                }
 //                documentDoc.put("organisations", document_organisations);
                 //authors/publication ?
-                Map<String, Object> result = new HashMap<String, Object>();
-                try {
-                    standoffNode = indexingPreprocess.getStandoffNerd(mapper, doc.getDocID());
-                    standoffNode = indexingPreprocess.getStandoffKeyTerm(mapper, doc.getDocID(), standoffNode);
-                    if (standoffNode != null) {
-                        result = mapper.convertValue(standoffNode, Map.class);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                documentDoc.put("annotations", result);
+//                Map<String, Object> result = new HashMap<String, Object>();
+//                try {
+//                    standoffNode = indexingPreprocess.getStandoffNerd(mapper, doc.getDocID());
+//                    standoffNode = indexingPreprocess.getStandoffKeyTerm(mapper, doc.getDocID(), standoffNode);
+//                    if (standoffNode != null) {
+//                        result = mapper.convertValue(standoffNode, Map.class);
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//                documentDoc.put("annotations", result);
                 publications.add(documentDoc);
 //                coauthors = pdao.getAuthorsByDocId(doc.getDocID());
 //
@@ -391,18 +391,18 @@ public class KnowledgeBaseIndexer extends Indexer {
                 documentDocument.put("publication", publicationDocument);
                 orgDocumentsDocument.add(documentDocument);
 
-                Map<String, Object> result = new HashMap<String, Object>();
-                try {
-                    standoffNode = indexingPreprocess.getStandoffNerd(mapper, doc.getDocID());
-                    standoffNode = indexingPreprocess.getStandoffKeyTerm(mapper, doc.getDocID(), standoffNode);
-                    if (standoffNode != null) {
-                        result = mapper.convertValue(standoffNode, Map.class);
-
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                documentDocument.put("annotations", result);
+//                Map<String, Object> result = new HashMap<String, Object>();
+//                try {
+//                    standoffNode = indexingPreprocess.getStandoffNerd(mapper, doc.getDocID());
+//                    standoffNode = indexingPreprocess.getStandoffKeyTerm(mapper, doc.getDocID(), standoffNode);
+//                    if (standoffNode != null) {
+//                        result = mapper.convertValue(standoffNode, Map.class);
+//
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//                documentDocument.put("annotations", result);
 
             }
             organisationDocument.put("docCount", docs.size());
