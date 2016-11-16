@@ -85,13 +85,13 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
                 statement = connect.prepareStatement(UPDATE_AFFILIATION, Statement.RETURN_GENERATED_KEYS);
                 if (obj.getFrom_date().before(existingAff.getFrom_date())) {
                     existingAff.setFrom_date(obj.getFrom_date());
-                } else if (obj.getFrom_date().after(existingAff.getUntil_date())) {
-                    existingAff.setUntil_date(obj.getFrom_date());
+                } else if (obj.getUntil_date().after(existingAff.getUntil_date())) {
+                    existingAff.setUntil_date(obj.getUntil_date());
                 }
                 statement.setDate(1, new java.sql.Date(existingAff.getFrom_date().getTime()));
-
                 statement.setDate(2, new java.sql.Date(existingAff.getUntil_date().getTime()));
                 statement.setLong(3, existingAff.getAffiliationId());
+
                 int code = statement.executeUpdate();
                 result = true;
                 statement.close();

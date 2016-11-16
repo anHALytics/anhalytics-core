@@ -249,8 +249,8 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                         statement2 = connect.prepareStatement(UPDATE_PART_OF, Statement.RETURN_GENERATED_KEYS);
                         if (rel.getFromDate().before(existingpart_of.getFromDate())) {
                             existingpart_of.setFromDate(rel.getFromDate());
-                        } else if (rel.getFromDate().after(existingpart_of.getUntilDate())) {
-                            existingpart_of.setUntilDate(rel.getFromDate());
+                        } else if (rel.getUntilDate().after(existingpart_of.getUntilDate())) {
+                            existingpart_of.setUntilDate(rel.getUntilDate());
                         }
                         statement2.setDate(1, new java.sql.Date(existingpart_of.getFromDate().getTime()));
 
