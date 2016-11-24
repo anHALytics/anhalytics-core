@@ -378,7 +378,7 @@ public class DocumentIndexer extends Indexer {
         request += "], \"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
         //System.out.println(request);
 
-        String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":" + IndexProperties.getElasticSearch_port() + "/" + IndexProperties.getFulltextTeisIndexName() + "/_search";
+        String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":9200/" + IndexProperties.getFulltextTeisIndexName() + "/_search";
         StringBuffer json = new StringBuffer();
         try {
             URL url = new URL(urlStr);
