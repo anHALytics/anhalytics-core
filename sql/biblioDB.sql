@@ -153,6 +153,24 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 0
 DEFAULT CHARACTER SET = utf8;
 
+-- -----------------------------------------------------
+-- Table `anhalytics_biblio`.`PERSON_IDENTIFIER`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PERSON_IDENTIFIER` (
+  `person_identifierID` INT(11) NOT NULL AUTO_INCREMENT,
+  `personID` INT(11) NOT NULL,
+  `ID` VARCHAR(150) NOT NULL,
+  `Type` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`person_identifierID`),
+  UNIQUE INDEX `index3` (`personID` ASC, `ID` ASC, `Type` ASC),
+  INDEX `fk_PERSON_IDENTIFIERS_PERSON1_idx` (`personID` ASC),
+  CONSTRAINT `fk_PERSON_IDENTIFIERS_PERSON1`
+    FOREIGN KEY (`personID`)
+    REFERENCES `anhalytics_biblio`.`PERSON` (`personID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
 -- Table `anhalytics_biblio`.`PUBLISHER`
