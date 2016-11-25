@@ -4,10 +4,8 @@ import fr.inria.anhalytics.index.exceptions.IndexNotCreatedException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
-import java.io.*;
 import java.util.*;
 
-import java.net.*;
 import org.elasticsearch.action.bulk.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +16,7 @@ import fr.inria.anhalytics.commons.properties.IndexProperties;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
+import org.elasticsearch.action.search.SearchResponse;
 
 /**
  * Method for management of the ElasticSearch cluster.
@@ -365,54 +364,14 @@ public class DocumentIndexer extends Indexer {
     private List<String> validDocIDs(String anhalyticsId, ObjectMapper mapper) {
         List<String> results = new ArrayList<String>();
         logger.info("validDocIDs: " + anhalyticsId);
-        String request = "{\"fields\": [ ";
-        boolean first = true;
-        for (String path : toBeIndexed) {
-            if (first) {
-                first = false;
-            } else {
-                request += ", ";
-            }
-            request += "\"" + path + "\"";
-        }
-        request += "], \"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
-        //System.out.println(request);
+        String request[] = toBeIndexed.toArray(new String[0]);
+        String query = "{\"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
+        
+        SearchResponse searchResponse = client.prepareSearch(IndexProperties.getFulltextTeisIndexName()).setQuery(query).addFields(request).execute().actionGet();
 
-        String urlStr = "http://" + IndexProperties.getElasticSearch_host() + ":9200/" + IndexProperties.getFulltextTeisIndexName() + "/_search";
-        StringBuffer json = new StringBuffer();
+        
         try {
-            URL url = new URL(urlStr);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(true);
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json; charset=utf8");
-
-            byte[] postDataBytes = request.getBytes("UTF-8");
-
-            OutputStream os = conn.getOutputStream();
-            os.write(postDataBytes);
-            os.flush();
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                logger.error("Failed, HTTP error code : "
-                        + conn.getResponseCode());
-                return null;
-            }
-            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                json.append(line);
-                json.append(" ");
-            }
-            os.close();
-            conn.disconnect();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            JsonNode resJsonStruct = mapper.readTree(json.toString());
+            JsonNode resJsonStruct = mapper.readTree(searchResponse.toString());
             JsonNode hits = resJsonStruct.findPath("hits").findPath("hits");
             if (hits.isArray()) {
                 JsonNode hit0 = hits.get(0);
