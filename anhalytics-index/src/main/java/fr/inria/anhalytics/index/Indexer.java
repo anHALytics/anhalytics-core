@@ -66,7 +66,7 @@ abstract class Indexer {
             // create new index and load the appropriate mapping
             createIndex(indexName);
         } catch (Exception e) {
-            logger.error("Sep-up of ElasticSearch failed for HAL index.", e);
+            logger.error("Sep-up of ElasticSearch failed for index "+indexName+".", e);
             e.printStackTrace();
         }
     }
@@ -95,7 +95,7 @@ abstract class Indexer {
     /**
      *
      */
-    private boolean createIndex(String indexName) throws IOException {
+    public boolean createIndex(String indexName) {
         boolean val = false;
         if (!client.admin().indices().prepareExists(indexName).execute().actionGet().isExists()) {
             // load custom analyzer

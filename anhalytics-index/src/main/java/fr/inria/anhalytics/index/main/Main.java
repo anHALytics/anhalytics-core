@@ -148,20 +148,32 @@ public class Main {
                     logger.info("Total: " + nbDoc + " fulltext documents indexed.");
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getFulltextTeisIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getFulltextTeisIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getFulltextTeisIndexName());
+                    int nbDoc = esm.indexTeiFulltextCollection();
+                    logger.info("Total: " + nbDoc + " fulltext documents indexed.");
                 }
 
                 try {
                     int nbDoc1 = esm.indexTeiMetadataCollection();
                     logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
-
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getMetadataTeisIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getMetadataTeisIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getMetadataTeisIndexName());
+                    int nbDoc1 = esm.indexTeiMetadataCollection();
+                    logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
                 }
+
                 try {
                     int nbNerdAnnot = esm.indexNerdAnnotations();
                     logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getNerdAnnotsIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getNerdAnnotsIndexName());
+                    int nbNerdAnnot = esm.indexNerdAnnotations();
+                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
                 }
 
                 try {
@@ -169,6 +181,10 @@ public class Main {
                     logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getKeytermAnnotsIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getKeytermAnnotsIndexName());
+                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
+                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 }
 //KB indexing
             } else if (process.equals("indexDaily")) {
@@ -182,20 +198,32 @@ public class Main {
                     logger.info("Total: " + nbDoc + " fulltext documents indexed.");
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getFulltextTeisIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getFulltextTeisIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getFulltextTeisIndexName());
+                    int nbDoc = esm.indexTeiFulltextCollection();
+                    logger.info("Total: " + nbDoc + " fulltext documents indexed.");
                 }
 
                 try {
                     int nbDoc1 = esm.indexTeiMetadataCollection();
                     logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
-
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getMetadataTeisIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getMetadataTeisIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getMetadataTeisIndexName());
+                    int nbDoc1 = esm.indexTeiMetadataCollection();
+                    logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
                 }
+
                 try {
                     int nbNerdAnnot = esm.indexNerdAnnotations();
                     logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getNerdAnnotsIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getNerdAnnotsIndexName());
+                    int nbNerdAnnot = esm.indexNerdAnnotations();
+                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
                 }
 
                 try {
@@ -203,6 +231,10 @@ public class Main {
                     logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getKeytermAnnotsIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getKeytermAnnotsIndexName());
+                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
+                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 }
                 // TBD: daily KB refresh and indexing ?
             } else if (process.equals("indexFulltext")) {
@@ -211,14 +243,21 @@ public class Main {
                     logger.info("Total: " + nbDoc + " fulltext documents indexed.");
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getFulltextTeisIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getFulltextTeisIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getFulltextTeisIndexName());
+                    int nbDoc = esm.indexTeiFulltextCollection();
+                    logger.info("Total: " + nbDoc + " fulltext documents indexed.");
                 }
             } else if (process.equals("indexMetadata")) {
                 try {
                     int nbDoc1 = esm.indexTeiMetadataCollection();
                     logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
-
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getMetadataTeisIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getMetadataTeisIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getMetadataTeisIndexName());
+                    int nbDoc1 = esm.indexTeiMetadataCollection();
+                    logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
                 }
             } else if (process.equals("indexAnnotations")) {
                 try {
@@ -226,6 +265,10 @@ public class Main {
                     logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getNerdAnnotsIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getNerdAnnotsIndexName());
+                    int nbNerdAnnot = esm.indexNerdAnnotations();
+                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
                 }
 
                 try {
@@ -233,6 +276,10 @@ public class Main {
                     logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getKeytermAnnotsIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getKeytermAnnotsIndexName());
+                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
+                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 }
             } else if (process.equals("indexKB")) {
                 KnowledgeBaseIndexer mi = new KnowledgeBaseIndexer(); // this is the KB in fact !
@@ -244,7 +291,19 @@ public class Main {
                     int nbOrgs = mi.indexOrganisations();
                     logger.info("Total: " + nbOrgs + " organisations indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
+                    logger.error(IndexProperties.getKbIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getKbIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getKbIndexName());
+                    try {
+                        int nbAuthtors = mi.indexAuthors();
+                        logger.info("Total: " + nbAuthtors + " authors indexed.");
+                        int nbPubs = mi.indexPublications();
+                        logger.info("Total: " + nbPubs + " publications indexed.");
+                        int nbOrgs = mi.indexOrganisations();
+                        logger.info("Total: " + nbOrgs + " organisations indexed.");
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
                 } catch (SQLException sqle) {
                     sqle.printStackTrace();
                 }
