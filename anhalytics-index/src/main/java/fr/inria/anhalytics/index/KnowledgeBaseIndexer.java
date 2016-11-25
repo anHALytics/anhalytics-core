@@ -389,9 +389,19 @@ public class KnowledgeBaseIndexer extends Indexer {
                         motheraddressDocument = motheraddr.getAddressDocument();
                     }
                     motherOrganisationDocument.put("address", motheraddressDocument);
+
                     orgRelationsDocument.add(motherOrganisationDocument);
+                    for (PART_OF partOfMother : organisation_mother.getRels()) {
+                        Organisation organisation_mother1 = partOfMother.getOrganisation_mother();
+                        Map<String, Object> motherOrganisationDocument1 = organisation_mother1.getOrganisationDocument();
+
+                        allOrgRelationsDocument.add(motherOrganisationDocument1);
+
                     }
 
+                    allOrgRelationsDocument.add(motherOrganisationDocument);
+                }
+                organisationDocument.put("allrelations", allOrgRelationsDocument);
                 organisationDocument.put("relations", orgRelationsDocument);
                 List<Document> docs = ddao.getDocumentsByOrgId(org.getOrganisationId());
                 List<Map<String, Object>> orgDocumentsDocument = new ArrayList<Map<String, Object>>();
