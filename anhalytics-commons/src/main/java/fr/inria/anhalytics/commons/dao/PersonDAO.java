@@ -55,7 +55,7 @@ public class PersonDAO extends DAO<Person, Long> {
             = "SELECT * FROM PERSON p WHERE p.personID = ?";
 
     private static final String READ_QUERY_PERSON_NAME_BY_ID
-            = "SELECT * FROM PERSON_NAME pn WHERE pn.personID = ? GROUP BY pn.lastupdate_date ORDER BY pn.lastupdate_date DESC";
+            = "SELECT * FROM PERSON_NAME pn WHERE pn.personID = ? ORDER BY pn.lastupdate_date DESC";
     private static final String READ_QUERY_AUTHORS
             = "SELECT DISTINCT personID FROM AUTHORSHIP";
 
