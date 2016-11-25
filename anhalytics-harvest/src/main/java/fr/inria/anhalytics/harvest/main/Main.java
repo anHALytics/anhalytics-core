@@ -194,7 +194,6 @@ public class Main {
         final StringBuffer help = new StringBuffer();
         help.append("HELP ANHALYTICS_HARVEST\n");
         help.append("-h: displays help\n");
-        help.append("-set: oai pmh set\n");
         help.append("-dOAI: url of the OAI-PMH service\n");
         help.append("-set: select a specific set (INRIA, CNRS..), the available sets are for instance : https://api.archives-ouvertes.fr/oai/hal/?verb=ListSets \n");
         help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");

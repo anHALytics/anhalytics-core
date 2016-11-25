@@ -146,11 +146,11 @@ public class Main {
     
     protected static String getHelp() {
         final StringBuffer help = new StringBuffer();
-        help.append("HELP ANHALYTICS_HARVEST\n");
+        help.append("HELP ANHALYTICS_KNOWLEDGE_BASE\n");
         help.append("-h: displays help\n");
-        help.append("-dOAI: url of the OAI-PMH service\n");
         help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-dUntilDate: filter until date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
+        help.append("-nodates: fetches entries from database with no date filtering.\n");
         help.append("-exe: gives the command to execute. The value should be one of these : \n");
         help.append("--reset: updates all the documents (beware about versions/updates) : \n");
         help.append("\t" + availableCommands + "\n");
