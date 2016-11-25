@@ -10,12 +10,10 @@ import java.util.List;
 public class Document_Organisation {
 
     private Document doc = null;
-    private String type = "";
     private List<Organisation> orgs = null;
 
-    public Document_Organisation(Document doc, String type, List<Organisation> orgs) {
+    public Document_Organisation(Document doc, List<Organisation> orgs) {
         this.doc = doc;
-        this.type = type;
         this.orgs = orgs;
     }
 
@@ -34,23 +32,6 @@ public class Document_Organisation {
      */
     public void setDoc(Document doc) {
         this.doc = doc;
-    }
-
-    /**
-     * @return the type
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(String type) {
-        if (type.length() > 55) {
-            type = type.substring(0, 54);
-        }
-        this.type = type;
     }
 
     /**

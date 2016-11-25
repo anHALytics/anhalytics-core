@@ -235,7 +235,6 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `anhalytics`.`DOCUMENT_ORGANISATION`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `anhalytics`.`DOCUMENT_ORGANISATION` (
-  `type` ENUM('institution', 'department', 'laboratory', 'researchteam') NULL DEFAULT NULL,
   `docID` VARCHAR(45) NOT NULL,
   `organisationID` INT(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`organisationID`, `docID`),

@@ -15,7 +15,7 @@ import java.sql.Statement;
 public class Document_OrganisationDAO extends DAO<Document_Organisation, Long> {
 
     private static final String SQL_INSERT
-            = "INSERT INTO DOCUMENT_ORGANISATION (docID, organisationID, type) VALUES (?, ?, ?)";
+            = "INSERT INTO DOCUMENT_ORGANISATION (docID, organisationID) VALUES (?, ?)";
 
     public Document_OrganisationDAO(Connection conn) {
         super(conn);
@@ -34,7 +34,6 @@ public class Document_OrganisationDAO extends DAO<Document_Organisation, Long> {
             try {
                 statement.setString(1, obj.getDoc().getDocID());
                 statement.setLong(2, org.getOrganisationId());
-                statement.setString(3, org.getType());
                 int code = statement.executeUpdate();
 
                 result = true;
