@@ -200,6 +200,72 @@
                     }
                 }
             },
+            
+            "allrelations": {
+                "properties": {
+                    "identifers": {
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "structId": {
+                        "type": "string"
+                    },
+                    "address": {
+                        "properties": {
+                            "country": {
+                                "type": "string"
+                            },
+                            "addrLine": {
+                                "type": "string"
+                            },
+                            "postBox": {
+                                "type": "string"
+                            },
+                            "postCode": {
+                                "type": "string"
+                            },
+                            "region": {
+                                "type": "string"
+                            },
+                            "addressId": {
+                                "type": "long"
+                            },
+                            "settlement": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "names": {
+                        "properties": {
+                            "date": {
+                                "format": "strict_date_optional_time||epoch_millis",
+                                "type": "date"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "organisationId": {
+                        "type": "long"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                }
+            },
             "type": {
                 "type": "string",
                 "index": "not_analyzed"
