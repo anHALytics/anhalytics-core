@@ -1,11 +1,16 @@
 {
-  "analysis" : { 
+  	"analysis" : { 
        "analyzer" : { 
-          "case_insensitive" : { 
-              "type" : "custom", 
-		      "tokenizer" : "keyword",
-		      "filter" : "lowercase"
-          }
-	   } 
-  }
+          	"case_insensitive_keyword" : { 
+              	"type" : "custom", 
+		      	"tokenizer" : "keyword",
+		      	"filter" : "lowercase"
+          	}, 
+          	"case_insensitive" : { 
+              	"type" : "custom", 
+		      	"tokenizer" : "standard",
+		      	"filter" : "lowercase"
+          	}
+	   	} 
+  	}
 }
