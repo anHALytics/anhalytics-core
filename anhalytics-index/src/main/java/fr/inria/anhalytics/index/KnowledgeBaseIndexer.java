@@ -68,7 +68,6 @@ public class KnowledgeBaseIndexer extends Indexer {
     }
 
     private static void getAffiliations(List<Map<String, Object>> organisations, Organisation org, Date begin_date, Date end_date) throws SQLException {
-
         if (org != null) {
             AddressDAO adao = (AddressDAO) adf.getAddressDAO();
             Map<String, Object> orgDocument = org.getOrganisationDocument();
@@ -82,11 +81,6 @@ public class KnowledgeBaseIndexer extends Indexer {
             }
             orgDocument.put("address", orgAddress);
             organisations.add(orgDocument);
-            for (PART_OF part_of : org.getRels()) {
-                Organisation org1 = part_of.getOrganisation_mother();
-                getAffiliations(organisations, org1, begin_date, end_date);
-
-            }
         }
 
     }
