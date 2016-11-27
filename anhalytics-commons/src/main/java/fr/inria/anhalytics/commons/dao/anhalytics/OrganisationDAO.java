@@ -45,7 +45,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
     private static final String SQL_UPDATE_END_DATE
             = "UPDATE PART_OF SET until_date = ? WHERE organisationID = ? AND organisation_motherID = ?";
 
-    private static final String SQL_SELECT_AFFILIATION_BY_PERSONID = "SELECT * FROM AFFILIATION WHERE personID = ? GROUP BY from_date, until_date, organisationID";
+    private static final String SQL_SELECT_AFFILIATION_BY_PERSONID = "SELECT * FROM AFFILIATION WHERE personID = ?";
 
     private static final String SQL_SELECT_ORGNAME_BY_ORGID = "SELECT * FROM ORGANISATION_NAME WHERE organisationID = ?";
 
@@ -55,7 +55,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
 
     private static final String SQL_SELECT_ORG_BY_ID = "SELECT * FROM ORGANISATION org WHERE org.organisationID = ? ";
 
-    private static final String SQL_SELECT_ORGNAMES_BY_ID = "SELECT * FROM ORGANISATION_NAME orgname WHERE orgname.organisationID = ? GROUP BY orgname.lastupdate_date, orgname.name";
+    private static final String SQL_SELECT_ORGNAMES_BY_ID = "SELECT * FROM ORGANISATION_NAME orgname WHERE orgname.organisationID = ?";
 
     private static final String SQL_SELECT_ORGIDENTIFIERS_BY_ID = "SELECT * FROM ORGANISATION_IDENTIFIER org_id WHERE org_id.organisationID = ?";
 
