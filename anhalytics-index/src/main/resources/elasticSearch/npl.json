@@ -490,7 +490,6 @@
                                                             "$listBibl": {
                                                                 "properties": {
                                                                     "$biblStruct": {
-                                                                        "type": "nested",
                                                                         "properties": {
                                                                             "$analytic": {
                                                                                 "properties": {
