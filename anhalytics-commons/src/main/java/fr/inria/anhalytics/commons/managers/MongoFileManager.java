@@ -732,7 +732,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                     result = annotations.toString();
                 }
             } else {
-                logger.error("The annotations for doc " + anhalyticsId + " was not found in " + annotationsCollection);
+                logger.warn("The annotations for doc " + anhalyticsId + " was not found in " + annotationsCollection);
             }
         } finally {
             if (curs != null) {
