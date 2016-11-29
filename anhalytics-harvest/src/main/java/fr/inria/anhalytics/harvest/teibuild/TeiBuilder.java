@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
+import fr.inria.anhalytics.commons.exceptions.SystemException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.converters.HalTEIConverter;
 import java.io.ByteArrayInputStream;
@@ -25,11 +26,17 @@ public class TeiBuilder {
 
     private DocumentBuilder docBuilder;
 
-    public TeiBuilder() throws ParserConfigurationException {
+    public TeiBuilder()  {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
         //docFactory.setNamespaceAware(true);
-        docBuilder = docFactory.newDocumentBuilder();
+
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new SystemException("Cannot instantiate TeiBuilder", e);
+        }
+
     }
 
     /**

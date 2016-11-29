@@ -1,29 +1,24 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
-import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
+import fr.inria.anhalytics.commons.utilities.Utilities;
+import org.apache.commons.io.FileUtils;
+import org.custommonkey.xmlunit.XMLTestCase;
+import org.junit.Test;
+import org.w3c.dom.Document;
+
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-
-import org.apache.commons.io.FileUtils;
-import org.custommonkey.xmlunit.XMLTestCase;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.w3c.dom.Document;
 
 /**
- *
  * @author Achraf
  */
 public class TeiBuildIntegrationTest extends XMLTestCase {
@@ -36,8 +31,8 @@ public class TeiBuildIntegrationTest extends XMLTestCase {
             System.err.println(exp.getMessage());
             return;
         }
-        
-        
+
+
         XPath xPath = XPathFactory.newInstance().newXPath();
         xPath.setNamespaceContext(new MyNamespaceContext());
 
@@ -57,18 +52,13 @@ public class TeiBuildIntegrationTest extends XMLTestCase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        TeiBuilder teiBuilder = null;
-        try {
-            teiBuilder = new TeiBuilder();
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(TeiBuildIntegrationTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        TeiBuilder teiBuilder = new TeiBuilder();
         Document corpusTei = teiBuilder.createTEICorpus(new FileInputStream(metadata));
         String corpusTeiString = Utilities.toString(corpusTei);
-        
+
         String result = Utilities.toString(teiBuilder.addGrobidTEIToTEICorpus(corpusTeiString, FileUtils.readFileToString(fullTextFile)));
         // some test here...
-        
+
         try {
             String expected = FileUtils.readFileToString(new File(this.getResourceDir("src/test/resources/").getAbsoluteFile()
                     + "/hal-00576900.corpus.tei.xml"), "UTF-8");

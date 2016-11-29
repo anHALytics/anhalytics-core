@@ -3,34 +3,16 @@ package fr.inria.anhalytics.commons.utilities;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.exceptions.DirectoryNotFoundException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.UnknownHostException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Set;
-import java.util.List;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.*;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -43,19 +25,16 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSSerializer;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * All utilities are grouped here for managing dates, id generations, files DOM
@@ -124,7 +103,7 @@ public class Utilities {
         }
     }
 
-    private static int daysInMonth(int year, int month) {
+    protected static int daysInMonth(int year, int month) {
         int daysInMonth;
         switch (month) {
             case 1:
@@ -311,22 +290,22 @@ public class Utilities {
 
     public static String storeTmpFile(InputStream inBinary) throws IOException {
         File f = File.createTempFile("tmp", ".pdf", new File(tmpPath));
-            // deletes file when the virtual machine terminate
-            f.deleteOnExit();
+        // deletes file when the virtual machine terminate
+        f.deleteOnExit();
         String filePath = f.getAbsolutePath();
-            if (inBinary == null) {
-                System.out.println("null");
-            }
-            getBinaryURLContent(f, inBinary);
+        if (inBinary == null) {
+            System.out.println("null");
+        }
+        getBinaryURLContent(f, inBinary);
         return filePath;
     }
 
     public static String storeToTmpXmlFile(InputStream inBinary) throws IOException {
-            File f = File.createTempFile("tmp", ".xml", new File(tmpPath));
-            // deletes file when the virtual machine terminate
-            f.deleteOnExit();
+        File f = File.createTempFile("tmp", ".xml", new File(tmpPath));
+        // deletes file when the virtual machine terminate
+        f.deleteOnExit();
         String filePath = f.getAbsolutePath();
-            getBinaryURLContent(f, inBinary);
+        getBinaryURLContent(f, inBinary);
         return filePath;
     }
 
@@ -334,8 +313,8 @@ public class Utilities {
      * Download binaries from a given URL
      */
     public static void getBinaryURLContent(File file, InputStream in) throws IOException {
-            FileOutputStream fos = new FileOutputStream(file);
-            DataOutputStream writer = new DataOutputStream(fos);
+        FileOutputStream fos = new FileOutputStream(file);
+        DataOutputStream writer = new DataOutputStream(fos);
         try {
             byte[] buf = new byte[4 * 1024]; // 4K buffer
             int bytesRead;
@@ -355,10 +334,10 @@ public class Utilities {
 
     public static Date parseStringDate(String dateString) throws ParseException {
         Date date = null;
-            if (dateString != null) {
-                DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-                date = format.parse(dateString);
-            }
+        if (dateString != null) {
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+            date = format.parse(dateString);
+        }
         return date;
     }
 
@@ -402,9 +381,9 @@ public class Utilities {
     }
 
     public static void unzipIt(String file, String outPath) {
+        ZipInputStream zis = null;
         try {
-            ZipInputStream zis
-                    = new ZipInputStream(new FileInputStream(new File(file)));
+            zis = new ZipInputStream(new FileInputStream(new File(file)));
             //get the zipped file list entry
             ZipEntry ze = zis.getNextEntry();
             byte[] buffer = new byte[1024];
@@ -420,13 +399,12 @@ public class Utilities {
                 fos.close();
                 ze = zis.getNextEntry();
             }
-
             zis.closeEntry();
-            zis.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error when unzipping the file " + file + ".", e);
+        } finally {
+            IOUtils.closeQuietly(zis);
         }
     }
 
@@ -443,7 +421,7 @@ public class Utilities {
             }
             return sb.toString();
         } finally {
-            br.close();
+            IOUtils.closeQuietly(br);
         }
     }
 
@@ -452,6 +430,7 @@ public class Utilities {
         try {
             URL url = new URL(request);
             URLConnection conn = url.openConnection();
+
             conn.setRequestProperty("accept-charset", "UTF-8");
             in = conn.getInputStream();
             return in;
@@ -464,11 +443,14 @@ public class Utilities {
                 }
                 in = request(request, true);
             } else {
-                throw new ServiceException("The service is not reachable.", e);
+                throw new ServiceException("The service is not reachable. Aborting.", e);
             }
+        } catch (FileNotFoundException e) {
+            logger.warn("Cannot download " + request + ". Ignoring it. ", e);
         } catch (IOException e) {
-            throw new ServiceException("The service is not reachable.", e);
+            throw new ServiceException("The service is not reachable or something is happening.", e);
         }
+
         return in;
     }
 

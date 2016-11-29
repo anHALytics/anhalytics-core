@@ -1,24 +1,23 @@
 package fr.inria.anhalytics.harvest.main;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
-import fr.inria.anhalytics.commons.exceptions.ServiceException;
+import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.oaipmh.HALOAIPMHHarvester;
 import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
 import fr.inria.anhalytics.harvest.crossref.CrossRef;
 import fr.inria.anhalytics.harvest.crossref.OpenUrl;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
-import fr.inria.anhalytics.commons.properties.HarvestProperties;
+import fr.inria.anhalytics.harvest.oaipmh.HALOAIPMHHarvester;
 import fr.inria.anhalytics.harvest.teibuild.TeiBuilderProcess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import javax.xml.parsers.ParserConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Main class that implements commands for harvesting, extracting, inserting in
@@ -76,47 +75,39 @@ public class Main {
         cal.add(Calendar.DATE, -1);
         String todayDate = dateFormat.format(cal.getTime());
         String process = HarvestProperties.getProcessName();
-        try {
-            GrobidProcess gp = new GrobidProcess();
-            TeiBuilderProcess tb = new TeiBuilderProcess();
-            HALOAIPMHHarvester oai = new HALOAIPMHHarvester();
-            IstexHarvester ih = new IstexHarvester();
-            CrossRef cr = new CrossRef();
-            OpenUrl ou = new OpenUrl();
-            if (process.equals("harvestAll")) {
-                oai.fetchAllDocuments();
-            } else if (process.equals("harvestDaily")) {
-                Utilities.updateDates(todayDate, todayDate);
-                oai.fetchAllDocuments();
-            } else if (process.equals("generateTei")) {
-                tb.buildTEICorpus();
-            } else if (process.equals("generateTeiDaily")) {
-                Utilities.updateDates(todayDate, todayDate);
-                tb.buildTEICorpus();
-            } else if (process.equals("processGrobid")) {
-                gp.processFulltexts();
-            } else if (process.equals("processGrobidDaily")) {
-                Utilities.updateDates(todayDate, todayDate);
-                gp.processFulltexts();
-            } else if (process.equals("fetchEmbargoPublications")) {
-                oai.fetchEmbargoPublications();
-            } else if (process.equals("harvestDOI")) {
-                cr.findDois();
-            } else if (process.equals("harvestDOIDaily")) {
-                Utilities.updateDates(todayDate, todayDate);
-                cr.findDois();
-            } else if (process.equals("assetLegend")) {
-                gp.addAssetsLegend();
-            } else if (process.equals("openUrl")) {
-                ou.getIstexUrl();
-            }
-        } catch (ServiceException e) {
-            logger.error(e.getMessage());
-        } catch (ParserConfigurationException e) {
-            logger.error(e.getMessage(), e);
+        GrobidProcess gp = new GrobidProcess();
+        TeiBuilderProcess tb = new TeiBuilderProcess();
+        HALOAIPMHHarvester oai = new HALOAIPMHHarvester();
+        IstexHarvester ih = new IstexHarvester();
+        CrossRef cr = new CrossRef();
+        OpenUrl ou = new OpenUrl();
+        if (process.equals("harvestAll")) {
+            oai.fetchAllDocuments();
+        } else if (process.equals("harvestDaily")) {
+            Utilities.updateDates(todayDate, todayDate);
+            oai.fetchAllDocuments();
+        } else if (process.equals("generateTei")) {
+            tb.buildTEICorpus();
+        } else if (process.equals("generateTeiDaily")) {
+            Utilities.updateDates(todayDate, todayDate);
+            tb.buildTEICorpus();
+        } else if (process.equals("processGrobid")) {
+            gp.processFulltexts();
+        } else if (process.equals("processGrobidDaily")) {
+            Utilities.updateDates(todayDate, todayDate);
+            gp.processFulltexts();
+        } else if (process.equals("fetchEmbargoPublications")) {
+            oai.fetchEmbargoPublications();
+        } else if (process.equals("harvestDOI")) {
+            cr.findDois();
+        } else if (process.equals("harvestDOIDaily")) {
+            Utilities.updateDates(todayDate, todayDate);
+            cr.findDois();
+        } else if (process.equals("assetLegend")) {
+            gp.addAssetsLegend();
+        } else if (process.equals("openUrl")) {
+            ou.getIstexUrl();
         }
-        
-        return;
     }
 
     protected static boolean processArgs(final String[] pArgs) {

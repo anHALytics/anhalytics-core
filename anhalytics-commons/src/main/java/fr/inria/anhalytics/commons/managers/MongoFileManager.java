@@ -1,33 +1,32 @@
 package fr.inria.anhalytics.commons.managers;
 
-import com.mongodb.gridfs.GridFS;
-import com.mongodb.gridfs.GridFSInputFile;
-import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.*;
+import com.mongodb.gridfs.GridFS;
+import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSInputFile;
 import com.mongodb.util.JSON;
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.exceptions.FileNotFoundException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.ConnectException;
-import java.net.UnknownHostException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 /**
  * Class for retrieving, inserting, updating and organizing metadata TEIs, PDFs
  * and extracted TEI files from MongoDB GridFS.
- *
+ * <p>
  * WARNING: to keep in mind - this is not thread safe !
  *
  * @author Achraf
@@ -94,8 +93,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      */
     public boolean initBinaries(String date) {
         setGridFSCollection(MongoCollectionsInterface.BINARIES);
+        BasicDBObject bdbo = new BasicDBObject();
         try {
-            BasicDBObject bdbo = new BasicDBObject();
             if (date != null) {
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
             }
@@ -103,7 +102,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT);
             indexFile = 0;
         } catch (ParseException e) {
-            logger.error(e.getMessage(), e.getCause());
+            logger.error("", e);
         }
         if (cursor.size() > 0) {
             logger.info(cursor.size() + " documents found for : " + date);
@@ -201,7 +200,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             cursor = gfs.getFileList(bdbo);
             indexFile = 0;
         } catch (ParseException e) {
-            logger.error(e.getMessage(), e.getCause());
+            logger.error("Cannot parse date: " + date, e);
         }
         if (cursor.size() > 0) {
             return true;
@@ -213,9 +212,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * This initializes cursor for annotations collection.
      *
-     * @param annotationCollection the annotation collection to initialize, e.g.
-     * MongoCollectionsInterface.NERD_ANNOTATIONS,
-     * MongoCollectionsInterface.KEYTERM_ANNOTATIONS, etc.
+     * @param date
+     * @param annotationsCollection the annotation collection to initialize, e.g.
+     *                             MongoCollectionsInterface.NERD_ANNOTATIONS,
+     *                             MongoCollectionsInterface.KEYTERM_ANNOTATIONS, etc.
      */
     public boolean initAnnotations(String date, String annotationsCollection) throws MongoException {
         collection = getCollection(annotationsCollection);

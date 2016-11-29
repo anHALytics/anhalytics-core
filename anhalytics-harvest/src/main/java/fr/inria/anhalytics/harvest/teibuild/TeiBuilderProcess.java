@@ -27,7 +27,7 @@ public class TeiBuilderProcess {
 
     private TeiBuilder tb;
 
-    public TeiBuilderProcess() throws ParserConfigurationException {
+    public TeiBuilderProcess()  {
         try {
             this.mm = MongoFileManager.getInstance(false);
         } catch (ServiceException ex) {

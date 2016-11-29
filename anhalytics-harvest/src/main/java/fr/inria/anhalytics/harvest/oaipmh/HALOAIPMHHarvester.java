@@ -3,13 +3,15 @@ package fr.inria.anhalytics.harvest.oaipmh;
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
-import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
-import java.io.*;
-import java.net.UnknownHostException;
+import fr.inria.anhalytics.commons.utilities.Utilities;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * HAL OAI-PMH implementation.
@@ -62,13 +64,9 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
 
     @Override
     public void fetchAllDocuments() {
-        try {
-            for (String date : Utilities.getDates()) {
-                logger.info("Extracting publications TEIs for : " + date);
-                fetchDocumentsByDate(date);
-            }
-        } catch (ServiceException se) {
-            logger.error(se.getMessage());
+        for (String date : Utilities.getDates()) {
+            logger.info("Extracting publications TEIs for : " + date);
+            fetchDocumentsByDate(date);
         }
     }
 

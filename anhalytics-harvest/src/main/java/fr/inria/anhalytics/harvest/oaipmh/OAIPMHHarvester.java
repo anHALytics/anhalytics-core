@@ -2,30 +2,27 @@ package fr.inria.anhalytics.harvest.oaipmh;
 
 import fr.inria.anhalytics.commons.data.PublicationFile;
 import fr.inria.anhalytics.commons.data.TEI;
-import fr.inria.anhalytics.harvest.exceptions.BinaryNotAvailableException;
-import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
+import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.HarvesterItf;
-import fr.inria.anhalytics.commons.properties.HarvestProperties;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.UnknownHostException;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import javax.sql.rowset.serial.SerialException;
-import javax.xml.parsers.ParserConfigurationException;
+import fr.inria.anhalytics.harvest.exceptions.BinaryNotAvailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+
 /**
  * Abstract class to be sub-classes to process a list
  * of TEI objects extracted from OAI-PMH services.
- * 
+ *
  * @author Achraf
  */
 abstract class OAIPMHHarvester implements HarvesterItf {
@@ -33,7 +30,7 @@ abstract class OAIPMHHarvester implements HarvesterItf {
     protected static final Logger logger = LoggerFactory.getLogger(OAIPMHHarvester.class);
 
     protected String oai_url = null;
-    
+
     public OAIPMHHarvester() {
         try {
             this.mm = MongoFileManager.getInstance(false);
@@ -63,7 +60,7 @@ abstract class OAIPMHHarvester implements HarvesterItf {
                 String teiString = tei.getTei();
                 String doi = tei.getDoi();
                 String pdfUrl = "";
-                if(tei.getPdfdocument() != null)
+                if (tei.getPdfdocument() != null)
                     pdfUrl = tei.getPdfdocument().getUrl();
                 String repositoryDocId = tei.getRepositoryDocId();
                 logger.info("\t\t Processing TEI for " + repositoryDocId);
@@ -88,9 +85,8 @@ abstract class OAIPMHHarvester implements HarvesterItf {
                 logger.error(bna.getMessage());
                 mm.save(tei.getRepositoryDocId(), "harvestProcess", "file not downloaded", date);
             } catch (ParseException | IOException e) {
-                e.printStackTrace();
                 mm.save(tei.getRepositoryDocId(), "harvestProcess", "harvest error", date);
-                logger.error("\t\t Error occured while processing TEI for " + tei.getRepositoryDocId());
+                logger.error("\t\t Error occured while processing TEI for " + tei.getRepositoryDocId(), e);
             }
         }
     }
@@ -111,25 +107,26 @@ abstract class OAIPMHHarvester implements HarvesterItf {
      * main file or as an annex.
      */
     protected boolean requestFile(PublicationFile file, String repositoryDocId, String type, String date) throws ParseException, IOException {
-        InputStream inBinary = null;
+        InputStream in = null;
         Date embDate = Utilities.parseStringDate(file.getEmbargoDate());
         Date today = new Date();
         if (embDate.before(today) || embDate.equals(today)) {
             logger.info("\t\t\t Downloading: " + file.getUrl());
-            inBinary = Utilities.request(file.getUrl(), false);
-            if (inBinary == null) {
+            in = Utilities.request(file.getUrl(), false);
+            if (in == null) {
                 mm.log(repositoryDocId, file.getUrl(), type, file.isAnnexFile(), "nostream", date);
             } else {
                 if (!file.isAnnexFile()) {
-                    mm.insertBinaryDocument(inBinary, HarvestProperties.getSource(), repositoryDocId, type, date);
+                    mm.insertBinaryDocument(in, HarvestProperties.getSource(), repositoryDocId, type, date);
                 } else {
                     int n = file.getUrl().lastIndexOf("/");
                     String filename = file.getUrl().substring(n + 1);
                     logger.info("\t\t\t\t Getting annex file " + filename + " for pub ID :" + repositoryDocId);
-                    mm.insertAnnexDocument(inBinary, HarvestProperties.getSource(), repositoryDocId, filename, date);
+                    mm.insertAnnexDocument(in, HarvestProperties.getSource(), repositoryDocId, filename, date);
                 }
+                in.close();
             }
-            inBinary.close();
+
             return true;
         } else {
             mm.log(repositoryDocId, file.getUrl(), type, file.isAnnexFile(), "embargo", file.getEmbargoDate());
