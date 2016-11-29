@@ -1302,7 +1302,7 @@
                                                                                 "type": "string"
                                                                             },
                                                                             "$fullName": {
-                                                                                "type": "multi_field",
+                                                                                "type": "string",
                                                                                 "fields": {
                                                                                     "notAnalyzed": {
                                                                                         "index": "not_analyzed",
@@ -1633,7 +1633,7 @@
                                                     "$type_author": {
                                                         "properties": {
                                                             "$term": {
-                                                                "type": "multi_field",
+                                                                "type": "string",
                                                                 "fields": {
                                                                     "notAnalyzed": {
                                                                         "index": "not_analyzed",
