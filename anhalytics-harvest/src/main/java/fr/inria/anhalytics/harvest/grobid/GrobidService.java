@@ -19,6 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -36,7 +37,6 @@ public class GrobidService {
     private int start = -1;
     private int end = -1;
     private boolean generateIDs = false;
-    private String date;
 
     int TIMEOUT_VALUE = 30000;
 
@@ -44,8 +44,10 @@ public class GrobidService {
         this.start = start;
         this.end = end;
         this.generateIDs = generateIDs;
-        this.date = date;
 
+    }
+
+    public GrobidService() {
     }
 
     /**
@@ -64,7 +66,6 @@ public class GrobidService {
      */
     public String runFullTextGrobid(String filepath) {
         String tei = null;
-        File zipFolder = null;
         try {
             URL url = new URL("http://" + HarvestProperties.getGrobidHost()
                     + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/processFulltextDocument");
@@ -230,6 +231,80 @@ public class GrobidService {
         return zipDirectoryPath;
     }
 
+    public String processAffiliation(String affiliations) {
+
+        String retVal = null;
+        try {
+            URL url = new URL("http://" + HarvestProperties.getGrobidHost()
+                    + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/processAffiliations");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            //conn.setConnectTimeout(TIMEOUT_VALUE);
+            //conn.setReadTimeout(TIMEOUT_VALUE);
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+            OutputStream out = conn.getOutputStream();
+            try {
+                DataOutputStream wr = new DataOutputStream(
+                        conn.getOutputStream());
+                wr.writeBytes("affiliations=" + URLEncoder.encode(affiliations, "UTF-8"));
+                wr.flush();
+                wr.close();
+            } finally {
+                out.close();
+            }
+
+            if (conn.getResponseCode() == HttpURLConnection.HTTP_UNAVAILABLE) {
+                throw new HttpRetryException("Failed : HTTP error code : "
+                        + conn.getResponseCode(), conn.getResponseCode());
+            }
+
+            //int status = connection.getResponseCode();
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + conn.getResponseCode() + " " + IOUtils.toString(conn.getErrorStream(), "UTF-8"));
+            }
+
+            //Get Response	
+            InputStream is = conn.getInputStream();
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+            String line;
+            StringBuffer response = new StringBuffer();
+            while ((line = rd.readLine()) != null) {
+                response.append(line);
+                response.append('\r');
+            }
+            rd.close();
+            retVal = response.toString();
+        } catch (ConnectException e) {
+            logger.error(e.getMessage(), e.getCause());
+            try {
+                Thread.sleep(20000);
+                processAffiliation(affiliations);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        } catch (HttpRetryException e) {
+            logger.error(e.getMessage(), e.getCause());
+            try {
+                Thread.sleep(20000);
+                processAffiliation(affiliations);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        } catch (SocketTimeoutException e) {
+            throw new GrobidTimeoutException("Grobid processing timed out.");
+        } catch (MalformedURLException e) {
+            logger.error(e.getMessage(), e.getCause());
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e.getCause());
+        }
+
+        return retVal;
+
+    }
+
     /**
      * Checks if Grobid service is responding and local tmp directory is
      * available.
@@ -254,8 +329,6 @@ public class GrobidService {
         if (responseCode != 200) {
             throw new UnreachableGrobidServiceException(responseCode);
         }
-
-        Utilities.checkPath(HarvestProperties.getTmpPath());
         logger.info("Grobid service is ok and can be used.");
         return true;
     }

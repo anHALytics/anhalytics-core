@@ -1,10 +1,7 @@
 package fr.inria.anhalytics.harvest.converters;
 
-import fr.inria.anhalytics.commons.utilities.JaroWinkler;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.grobid.MyGrobid;
-import fr.inria.anhalytics.commons.entities.Person;
-import fr.inria.anhalytics.commons.entities.Person_Name;
+import fr.inria.anhalytics.harvest.grobid.GrobidService;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -141,6 +138,7 @@ public class HalTEIConverter implements MetadataConverter {
 
     private void parseOrgsAddress(Document doc, NodeList orgs) {
         Node org = null;
+        GrobidService gs = new GrobidService();
         for (int i = orgs.getLength() - 1; i >= 0; i--) {
             org = orgs.item(i);
             if (org.getNodeType() == Node.ELEMENT_NODE) {
@@ -150,7 +148,7 @@ public class HalTEIConverter implements MetadataConverter {
                 if (addressNodes != null) {
                     Node addrLine = addressNodes.item(0);
                     if (addrLine != null) {
-                        grobidResponse = MyGrobid.runGrobid(addrLine.getTextContent());
+                        grobidResponse = gs.processAffiliation(addrLine.getTextContent());
                         try {
                             Element node = DocumentBuilderFactory
                                     .newInstance()

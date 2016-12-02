@@ -183,20 +183,6 @@ public class Main {
             defaultprops.setProperty("harvest.grobid_port", Integer.toString(grobid_port));
         }
 
-        String grobid_home = defaultprops.getProperty("harvest.grobid_home");
-        System.out.print(ANSI_YELLOW + "grobid_home (" + grobid_home + "): " + ANSI_RESET);
-        if (!grobid_home.isEmpty()) {
-            grobid_home = scanner.nextLine();
-        }
-        defaultprops.setProperty("harvest.grobid_home", grobid_home);
-
-        String grobid_properties = defaultprops.getProperty("harvest.grobid_properties");
-        System.out.print(ANSI_YELLOW + "grobid_properties (" + grobid_properties + ") : " + ANSI_RESET);
-        grobid_properties = scanner.nextLine();
-        if (!grobid_properties.isEmpty()) {
-            defaultprops.setProperty("harvest.grobid_properties", grobid_properties);
-        }
-
         int nb_threads = Integer.parseInt(defaultprops.getProperty("harvest.nbThreads"));
         System.out.print(ANSI_YELLOW + "nb_threads (" + nb_threads + "): " + ANSI_RESET);
         try {

@@ -5,6 +5,8 @@ import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
+import fr.inria.anhalytics.harvest.exceptions.UnreachableGrobidServiceException;
+import fr.inria.anhalytics.harvest.grobid.GrobidService;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +29,7 @@ public class TeiBuilderProcess {
 
     private TeiBuilder tb;
 
-    public TeiBuilderProcess()  {
+    public TeiBuilderProcess() {
         try {
             this.mm = MongoFileManager.getInstance(false);
         } catch (ServiceException ex) {
@@ -40,40 +42,47 @@ public class TeiBuilderProcess {
      * Clean up metadatas , add grobid TEI and build a corpus tei.
      */
     public void buildTEICorpus() {
-        for (String date : Utilities.getDates()) {
-            if (!HarvestProperties.isProcessByDate()) {
-                date = null;
-            }
-            if (mm.initMetadataTeis(date)) {
-                while (mm.hasMoreTeis()) {
-                    String metadataString = mm.nextTeiDocument();
-                    String currentRepositoryDocId = mm.getCurrentRepositoryDocId();
-                    String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
-                    boolean fulltextAvailable = false;
-                    Document generatedTEIcorpus = null;
-                    if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
-                        logger.info("skipping " + currentRepositoryDocId + " No anHALytics id provided");
-                        continue;
+        try {
+            if (GrobidService.isGrobidOk()) {
+                for (String date : Utilities.getDates()) {
+                    if (!HarvestProperties.isProcessByDate()) {
+                        date = null;
                     }
-                    logger.info("\t Building TEI for: " + currentRepositoryDocId);
-                    metadataString = Utilities.trimEncodedCharaters(metadataString);
-                    generatedTEIcorpus = createTEICorpus(metadataString);
-                    try {
-                        String grobidTei = getGrobidTei(currentAnhalyticsId);
-                        generatedTEIcorpus = tb.addGrobidTEIToTEICorpus(Utilities.toString(generatedTEIcorpus), grobidTei);
-                        fulltextAvailable = true;
-                    } catch (DataException de) {
-                        logger.error("No corresponding fulltext TEI was found.");
+                    if (mm.initMetadataTeis(date)) {
+                        while (mm.hasMoreTeis()) {
+                            String metadataString = mm.nextTeiDocument();
+                            String currentRepositoryDocId = mm.getCurrentRepositoryDocId();
+                            String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
+                            boolean fulltextAvailable = false;
+                            Document generatedTEIcorpus = null;
+                            if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
+                                logger.info("skipping " + currentRepositoryDocId + " No anHALytics id provided");
+                                continue;
+                            }
+                            logger.info("\t Building TEI for: " + currentRepositoryDocId);
+                            metadataString = Utilities.trimEncodedCharaters(metadataString);
+                            generatedTEIcorpus = createTEICorpus(metadataString);
+                            try {
+                                String grobidTei = getGrobidTei(currentAnhalyticsId);
+                                generatedTEIcorpus = tb.addGrobidTEIToTEICorpus(Utilities.toString(generatedTEIcorpus), grobidTei);
+                                
+                                fulltextAvailable = true;
+                            } catch (DataException de) {
+                                logger.error("No corresponding fulltext TEI was found.");
+                            }
+                            String teiCorpus = Utilities.toString(generatedTEIcorpus);
+                            mm.insertTei(teiCorpus, currentRepositoryDocId, currentAnhalyticsId, fulltextAvailable, date);
+                        }
                     }
-                    String teiCorpus = Utilities.toString(generatedTEIcorpus);
-                    mm.insertTei(teiCorpus, currentRepositoryDocId, currentAnhalyticsId, fulltextAvailable, date);
+                    if (!HarvestProperties.isProcessByDate()) {
+                        break;
+                    }
                 }
             }
-            if (!HarvestProperties.isProcessByDate()) {
-                break;
-            }
+            logger.info("Done");
+        } catch (UnreachableGrobidServiceException ugse) {
+            logger.error(ugse.getMessage());
         }
-        logger.info("Done");
     }
 
     /**

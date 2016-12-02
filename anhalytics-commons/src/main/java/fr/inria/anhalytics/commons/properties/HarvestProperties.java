@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.commons.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
+import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -28,9 +29,6 @@ public class HarvestProperties {
     
     private static String grobidHost;
     private static String grobidPort;
-    
-    private static String grobidHome;
-    private static String grobidProperties;
 
     private static String tmpPath;
 
@@ -56,9 +54,8 @@ public class HarvestProperties {
         setApiUrl(props.getProperty("harvest.api_url"));
         setGrobidHost(props.getProperty("harvest.grobid_host"));
         setGrobidPort(props.getProperty("harvest.grobid_port"));
-        setGrobidHome(props.getProperty("harvest.grobid_home"));
-        setGrobidProperties(props.getProperty("harvest.grobid_properties"));
         setTmpPath(props.getProperty("harvest.tmpPath"));
+        Utilities.checkPath(HarvestProperties.getTmpPath());
         String threads = props.getProperty("harvest.nbThreads");
         
         setCrossrefId(props.getProperty("harvest.crossref_id"));
@@ -204,34 +201,6 @@ public class HarvestProperties {
      */
     public static void setNbThreads(int aNbThreads) {
         nbThreads = aNbThreads;
-    }
-
-    /**
-     * @return the grobidHome
-     */
-    public static String getGrobidHome() {
-        return grobidHome;
-    }
-
-    /**
-     * @param aGrobidHome the grobidHome to set
-     */
-    public static void setGrobidHome(String aGrobidHome) {
-        grobidHome = aGrobidHome;
-    }
-
-    /**
-     * @return the grobidProperties
-     */
-    public static String getGrobidProperties() {
-        return grobidProperties;
-    }
-
-    /**
-     * @param aGrobidProperties the grobidProperties to set
-     */
-    public static void setGrobidProperties(String aGrobidProperties) {
-        grobidProperties = aGrobidProperties;
     }
 
     /**
