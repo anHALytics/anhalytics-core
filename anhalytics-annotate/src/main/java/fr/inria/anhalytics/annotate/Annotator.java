@@ -23,7 +23,7 @@ public class Annotator {
 
     private static final Logger logger = LoggerFactory.getLogger(Annotator.class);
 
-    private final MongoFileManager mm;
+    private MongoFileManager mm;
 
     public enum Annotator_Type {
 
@@ -42,11 +42,7 @@ public class Annotator {
     }
 
     public Annotator() {
-        try {
-            this.mm = MongoFileManager.getInstance(false);
-        } catch (ServiceException ex) {
-            throw new ServiceException("MongoDB is not UP, the process will be halted.");
-        }
+        this.mm = MongoFileManager.getInstance(false);
     }
 
     public void annotate(Annotator_Type annotator_type) {
@@ -79,8 +75,7 @@ public class Annotator {
             throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
         }
         try {
-            if (AnnotateService.isAnnotateServiceReady(annotator_type)) 
-            {
+            if (AnnotateService.isAnnotateServiceReady(annotator_type)) {
                 for (String date : Utilities.getDates()) {
 
                     if (!AnnotateProperties.isProcessByDate()) {
@@ -161,7 +156,7 @@ public class Annotator {
                             String tei = mm.nextTeiDocument();
                             String repositoryDocId = mm.getCurrentRepositoryDocId();
                             String anhalyticsId = mm.getCurrentAnhalyticsId();
-                            
+
                             if (anhalyticsId == null || anhalyticsId.isEmpty()) {
                                 logger.info("skipping " + repositoryDocId + " No anHALytics id provided");
                                 continue;

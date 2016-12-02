@@ -20,8 +20,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Abstract class to be sub-classes to process a list
- * of TEI objects extracted from OAI-PMH services.
+ * Abstract class to be sub-classes to process a list of TEI objects extracted
+ * from OAI-PMH services.
  *
  * @author Achraf
  */
@@ -32,11 +32,7 @@ abstract class OAIPMHHarvester implements HarvesterItf {
     protected String oai_url = null;
 
     public OAIPMHHarvester() {
-        try {
-            this.mm = MongoFileManager.getInstance(false);
-        } catch (ServiceException ex) {
-            throw new ServiceException("MongoDB is not UP, the process will be halted.");
-        }
+        this.mm = MongoFileManager.getInstance(false);
         this.oai_url = HarvestProperties.getApiUrl();
 //        if(this.oai_url.isEmpty() || this.oai_url == null)
 //            throw new PropertyException("No API URL is found, check the properties file.");
@@ -60,8 +56,9 @@ abstract class OAIPMHHarvester implements HarvesterItf {
                 String teiString = tei.getTei();
                 String doi = tei.getDoi();
                 String pdfUrl = "";
-                if (tei.getPdfdocument() != null)
+                if (tei.getPdfdocument() != null) {
                     pdfUrl = tei.getPdfdocument().getUrl();
+                }
                 String repositoryDocId = tei.getRepositoryDocId();
                 logger.info("\t\t Processing TEI for " + repositoryDocId);
                 if (teiString.length() > 0) {

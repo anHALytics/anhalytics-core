@@ -54,15 +54,9 @@ public class KnowledgeBaseIndexer extends Indexer {
 
     private static final AbstractDAOFactory adf = AbstractDAOFactory.getFactory(AbstractDAOFactory.DAO_FACTORY);
     private static final AbstractBiblioDAOFactory biblioadf = AbstractBiblioDAOFactory.getFactory(AbstractBiblioDAOFactory.DAO_FACTORY);
-    private MongoFileManager mm;
 
     public KnowledgeBaseIndexer() {
         super();
-        try {
-            this.mm = MongoFileManager.getInstance(false);
-        } catch (ServiceException ex) {
-            throw new ServiceException("MongoDB is not UP, the process will be halted.");
-        }
         DAOFactory.initConnection();
         BiblioDAOFactory.initConnection();
     }

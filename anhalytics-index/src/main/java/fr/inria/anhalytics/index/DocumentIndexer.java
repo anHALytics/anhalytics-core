@@ -27,8 +27,6 @@ public class DocumentIndexer extends Indexer {
 
     private static final Logger logger = LoggerFactory.getLogger(DocumentIndexer.class);
 
-    private final MongoFileManager mm;
-
     IndexingPreprocess indexingPreprocess;
     // only annotations under these paths will be indexed for the moment
     static final public List<String> toBeIndexed
@@ -38,11 +36,6 @@ public class DocumentIndexer extends Indexer {
 
     public DocumentIndexer() {
         super();
-        try {
-            this.mm = MongoFileManager.getInstance(false);
-        } catch (ServiceException ex) {
-            throw new ServiceException("MongoDB is not UP, the process will be halted.");
-        }
         this.indexingPreprocess = new IndexingPreprocess(this.mm);
     }
 

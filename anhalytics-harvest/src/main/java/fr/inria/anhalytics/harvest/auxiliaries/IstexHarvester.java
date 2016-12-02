@@ -36,11 +36,7 @@ public class IstexHarvester {
     private String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
 
     public IstexHarvester() {
-        try {
-            this.mm = MongoFileManager.getInstance(false);
-        } catch (ServiceException ex) {
-            throw new ServiceException("MongoDB is not UP, the process will be halted.");
-        }
+        this.mm = MongoFileManager.getInstance(false);
     }
 
     public List<String> harvest() {

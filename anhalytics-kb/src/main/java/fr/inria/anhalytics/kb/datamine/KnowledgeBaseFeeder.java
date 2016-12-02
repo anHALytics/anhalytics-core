@@ -87,11 +87,7 @@ public class KnowledgeBaseFeeder {
     protected MongoFileManager mm = null;
 
     public KnowledgeBaseFeeder() {
-        try {
-            this.mm = MongoFileManager.getInstance(false);
-        } catch (ServiceException ex) {
-            throw new ServiceException("MongoDB is not UP, the process will be halted.");
-        }
+        this.mm = MongoFileManager.getInstance(false);
     }
 
     /**

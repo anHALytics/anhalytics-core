@@ -24,11 +24,7 @@ public class OpenUrl {
             = "http://api.istex.fr/document/openurl?url_ver=rft_id=info:doi/%s";
 
     public OpenUrl() {
-        try {
-            this.mm = MongoFileManager.getInstance(false);
-        } catch (ServiceException ex) {
-            throw new ServiceException("MongoDB is not UP, the process will be halted.");
-        }
+        this.mm = MongoFileManager.getInstance(false);
     }
 
     public void getIstexUrl() {
@@ -37,7 +33,7 @@ public class OpenUrl {
                 try {
                     String doi = mm.nextIdentifier();
                     String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
-                    logger.info("################################" + currentAnhalyticsId+"####################");
+                    logger.info("################################" + currentAnhalyticsId + "####################");
                     URL url = new URL(String.format(IstexURL, doi));
                     logger.info("Sending: " + url.toString());
                     HttpURLConnection urlConn = null;

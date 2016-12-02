@@ -3,6 +3,7 @@ package fr.inria.anhalytics.index;
 import fr.inria.anhalytics.index.exceptions.ElasticSearchConfigurationException;
 import fr.inria.anhalytics.index.exceptions.IndexingServiceException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.IndexProperties;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -27,9 +28,12 @@ abstract class Indexer {
 
     private static final Logger logger = LoggerFactory.getLogger(Indexer.class);
 
+    protected MongoFileManager mm;
+
     protected TransportClient client;
 
     public Indexer() {
+        this.mm = MongoFileManager.getInstance(false);
         try {
             Settings settings = Settings.settingsBuilder()
                     .put("cluster.name", IndexProperties.getElasticSearchClusterName()).build();
@@ -48,13 +52,11 @@ abstract class Indexer {
         this.client.close();
     }
 
-    
-    
-
     public boolean isIndexExists(String indexName) {
         boolean exists = this.client.admin().indices().prepareExists(indexName).execute().actionGet().isExists();
         return exists;
     }
+
     /**
      * set-up ElasticSearch by loading the mapping and river json for the HAL
      * document database
@@ -66,7 +68,7 @@ abstract class Indexer {
             // create new index and load the appropriate mapping
             createIndex(indexName);
         } catch (Exception e) {
-            logger.error("Sep-up of ElasticSearch failed for index "+indexName+".", e);
+            logger.error("Sep-up of ElasticSearch failed for index " + indexName + ".", e);
             e.printStackTrace();
         }
     }

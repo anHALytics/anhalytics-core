@@ -38,7 +38,7 @@ abstract class GrobidWorker implements Runnable {
     protected String anhalyticsId;
     protected int start = 2;
     protected int end = -1;
-    
+
     private static final String DOI_PATH = "teiHeader/fileDesc/sourceDesc/biblStruct/idno[@type=\"DOI\"]";
 
     protected DocumentBuilder docBuilder;
@@ -47,11 +47,7 @@ abstract class GrobidWorker implements Runnable {
 
     public GrobidWorker(InputStream content, String currentRepositoryDocId, String currentAnhalyticsId, String date, int start, int end) throws ParserConfigurationException {
         this.content = content;
-        try {
-            this.mm = MongoFileManager.getInstance(false);
-        } catch (ServiceException ex) {
-            throw new ServiceException("MongoDB is not UP, the process will be halted.");
-        }
+        this.mm = MongoFileManager.getInstance(false);
         this.date = date;
         this.repositoryDocId = currentRepositoryDocId;
         this.anhalyticsId = currentAnhalyticsId;

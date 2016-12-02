@@ -31,11 +31,7 @@ public class GrobidProcess {
     private MongoFileManager mm;
 
     public GrobidProcess() {
-        try {
-            this.mm = MongoFileManager.getInstance(false);
-        } catch (ServiceException ex) {
-            throw new ServiceException("MongoDB is not UP, the process will be halted.");
-        }
+        this.mm = MongoFileManager.getInstance(false);
     }
 
     static final public List<String> toBeGrobidified

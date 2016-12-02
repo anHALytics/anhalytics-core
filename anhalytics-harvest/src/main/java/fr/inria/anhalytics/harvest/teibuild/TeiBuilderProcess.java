@@ -30,11 +30,7 @@ public class TeiBuilderProcess {
     private TeiBuilder tb;
 
     public TeiBuilderProcess() {
-        try {
-            this.mm = MongoFileManager.getInstance(false);
-        } catch (ServiceException ex) {
-            throw new ServiceException("MongoDB is not UP, the process will be halted.");
-        }
+        this.mm = MongoFileManager.getInstance(false);
         this.tb = new TeiBuilder();
     }
 
@@ -65,7 +61,7 @@ public class TeiBuilderProcess {
                             try {
                                 String grobidTei = getGrobidTei(currentAnhalyticsId);
                                 generatedTEIcorpus = tb.addGrobidTEIToTEICorpus(Utilities.toString(generatedTEIcorpus), grobidTei);
-                                
+
                                 fulltextAvailable = true;
                             } catch (DataException de) {
                                 logger.error("No corresponding fulltext TEI was found.");
