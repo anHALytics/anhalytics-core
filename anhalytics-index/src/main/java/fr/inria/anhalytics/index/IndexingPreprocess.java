@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import org.w3c.dom.Node;
 
 /**
  * Additional Java pre-processing of the JSON string.
@@ -104,7 +105,6 @@ public class IndexingPreprocess {
                 JsonNode thePersonNode = null;
                 JsonNode theItemNode = null;
                 JsonNode theKeywordsNode = null;
-                JsonNode theDepositorKeywordsNode = null;
                 JsonNode theDateNode = null;
                 JsonNode theIdnoNode = null;
                 JsonNode theBiblScopeNode = null;
@@ -115,7 +115,6 @@ public class IndexingPreprocess {
                 JsonNode theTitleNode = null;
                 JsonNode theXmlIdNode = null;
                 JsonNode theLevelNode = null;
-                boolean isDepositorKeywords = false;
                 while (fields.hasNext()) {
                     String field = fields.next();
                     if (field.startsWith("$")) {
@@ -254,9 +253,6 @@ public class IndexingPreprocess {
                     } else if (field.equals("$keywords")) {
                         theKeywordsNode = subJson.path("$keywords");
                         String keywords = "";
-                        if (isDepositorKeywords) {
-                            theDepositorKeywordsNode = theKeywordsNode;
-                        }
 
                         //raw
                         Iterator<JsonNode> ite2 = theKeywordsNode.getElements();
@@ -289,11 +285,6 @@ public class IndexingPreprocess {
                         theBiblScopeNode = subJson.path("$biblScope");
                     } else if (field.equals("scheme")) {
                         theSchemeNode = subJson.path("scheme");
-
-                        if (theSchemeNode.getTextValue().equals("author") && theKeywordsNode != null) {
-                            theDepositorKeywordsNode = theKeywordsNode;
-                            isDepositorKeywords = true;
-                        }
                     } else if (field.equals("type")) {
                         theTypeNode = subJson.path("type");
                     } else if (field.equals("unit")) {
@@ -348,14 +339,15 @@ public class IndexingPreprocess {
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$div", arrayNode); // update value
                     return subJson;
-                } else if (theDepositorKeywordsNode != null) {
+                } else if ((theSchemeNode != null  && theSchemeNode.getTextValue().equals("author")) && theKeywordsNode != null) {
                     // we need to set a default "author" type 
                     JsonNode typeNode = mapper.createObjectNode();
                     ((ObjectNode) typeNode).put("$type_author",
-                            process(theDepositorKeywordsNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
+                            process(theKeywordsNode, mapper, currentLang, false, expandLang, false, anhalyticsId));
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$keywords", arrayNode); // update value
+                    
                     return subJson;
                 } else if ((theTypeNode != null) && (theIdnoNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
