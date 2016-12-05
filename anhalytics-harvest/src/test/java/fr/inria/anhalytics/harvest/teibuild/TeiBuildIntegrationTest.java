@@ -3,7 +3,6 @@ package fr.inria.anhalytics.harvest.teibuild;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import org.apache.commons.io.FileUtils;
-import org.custommonkey.xmlunit.XMLTestCase;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -18,10 +17,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Iterator;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Achraf
  */
-public class TeiBuildIntegrationTest extends XMLTestCase {
+public class TeiBuildIntegrationTest {
 
     @Test
     public void testMetadataAppend() throws Exception {

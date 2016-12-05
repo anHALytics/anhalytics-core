@@ -29,7 +29,7 @@ import java.net.URLEncoder;
 import java.util.StringTokenizer;
 
 /**
- * Class for managing the extraction of bibliographical informations from pdf
+ * Class for managing the extraction of bibliographical information from pdf
  * documents.
  *
  * @author Achraf Azhar

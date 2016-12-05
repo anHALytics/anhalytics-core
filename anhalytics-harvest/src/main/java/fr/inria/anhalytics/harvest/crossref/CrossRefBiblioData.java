@@ -107,7 +107,7 @@ public class CrossRefBiblioData {
     }
 
     /**
-     * @param firstPage the firstPage to set
+     * @param pageRange the firstPage to set
      */
     public void setPageRange(String pageRange) {
         this.pageRange = pageRange;

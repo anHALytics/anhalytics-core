@@ -1,17 +1,11 @@
 package fr.inria.anhalytics.commons.dao;
 
-import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+import fr.inria.anhalytics.commons.entities.*;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.commons.entities.Author;
-import fr.inria.anhalytics.commons.entities.Editor;
-import fr.inria.anhalytics.commons.entities.Person;
-import fr.inria.anhalytics.commons.entities.Person_Identifier;
-import fr.inria.anhalytics.commons.entities.Person_Name;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.LoggerFactory;
+
+import java.sql.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,10 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author azhar
  */
 public class PersonDAO extends DAO<Person, Long> {
@@ -146,17 +138,7 @@ public class PersonDAO extends DAO<Person, Long> {
 
             statement1 = connect.prepareStatement(SQL_INSERT_PERSON_NAME);
             for (Person_Name pn : obj.getPerson_names()) {
-                statement1.setLong(1, obj.getPersonId());
-                statement1.setString(2, pn.getFullname());
-                statement1.setString(3, pn.getForename());
-                statement1.setString(4, pn.getMiddlename());
-                statement1.setString(5, pn.getSurname());
-                statement1.setString(6, pn.getTitle());
-                if (pn.getLastupdate_date()== null) {
-                    statement1.setDate(7, new java.sql.Date(00000000L));
-                } else {
-                    statement1.setDate(7, new java.sql.Date(pn.getLastupdate_date().getTime()));
-                }
+                setPersonNameUpdateParameters(obj, statement1, pn);
 
                 int code1 = statement1.executeUpdate();
             }
@@ -204,28 +186,18 @@ public class PersonDAO extends DAO<Person, Long> {
         int code1 = preparedStatement.executeUpdate();
 
         preparedStatement2 = this.connect.prepareStatement(SQL_INSERT_PERSON_NAME);
-       
-            for (Person_Name pn : obj.getPerson_names()) {
-                 try {
-                preparedStatement2.setLong(1, obj.getPersonId());
-                preparedStatement2.setString(2, pn.getFullname());
-                preparedStatement2.setString(3, pn.getForename());
-                preparedStatement2.setString(4, pn.getMiddlename());
-                preparedStatement2.setString(5, pn.getSurname());
-                preparedStatement2.setString(6, pn.getTitle());
-                if (pn.getLastupdate_date()== null) {
-                    preparedStatement2.setDate(7, new java.sql.Date(00000000L));
-                } else {
-                    preparedStatement2.setDate(7, new java.sql.Date(pn.getLastupdate_date().getTime()));
-                }
+
+        for (Person_Name pn : obj.getPerson_names()) {
+            try {
+                setPersonNameUpdateParameters(obj, preparedStatement2, pn);
                 int code2 = preparedStatement2.executeUpdate();
-                } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e) {
-            //e.printStackTrace();
-        } 
+            } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e) {
+                //e.printStackTrace();
             }
-            preparedStatement2.close();
-        
-        
+        }
+        preparedStatement2.close();
+
+
         preparedStatement3 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
 
         if (obj.getPerson_identifiers() != null) {
@@ -237,16 +209,30 @@ public class PersonDAO extends DAO<Person, Long> {
 
                     int code3 = preparedStatement3.executeUpdate();
                 } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e) {
-                } 
+                }
             }
-                    preparedStatement3.close();
-                
+            preparedStatement3.close();
+
         }
 
         result = true;
 
         preparedStatement.close();
         return result;
+    }
+
+    private void setPersonNameUpdateParameters(Person obj, PreparedStatement statement, Person_Name pn) throws SQLException {
+        statement.setLong(1, obj.getPersonId());
+        statement.setString(2, pn.getFullname());
+        statement.setString(3, pn.getForename());
+        statement.setString(4, pn.getMiddlename());
+        statement.setString(5, pn.getSurname());
+        statement.setString(6, pn.getTitle());
+        if (pn.getLastupdate_date() == null) {
+            statement.setDate(7, new Date(00000000L));
+        } else {
+            statement.setDate(7, new Date(pn.getLastupdate_date().getTime()));
+        }
     }
 
     /**
@@ -261,7 +247,7 @@ public class PersonDAO extends DAO<Person, Long> {
                 preparedStatement1 = this.connect.prepareStatement(READ_QUERY_PERSON_NAME_BY_ID),
                 preparedStatement2 = this.connect.prepareStatement(READ_QUERY_PERSON_IDENTIFIER_BY_ID);
         try {
-            
+
             preparedStatement.setLong(1, id);
             ResultSet rs = preparedStatement.executeQuery();
 
@@ -276,15 +262,23 @@ public class PersonDAO extends DAO<Person, Long> {
                         new ArrayList<Person_Identifier>(),
                         new ArrayList<Person_Name>()
                 );
-                
+
                 preparedStatement1.setLong(1, id);
                 ResultSet rs1 = preparedStatement1.executeQuery();
                 Person_Name pn = null;
                 while (rs1.next()) {
                     try {
-                        pn = new Person_Name(rs1.getLong("pn.person_nameID"), id, rs1.getString("pn.fullname"), rs1.getString("pn.forename"), rs1.getString("pn.middlename"), rs1.getString("pn.surname"), rs1.getString("pn.title"), Utilities.parseStringDate(rs1.getString("pn.lastupdate_date")));
-                        if(!person_names.contains(pn))
-                        person_names.add(pn);
+                        pn = new Person_Name(
+                                rs1.getLong("pn.person_nameID"),
+                                id,
+                                rs1.getString("pn.fullname"),
+                                rs1.getString("pn.forename"),
+                                rs1.getString("pn.middlename"),
+                                rs1.getString("pn.surname"),
+                                rs1.getString("pn.title"),
+                                Utilities.parseStringDate(rs1.getString("pn.lastupdate_date")));
+                        if (!person_names.contains(pn))
+                            person_names.add(pn);
                     } catch (ParseException ex) {
                         Logger.getLogger(PersonDAO.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -312,8 +306,8 @@ public class PersonDAO extends DAO<Person, Long> {
 
     public Map<Long, Person> findAllAuthors() throws SQLException {
         HashMap<Long, Person> persons = new HashMap<Long, Person>();
-        PreparedStatement 
-            preparedStatement = this.connect.prepareStatement(READ_QUERY_AUTHORS);
+        PreparedStatement
+                preparedStatement = this.connect.prepareStatement(READ_QUERY_AUTHORS);
         try {
             ResultSet rs = preparedStatement.executeQuery();
 
@@ -388,7 +382,8 @@ public class PersonDAO extends DAO<Person, Long> {
 
     public Map<Long, Person> getPersonsByOrgID(Long orgID) throws SQLException {
         HashMap<Long, Person> persons = new HashMap<Long, Person>();
-        PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_PERSON_BY_ORGID);;
+        PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_PERSON_BY_ORGID);
+
         try {
             Person person = null;
             ps.setLong(1, orgID);

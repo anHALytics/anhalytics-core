@@ -8,5 +8,5 @@ import org.w3c.dom.Element;
  * @author azhar
  */
 public interface MetadataConverter {
-    public Element convertMetadataToTEIHeader(Document metadata, Document newTEIcorpus) ;
+    Element convertMetadataToTEIHeader(Document metadata, Document newTEIcorpus) ;
 }
