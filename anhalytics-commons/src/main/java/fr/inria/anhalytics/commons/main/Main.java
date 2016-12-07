@@ -1,30 +1,14 @@
 package fr.inria.anhalytics.commons.main;
 
-import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.ScriptRunner;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Scanner;
-import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
 
 /**
- *
  * @author azhar
  */
 public class Main {
@@ -39,7 +23,7 @@ public class Main {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException, SQLException {
+    public static void main(String[] args) throws IOException, InterruptedException, SQLException {
 
         String option = "";
         String currArg;
@@ -60,9 +44,10 @@ public class Main {
 
         if (option.equals("configure")) {
             configure();
-
         } else if (option.equals("prepare")) {
             prepare();
+        } else {
+            System.out.println(getHelp());
         }
     }
 
@@ -78,7 +63,7 @@ public class Main {
             props.load(in);
             in.close();
         } catch (IOException ex) {
-            System.err.println(ANSI_RED + "You should set the conguration using --configure ." + ANSI_RESET);
+            System.err.println(ANSI_RED + "You should set the configuration using --configure ." + ANSI_RESET);
             return;
         }
         System.out.println(ANSI_GREEN + "Schema creation in progress... " + ANSI_RESET);
@@ -91,14 +76,25 @@ public class Main {
         } catch (SQLException e) {
             System.err.println("Unable to connect to server: " + e);
         }
+
         ScriptRunner runner = new ScriptRunner(connectDB, false, false);
+
+        String createSchema = "CREATE SCHEMA IF NOT EXISTS `" + props.getProperty("kb.mysql_db")
+                + "` DEFAULT CHARACTER SET utf8;\n" +
+                "USE `" + props.getProperty("kb.mysql_db") + "`;";
+        runner.runScript(new BufferedReader(new StringReader(createSchema)));
         String sql1 = file.getAbsolutePath() + File.separator + "sql" + File.separator + "anhalyticsDB.sql";
         runner.runScript(new BufferedReader(new FileReader(sql1)));
+
+        String createSchemaBiblio = "CREATE SCHEMA IF NOT EXISTS `" + props.getProperty("kb.mysql_bibliodb")
+                + "` DEFAULT CHARACTER SET utf8;\n" +
+                "USE `" + props.getProperty("kb.mysql_bibliodb") + "`;";
+        runner.runScript(new BufferedReader(new StringReader(createSchemaBiblio)));
         String sql2 = file.getAbsolutePath() + File.separator + "sql" + File.separator + "biblioDB.sql";
         runner.runScript(new BufferedReader(new FileReader(sql2)));
     }
 
-    protected static void configure() throws FileNotFoundException, IOException {
+    protected static void configure() throws IOException {
         System.out.println(ANSI_GREEN + "Parameters settings " + ANSI_RESET);
         File file = new File(System.getProperty("user.dir"));
 
@@ -391,6 +387,15 @@ public class Main {
 
         System.out.println(ANSI_GREEN + "CHECK IF EVERYTHING IS UP AND RUNNING (Status..)." + ANSI_RESET);
         System.out.println(ANSI_GREEN + "PERFECTO, WE'RE READY NOW." + ANSI_RESET);
+    }
+
+    protected static String getHelp() {
+        final StringBuffer help = new StringBuffer();
+        help.append("HELP ANHALYTICS_COMMONS\n");
+        help.append("-h: displays help\n");
+        help.append("-configure: Prepare the configuration\n");
+        help.append("-prepare: Prepare the knowledge base, load the schema. \n");
+        return help.toString();
     }
 
 }

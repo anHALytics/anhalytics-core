@@ -14,13 +14,13 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 -- Schema anhalytics_biblio
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `anhalytics_biblio` DEFAULT CHARACTER SET utf8 ;
-USE `anhalytics_biblio` ;
+-- CREATE SCHEMA IF NOT EXISTS `anhalytics_biblio` DEFAULT CHARACTER SET utf8 ;
+-- USE `anhalytics_biblio` ;
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`COUNTRY`
+-- Table `COUNTRY`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`COUNTRY` (
+CREATE TABLE IF NOT EXISTS `COUNTRY` (
   `countryID` INT(11) NOT NULL AUTO_INCREMENT,
   `ISO` VARCHAR(2) NULL DEFAULT NULL COMMENT 'ISO3166-1',
   PRIMARY KEY (`countryID`))
@@ -29,9 +29,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`ADDRESS`
+-- Table `ADDRESS`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`ADDRESS` (
+CREATE TABLE IF NOT EXISTS `ADDRESS` (
   `addressID` INT(11) NOT NULL AUTO_INCREMENT,
   `addrLine` VARCHAR(150) NULL DEFAULT NULL,
   `postBox` VARCHAR(45) NULL DEFAULT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`ADDRESS` (
   INDEX `fk_ADRESS_COUNTRY1_idx` (`countryID` ASC),
   CONSTRAINT `fk_ADRESS_COUNTRY1`
     FOREIGN KEY (`countryID`)
-    REFERENCES `anhalytics_biblio`.`COUNTRY` (`countryID`)
+    REFERENCES `COUNTRY` (`countryID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -53,9 +53,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`COLLECTION`
+-- Table `COLLECTION`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`COLLECTION` (
+CREATE TABLE IF NOT EXISTS `COLLECTION` (
   `collectionID` INT(11) NOT NULL AUTO_INCREMENT,
   `title` TEXT NULL DEFAULT NULL,
   PRIMARY KEY (`collectionID`))
@@ -65,9 +65,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`CONFERENCE`
+-- Table `CONFERENCE`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`CONFERENCE` (
+CREATE TABLE IF NOT EXISTS `CONFERENCE` (
   `conferenceID` INT(11) NOT NULL AUTO_INCREMENT,
   `title` TEXT NULL DEFAULT NULL,
   PRIMARY KEY (`conferenceID`))
@@ -77,9 +77,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`MONOGRAPH`
+-- Table `MONOGRAPH`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`MONOGRAPH` (
+CREATE TABLE IF NOT EXISTS `MONOGRAPH` (
   `monographID` INT(11) NOT NULL AUTO_INCREMENT,
   `type` VARCHAR(45) NULL DEFAULT NULL COMMENT 'journal \nproceedings\ncollection\nbook\nphd_thesis\nmaster_thesis\nreport\narchive',
   `title` TEXT NULL DEFAULT NULL,
@@ -91,9 +91,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`CONFERENCE_EVENT`
+-- Table `CONFERENCE_EVENT`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`CONFERENCE_EVENT` (
+CREATE TABLE IF NOT EXISTS `CONFERENCE_EVENT` (
   `conference_eventID` INT(11) NOT NULL AUTO_INCREMENT,
   `conferenceID` INT(11) NOT NULL,
   `addressID` INT(11) NULL DEFAULT NULL,
@@ -106,17 +106,17 @@ CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`CONFERENCE_EVENT` (
   INDEX `fk_CONFERENCE_EVENT_MONOGRAPH1_idx` (`monographID` ASC),
   CONSTRAINT `fk_CONFERENCE_EVENT_MONOGRAPH1`
     FOREIGN KEY (`monographID`)
-    REFERENCES `anhalytics_biblio`.`MONOGRAPH` (`monographID`)
+    REFERENCES `MONOGRAPH` (`monographID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_CONFERENCE_has_ADRESS_ADRESS1`
     FOREIGN KEY (`addressID`)
-    REFERENCES `anhalytics_biblio`.`ADDRESS` (`addressID`)
+    REFERENCES `ADDRESS` (`addressID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_CONFERENCE_has_ADRESS_CONFERENCE1`
     FOREIGN KEY (`conferenceID`)
-    REFERENCES `anhalytics_biblio`.`CONFERENCE` (`conferenceID`)
+    REFERENCES `CONFERENCE` (`conferenceID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -125,9 +125,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`DOCUMENT`
+-- Table `DOCUMENT`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`DOCUMENT` (
+CREATE TABLE IF NOT EXISTS `DOCUMENT` (
   `docID` VARCHAR(45) NOT NULL,
   `version` VARCHAR(45) NULL DEFAULT NULL,
   `URI` VARCHAR(45) NULL DEFAULT NULL,
@@ -139,9 +139,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`PERSON`
+-- Table `PERSON`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PERSON` (
+CREATE TABLE IF NOT EXISTS `PERSON` (
   `personID` INT(11) NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(45) NULL DEFAULT NULL,
   `photo` VARCHAR(45) NULL DEFAULT NULL,
@@ -154,9 +154,9 @@ AUTO_INCREMENT = 0
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`PERSON_IDENTIFIER`
+-- Table `PERSON_IDENTIFIER`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PERSON_IDENTIFIER` (
+CREATE TABLE IF NOT EXISTS `PERSON_IDENTIFIER` (
   `person_identifierID` INT(11) NOT NULL AUTO_INCREMENT,
   `personID` INT(11) NOT NULL,
   `ID` VARCHAR(150) NOT NULL,
@@ -166,16 +166,16 @@ CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PERSON_IDENTIFIER` (
   INDEX `fk_PERSON_IDENTIFIERS_PERSON1_idx` (`personID` ASC),
   CONSTRAINT `fk_PERSON_IDENTIFIERS_PERSON1`
     FOREIGN KEY (`personID`)
-    REFERENCES `anhalytics_biblio`.`PERSON` (`personID`)
+    REFERENCES `PERSON` (`personID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`PUBLISHER`
+-- Table `PUBLISHER`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PUBLISHER` (
+CREATE TABLE IF NOT EXISTS `PUBLISHER` (
   `publisherID` INT(11) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(150) NULL DEFAULT NULL,
   PRIMARY KEY (`publisherID`))
@@ -185,9 +185,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`PUBLICATION`
+-- Table `PUBLICATION`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PUBLICATION` (
+CREATE TABLE IF NOT EXISTS `PUBLICATION` (
   `publicationID` INT(11) NOT NULL AUTO_INCREMENT,
   `docID` VARCHAR(45) NOT NULL,
   `monographID` INT(11) NULL DEFAULT NULL,
@@ -205,17 +205,17 @@ CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PUBLICATION` (
   INDEX `fk_PUBLICATION_DOCUMENT1` (`docID` ASC),
   CONSTRAINT `fk_PUBLICATION_DOCUMENT1`
     FOREIGN KEY (`docID`)
-    REFERENCES `anhalytics_biblio`.`DOCUMENT` (`docID`)
+    REFERENCES `DOCUMENT` (`docID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_PUBLICATION_MONOGRAPH1`
     FOREIGN KEY (`monographID`)
-    REFERENCES `anhalytics_biblio`.`MONOGRAPH` (`monographID`)
+    REFERENCES `MONOGRAPH` (`monographID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_PUBLICATION_PUBLISHER1`
     FOREIGN KEY (`publisherID`)
-    REFERENCES `anhalytics_biblio`.`PUBLISHER` (`publisherID`)
+    REFERENCES `PUBLISHER` (`publisherID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -224,9 +224,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`EDITOR`
+-- Table `EDITOR`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`EDITORSHIP` (
+CREATE TABLE IF NOT EXISTS `EDITORSHIP` (
   `rank` INT(11) NULL DEFAULT NULL,
   `personID` INT(11) NULL DEFAULT NULL,
   `publicationID` INT(11) NULL DEFAULT NULL,
@@ -234,12 +234,12 @@ CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`EDITORSHIP` (
   INDEX `fk_EDITOR_PUBLICATION1_idx` (`publicationID` ASC),
   CONSTRAINT `fk_EDITOR_PERSON**1`
     FOREIGN KEY (`personID`)
-    REFERENCES `anhalytics_biblio`.`PERSON` (`personID`)
+    REFERENCES `PERSON` (`personID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_EDITOR_PUBLICATION1`
     FOREIGN KEY (`publicationID`)
-    REFERENCES `anhalytics_biblio`.`PUBLICATION` (`publicationID`)
+    REFERENCES `PUBLICATION` (`publicationID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -247,9 +247,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`JOURNAL`
+-- Table `JOURNAL`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`JOURNAL` (
+CREATE TABLE IF NOT EXISTS `JOURNAL` (
   `journalID` INT(11) NOT NULL AUTO_INCREMENT,
   `title` TEXT NULL DEFAULT NULL,
   PRIMARY KEY (`journalID`))
@@ -259,9 +259,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`IN_SERIAL`
+-- Table `IN_SERIAL`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`IN_SERIAL` (
+CREATE TABLE IF NOT EXISTS `IN_SERIAL` (
   `monographID` INT(11) NOT NULL DEFAULT '0',
   `collectionID` INT(11) NULL DEFAULT NULL,
   `journalID` INT(11) NULL DEFAULT NULL,
@@ -273,17 +273,17 @@ CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`IN_SERIAL` (
   INDEX `fk_IN_SERIAL_JOURNAL1_idx` (`journalID` ASC),
   CONSTRAINT `fk_IN_SERIAL_JOURNAL1`
     FOREIGN KEY (`journalID`)
-    REFERENCES `anhalytics_biblio`.`JOURNAL` (`journalID`)
+    REFERENCES `JOURNAL` (`journalID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_MONOGRAPH_has_COLLECTION_COLLECTION1`
     FOREIGN KEY (`collectionID`)
-    REFERENCES `anhalytics_biblio`.`COLLECTION` (`collectionID`)
+    REFERENCES `COLLECTION` (`collectionID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_MONOGRAPH_has_COLLECTION_MONOGRAPH1`
     FOREIGN KEY (`monographID`)
-    REFERENCES `anhalytics_biblio`.`MONOGRAPH` (`monographID`)
+    REFERENCES `MONOGRAPH` (`monographID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -291,9 +291,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`MONOGRAPH_IDENTIFIER`
+-- Table `MONOGRAPH_IDENTIFIER`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`MONOGRAPH_IDENTIFIER` (
+CREATE TABLE IF NOT EXISTS `MONOGRAPH_IDENTIFIER` (
   `monograph_identifierID` INT(11) NOT NULL AUTO_INCREMENT,
   `monographID` INT(11) NULL DEFAULT NULL,
   `ID` VARCHAR(45) NULL DEFAULT NULL,
@@ -302,7 +302,7 @@ CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`MONOGRAPH_IDENTIFIER` (
   INDEX `fk_MONOGRAPH_IDENTIFIER_MONOGRAPH1_idx` (`monographID` ASC),
   CONSTRAINT `fk_MONOGRAPH_IDENTIFIER_MONOGRAPH1`
     FOREIGN KEY (`monographID`)
-    REFERENCES `anhalytics_biblio`.`MONOGRAPH` (`monographID`)
+    REFERENCES `MONOGRAPH` (`monographID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -310,9 +310,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`PERSON_NAME`
+-- Table `PERSON_NAME`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PERSON_NAME` (
+CREATE TABLE IF NOT EXISTS `PERSON_NAME` (
   `person_nameID` INT(11) NOT NULL AUTO_INCREMENT,
   `personID` INT(11) NOT NULL,
   `fullname` VARCHAR(150) NULL DEFAULT NULL,
@@ -325,7 +325,7 @@ CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PERSON_NAME` (
   INDEX `fk_PERSON_NAME_PERSON1_idx` (`personID` ASC),
   CONSTRAINT `fk_PERSON_NAME_PERSON1`
     FOREIGN KEY (`personID`)
-    REFERENCES `anhalytics_biblio`.`PERSON` (`personID`)
+    REFERENCES `PERSON` (`personID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -334,9 +334,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`PUBLISHER_LOCATION`
+-- Table `PUBLISHER_LOCATION`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PUBLISHER_LOCATION` (
+CREATE TABLE IF NOT EXISTS `PUBLISHER_LOCATION` (
   `publisherID` INT(11) NOT NULL DEFAULT '0',
   `ADRESS_addressID` INT(11) NOT NULL,
   `from_date` VARCHAR(45) NULL DEFAULT NULL,
@@ -346,12 +346,12 @@ CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`PUBLISHER_LOCATION` (
   INDEX `fk_PUBLISHER_has_ADRESS_PUBLISHER1_idx` (`publisherID` ASC),
   CONSTRAINT `fk_PUBLISHER_has_ADRESS_ADRESS1`
     FOREIGN KEY (`ADRESS_addressID`)
-    REFERENCES `anhalytics_biblio`.`ADDRESS` (`addressID`)
+    REFERENCES `ADDRESS` (`addressID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_PUBLISHER_has_ADRESS_PUBLISHER1`
     FOREIGN KEY (`publisherID`)
-    REFERENCES `anhalytics_biblio`.`PUBLISHER` (`publisherID`)
+    REFERENCES `PUBLISHER` (`publisherID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -359,9 +359,9 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `anhalytics_biblio`.`SERIAL_IDENTIFIER`
+-- Table `SERIAL_IDENTIFIER`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `anhalytics_biblio`.`SERIAL_IDENTIFIER` (
+CREATE TABLE IF NOT EXISTS `SERIAL_IDENTIFIER` (
   `serial_identifierID` INT(11) NOT NULL AUTO_INCREMENT,
   `ID` VARCHAR(45) NULL DEFAULT NULL,
   `Type` ENUM('hal','arxiv','doi') NULL DEFAULT NULL COMMENT 'journal \nproceedings\ncollection\nbook\nphd_thesis\nmaster_thesis\nreport\narchive',
