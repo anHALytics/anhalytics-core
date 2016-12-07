@@ -57,13 +57,6 @@ public class GrobidService {
      * @return the resulting TEI document as a String or null if the service
      * failed
      */
-    /**
-     * Call the Grobid full text extraction service on server.
-     *
-     * @param pdfBinary InputStream of the PDF file to be processed
-     * @return the resulting TEI document as a String or null if the service
-     * failed
-     */
     public String runFullTextGrobid(String filepath) {
         String tei = null;
         try {
