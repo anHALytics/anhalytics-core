@@ -55,6 +55,7 @@ public class TeiBuilder {
         Document newTEICorpus = docBuilder.newDocument();
         Element teiHeader = htc.convertMetadataToTEIHeader(metadata, newTEICorpus);
         Element teiCorpus = newTEICorpus.createElement("teiCorpus");
+        teiHeader.setAttribute("xml:id", "hal");
         teiCorpus.appendChild(teiHeader);
         teiCorpus.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
         newTEICorpus.appendChild(teiCorpus);
@@ -85,6 +86,7 @@ public class TeiBuilder {
                 Attr attr = grobidTeiElement.getAttributeNode("xmlns");
                 grobidTeiElement.removeAttributeNode(attr);
                 grobidTeiElement.setAttribute("type", "main");
+                grobidTeiElement.setAttribute("xml:id", "grobid");
                 htc.fillAbstract(doc, teiCorpusDoc);
                 htc.fillKeywords(doc, teiCorpusDoc);
                 htc.fillPubDate(doc, teiCorpusDoc);

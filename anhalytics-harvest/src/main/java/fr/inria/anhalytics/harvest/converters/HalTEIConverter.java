@@ -443,6 +443,7 @@ public class HalTEIConverter implements MetadataConverter {
                                         Element org = null;
                                         for (Element labOrgname : labOrgnames) {
                                             aff = teiCorpusDoc.createElement("affiliation");
+                                            aff.setAttribute("source", "#grobid");
                                             org = teiCorpusDoc.createElement("org");
                                             org.setAttribute("type", "laboratory");
                                             org.appendChild(teiCorpusDoc.importNode(labOrgname, true));
@@ -460,6 +461,7 @@ public class HalTEIConverter implements MetadataConverter {
                                         Element org = null;
                                         for (Element deptOrgname : deptOrgnames) {
                                             aff = teiCorpusDoc.createElement("affiliation");
+                                            aff.setAttribute("source", "#grobid");
                                             org = teiCorpusDoc.createElement("org");
                                             org.setAttribute("type", "department");
                                             org.appendChild(teiCorpusDoc.importNode(deptOrgname, true));
@@ -476,6 +478,7 @@ public class HalTEIConverter implements MetadataConverter {
                                         Element org = null;
                                         for (Element instOrgname : instOrgnames) {
                                             aff = teiCorpusDoc.createElement("affiliation");
+                                            aff.setAttribute("source", "#grobid");
                                             org = teiCorpusDoc.createElement("org");
                                             org.setAttribute("type", "institution");
                                             org.appendChild(teiCorpusDoc.importNode(instOrgname, true));
