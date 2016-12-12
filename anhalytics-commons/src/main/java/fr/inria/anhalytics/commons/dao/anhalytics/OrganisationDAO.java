@@ -11,7 +11,6 @@ import fr.inria.anhalytics.commons.entities.Organisation_Identifier;
 import fr.inria.anhalytics.commons.entities.Organisation_Name;
 import fr.inria.anhalytics.commons.entities.PART_OF;
 import fr.inria.anhalytics.commons.entities.Person;
-import fr.inria.anhalytics.commons.entities.Person_Identifier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,8 +18,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -353,7 +350,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                             rs.getString("org.url"),
                             (new ArrayList<Organisation_Name>()),
                             null,
-                            (new ArrayList<Organisation_Identifier>())
+                            (new ArrayList<Organisation_Identifier>()), null
                     );
 
                     preparedStatement1.setLong(1, id);
@@ -440,7 +437,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                                 rs1.getString("org.url"),
                                 (new ArrayList<Organisation_Name>()),
                                 new ArrayList<PART_OF>(),
-                                (new ArrayList<Organisation_Identifier>())
+                                (new ArrayList<Organisation_Identifier>()), null
                         );
                         preparedStatement2.setLong(1, id);
 
@@ -556,13 +553,14 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                     return orgId;
                 }
             }
-
-            for (int i = 0; i < obj.getNames().size(); i++) {
-                statement1.setString(1, obj.getNames().get(i).getName());
-                ResultSet rs = statement1.executeQuery();
-                if (rs.first()) {
-                    orgId = rs.getLong("organisationID");
-                    return orgId;
+            if (obj.getSource().equals("#grobid")) {
+                for (int i = 0; i < obj.getNames().size(); i++) {
+                    statement1.setString(1, obj.getNames().get(i).getName());
+                    ResultSet rs = statement1.executeQuery();
+                    if (rs.first()) {
+                        orgId = rs.getLong("organisationID");
+                        return orgId;
+                    }
                 }
             }
         } catch (SQLException ex) {

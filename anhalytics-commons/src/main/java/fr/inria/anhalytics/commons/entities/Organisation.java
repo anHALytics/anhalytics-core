@@ -22,11 +22,12 @@ public class Organisation {
     private List<Organisation_Name> names = null;
     private List<PART_OF> rels = null;
     private List<Organisation_Identifier> organisation_identifiers = null;
+    private String source = "";
 
     public Organisation() {
     }
 
-    public Organisation(Long organisationId, String type, String status, String url, List<Organisation_Name> names, List<PART_OF> rels, List<Organisation_Identifier> organisation_identifiers) {
+    public Organisation(Long organisationId, String type, String status, String url, List<Organisation_Name> names, List<PART_OF> rels, List<Organisation_Identifier> organisation_identifiers, String source) {
         this.organisationId = organisationId;
         this.type = type;
         this.url = url;
@@ -35,6 +36,7 @@ public class Organisation {
         this.status = status;
         this.rels = rels;
         this.organisation_identifiers = organisation_identifiers;
+        this.source= source;
     }
 
     /**
@@ -210,6 +212,20 @@ public class Organisation {
         }
 
         return isEqual;
+    }
+
+    /**
+     * @return the source
+     */
+    public String getSource() {
+        return source;
+    }
+
+    /**
+     * @param source the source to set
+     */
+    public void setSource(String source) {
+        this.source = source;
     }
 
 }

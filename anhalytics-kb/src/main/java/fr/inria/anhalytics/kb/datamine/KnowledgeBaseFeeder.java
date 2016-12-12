@@ -430,11 +430,12 @@ public class KnowledgeBaseFeeder {
         return org;
     }
 
-    private static void parseAffiliationOrg(Affiliation affiliation, Publication pub, Element orgElt, Document doc) throws SQLException {
+    private static void parseAffiliationOrg(Affiliation affiliation, Publication pub, Element orgElt, Document doc, String source) throws SQLException {
         Document_Organisation document_organisation = new Document_Organisation();
         Document_OrganisationDAO d_o = (Document_OrganisationDAO) adf.getDocument_OrganisationDAO();
         document_organisation.setDoc(pub.getDocument());
         Organisation organisation = new Organisation();
+        organisation.setSource(source);
         OrganisationDAO od = (OrganisationDAO) adf.getOrganisationDAO();
         Location location = null;
         LocationDAO ld = (LocationDAO) adf.getLocationDAO();
@@ -575,7 +576,8 @@ public class KnowledgeBaseFeeder {
                                             }
                                         }
                                     }
-                                    parseAffiliationOrg(affiliation, pub, org, doc);
+                                    String source = personChildElt.getAttribute("source");
+                                    parseAffiliationOrg(affiliation, pub, org, doc, source);
                                 } else if (personChildElt.getNodeName().equals("idno")) {
                                     Person_Identifier pi = new Person_Identifier();
                                     String id_type = personChildElt.getAttribute("type");
