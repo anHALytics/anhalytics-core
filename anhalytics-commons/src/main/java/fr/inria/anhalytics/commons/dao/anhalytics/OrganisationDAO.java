@@ -539,7 +539,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
         return orgs;
     }
 
-    private Long getOrgEntityIfAlreadyStored(Organisation obj) throws SQLException {
+    protected Long getOrgEntityIfAlreadyStored(Organisation obj) throws SQLException {
         Long orgId = null;
         PreparedStatement statement = connect.prepareStatement(READ_QUERY_ORG_BY_IDENTIFIER);
         PreparedStatement statement1 = connect.prepareStatement(READ_QUERY_ORG_BY_NAME);
@@ -553,7 +553,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                     return orgId;
                 }
             }
-            if (obj.getSource().equals("#grobid")) {
+/*            if (obj.getSource().equals("#grobid")) {
                 for (int i = 0; i < obj.getNames().size(); i++) {
                     statement1.setString(1, obj.getNames().get(i).getName());
                     ResultSet rs = statement1.executeQuery();
@@ -563,6 +563,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                     }
                 }
             }
+            */
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {

@@ -15,7 +15,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- Schema anhalytics
 -- -----------------------------------------------------
 -- CREATE SCHEMA IF NOT EXISTS `anhalytics` DEFAULT CHARACTER SET utf8 ;
---  USE `anhalytics2` ;
+--  USE `anhalytics` ;
 
 -- -----------------------------------------------------
 -- Table `COUNTRY`
