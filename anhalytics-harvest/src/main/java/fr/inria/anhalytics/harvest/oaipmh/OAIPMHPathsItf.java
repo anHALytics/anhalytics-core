@@ -17,6 +17,7 @@ public interface OAIPMHPathsItf {
     public final static String ResumptionToken = "resumptionToken";
     public final static String AnnexesUrlsElement = "metadata/TEI/text/body/listBibl/biblFull/editionStmt/edition[@type='current']/ref[@type='annex']";
     public final static String FileElement = "metadata/TEI/text/body/listBibl/biblFull/editionStmt/edition[@type='current']/ref[@type='file'][1]";
+    public final static String EditionElement = "metadata/TEI/text/body/listBibl/biblFull/editionStmt/edition[@type='current']";
     public final static String RefPATH = "metadata/TEI/text/body/listBibl/biblFull/publicationStmt/idno[@type='halRef']";
     public final static String DoiPATH = "metadata/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/idno[@type='doi']";
     

@@ -446,8 +446,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             GridFSInputFile gfsFile = gfs.createFile(new ByteArrayInputStream(tei.getBytes()), true);
             gfsFile.put("uploadDate", Utilities.parseStringDate(date));
             gfsFile.setFilename(repositoryDocId + ".tei.xml");
-            gfsFile.put("repositoryDocId", repositoryDocId);
-            gfsFile.put("anhalyticsId", generateAnhalyticsId(repositoryDocId, doi, pdfUrl));
+            gfsFile.put("repositoryDocId", Utilities.getHalIDFromHalDocID(repositoryDocId));
+            gfsFile.put("anhalyticsId", generateAnhalyticsId(Utilities.getHalIDFromHalDocID(repositoryDocId), doi, pdfUrl));
             gfsFile.put("source", source);
             gfsFile.put("documentType", type);
             gfsFile.save();

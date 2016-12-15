@@ -65,16 +65,22 @@ public class HALOAIPMHDomParser {
                         Element record = (Element) listRecords.item(i);
                         String type = getDocumentType(record.getElementsByTagName(OAIPMHPathsItf.TypeElement));
                         if (isConsideredType(type)) {
-                            String tei = getTei(record.getElementsByTagName(OAIPMHPathsItf.TeiElement));
-                            String doi = getDoi(record);
-                            String repositoryDocId = getRepositoryDocId(record.getElementsByTagName(OAIPMHPathsItf.IdElement));
+                            String completeRepositoryDocId = getRepositoryDocId(record.getElementsByTagName(OAIPMHPathsItf.IdElement));
+                            String currentVersion = getCurrentVersion(record);
+                            String docVersion = Utilities.getVersionFromURI(completeRepositoryDocId);
+                            if (docVersion.equals(currentVersion)) {
+                                String tei = getTei(record.getElementsByTagName(OAIPMHPathsItf.TeiElement));
+                                String doi = getDoi(record);
 
-                            PublicationFile file = getFile(record);
-                            List<PublicationFile> annexes = getAnnexes(record);
+                                PublicationFile file = getFile(record);
+                                List<PublicationFile> annexes = getAnnexes(record);
 
-                            String ref = getRef(record);
-                            teis.add(new TEI(Utilities.getHalIDFromHalDocID(repositoryDocId), file, annexes, doi, type, tei, ref));
-                            logger.info("\t \t \t tei of " + repositoryDocId + " extracted.");
+                                String ref = getRef(record);
+                                teis.add(new TEI(completeRepositoryDocId, file, annexes, doi, type, tei, ref));
+                                logger.info("\t \t \t tei of " + completeRepositoryDocId + " extracted.");
+                            } else {
+                                logger.info("\t \t \t skipping " + completeRepositoryDocId + " , it's not a current version.");
+                            }
                         }
                     }
                 }
@@ -84,6 +90,17 @@ public class HALOAIPMHDomParser {
             throw new ServiceException("No TEIs metadata found.");
         }
         return teis;
+    }
+
+    public String getCurrentVersion(Node record) {
+        String currentVersion = null;
+        try {
+            Element node = (Element) xPath.compile(OAIPMHPathsItf.EditionElement).evaluate(record, XPathConstants.NODE);
+            currentVersion = node.getAttribute("n");
+        } catch (DataException | XPathExpressionException ex) {
+            logger.info("\t \t \t \t No current edition found .");
+        }
+        return currentVersion;
     }
 
     public String getRef(Node ref) {
