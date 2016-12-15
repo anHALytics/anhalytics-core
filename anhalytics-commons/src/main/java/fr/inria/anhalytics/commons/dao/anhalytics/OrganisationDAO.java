@@ -608,7 +608,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
 
     public Document_Organisation getOrganisationByDocumentID(String docID) throws SQLException {
         Document_Organisation dorg = new Document_Organisation();
-        dorg.setDoc(new Document(docID, null, null, null));
+        dorg.setDoc(new Document(docID, null, null));
         PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_ORGANISATIONS_BY_DOCUMENT);
         try {
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);

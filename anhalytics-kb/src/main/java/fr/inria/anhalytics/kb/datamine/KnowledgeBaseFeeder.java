@@ -149,7 +149,7 @@ public class KnowledgeBaseFeeder {
                                 throw new NumberOfCoAuthorsExceededException("Number of authors exceed 30 co-authors for this publication.");
                             }
 
-                            fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(currentAnhalyticsId, "", repositoryDocId, new ArrayList<Document_Identifier>());
+                            fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(currentAnhalyticsId, "", new ArrayList<Document_Identifier>());
 
                             processIdentifiers(ids, doc, repositoryDocId);
                             dd.create(doc);
@@ -678,7 +678,7 @@ public class KnowledgeBaseFeeder {
                             Node citations = (Node) xPath.compile("/teiCorpus/TEI/text/back/div[@type='references']/listBibl").evaluate(teiDoc, XPathConstants.NODE);
                             if (citations != null) {
                                 NodeList references = citations.getChildNodes();
-                                fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(anhalyticsId, Utilities.getVersionFromURI(repositoryDocId), repositoryDocId, new ArrayList<Document_Identifier>());
+                                fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(anhalyticsId, Utilities.getVersionFromURI(repositoryDocId), new ArrayList<Document_Identifier>());
                                 dd.create(doc);
 
                                 for (int j = 0; j < references.getLength() - 1; j++) {

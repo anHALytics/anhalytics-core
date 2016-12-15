@@ -13,13 +13,11 @@ public class Document {
 
     private String docID;
     private String version = "";
-    private String uri = "";
     private List<Document_Identifier> document_Identifiers = null;
 
-    public Document(String docID, String version, String uri, List<Document_Identifier> document_Identifiers) {
+    public Document(String docID, String version, List<Document_Identifier> document_Identifiers) {
         this.docID = docID;
         this.version = version;
-        this.uri = uri;
         this.document_Identifiers = document_Identifiers;
     }
 
@@ -57,22 +55,6 @@ public class Document {
     }
 
     /**
-     * @return the uri
-     */
-    public String getUri() {
-        return uri;
-    }
-
-    /**
-     * @param uri the uri to set
-     */
-    public void setUri(String uri) {
-        if(uri.length() > 45)
-            uri = uri.substring(0, 44);
-        this.uri = uri;
-    }
-
-    /**
      * The user ID is unique for each User. So this should compare User by ID
      * only.
      *
@@ -106,15 +88,14 @@ public class Document {
      */
     @Override
     public String toString() {
-        return String.format("User[docID=%d,version=%s,uri=%s]",
-                docID, version, uri);
+        return String.format("User[docID=%d,version=%s]",
+                docID, version);
     }
 
     public Map<String, Object> getDocumentDocument() {
         Map<String, Object> documentDocument = new HashMap<String, Object>();
         documentDocument.put("docID", this.getDocID());
         documentDocument.put("version", this.getVersion());
-        documentDocument.put("uri", this.getUri());
         return documentDocument;
     }
 

@@ -20,7 +20,7 @@ public class DocumentDAO extends DAO<Document, String> {
     private static final Logger logger = LoggerFactory.getLogger(DocumentDAO.class);
 
     private static final String SQL_INSERT
-            = "INSERT INTO DOCUMENT (docID, version, uri) VALUES (?, ?, ?)";
+            = "INSERT INTO DOCUMENT (docID, version) VALUES (?, ?)";
 
     private static final String SQL_INSERT_IDENTIFIER
             = "INSERT INTO DOCUMENT_IDENTIFIER (docID, ID, Type) VALUES (?, ?, ?)";
@@ -48,7 +48,6 @@ public class DocumentDAO extends DAO<Document, String> {
         statement.setString(1, obj.getDocID());
         statement.setString(2, obj.getVersion());
 
-        statement.setString(3, obj.getUri());
         int code = statement.executeUpdate();
         statement.close();
 
@@ -92,8 +91,6 @@ public class DocumentDAO extends DAO<Document, String> {
                 document = new Document(
                         doc_id,
                         rs.getString("version"),
-                        rs.getString("uri"
-                        ),
                 new ArrayList<Document_Identifier>());
             }
         } catch (SQLException e) {
@@ -130,7 +127,6 @@ public class DocumentDAO extends DAO<Document, String> {
                         new Document(
                                 rs.getString("docID"),
                                 rs.getString("version"),
-                                rs.getString("uri"),
                 new ArrayList<Document_Identifier>()
                         ));
             }
