@@ -80,10 +80,6 @@ public class KnowledgeBaseIndexer extends Indexer {
     }
 
     public int indexAuthors() throws SQLException {
-//        IndexingPreprocess indexingPreprocess = new IndexingPreprocess(mm);
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//        JsonNode standoffNode = null;
 
         int nb = 0;
         if (isIndexExists(IndexProperties.getKbIndexName())) {
@@ -122,43 +118,9 @@ public class KnowledgeBaseIndexer extends Indexer {
                     documentDoc = doc.getDocumentDocument();
                     publication = pubdao.findByDocId(doc.getDocID()).get(0);
                     documentDoc.put("publication", publication.getPublicationDocument());
-//                dorg = odao.getOrganisationByDocumentID(doc.getDocID());
-//                for (Organisation org : dorg.getOrgs()) {
-//                    orgDoc = org.getOrganisationDocument();
-//                    addr = adao.getOrganisationAddress(org.getOrganisationId());
-//                    if (addr != null) {
-//                        orgDoc.put("address", addr.getAddressDocument());
-//                    }
-//                    document_organisations.add(orgDoc);
-//                }
-//                documentDoc.put("organisations", document_organisations);
-                    //authors/publication ?
-//                Map<String, Object> result = new HashMap<String, Object>();
-//                try {
-//                    standoffNode = indexingPreprocess.getStandoffNerd(mapper, doc.getDocID());
-//                    standoffNode = indexingPreprocess.getStandoffKeyTerm(mapper, doc.getDocID(), standoffNode);
-//                    if (standoffNode != null) {
-//                        result = mapper.convertValue(standoffNode, Map.class);
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                documentDoc.put("annotations", result);
                     publications.add(documentDoc);
-//                coauthors = pdao.getAuthorsByDocId(doc.getDocID());
-//
-//                coauthors.remove(personId);
-//
-//                Iterator it2 = coauthors.entrySet().iterator();
-//                while (it2.hasNext()) {
-//                    Map.Entry pair1 = (Map.Entry) it2.next();
-//                    Map<String, Object> personDoc = ((Person) pair1.getValue()).getPersonDocument();
-//                    personDoc.put("date_coauthorship", publication.getDate_printed());
-//                    coauthors_documents.add(personDoc);
-//                }
                     //Get authors ids(except the actual one) + get pub date + with fullname
                 }
-                //jsonDocument.put("coauthors", coauthors_documents);
                 jsonDocument.put("publications", publications);
                 // index the json in ElasticSearch
                 // beware the document type bellow and corresponding mapping!
@@ -345,10 +307,6 @@ public class KnowledgeBaseIndexer extends Indexer {
         int nb = 0;
         if (isIndexExists(IndexProperties.getKbIndexName())) {
             int bulkSize = 100;
-            IndexingPreprocess indexingPreprocess = new IndexingPreprocess(mm);
-
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode standoffNode = null;
 
             OrganisationDAO odao = (OrganisationDAO) adf.getOrganisationDAO();
             PublicationDAO pubdao = (PublicationDAO) adf.getPublicationDAO();
@@ -393,42 +351,7 @@ public class KnowledgeBaseIndexer extends Indexer {
                 organisationDocument.put("relations", orgRelationsDocument);
                 List<Document> docs = ddao.getDocumentsByOrgId(org.getOrganisationId());
                 List<Map<String, Object>> orgDocumentsDocument = new ArrayList<Map<String, Object>>();
-                Map<String, Object> documentDocument = null;
-                for (Document doc : docs) {
-                    List<Publication> pubs = pubdao.findByDocId(doc.getDocID());
-                    Map<String, Object> publicationDocument = pubs.get(0).getPublicationDocument();
-                    documentDocument = doc.getDocumentDocument();
-                    documentDocument.put("publication", publicationDocument);
-                    orgDocumentsDocument.add(documentDocument);
-
-//                Map<String, Object> result = new HashMap<String, Object>();
-//                try {
-//                    standoffNode = indexingPreprocess.getStandoffNerd(mapper, doc.getDocID());
-//                    standoffNode = indexingPreprocess.getStandoffKeyTerm(mapper, doc.getDocID(), standoffNode);
-//                    if (standoffNode != null) {
-//                        result = mapper.convertValue(standoffNode, Map.class);
-//
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                documentDocument.put("annotations", result);
-                }
                 organisationDocument.put("docCount", docs.size());
-                organisationDocument.put("documents", orgDocumentsDocument);
-
-                Map<Long, Person> authors = pdao.getPersonsByOrgID(org.getOrganisationId());
-                List<Map<String, Object>> authorsDocument = new ArrayList<Map<String, Object>>();
-
-                Iterator it2 = authors.entrySet().iterator();
-                while (it2.hasNext()) {
-                    Map.Entry pair = (Map.Entry) it2.next();
-                    Long personId = (Long) pair.getKey();
-                    Person pers = (Person) pair.getValue();
-                    Map<String, Object> jsonDocument = pers.getPersonDocument();
-                    authorsDocument.add(jsonDocument);
-                }
-                organisationDocument.put("authors", authorsDocument);
                 // index the json in ElasticSearch
                 // beware the document type bellow and corresponding mapping!
                 bulkRequest.add(client.prepareIndex(IndexProperties.getKbIndexName(), "organisations", "" + org.getOrganisationId()).setSource(organisationDocument));

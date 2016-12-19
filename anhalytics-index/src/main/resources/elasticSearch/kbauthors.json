@@ -139,73 +139,7 @@
                 "index": "not_analyzed",
                 "type": "string"
             },
-            "coauthors": {
-                "type": "nested",
-                "properties": {
-                    "identifers": {
-                        "properties": {
-                            "id": {
-                                "type": "string"
-                            },
-                            "type": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "names": {
-                        "properties": {
-                            "date": {
-                                "format": "dateOptionalTime",
-                                "type": "date"
-                            },
-                            "fullname": {
-                                "type": "string"
-                            },
-                            "title": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "phone": {
-                        "type": "string"
-                    },
-                    "photo": {
-                        "type": "string"
-                    },
-                    "personId": {
-                        "type": "long"
-                    },
-                    "title": {
-                        "type": "string"
-                    },
-                    "date_coauthorship": {
-                        "format": "dateOptionalTime",
-                        "type": "date"
-                    },
-                    "email": {
-                        "type": "string"
-                    },
-                    "url": {
-                        "type": "string"
-                    }
-                }
-            },
-            "names": {
-                "properties": {
-                    "date": {
-                        "format": "dateOptionalTime",
-                        "type": "date"
-                    },
-                    "fullname": {
-                        "type": "string"
-                    },
-                    "title": {
-                        "type": "string"
-                    }
-                }
-            },
             "publications": {
-                "type": "nested",
                 "properties": {
                     "docID": {
                         "index": "not_analyzed",
