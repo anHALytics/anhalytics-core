@@ -33,8 +33,8 @@ public class Main {
         {
             add("harvestAll");
             add("harvestDaily");
-            add("generateTei");
-            add("generateTeiDaily");
+            add("appendFulltextTei");
+            add("appendFulltextTeiDaily");
             //add("fetchEmbargoPublications");
             add("processGrobid");
             add("processGrobidDaily");
