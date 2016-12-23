@@ -1,6 +1,5 @@
 package fr.inria.anhalytics.harvest.oaipmh;
 
-import fr.inria.anhalytics.commons.data.PublicationFile;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 

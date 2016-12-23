@@ -1,8 +1,9 @@
 package fr.inria.anhalytics.harvest.oaipmh;
 
-import fr.inria.anhalytics.commons.data.PublicationFile;
-import fr.inria.anhalytics.commons.data.TEI;
+import fr.inria.anhalytics.commons.data.BinaryFile;
+import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
@@ -15,6 +16,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -50,11 +52,10 @@ abstract class OAIPMHHarvester implements HarvesterItf {
      * Stores the given teis and downloads attachements(main file(s), annexes
      * ..) .
      */
-    protected void processTeis(List<TEI> teis, String date, boolean withAnnexes) {
-        for (TEI tei : teis) {
+    protected void processTeis(List<TEIFile> teis, String date, boolean withAnnexes) {
+        for (TEIFile tei : teis) {
             try {
                 String teiString = tei.getTei();
-                String doi = tei.getDoi();
                 String pdfUrl = "";
                 if (tei.getPdfdocument() != null) {
                     pdfUrl = tei.getPdfdocument().getUrl();
@@ -63,17 +64,17 @@ abstract class OAIPMHHarvester implements HarvesterItf {
                 logger.info("\t\t Processing TEI for " + repositoryDocId);
                 if (teiString.length() > 0) {
                     logger.info("\t\t\t\t Storing TEI " + repositoryDocId);
-                    mm.insertMetadataTei(teiString, doi, pdfUrl, HarvestProperties.getSource(), repositoryDocId, tei.getDocumentType(), date);
+                    mm.insertTei(tei, date, MongoCollectionsInterface.METADATAS_TEIS);
 
                     if (tei.getPdfdocument() != null) {
                         logger.info("\t\t\t\t downloading PDF file.");
-                        requestFile(tei.getPdfdocument(), repositoryDocId, tei.getDocumentType(), date);
+                        requestFile(tei.getPdfdocument(), date);
                     } else {
                         mm.save(tei.getRepositoryDocId(), "harvestProcess", "no URL for binary", date);
                         logger.info("\t\t\t\t PDF not found !");
                     }
                     if (withAnnexes) {
-                        downloadAnnexes(tei.getAnnexes(), tei.getRepositoryDocId(), date);
+                        downloadAnnexes(tei.getAnnexes(), date);
                     }
                 } else {
                     logger.info("\t\t\t No TEI metadata !!!");
@@ -91,10 +92,10 @@ abstract class OAIPMHHarvester implements HarvesterItf {
     /**
      * Downloads publication annexes and stores them.
      */
-    protected void downloadAnnexes(List<PublicationFile> annexes, String repositoryDocId, String date) throws ParseException, IOException {
+    protected void downloadAnnexes(List<BinaryFile> annexes, String date) throws ParseException, IOException {
         //annexes
-        for (PublicationFile file : annexes) {
-            requestFile(file, repositoryDocId, "annex", date);
+        for (BinaryFile file : annexes) {
+            requestFile(file, date);
             // diagnose annexes (not found)?
         }
     }
@@ -103,30 +104,33 @@ abstract class OAIPMHHarvester implements HarvesterItf {
      * Requests the given file if is not under embargo and register it either as
      * main file or as an annex.
      */
-    protected boolean requestFile(PublicationFile file, String repositoryDocId, String type, String date) throws ParseException, IOException {
-        InputStream in = null;
-        Date embDate = Utilities.parseStringDate(file.getEmbargoDate());
+    protected boolean requestFile(BinaryFile bf, String date) throws ParseException, IOException {
+        Date embDate = Utilities.parseStringDate(bf.getEmbargoDate());
         Date today = new Date();
         if (embDate.before(today) || embDate.equals(today)) {
-            logger.info("\t\t\t Downloading: " + file.getUrl());
-            in = Utilities.request(file.getUrl(), false);
-            if (in == null) {
-                mm.log(repositoryDocId, file.getUrl(), type, file.isAnnexFile(), "nostream", date);
-            } else {
-                if (!file.isAnnexFile()) {
-                    mm.insertBinaryDocument(in, HarvestProperties.getSource(), repositoryDocId, type, date);
+            logger.info("\t\t\t Downloading: " + bf.getUrl());
+            try {
+                bf.setStream(Utilities.request(bf.getUrl()));
+                if (bf.getStream() == null) {
+                    mm.log(bf.getRepositoryDocId(), bf.getAnhalyticsId(), bf.getUrl(), bf.getDocumentType(), bf.isIsAnnexFile(), "nostream", date);
                 } else {
-                    int n = file.getUrl().lastIndexOf("/");
-                    String filename = file.getUrl().substring(n + 1);
-                    logger.info("\t\t\t\t Getting annex file " + filename + " for pub ID :" + repositoryDocId);
-                    mm.insertAnnexDocument(in, HarvestProperties.getSource(), repositoryDocId, filename, date);
+                    if (!bf.isIsAnnexFile()) {
+                        mm.insertBinaryDocument(bf, date);
+                    } else {
+                        int n = bf.getUrl().lastIndexOf("/");
+                        String filename = bf.getUrl().substring(n + 1);
+                        bf.setFileName(filename);
+                        logger.info("\t\t\t\t Getting annex file " + filename + " for pub ID :" + bf.getRepositoryDocId());
+                        mm.insertAnnexDocument(bf, date);
+                    }
+                    bf.getStream().close();
                 }
-                in.close();
+            } catch (MalformedURLException | ServiceException se) {
+                throw new BinaryNotAvailableException();
             }
-
             return true;
         } else {
-            mm.log(repositoryDocId, file.getUrl(), type, file.isAnnexFile(), "embargo", file.getEmbargoDate());
+            mm.log(bf.getRepositoryDocId(), bf.getAnhalyticsId(), bf.getUrl(), bf.getDocumentType(), bf.isIsAnnexFile(), "embargo", bf.getEmbargoDate());
             logger.info("\t\t\t file under embargo !");
             return false;
         }

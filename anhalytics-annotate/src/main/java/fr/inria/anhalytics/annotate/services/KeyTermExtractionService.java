@@ -33,7 +33,7 @@ public class KeyTermExtractionService extends AnnotateService {
 
     static private String RESOURCEPATH = "processKeyTermArticleTEI";
 
-    public KeyTermExtractionService(String name, String tei) {
+    public KeyTermExtractionService(String tei) {
         super(tei);
     }
 

@@ -4,14 +4,12 @@ import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.annotate.exceptions.UnreachableAnnotateServiceException;
 import fr.inria.anhalytics.annotate.exceptions.AnnotatorNotAvailableException;
 import fr.inria.anhalytics.annotate.services.AnnotateService;
-import fr.inria.anhalytics.commons.exceptions.ServiceException;
+import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.net.UnknownHostException;
 import java.util.concurrent.*;
 
 /**
@@ -67,7 +65,7 @@ public class Annotator {
         String annotationsCollection = null, teiCollection = null;
         if (annotator_type == Annotator_Type.NERD) {
             annotationsCollection = MongoCollectionsInterface.NERD_ANNOTATIONS;
-            teiCollection = MongoCollectionsInterface.FINAL_TEIS;
+            teiCollection = MongoCollectionsInterface.METADATA_WITHFULLTEXT_TEIS;
         } else if (annotator_type == Annotator_Type.KEYTERM) {
             annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
             teiCollection = MongoCollectionsInterface.GROBID_TEIS;
@@ -81,36 +79,33 @@ public class Annotator {
                     if (!AnnotateProperties.isProcessByDate()) {
                         date = null;
                     }
-                    if (mm.initTeis(date, true, teiCollection)) {
+                    if (mm.initTeis(date, teiCollection)) {
                         logger.info("processing teis for :" + date);
-                        while (mm.hasMoreTeis()) {
-                            String tei = mm.nextTeiDocument();
-                            String id = mm.getCurrentRepositoryDocId();
-                            String anhalyticsId = mm.getCurrentAnhalyticsId();
-                            boolean isWithFulltext = mm.isCurrentIsWithFulltext();
-                            if (anhalyticsId == null || anhalyticsId.isEmpty()) {
-                                logger.info("skipping " + id + " No anHALytics id provided");
+                        while (mm.hasMore()) {
+                            TEIFile tei = mm.nextTeiDocument();
+                            if (tei.getAnhalyticsId() == null || tei.getAnhalyticsId().isEmpty()) {
+                                logger.info("skipping " + tei.getRepositoryDocId() + " No anHALytics id provided");
                                 continue;
                             }
                             // check if the document is already annotated
                             if (!AnnotateProperties.isReset()) {
-                                if (mm.isAnnotated(annotationsCollection)) {
-                                    logger.info("skipping " + id + ": already annotated");
+                                if (mm.isAnnotated(annotationsCollection, tei.getAnhalyticsId())) {
+                                    logger.info("skipping " + tei.getRepositoryDocId() + ": already annotated");
                                     continue;
                                 }
                             }
 
                             // filter based on document size... we should actually annotate only 
                             // a given length and then stop
-                            if (tei.length() > 300000) {
-                                logger.info("skipping " + id + ": file too large");
+                            if (tei.getTei().length() > 300000) {
+                                logger.info("skipping " + tei.getRepositoryDocId() + ": file too large");
                                 continue;
                             }
                             Runnable worker = null;
                             if (annotator_type == Annotator_Type.NERD) {
-                                worker = new NerdAnnotatorWorker(mm, id, anhalyticsId, tei, date);
+                                worker = new NerdAnnotatorWorker(mm, tei, date);
                             } else if (annotator_type == Annotator_Type.KEYTERM) {
-                                worker = new KeyTermAnnotatorWorker(mm, id, anhalyticsId, tei, date);
+                                worker = new KeyTermAnnotatorWorker(mm, tei, date);
                             }
                             worker.run();
                             nb++;
@@ -136,7 +131,7 @@ public class Annotator {
         String annotationsCollection = null, teiCollection = null;
         if (annotator_type == Annotator_Type.NERD) {
             annotationsCollection = MongoCollectionsInterface.NERD_ANNOTATIONS;
-            teiCollection = MongoCollectionsInterface.FINAL_TEIS;
+            teiCollection = MongoCollectionsInterface.METADATA_WITHFULLTEXT_TEIS;
         } else if (annotator_type == Annotator_Type.KEYTERM) {
             annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
             teiCollection = MongoCollectionsInterface.GROBID_TEIS;
@@ -150,36 +145,34 @@ public class Annotator {
                     if (!AnnotateProperties.isProcessByDate()) {
                         date = null;
                     }
-                    if (mm.initTeis(date, true, teiCollection)) {
+                    if (mm.initTeis(date, teiCollection)) {
                         //logger.info("processing teis for :" + date);
-                        while (mm.hasMoreTeis()) {
-                            String tei = mm.nextTeiDocument();
-                            String repositoryDocId = mm.getCurrentRepositoryDocId();
-                            String anhalyticsId = mm.getCurrentAnhalyticsId();
+                        while (mm.hasMore()) {
+                            TEIFile tei = mm.nextTeiDocument();
 
-                            if (anhalyticsId == null || anhalyticsId.isEmpty()) {
-                                logger.info("skipping " + repositoryDocId + " No anHALytics id provided");
+                            if (tei.getAnhalyticsId() == null || tei.getAnhalyticsId().isEmpty()) {
+                                logger.info("skipping " + tei.getRepositoryDocId() + " No anHALytics id provided");
                                 continue;
                             }
                             // check if the document is already annotated
                             if (!AnnotateProperties.isReset()) {
-                                if (mm.isAnnotated(annotationsCollection)) {
-                                    logger.info("skipping " + repositoryDocId + ": already annotated");
+                                if (mm.isAnnotated(annotationsCollection, tei.getAnhalyticsId())) {
+                                    logger.info("skipping " + tei.getRepositoryDocId() + ": already annotated");
                                     continue;
                                 }
                             }
 
                             // filter based on document size... we should actually annotate only 
                             // a given length and then stop
-                            if (tei.length() > 300000) {
-                                logger.info("skipping " + repositoryDocId + ": file too large");
+                            if (tei.getTei().length() > 300000) {
+                                logger.info("skipping " + tei.getRepositoryDocId() + ": file too large");
                                 continue;
                             }
                             Runnable worker = null;
                             if (annotator_type == Annotator_Type.NERD) {
-                                worker = new NerdAnnotatorWorker(mm, repositoryDocId, anhalyticsId, tei, date);
+                                worker = new NerdAnnotatorWorker(mm, tei, date);
                             } else {
-                                worker = new KeyTermAnnotatorWorker(mm, repositoryDocId, anhalyticsId, tei, date);
+                                worker = new KeyTermAnnotatorWorker(mm, tei, date);
                             }
 
                             executor.execute(worker);

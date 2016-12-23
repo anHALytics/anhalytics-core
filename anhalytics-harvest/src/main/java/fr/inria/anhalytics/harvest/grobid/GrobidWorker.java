@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.harvest.grobid;
 
+import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.harvest.exceptions.GrobidTimeoutException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
@@ -31,11 +32,9 @@ import org.xml.sax.SAXException;
 abstract class GrobidWorker implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(GrobidWorker.class);
-    protected InputStream content;
     protected MongoFileManager mm;
     protected String date;
-    protected String repositoryDocId;
-    protected String anhalyticsId;
+    protected BinaryFile bf;
     protected int start = 2;
     protected int end = -1;
 
@@ -45,15 +44,12 @@ abstract class GrobidWorker implements Runnable {
 
     protected XPath xPath = XPathFactory.newInstance().newXPath();
 
-    public GrobidWorker(InputStream content, String currentRepositoryDocId, String currentAnhalyticsId, String date, int start, int end) throws ParserConfigurationException {
-        this.content = content;
+    public GrobidWorker(BinaryFile bf, String date, int start, int end) throws ParserConfigurationException {
         this.mm = MongoFileManager.getInstance(false);
         this.date = date;
-        this.repositoryDocId = currentRepositoryDocId;
-        this.anhalyticsId = currentAnhalyticsId;
         this.start = start;
         this.end = end;
-
+        this.bf = bf;
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
         //docFactory.setNamespaceAware(true);
@@ -63,7 +59,7 @@ abstract class GrobidWorker implements Runnable {
     @Override
     public void run() {
         long startTime = System.nanoTime();
-        logger.info(Thread.currentThread().getName() + " Start. Processing = " + repositoryDocId);
+        logger.info(Thread.currentThread().getName() + " Start. Processing = " + bf.getRepositoryDocId());
         processCommand();
         long endTime = System.nanoTime();
         logger.info(Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
@@ -73,30 +69,30 @@ abstract class GrobidWorker implements Runnable {
         try {
             GrobidService grobidService = new GrobidService(this.start, this.end, true, date);//configured for HAL, first page is added to the document
 
-            String filepath = Utilities.storeTmpFile(content);
+            String filepath = Utilities.storeTmpFile(bf.getStream());
             File file = new File(filepath);
             double mb = file.length() / (1024 * 1024);
 
             if (mb <= 15) { // for now we extract just files with less size (avoid thesis..which may take long time)
-                logger.info("\t\t Tei extraction for : " + repositoryDocId + " sizing :" + mb + "mb");
+                logger.info("\t\t Tei extraction for : " + bf.getRepositoryDocId() + " sizing :" + mb + "mb");
                 String resultPath = grobidService.runFullTextAssetGrobid(filepath);
                 saveExtractions(resultPath);
 
                 FileUtils.deleteDirectory(new File(resultPath));
-                logger.info("\t\t " + repositoryDocId + " processed.");
+                logger.info("\t\t " + bf.getRepositoryDocId()+bf.getRepositoryDocVersion() + " processed.");
             } else {
-                logger.info("\t\t can't extract tei for : " + repositoryDocId + "size too large : " + mb + "mb");
+                logger.info("\t\t can't extract tei for : " + bf.getRepositoryDocId() + "size too large : " + mb + "mb");
             }
             file.delete();
         } catch (GrobidTimeoutException e) {
-            mm.save(repositoryDocId, "processGrobid", "timed out", date);
-            logger.warn("Processing of " + repositoryDocId + " timed out");
+            mm.save(bf.getRepositoryDocId(), "processGrobid", "timed out", date);
+            logger.warn("Processing of " + bf.getRepositoryDocId() + " timed out");
         } catch (RuntimeException e) {
-            logger.error("\t\t error occurred while processing " + repositoryDocId);
+            logger.error("\t\t error occurred while processing " + bf.getRepositoryDocId());
             if (e.getMessage().contains("timed out")) {
-                mm.save(repositoryDocId, "processGrobid", "timed out", date);
+                mm.save(bf.getRepositoryDocId(), "processGrobid", "timed out", date);
             } else if (e.getMessage().contains("failed")) {
-                mm.save(repositoryDocId, "processGrobid", "failed", date);
+                mm.save(bf.getRepositoryDocId(), "processGrobid", "failed", date);
             }
             logger.error(e.getMessage(), e.getCause());
         } catch (IOException ex) {
@@ -122,7 +118,7 @@ abstract class GrobidWorker implements Runnable {
     }
 
     protected void saveDocumentDOI(String tei) {
-        if (mm.isWithoutDoi(anhalyticsId)) {
+        if (mm.isWithoutDoi(bf.getAnhalyticsId())) {
             try {
                 InputStream grobidStream = new ByteArrayInputStream(tei.getBytes());
                 Document grobid;
@@ -131,14 +127,14 @@ abstract class GrobidWorker implements Runnable {
                 Node doiNode = (Node) xPath.compile(DOI_PATH)
                         .evaluate(grobidRootElement, XPathConstants.NODE);
                 if (doiNode != null) {
-                    mm.updateDoi(anhalyticsId, doiNode.getTextContent());
-                    logger.info("\t\t DOI of " + repositoryDocId + " saved.");
+                    mm.updateDoi(bf.getAnhalyticsId(), doiNode.getTextContent());
+                    logger.info("\t\t DOI of " + bf.getRepositoryDocId() + " saved.");
                 }
                 grobidStream.close();
             } catch (SAXException ex) {
-                logger.error("\t\t error occurred while parsing document to find DOI " + repositoryDocId);
+                logger.error("\t\t error occurred while parsing document to find DOI " + bf.getRepositoryDocId());
             } catch (XPathExpressionException ex) {
-                logger.error("\t\t error occurred while parsing document to find DOI " + repositoryDocId);
+                logger.error("\t\t error occurred while parsing document to find DOI " + bf.getRepositoryDocId());
             } catch (IOException ex) {
                 logger.error(ex.getMessage(), ex.getCause());
             }
@@ -152,6 +148,6 @@ abstract class GrobidWorker implements Runnable {
 
     @Override
     public String toString() {
-        return this.repositoryDocId;
+        return this.bf.getRepositoryDocId();
     }
 }

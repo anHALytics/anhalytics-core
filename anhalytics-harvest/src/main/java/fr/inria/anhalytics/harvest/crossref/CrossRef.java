@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.harvest.crossref;
 
+import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.exceptions.SystemException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
@@ -107,11 +108,12 @@ public class CrossRef {
                 date = null;
             }
             if (mm.initMetadataTeis(date)) {
-                while (mm.hasMoreTeis()) {
+                while (mm.hasMore()) {
 
-                    String metadataString = mm.nextTeiDocument();
-                    String currentRepositoryDocId = mm.getCurrentRepositoryDocId();
-                    String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
+                    TEIFile tei = mm.nextTeiDocument();
+                    String metadataString = tei.getTei();
+                    String currentRepositoryDocId = tei.getRepositoryDocId();
+                    String currentAnhalyticsId = tei.getAnhalyticsId();
 
                     InputStream metadataStream = new ByteArrayInputStream(metadataString.getBytes());
 

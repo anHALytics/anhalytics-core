@@ -71,6 +71,8 @@ public class HalTEIConverter implements MetadataConverter {
         try {
             Element dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"datePub\"]").evaluate(newTEICorpus, XPathConstants.NODE);
 
+            Element submissionDateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/editionStmt/edition[@type=\"current\"]/date[@type=\"whenSubmitted\"]").evaluate(newTEICorpus, XPathConstants.NODE);
+            
             Element defendingElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"dateDefended\"]").evaluate(newTEICorpus, XPathConstants.NODE);
 
             Element startDateConferenceElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/meeting/date[@type=\"start\"]").evaluate(newTEICorpus, XPathConstants.NODE);
@@ -81,7 +83,11 @@ public class HalTEIConverter implements MetadataConverter {
             }
             if (pubDate.isEmpty()) {
                 String date = "";
-
+                
+                if (submissionDateElt != null) {
+                    date = submissionDateElt.getTextContent().split(" ")[0];
+                }
+                
                 if (startDateConferenceElt != null) {
                     String confDate = Utilities.completeDate(startDateConferenceElt.getTextContent());
                     if (!confDate.isEmpty()) {
@@ -103,6 +109,7 @@ public class HalTEIConverter implements MetadataConverter {
                 newPubDate.setAttribute("when", pubDate);
                 newPubDate.setAttribute("type", "datePub");
                 newPubDate.setTextContent(pubDate);
+                
                 Element eltMonogr = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr").evaluate(newTEICorpus, XPathConstants.NODE);
                 Element eltImprint = (Element) eltMonogr.getElementsByTagName("imprint").item(0);
                 eltImprint = (eltImprint == null) ? newTEICorpus.createElement("imprint") : eltImprint;
@@ -113,9 +120,7 @@ public class HalTEIConverter implements MetadataConverter {
             }
         } catch (XPathExpressionException e) {
             e.printStackTrace();
-
         }
-
     }
 
     private Element createMetadataTEIHeader(NodeList stuffToTake, Document doc) {
@@ -244,7 +249,7 @@ public class HalTEIConverter implements MetadataConverter {
         return metadata;
     }
 
-    private void updateOrgType(Element org, NodeList orgs) {
+    private void moveOrgToAffiliation(Element aff, Element org, NodeList orgs) {
 
         NodeList relations = org.getElementsByTagName("relation");
         for (int j = relations.getLength() - 1; j >= 0; j--) {
@@ -254,11 +259,10 @@ public class HalTEIConverter implements MetadataConverter {
                 if (relation.getAttribute("type").equals("direct")) {
                     String id = relation.getAttribute("active");
                     id = id.replace("#", "");
-                    Node rel = Utilities.findNode(id, orgs);
+                    Node rel = Utilities.findNode("xml:id",id, orgs);
                     Node newRel = rel.cloneNode(true);
-                    updateOrgType((Element) newRel, orgs);
-
-                    org.appendChild(newRel);
+                    moveOrgToAffiliation(aff, (Element) newRel, orgs);
+                    aff.appendChild(newRel);
                 }
             }
         }
@@ -275,7 +279,7 @@ public class HalTEIConverter implements MetadataConverter {
                     Element e = (Element) (theNodes.item(y));
                     if (e.getTagName().equals("affiliation")) {
                         String name = e.getAttribute("ref").replace("#", "");
-                        Node aff = Utilities.findNode(name, orgs);
+                        Node aff = Utilities.findNode("xml:id", name, orgs);
                         if (aff != null) {
                             //person.removeChild(theNodes.item(y));
                             aff = aff.cloneNode(true);
@@ -283,7 +287,7 @@ public class HalTEIConverter implements MetadataConverter {
                             // we need to rename this attribute because we cannot multiply the id attribute
                             // with the same value (XML doc becomes not well-formed)
                             Element orgElement = (Element) localNode;
-                            updateOrgType(orgElement, orgs);
+                            moveOrgToAffiliation(e, orgElement, orgs);
                             e.removeAttribute("ref");
                             e.appendChild(localNode);
                         }
@@ -346,7 +350,6 @@ public class HalTEIConverter implements MetadataConverter {
         try {
             Element dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"datePub\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
             Element grobidDateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/publicationStmt/date[@type=\"published\"]").evaluate(doc, XPathConstants.NODE);
-            Element submissionDateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/editionStmt/edition[@type=\"current\"]/date[@type=\"whenSubmitted\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
 
             String dateRaw = "";
             String dateFormatted = dateElt.getAttribute("when");
@@ -358,10 +361,6 @@ public class HalTEIConverter implements MetadataConverter {
                     if (!dateRaw.isEmpty()) {
                         dateFormatted = Utilities.completeDate(dateRaw);
                     }
-                }
-
-                if (dateFormatted.isEmpty()) {
-                    dateFormatted = submissionDateElt.getTextContent().split(" ")[0];
                 }
 
                 dateElt.setTextContent(dateFormatted);

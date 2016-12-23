@@ -22,7 +22,7 @@ public interface MongoCollectionsInterface {
     // publications annexes
     public static final String PUB_ANNEXES = "pub_annexes";
     // tei generated using metadata and fulltext
-    public static final String FINAL_TEIS = "final_teis";
+    public static final String METADATA_WITHFULLTEXT_TEIS = "metadata_teis_fulltext";
     // tei extracted using grobid
     public static final String GROBID_TEIS = "grobid_teis";
     // grobid provided by grobid after tei extraction

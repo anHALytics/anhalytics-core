@@ -43,24 +43,16 @@ public class TeiBuilder {
      * returns new Document representing TEICorpus with harvested metadata in
      * TEI header.
      */
-    public Document createTEICorpus(InputStream metadataStream) {
+    public Document createTEICorpus(Document metadataDoc) {
         HalTEIConverter htc = new HalTEIConverter();//
-        Document metadata = null;
-        try {
-            metadata = docBuilder.parse(metadataStream);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         Document newTEICorpus = docBuilder.newDocument();
-        Element teiHeader = htc.convertMetadataToTEIHeader(metadata, newTEICorpus);
+        Element teiHeader = htc.convertMetadataToTEIHeader(metadataDoc, newTEICorpus);
         Element teiCorpus = newTEICorpus.createElement("teiCorpus");
         teiHeader.setAttribute("xml:id", "hal");
         teiCorpus.appendChild(teiHeader);
         teiCorpus.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
         newTEICorpus.appendChild(teiCorpus);
-        
-            htc.updatePublicationDate(teiHeader, newTEICorpus);
+        htc.updatePublicationDate(teiHeader, newTEICorpus);
         return newTEICorpus;
     }
 

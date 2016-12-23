@@ -20,6 +20,7 @@ import fr.inria.anhalytics.commons.dao.PublisherDAO;
 import fr.inria.anhalytics.commons.dao.anhalytics.DAOFactory;
 import fr.inria.anhalytics.commons.dao.biblio.AbstractBiblioDAOFactory;
 import fr.inria.anhalytics.commons.dao.biblio.BiblioDAOFactory;
+import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.entities.Address;
 import fr.inria.anhalytics.commons.entities.Affiliation;
 import fr.inria.anhalytics.commons.entities.Author;
@@ -44,12 +45,10 @@ import fr.inria.anhalytics.commons.entities.Person_Name;
 import fr.inria.anhalytics.commons.entities.Publication;
 import fr.inria.anhalytics.commons.entities.Publisher;
 import fr.inria.anhalytics.commons.entities.Serial_Identifier;
-import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.KbProperties;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -103,20 +102,18 @@ public class KnowledgeBaseFeeder {
             if (!KbProperties.isProcessByDate()) {
                 date = null;
             }
-            if (mm.initTeis(date, true, MongoCollectionsInterface.FINAL_TEIS)) {
-                while (mm.hasMoreTeis()) {
-                    String metadataTeiString = mm.nextTeiDocument();
-                    String repositoryDocId = mm.getCurrentRepositoryDocId();
-                    String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
-                    if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
-                        logger.info("skipping " + repositoryDocId + " No anHALytics id provided");
+            if (mm.initTeis(date, MongoCollectionsInterface.METADATAS_TEIS)) {
+                while (mm.hasMore()) {
+                    TEIFile tei = mm.nextTeiDocument();
+                    if (tei.getAnhalyticsId() == null || tei.getAnhalyticsId().isEmpty()) {
+                        logger.info("skipping " + tei.getRepositoryDocId() + " No anHALytics id provided");
                         continue;
                     }
-                    if (!dd.isMined(currentAnhalyticsId)) {
+                    if (!dd.isMined(tei.getAnhalyticsId())) {
                         adf.openTransaction();
                         Document teiDoc = null;
                         try {
-                            InputStream teiStream = new ByteArrayInputStream(metadataTeiString.getBytes());
+                            InputStream teiStream = new ByteArrayInputStream(tei.getTei().getBytes());
                             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
                             docFactory.setValidating(false);
                             //docFactory.setNamespaceAware(true);
@@ -144,14 +141,14 @@ public class KnowledgeBaseFeeder {
                             NodeList authors = teiHeader.getElementsByTagName("author");
                             Element monogr = (Element) xPath.compile(TeiPaths.MonogrElement).evaluate(teiDoc, XPathConstants.NODE);
                             NodeList ids = (NodeList) xPath.compile(TeiPaths.IdnoElement).evaluate(teiDoc, XPathConstants.NODESET);
-                            logger.info("Extracting :" + repositoryDocId);
+                            logger.info("Extracting :" + tei.getRepositoryDocId());
                             if (authors.getLength() > 30) {
                                 throw new NumberOfCoAuthorsExceededException("Number of authors exceed 30 co-authors for this publication.");
                             }
 
-                            fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(currentAnhalyticsId, "", new ArrayList<Document_Identifier>());
+                            fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(tei.getAnhalyticsId(), tei.getRepositoryDocVersion(), new ArrayList<Document_Identifier>());
 
-                            processIdentifiers(ids, doc, repositoryDocId);
+                            processIdentifiers(ids, doc, tei.getRepositoryDocId());
                             dd.create(doc);
 
                             pub.setDocument(doc);
@@ -176,7 +173,7 @@ public class KnowledgeBaseFeeder {
                         adf.endTransaction();
                         if (teiDoc != null) {
                             String generatedTeiString = Utilities.toString(teiDoc);
-                            mm.updateTei(generatedTeiString, repositoryDocId, true);
+                            mm.updateTei(generatedTeiString, tei.getRepositoryDocId(), MongoCollectionsInterface.METADATAS_TEIS);
                         }
                     }
                 }
@@ -250,7 +247,7 @@ public class KnowledgeBaseFeeder {
                                 } else if (imprintChildElt.getNodeName().equals("date")) {
                                     String type = imprintChildElt.getAttribute("type");
                                     String date = imprintChildElt.getAttribute("when");
-                                    if (type.equals("datePub") || type.equals("dateDefended")) {
+                                    if (type.equals("datePub")) {
                                         pub.setDate_eletronic(date);
                                         date = Utilities.completeDate(date);
                                         try {
@@ -344,103 +341,119 @@ public class KnowledgeBaseFeeder {
         }
     }
 
-    private static Organisation parseOrg(Node orgNode, Organisation org, Document_Organisation document_organisation, Date pubDate, Document doc) throws SQLException {
+    private static Organisation parseListRelation(Node listRelationNode, Element affiliationElt, Organisation org, Document_Organisation document_organisation, Date pubDate, Document doc) throws SQLException {
         LocationDAO ld = (LocationDAO) adf.getLocationDAO();
         AddressDAO ad = (AddressDAO) adf.getAddressDAO();
         OrganisationDAO od = (OrganisationDAO) adf.getOrganisationDAO();
-        Organisation organisationParent = new Organisation();
-        List<Organisation_Identifier> ois = new ArrayList<Organisation_Identifier>();
-        Location locationParent = null;
-        PART_OF part_of = new PART_OF();
-        if (orgNode.getNodeType() == Node.ELEMENT_NODE) {
-            Element orgElt = (Element) orgNode;
-            organisationParent.setType(orgElt.getAttribute("type"));
-            if (orgElt.hasAttribute("xml:id")) {
-                ois.add(new Organisation_Identifier(orgElt.getAttribute("xml:id"), "halId"));
-            }
-            if (orgElt.hasAttribute("status")) {
-                organisationParent.setStatus(orgElt.getAttribute("status"));
-            }
-            NodeList nlorg = orgElt.getChildNodes();
-            for (int o = nlorg.getLength() - 1; o >= 0; o--) {
-                Node ndorg = nlorg.item(o);
-                if (ndorg.getNodeType() == Node.ELEMENT_NODE) {
-                    Element orgChildElt = (Element) ndorg;
-                    if (orgChildElt.getNodeName().equals("orgName")) {
-                        organisationParent.addName(new Organisation_Name(null, orgChildElt.getTextContent().trim(), pubDate));
-                    } else if (orgChildElt.getNodeName().equals("desc")) {
-                        NodeList descorgChilds = ndorg.getChildNodes();
-                        for (int l = descorgChilds.getLength() - 1; l >= 0; l--) {
-                            Node descChild = descorgChilds.item(l);
-                            if (descChild.getNodeType() == Node.ELEMENT_NODE) {
-                                Element descChildElt = (Element) descChild;
-                                if (descChildElt.getNodeName().equals("address")) {
-                                    locationParent = processAddress(descChildElt);
 
-                                } else if (descChildElt.getNodeName().equals("ref")) {
-                                    String type = descChildElt.getAttribute("type");
-                                    if (type.equals("url")) {
-                                        organisationParent.setUrl(descChildElt.getTextContent().trim());
+        Element listRelationElt = (Element) listRelationNode;
+        NodeList relationsNL = listRelationElt.getChildNodes();
+        for (int i = relationsNL.getLength() - 1; i >= 0; i--) {
+            if (relationsNL.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                Element relationElt = (Element) relationsNL.item(i);
+                if (relationElt.getAttribute("type").equals("direct")) {
+                    Element orgElt = (Element) Utilities.findNode("xml:id", relationElt.getAttribute("active").replace("#", ""), affiliationElt.getChildNodes());
+                    Organisation organisationParent = new Organisation();
+                    Location locationParent = null;
+                    PART_OF part_of = new PART_OF();
+
+                    List<Organisation_Identifier> ois = new ArrayList<Organisation_Identifier>();
+                    organisationParent.setType(orgElt.getAttribute("type"));
+                    if (orgElt.hasAttribute("xml:id")) {
+                        ois.add(new Organisation_Identifier(orgElt.getAttribute("xml:id").split("-")[1], "halId"));
+                    }
+                    if (orgElt.hasAttribute("status")) {
+                        organisationParent.setStatus(orgElt.getAttribute("status"));
+                    }
+                    NodeList nlorg = orgElt.getChildNodes();
+                    for (int o = nlorg.getLength() - 1; o >= 0; o--) {
+                        Node ndorg = nlorg.item(o);
+                        if (ndorg.getNodeType() == Node.ELEMENT_NODE) {
+                            Element orgChildElt = (Element) ndorg;
+                            if (orgChildElt.getNodeName().equals("orgName")) {
+                                organisationParent.addName(new Organisation_Name(null, orgChildElt.getTextContent().trim(), pubDate));
+                            } else if (orgChildElt.getNodeName().equals("desc")) {
+                                NodeList descorgChilds = ndorg.getChildNodes();
+                                for (int l = descorgChilds.getLength() - 1; l >= 0; l--) {
+                                    Node descChild = descorgChilds.item(l);
+                                    if (descChild.getNodeType() == Node.ELEMENT_NODE) {
+                                        Element descChildElt = (Element) descChild;
+                                        if (descChildElt.getNodeName().equals("address")) {
+                                            locationParent = processAddress(descChildElt);
+
+                                        } else if (descChildElt.getNodeName().equals("ref")) {
+                                            String type = descChildElt.getAttribute("type");
+                                            if (type.equals("url")) {
+                                                organisationParent.setUrl(descChildElt.getTextContent().trim());
+                                            }
+                                        }
                                     }
+                                }
+                            } else if (orgChildElt.getNodeName().equals("listRelation")) {
+                                organisationParent = parseListRelation(orgChildElt, affiliationElt, organisationParent, document_organisation, pubDate, doc);
+                            } else if (orgChildElt.getNodeName().equals("ref")) {
+                                String descReftype = orgChildElt.getAttribute("type");
+                                if (descReftype.equals("url")) {
+                                    organisationParent.setUrl(orgChildElt.getTextContent().trim());
+                                }
+                            } else if (orgChildElt.getNodeName().equals("idno")) {
+                                String id_type = orgChildElt.getAttribute("type");
+                                String id_value = orgChildElt.getTextContent().trim();
+                                if (id_type.equals("anhalyticsID")) {
+                                    orgElt.removeChild(orgChildElt);
+                                } else {
+                                    organisationParent.getOrganisation_identifiers().add(new Organisation_Identifier(id_value, id_type));
                                 }
                             }
                         }
-                    } else if (orgChildElt.getNodeName().equals("org")) {
-                        organisationParent = parseOrg(orgChildElt, organisationParent, document_organisation, pubDate, doc);
-                    } else if (orgChildElt.getNodeName().equals("ref")) {
-                        String descReftype = orgChildElt.getAttribute("type");
-                        if (descReftype.equals("url")) {
-                            organisationParent.setUrl(orgChildElt.getTextContent().trim());
-                        }
-                    } else if (orgChildElt.getNodeName().equals("idno")) {
-                        String id_type = orgChildElt.getAttribute("type");
-                        String id_value = orgChildElt.getTextContent().trim();
-                        if (id_type.equals("anhalyticsID")) {
-                            orgNode.removeChild(orgChildElt);
-                        } else {
-                            organisationParent.getOrganisation_identifiers().add(new Organisation_Identifier(id_value, id_type));
-                        }
                     }
+                    organisationParent.setOrganisation_identifiers(ois);
+                    od.create(organisationParent);
+                    document_organisation.addOrg(organisationParent);
+                    part_of.setOrganisation_mother(organisationParent);
+                    part_of.setFromDate(pubDate);
+                    part_of.setUntilDate(pubDate);
+                    org.addRel(part_of);
+
+                    if (locationParent != null && locationParent.getAddress() != null) {
+                        if (locationParent.getAddress().getAddressId() == null) {
+
+                            ad.create(locationParent.getAddress());
+                        }
+                        locationParent.setFrom_date(pubDate);
+                        locationParent.setUntil_date(pubDate);
+                        locationParent.setOrganisation(organisationParent);
+                        ld.create(locationParent);
+                    }
+                    // how to handle it for grobid case ?
+                    Element idno = doc.createElement("idno");
+                    idno.setAttribute("type", "anhalyticsID");
+                    idno.setTextContent(Long.toString(organisationParent.getOrganisationId()));
+                    orgElt.appendChild(idno);
                 }
             }
-            organisationParent.setOrganisation_identifiers(ois);
-            od.create(organisationParent);
-            document_organisation.addOrg(organisationParent);
-            part_of.setOrganisation_mother(organisationParent);
-            part_of.setFromDate(pubDate);
-            part_of.setUntilDate(pubDate);
-            org.addRel(part_of);
-
-            if (locationParent != null && locationParent.getAddress() != null) {
-                if (locationParent.getAddress().getAddressId() == null) {
-
-                    ad.create(locationParent.getAddress());
-                }
-                locationParent.setFrom_date(pubDate);
-                locationParent.setUntil_date(pubDate);
-                locationParent.setOrganisation(organisationParent);
-                ld.create(locationParent);
-            }
-            // how to handle it for grobid case ?
-            Element idno = doc.createElement("idno");
-            idno.setAttribute("type", "anhalyticsID");
-            idno.setTextContent(Long.toString(organisationParent.getOrganisationId()));
-            orgNode.appendChild(idno);
         }
         return org;
     }
 
-    private static void parseAffiliationOrg(Affiliation affiliation, Publication pub, Element orgElt, Document doc, String source) throws SQLException {
+    private static void parseAffiliationOrg(Affiliation affiliation, Publication pub, Element orgElt, Element affiliationElt, Document doc) throws SQLException {
         Document_Organisation document_organisation = new Document_Organisation();
         Document_OrganisationDAO d_o = (Document_OrganisationDAO) adf.getDocument_OrganisationDAO();
         document_organisation.setDoc(pub.getDocument());
         Organisation organisation = new Organisation();
-        organisation.setSource(source);
         OrganisationDAO od = (OrganisationDAO) adf.getOrganisationDAO();
         Location location = null;
         LocationDAO ld = (LocationDAO) adf.getLocationDAO();
         AddressDAO ad = (AddressDAO) adf.getAddressDAO();
         NodeList nodes = orgElt.getChildNodes();
+
+        organisation.setType(orgElt.getAttribute("type"));
+        if (orgElt.hasAttribute("xml:id")) {
+            organisation.getOrganisation_identifiers().add(new Organisation_Identifier(orgElt.getAttribute("xml:id").split("-")[1], "halId"));
+        }
+        if (orgElt.hasAttribute("status")) {
+            organisation.setStatus(orgElt.getAttribute("status"));
+        }
 
         for (int o = nodes.getLength() - 1; o >= 0; o--) {
 
@@ -465,8 +478,8 @@ public class KnowledgeBaseFeeder {
                             }
                         }
                     }
-                } else if (childElt.getNodeName().equals("org")) {
-                    organisation = parseOrg(childElt, organisation, document_organisation, pub.getDate_printed(), doc);
+                } else if (childElt.getNodeName().equals("listRelation")) {
+                    organisation = parseListRelation(childElt, affiliationElt, organisation, document_organisation, pub.getDate_printed(), doc);
                 } else if (childElt.getNodeName().equals("ref")) {
                     String descReftype = childElt.getAttribute("type");
                     if (descReftype.equals("url")) {
@@ -482,13 +495,6 @@ public class KnowledgeBaseFeeder {
                     }
                 }
             }
-        }
-        organisation.setType(orgElt.getAttribute("type"));
-        if (orgElt.hasAttribute("xml:id")) {
-            organisation.getOrganisation_identifiers().add(new Organisation_Identifier(orgElt.getAttribute("xml:id"), "halId"));
-        }
-        if (orgElt.hasAttribute("status")) {
-            organisation.setStatus(orgElt.getAttribute("status"));
         }
         od.create(organisation);
         document_organisation.addOrg(organisation);
@@ -566,18 +572,22 @@ public class KnowledgeBaseFeeder {
                                 } else if (personChildElt.getNodeName().equals("affiliation")) {
                                     NodeList nl = personChildElt.getChildNodes();
                                     Element org = null;
-                                    Node n = null;
-                                    for (int z = nl.getLength() - 1; z >= 0; z--) {
-                                        n = nl.item(z);
-                                        if (n.getNodeType() == Node.ELEMENT_NODE) {
-                                            if (n.getNodeName().equals("org")) {
-                                                org = (Element) n;
-                                                break;
-                                            }
-                                        }
+                                    String orgType = "researchteam";
+                                    //Research team - Department - Laboratory - Institution
+                                    org = (Element) Utilities.findNode("type", orgType, nl);
+                                    if (org == null) {
+                                        orgType = "department";
+                                        org = (Element) Utilities.findNode("type", orgType, nl);
                                     }
-                                    String source = personChildElt.getAttribute("source");
-                                    parseAffiliationOrg(affiliation, pub, org, doc, source);
+                                    if (org == null) {
+                                        orgType = "laboratory";
+                                        org = (Element) Utilities.findNode("type", orgType, nl);
+                                    }
+                                    if (org == null) {
+                                        orgType = "institution";
+                                        org = (Element) Utilities.findNode("type", orgType, nl);
+                                    }
+                                    parseAffiliationOrg(affiliation, pub, org, personChildElt, doc);
                                 } else if (personChildElt.getNodeName().equals("idno")) {
                                     Person_Identifier pi = new Person_Identifier();
                                     String id_type = personChildElt.getAttribute("type");
@@ -659,26 +669,24 @@ public class KnowledgeBaseFeeder {
             if (!KbProperties.isProcessByDate()) {
                 date = null;
             }
-            if (mm.initTeis(date, true, MongoCollectionsInterface.FINAL_TEIS)) {
-                while (mm.hasMoreTeis()) {
-                    String teiString = mm.nextTeiDocument();
-                    String repositoryDocId = mm.getCurrentRepositoryDocId();
-                    String anhalyticsId = mm.getCurrentAnhalyticsId();
-                    if (anhalyticsId == null || anhalyticsId.isEmpty()) {
-                        logger.info("skipping " + repositoryDocId + " No anHALytics id provided");
+            if (mm.initTeis(date, MongoCollectionsInterface.METADATA_WITHFULLTEXT_TEIS)) {
+                while (mm.hasMore()) {
+                    TEIFile tei = mm.nextTeiDocument();
+                    if (tei.getAnhalyticsId() == null || tei.getAnhalyticsId().isEmpty()) {
+                        logger.info("skipping " + tei.getRepositoryDocId() + " No anHALytics id provided");
                         continue;
                     }
-                    if (!dd.isCitationsMined(anhalyticsId)) {
-                        logger.info("Extracting :" + repositoryDocId);
+                    if (!dd.isCitationsMined(tei.getAnhalyticsId())) {
+                        logger.info("Extracting :" + tei.getRepositoryDocId());
                         abdf.openTransaction();
                         try {
-                            InputStream teiStream = new ByteArrayInputStream(teiString.getBytes());
+                            InputStream teiStream = new ByteArrayInputStream(tei.getTei().getBytes());
                             Document teiDoc = getDocument(teiStream);
                             teiStream.close();
                             Node citations = (Node) xPath.compile("/teiCorpus/TEI/text/back/div[@type='references']/listBibl").evaluate(teiDoc, XPathConstants.NODE);
                             if (citations != null) {
                                 NodeList references = citations.getChildNodes();
-                                fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(anhalyticsId, Utilities.getVersionFromURI(repositoryDocId), new ArrayList<Document_Identifier>());
+                                fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(tei.getAnhalyticsId(), tei.getRepositoryDocVersion(), new ArrayList<Document_Identifier>());
                                 dd.create(doc);
 
                                 for (int j = 0; j < references.getLength() - 1; j++) {

@@ -26,6 +26,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -70,8 +72,9 @@ public class Utilities {
             int monthYear = (year == todayYear) ? todayMonth : 12;
             for (int month = 1; month <= monthYear; month++) {
                 for (int day = 1; day <= daysInMonth(year, month); day++) {
-                    if((year == todayYear) && (todayMonth == todayMonth) && (todayDay == day))
+                    if ((year == todayYear) && (todayMonth == todayMonth) && (todayDay == day)) {
                         break;
+                    }
                     StringBuilder date = new StringBuilder();
                     date.append(String.format("%04d", year));
                     date.append("-");
@@ -219,16 +222,18 @@ public class Utilities {
         return sb.toString();
     }
 
-    public static Node findNode(String id, NodeList orgs) {
-        Node org = null;
-        for (int i = 0; i < orgs.getLength(); i++) {
-            NamedNodeMap attr = orgs.item(i).getAttributes();
-            if (attr.getNamedItem("xml:id") == null) {
-                continue;
-            }
-            if (attr.getNamedItem("xml:id").getNodeValue().equals(id)) {
-                org = orgs.item(i);
-                break;
+    public static Element findNode(String attribut, String value, NodeList orgs) {
+        Element org = null;
+        for (int i = orgs.getLength() - 1; i >= 0; i--) {
+            if (orgs.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) orgs.item(i);
+                if (element.getAttribute(attribut) == null) {
+                    continue;
+                }
+                if (element.getAttribute(attribut).equals(value)) {
+                    org = element;
+                    break;
+                }
             }
         }
         return org;
@@ -428,33 +433,71 @@ public class Utilities {
         }
     }
 
-    public static InputStream request(String request, boolean retry) {
+    public static InputStream request(String request) throws MalformedURLException {
         InputStream in = null;
+        long startTime = 0;
+        long endTime = 0;
+        startTime = System.currentTimeMillis();
+        URL url = new URL(request);
+        HttpURLConnection conn = getConnection(url);
         try {
-            URL url = new URL(request);
-            URLConnection conn = url.openConnection();
-
-            conn.setRequestProperty("accept-charset", "UTF-8");
             in = conn.getInputStream();
-            return in;
-        } catch (UnknownHostException e) {
-            if (retry) {
-                try {
-                    Thread.sleep(900000); //take a nap.
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-                in = request(request, true);
-            } else {
-                throw new ServiceException("The service is not reachable. Aborting.", e);
-            }
-        } catch (FileNotFoundException e) {
-            logger.warn("Cannot download " + request + ". Ignoring it. ", e);
         } catch (IOException e) {
-            throw new ServiceException("The service is not reachable or something is happening.", e);
+            throw new ServiceException("Can't get data stream.", e);
         }
-
+        endTime = System.currentTimeMillis();
+        logger.info("spend:" + (endTime - startTime) + " ms");
         return in;
+    }
+
+    private static final HttpURLConnection getConnection(URL url) {
+        int retry = 0, retries = 4;
+        boolean delay = false;
+        HttpURLConnection connection = null;
+        do {
+            try {
+                if (delay) {
+                    try {
+                        Thread.sleep(900000);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("accept-charset", "UTF-8");
+                switch (connection.getResponseCode()) {
+                    case HttpURLConnection.HTTP_OK:
+                        logger.info(url + " **OK**");
+                        return connection; // **EXIT POINT** fine, go on
+                    case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
+                        logger.info(url + ":" + connection.getResponseCode());
+                        break;// retry
+                    case HttpURLConnection.HTTP_UNAVAILABLE:
+                        logger.info(url + "**unavailable**" + " :" + connection.getResponseCode());
+                        break;// retry, server is unstable
+                    default:
+                        //stop
+                        logger.info(url + ":" + connection.getResponseCode());
+                        throw new ServiceException(url + ":" + connection.getResponseCode());
+                }
+                // we did not succeed with connection (or we would have returned the connection).
+                connection.disconnect();
+                // retry
+                retry++;
+                logger.warn("Failed retry " + retry + "/" + retries);
+                delay = true;
+                if (retry == retries) {
+                    throw new ServiceException(url + ":" + connection.getResponseCode());
+                }
+            } catch (FileNotFoundException e) {
+                logger.warn("Cannot download " + url.getQuery() + ". Ignoring it. ", e);
+                throw new ServiceException("Cannot download " + url.getQuery() + ". Ignoring it.", e);
+            } catch (IOException e) {
+                throw new ServiceException("The service is not reachable or something is happening.", e);
+            }
+        } while (retry < retries);
+        return connection;
     }
 
     public static String formatXMLString(String xmlString) {

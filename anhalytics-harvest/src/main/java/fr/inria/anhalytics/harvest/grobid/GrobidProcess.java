@@ -1,17 +1,10 @@
 package fr.inria.anhalytics.harvest.grobid;
 
-import com.mongodb.MongoException;
-import fr.inria.anhalytics.commons.exceptions.DataException;
-import fr.inria.anhalytics.commons.exceptions.ServiceException;
+import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.harvest.exceptions.UnreachableGrobidServiceException;
-import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -49,38 +42,29 @@ public class GrobidProcess {
                         date = null;
                     }
                     if (mm.initBinaries(date)) {
-                        while (mm.hasMoreBinaryDocuments()) {
-                            InputStream content = mm.nextBinaryDocument();
-                            String currentRepositoryDocId = mm.getCurrentRepositoryDocId();
-                            String type = mm.getCurrentDocType();
-                            String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
-                            String source = mm.getCurrentDocSource();
-                            if (toBeGrobidified.contains(type)) {
-                                if (currentAnhalyticsId == null || currentAnhalyticsId.isEmpty()) {
-                                    logger.info("skipping " + currentRepositoryDocId + " No anHALytics id provided");
+                        while (mm.hasMore()) {
+                            BinaryFile bf = mm.nextBinaryDocument();
+                            if (toBeGrobidified.contains(bf.getDocumentType())) {
+                                if (bf.getAnhalyticsId() == null || bf.getAnhalyticsId().isEmpty()) {
+                                    logger.info("skipping " + bf.getRepositoryDocId() + " No anHALytics id provided");
                                     continue;
                                 }
                                 if (!HarvestProperties.isReset()) {
-                                    if (mm.isGrobidified(currentRepositoryDocId)) {
-                                        logger.info("skipping " + currentRepositoryDocId + " Already grobidified");
+                                    if (mm.isGrobidified(bf.getRepositoryDocId(), bf.getRepositoryDocVersion())) {
+                                        logger.info("skipping " + bf.getRepositoryDocId() +bf.getRepositoryDocVersion()+ " Already grobidified");
                                         continue;
                                     }
                                 }
 
                                 try {
-                                    if (source.equalsIgnoreCase("hal")) {
+                                    if (bf.getSource().equalsIgnoreCase("hal")) {
                                         start = 2;
                                     }
-                                    Runnable worker = new GrobidSimpleFulltextWorker(content, currentRepositoryDocId, currentAnhalyticsId, date, start, end);
+                                    Runnable worker = new GrobidSimpleFulltextWorker(bf, date, start, end);
                                     executor.execute(worker);
                                 } catch (ParserConfigurationException exp) {
-                                    logger.error("An error occured while processing the file " + currentRepositoryDocId
+                                    logger.error("An error occured while processing the file " + bf.getRepositoryDocId()
                                             + ". Continuing the process for the other files" + exp.getMessage());
-                                }
-                                try {
-                                    content.close();
-                                } catch (IOException ex) {
-                                    throw new DataException("File stream can't be closed.", ex);
                                 }
                             }
                         }
@@ -98,60 +82,60 @@ public class GrobidProcess {
             logger.error(ugse.getMessage());
         }
     }
-
-    public void processAnnexes() throws IOException {
-        if (GrobidService.isGrobidOk()) {
-            ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
-            mm.setGridFSCollection(MongoCollectionsInterface.PUB_ANNEXES);
-            for (String date : Utilities.getDates()) {
-                if (mm.initAnnexes(date)) {
-                    while (mm.hasMoreBinaryDocuments()) {
-                        InputStream content = mm.nextBinaryDocument();
-                        String anhalyticsId = mm.getCurrentAnhalyticsId();
-                        if (mm.getCurrentFileType().contains(".pdf")) {
-                            String id = mm.getCurrentRepositoryDocId();
-                            try {
-                                Runnable worker = new GrobidAnnexWorker(content, id, anhalyticsId, date, -1, -1);
-                                executor.execute(worker);
-                            } catch (final Exception exp) {
-                                logger.error("An error occured while processing the file " + id
-                                        + ". Continuing the process for the other files" + exp.getMessage());
-                            }
-                            content.close();
-                        }
-                    }
-                }
-            }
-            executor.shutdown();
-            while (!executor.isTerminated()) {
-            }
-            logger.info("Finished all threads");
-        }
-    }
-
-    public void addAssetsLegend() {
-        try {
-            for (String date : Utilities.getDates()) {
-                if (mm.initAssets(date)) {
-                    while (mm.hasMoreBinaryDocuments()) {
-                        String filename = mm.nextAsset();
-                        String currentRepositoryId = mm.getCurrentRepositoryDocId();
-                        String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
-                        System.out.println(currentRepositoryId);
-                        String tei = mm.findGrobidTeiById(currentRepositoryId);
-                        InputStream teiStream = new ByteArrayInputStream(tei.getBytes());
-                        String legend = AssetLegendExtracter.extractLegendFromTei(filename, teiStream);
-                        teiStream.close();
-                        if (legend != null) {
-                            System.out.println(legend);
-                            //mm.addLegendToAsset(legend);
-                        }
-                    }
-                }
-            }
-
-        } catch (Exception exp) {
-            exp.printStackTrace();
-        }
-    }
+//
+//    public void processAnnexes() throws IOException {
+//        if (GrobidService.isGrobidOk()) {
+//            ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
+//            mm.setGridFSCollection(MongoCollectionsInterface.PUB_ANNEXES);
+//            for (String date : Utilities.getDates()) {
+//                if (mm.initAnnexes(date)) {
+//                    while (mm.hasMore()) {
+//                        BinaryFile bf = mm.nextBinaryDocument();
+//                        String anhalyticsId = mm.getCurrentAnhalyticsId();
+//                        if (mm.getCurrentFileType().contains(".pdf")) {
+//                            String id = mm.getCurrentRepositoryDocId();
+//                            try {
+//                                Runnable worker = new GrobidAnnexWorker(content, id, anhalyticsId, date, -1, -1);
+//                                executor.execute(worker);
+//                            } catch (final Exception exp) {
+//                                logger.error("An error occured while processing the file " + id
+//                                        + ". Continuing the process for the other files" + exp.getMessage());
+//                            }
+//                            content.close();
+//                        }
+//                    }
+//                }
+//            }
+//            executor.shutdown();
+//            while (!executor.isTerminated()) {
+//            }
+//            logger.info("Finished all threads");
+//        }
+//    }
+//
+//    public void addAssetsLegend() {
+//        try {
+//            for (String date : Utilities.getDates()) {
+//                if (mm.initAssets(date)) {
+//                    while (mm.hasMoreBinaryDocuments()) {
+//                        String filename = mm.nextAsset();
+//                        String currentRepositoryId = mm.getCurrentRepositoryDocId();
+//                        String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
+//                        System.out.println(currentRepositoryId);
+//                        String tei = mm.findGrobidTeiById(currentRepositoryId);
+//                        InputStream teiStream = new ByteArrayInputStream(tei.getBytes());
+//                        String legend = AssetLegendExtracter.extractLegendFromTei(filename, teiStream);
+//                        teiStream.close();
+//                        if (legend != null) {
+//                            System.out.println(legend);
+//                            //mm.addLegendToAsset(legend);
+//                        }
+//                    }
+//                }
+//            }
+//
+//        } catch (Exception exp) {
+//            exp.printStackTrace();
+//        }
+//    }
 }

@@ -1,13 +1,9 @@
 package fr.inria.anhalytics.harvest.crossref;
 
-import fr.inria.anhalytics.commons.exceptions.ServiceException;
+import fr.inria.anhalytics.commons.data.Identifier;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,12 +25,12 @@ public class OpenUrl {
 
     public void getIstexUrl() {
         if (mm.initIdentifiersWithoutPdfUrl()) {
-            while (mm.hasMoreIdentifiers()) {
+            while (mm.hasMore()) {
                 try {
-                    String doi = mm.nextIdentifier();
-                    String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
+                    Identifier id = mm.nextIdentifier();
+                    String currentAnhalyticsId = id.getAnhalyticsId();
                     logger.info("################################" + currentAnhalyticsId + "####################");
-                    URL url = new URL(String.format(IstexURL, doi));
+                    URL url = new URL(String.format(IstexURL, id.getDoi()));
                     logger.info("Sending: " + url.toString());
                     HttpURLConnection urlConn = null;
                     try {

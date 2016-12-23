@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.services.NerdService;
+import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import org.slf4j.Logger;
@@ -31,11 +32,9 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
     private static final Logger logger = LoggerFactory.getLogger(NerdAnnotatorWorker.class);
 
     public NerdAnnotatorWorker(MongoFileManager mongoManager,
-            String repositoryDocId,
-            String anhalyticsId,
-            String tei,
+            TEIFile tei,
             String date) {
-        super(mongoManager, repositoryDocId, anhalyticsId, date, MongoCollectionsInterface.NERD_ANNOTATIONS);
+        super(mongoManager, tei, date, MongoCollectionsInterface.NERD_ANNOTATIONS);
         this.tei = tei;
     }
 
@@ -43,7 +42,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
     protected void processCommand() {
         // get all the elements having an attribute id and annotate their text content
         mm.insertAnnotation(annotateDocument(), annotationsCollection);
-        logger.info("\t\t " + Thread.currentThread().getName() + ": " + repositoryDocId + " annotated by the NERD service.");
+        logger.info("\t\t " + Thread.currentThread().getName() + ": " + tei.getRepositoryDocId() + " annotated by the NERD service.");
     }
 
     /**
@@ -59,7 +58,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
         try {
             docBuilder = docFactory.newDocumentBuilder();
             // parse the TEI
-            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(tei.getBytes("UTF-8"))));
+            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(tei.getTei().getBytes("UTF-8"))));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -88,8 +87,8 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
             }
         }*/
         StringBuffer json = new StringBuffer();
-        json.append("{ \"repositoryDocId\" : \"" + repositoryDocId
-                + "\",\"anhalyticsId\" : \"" + anhalyticsId
+        json.append("{ \"repositoryDocId\" : \"" + tei.getRepositoryDocId()
+                + "\",\"anhalyticsId\" : \"" + tei.getAnhalyticsId()
                 + "\", \"date\" :\"" + date
                 + "\", \"nerd\" : [");
         //check if any thing was added, throw exception if not (not insert entry)

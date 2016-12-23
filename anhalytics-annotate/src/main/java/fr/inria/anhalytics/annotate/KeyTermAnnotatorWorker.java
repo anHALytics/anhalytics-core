@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.services.KeyTermExtractionService;
+import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import org.slf4j.Logger;
@@ -23,21 +24,18 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
     private static final Logger logger = LoggerFactory.getLogger(KeyTermAnnotatorWorker.class);
 
     public KeyTermAnnotatorWorker(MongoFileManager mongoManager,
-            String repositoryDocId,
-            String anhalyticsId,
-            String tei,
+            TEIFile tei,
             String date) {
-        super(mongoManager, repositoryDocId, anhalyticsId, date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
-        this.tei = tei;
+        super(mongoManager, tei, date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
     }
 
     @Override
     protected void processCommand() {
         try {
             mm.insertAnnotation(annotateDocument(), annotationsCollection);
-            logger.info("\t\t " + Thread.currentThread().getName() + ": "+ repositoryDocId + " annotated by the KeyTerm extraction and disambiguation service.");
+            logger.info("\t\t " + Thread.currentThread().getName() + ": "+ tei.getRepositoryDocId() + " annotated by the KeyTerm extraction and disambiguation service.");
         } catch (Exception ex) {
-            logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + repositoryDocId);
+            logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + tei.getRepositoryDocId());
             ex.printStackTrace();
         }
     }
@@ -72,12 +70,12 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
             }
         }*/
         StringBuffer json = new StringBuffer();
-        json.append("{ \"repositoryDocId\" : \"" + repositoryDocId
-                + "\",\"anhalyticsId\" : \"" + anhalyticsId
+        json.append("{ \"repositoryDocId\" : \"" + tei.getRepositoryDocId()
+                + "\",\"anhalyticsId\" : \"" + tei.getAnhalyticsId()
                 + "\", \"date\" :\"" + date
                 + "\", \"keyterm\" : ");
         String jsonText = null;
-        KeyTermExtractionService keyTermService = new KeyTermExtractionService(repositoryDocId, tei);
+        KeyTermExtractionService keyTermService = new KeyTermExtractionService(tei.getTei());
         jsonText = keyTermService.runKeyTermExtraction();
         if (jsonText != null) {
             json.append(jsonText).append("}");

@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.harvest.grobid;
 
+import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.File;
 import java.io.InputStream;
@@ -18,35 +19,35 @@ public class GrobidFulltextWorker extends GrobidWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(GrobidFulltextWorker.class);
     
-    public GrobidFulltextWorker(InputStream content, String id, String anhalyticsId, String date, int start, int end) throws ParserConfigurationException {
-        super(content, id, anhalyticsId, date, start, end);
+    public GrobidFulltextWorker(BinaryFile bf, String date, int start, int end) throws ParserConfigurationException {
+        super(bf, date, start, end);
     }
     
-    @Override
-    protected void saveExtractions(String resultDirectoryPath) {
-        String tei = null;
-        try {
-            File directoryPath = new File(resultDirectoryPath);
-            if (directoryPath.exists()) {
-                File[] files = directoryPath.listFiles();
-                if (files != null) {
-                    for (final File currFile : files) {
-                        if (currFile.getName().toLowerCase().endsWith(".png")) {
-                            InputStream targetStream = FileUtils.openInputStream(currFile);
-                            mm.insertGrobidAssetDocument(targetStream, repositoryDocId, anhalyticsId,currFile.getName(), date);
-                            targetStream.close();
-                        } else if (currFile.getName().toLowerCase().endsWith(".xml")) {
-                            tei = Utilities.readFile(currFile.getAbsolutePath());
-                            tei = Utilities.trimEncodedCharaters(tei);
-                            tei = generateIdsTeiDoc(tei);
-                            System.out.println(repositoryDocId);
-                            mm.insertGrobidTei(tei, repositoryDocId, anhalyticsId, date);
-                        }
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex.getCause());
-        }
-    }
+//    @Override
+//    protected void saveExtractions(String resultDirectoryPath) {
+//        String tei = null;
+//        try {
+//            File directoryPath = new File(resultDirectoryPath);
+//            if (directoryPath.exists()) {
+//                File[] files = directoryPath.listFiles();
+//                if (files != null) {
+//                    for (final File currFile : files) {
+//                        if (currFile.getName().toLowerCase().endsWith(".png")) {
+//                            InputStream targetStream = FileUtils.openInputStream(currFile);
+//                            mm.insertGrobidAssetDocument(targetStream, repositoryDocId, anhalyticsId,currFile.getName(), date);
+//                            targetStream.close();
+//                        } else if (currFile.getName().toLowerCase().endsWith(".xml")) {
+//                            tei = Utilities.readFile(currFile.getAbsolutePath());
+//                            tei = Utilities.trimEncodedCharaters(tei);
+//                            tei = generateIdsTeiDoc(tei);
+//                            System.out.println(repositoryDocId);
+//                            mm.insertGrobidTei(tei, repositoryDocId, anhalyticsId, date);
+//                        }
+//                    }
+//                }
+//            }
+//        } catch (Exception ex) {
+//            logger.error(ex.getMessage(), ex.getCause());
+//        }
+//    }
 }

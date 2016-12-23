@@ -1,8 +1,7 @@
 package fr.inria.anhalytics.harvest.grobid;
 
+import fr.inria.anhalytics.commons.data.BinaryFile;
 import java.io.File;
-import java.io.InputStream;
-import java.net.UnknownHostException;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
@@ -12,8 +11,8 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class GrobidAnnexWorker extends GrobidWorker {
 
-    public GrobidAnnexWorker(InputStream content, String id, String anhalyticsId, String date, int start, int end) throws ParserConfigurationException {
-        super(content, id, anhalyticsId, date, start, end);
+    public GrobidAnnexWorker(BinaryFile bf, String date, int start, int end) throws ParserConfigurationException {
+        super(bf, date, start, end);
     }
 
     @Override
