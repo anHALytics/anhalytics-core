@@ -40,7 +40,7 @@ public class TeiCorpusBuilderProcess {
                     if (!HarvestProperties.isProcessByDate()) {
                         date = null;
                     }
-                    if (mm.initMetadataTeis(date)) {
+                    if (mm.initTeis(date, MongoCollectionsInterface.GROBID_TEIS)) {
                         while (mm.hasMore()) {
                             TEIFile tei = mm.nextTeiDocument();
                             Document generatedTEIcorpus = null;
@@ -51,8 +51,8 @@ public class TeiCorpusBuilderProcess {
                             logger.info("\t Building TEI for: " + tei.getRepositoryDocId());
                            tei.setTei(Utilities.trimEncodedCharaters(tei.getTei()));
                             try {
-                                String grobidTei = getGrobidTei(tei.getAnhalyticsId());
-                                generatedTEIcorpus = tb.addGrobidTEIToTEICorpus(tei.getTei(), grobidTei);
+                                String metadataTei = getMetadataTei(tei.getAnhalyticsId());
+                                generatedTEIcorpus = tb.addGrobidTEIToTEICorpus(metadataTei, tei.getTei());
                             } catch (DataException de) {
                                 logger.error("No corresponding fulltext TEI was found.");
                             }
@@ -76,7 +76,7 @@ public class TeiCorpusBuilderProcess {
     /*
      Get correponding Metadata to process..anhalyticsId is necessary for identification
      */
-    private String getGrobidTei(String anhalyticsId) {
-        return mm.findGrobidTeiById(anhalyticsId);
+    private String getMetadataTei(String anhalyticsId) {
+        return mm.findMetadataTeiById(anhalyticsId);
     }
 }

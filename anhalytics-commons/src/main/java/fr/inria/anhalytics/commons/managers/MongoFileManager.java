@@ -131,31 +131,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     /**
-     * This initializes cursor for metadata tei collection.
-     */
-    public boolean initMetadataTeis(String date) throws MongoException {
-        try {
-            setGridFSCollection(MongoCollectionsInterface.METADATAS_TEIS);
-
-            BasicDBObject bdbo = new BasicDBObject();
-            if (date != null) {
-                bdbo.append("uploadDate", Utilities.parseStringDate(date));
-            }
-            cursor = gfs.getFileList(bdbo);
-            cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT);
-            indexFile = 0;
-        } catch (ParseException e) {
-            logger.error(e.getMessage(), e.getCause());
-        }
-        if (cursor.size() > 0) {
-            logger.info(cursor.size() + " documents found for : " + date);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * This initializes cursor for tei generated collection.
      */
     public boolean initTeis(String date, String teiCollection) throws MongoException {

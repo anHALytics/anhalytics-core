@@ -3,6 +3,7 @@ package fr.inria.anhalytics.harvest.crossref;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.exceptions.SystemException;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
@@ -107,7 +108,7 @@ public class CrossRef {
             if (!HarvestProperties.isProcessByDate()) {
                 date = null;
             }
-            if (mm.initMetadataTeis(date)) {
+            if (mm.initTeis(date, MongoCollectionsInterface.METADATAS_TEIS)) {
                 while (mm.hasMore()) {
 
                     TEIFile tei = mm.nextTeiDocument();
