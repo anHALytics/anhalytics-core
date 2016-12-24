@@ -227,7 +227,7 @@ public class HALOAIPMHDomParser {
                 renameNode(teiElement);
             }
         }
-        String teiString = sb.append(innerXmlToString(tei.item(0))).toString();
+        String teiString = sb.append(Utilities.innerXmlToString(tei.item(0))).toString();
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
         Document teiDoc = null;
@@ -279,19 +279,6 @@ public class HALOAIPMHDomParser {
 
     private NodeList getRecords(Element rootElement) {
         return rootElement.getElementsByTagName(OAIPMHPathsItf.RecordElement);
-    }
-
-    private static String innerXmlToString(Node node) {
-        DOMImplementationLS lsImpl
-                = (DOMImplementationLS) node.getOwnerDocument().getImplementation().getFeature("LS", "3.0");
-        LSSerializer lsSerializer = lsImpl.createLSSerializer();
-        lsSerializer.getDomConfig().setParameter("xml-declaration", false);
-        NodeList childNodes = node.getChildNodes();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            sb.append(lsSerializer.writeToString(childNodes.item(i)));
-        }
-        return sb.toString();
     }
 
     /**
