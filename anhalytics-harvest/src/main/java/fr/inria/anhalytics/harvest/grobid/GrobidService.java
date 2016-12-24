@@ -254,7 +254,7 @@ public class GrobidService {
             }
 
             //int status = connection.getResponseCode();
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK && conn.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT) {
                 throw new RuntimeException("Failed : HTTP error code : "
                         + conn.getResponseCode() + " " + IOUtils.toString(conn.getErrorStream(), "UTF-8"));
             }

@@ -152,7 +152,7 @@ public class HalTEIConverter implements MetadataConverter {
                 String grobidResponse = null;
                 if (addressNodes != null) {
                     Node addrLine = addressNodes.item(0);
-                    if (addrLine != null) {
+                    if (addrLine != null && addrLine.getTextContent().trim().length() > 0) {
                         grobidResponse = gs.processAffiliation(addrLine.getTextContent());
                         try {
                             Element node = DocumentBuilderFactory
