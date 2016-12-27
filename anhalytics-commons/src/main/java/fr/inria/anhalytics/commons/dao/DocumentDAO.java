@@ -27,6 +27,8 @@ public class DocumentDAO extends DAO<Document, String> {
 
     private static final String READ_QUERY_DOCUMENTS = "SELECT * FROM DOCUMENT";
 
+    private static final String READ_QUERY_DOCUMENT_IDENTIFIER = "SELECT * FROM DOCUMENT_IDENTIFIER WHERE DOCUMENT_IDENTIFIER.docID = ?";
+
     private static final String READ_QUERY_DOCID_BY_AUTHORS = "SELECT docID FROM AUTHORSHIP WHERE personID = ?";
 
     private static final String SQL_SELECT_DOCID_BY_ORGID = "SELECT * FROM DOCUMENT_ORGANISATION WHERE organisationID = ?";
@@ -83,6 +85,7 @@ public class DocumentDAO extends DAO<Document, String> {
     public Document find(String doc_id) throws SQLException {
         Document document = null;
         PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_DOC_BY_ID);
+        PreparedStatement preparedStatement1 = this.connect.prepareStatement(READ_QUERY_DOCUMENT_IDENTIFIER);
         try {
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setString(1, doc_id);
@@ -91,13 +94,23 @@ public class DocumentDAO extends DAO<Document, String> {
                 document = new Document(
                         doc_id,
                         rs.getString("version"),
-                new ArrayList<Document_Identifier>());
+                        new ArrayList<Document_Identifier>());
+
+                preparedStatement1.setString(1, doc_id);
+                ResultSet rs1 = preparedStatement1.executeQuery();
+                Document_Identifier di = null;
+                while (rs1.next()) {
+                    di = new Document_Identifier(rs1.getString("id"), rs1.getString("type"));
+                    document.addDocument_Identifier(di);
+                }
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
 
         } finally {
             preparedStatement.close();
+            preparedStatement1.close();
         }
         return document;
     }
@@ -118,17 +131,28 @@ public class DocumentDAO extends DAO<Document, String> {
     public List<Document> findAllDocuments() throws SQLException {
         List<Document> documents = new ArrayList<Document>();
         PreparedStatement preparedStatement = this.connect.prepareStatement(READ_QUERY_DOCUMENTS);
+        PreparedStatement preparedStatement1 = this.connect.prepareStatement(READ_QUERY_DOCUMENT_IDENTIFIER);
         try {
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             ResultSet rs = preparedStatement.executeQuery();
-
+            Document document = null;
             while (rs.next()) {
-                documents.add(
-                        new Document(
-                                rs.getString("docID"),
-                                rs.getString("version"),
-                new ArrayList<Document_Identifier>()
-                        ));
+
+                document = new Document(
+                        rs.getString("docID"),
+                        rs.getString("version"),
+                        new ArrayList<Document_Identifier>()
+                );
+
+                preparedStatement1.setString(1, rs.getString("docID"));
+                ResultSet rs1 = preparedStatement1.executeQuery();
+                Document_Identifier di = null;
+                while (rs1.next()) {
+                    di = new Document_Identifier(rs1.getString("id"), rs1.getString("type"));
+                    document.addDocument_Identifier(di);
+                }
+
+                documents.add(document);
             }
         } catch (SQLException ex) {
             logger.error(ex.getMessage());

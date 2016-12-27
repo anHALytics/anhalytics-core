@@ -96,7 +96,28 @@ public class Document {
         Map<String, Object> documentDocument = new HashMap<String, Object>();
         documentDocument.put("docID", this.getDocID());
         documentDocument.put("version", this.getVersion());
+        
+        List<Map<String, Object>> identifiers = new ArrayList<Map<String, Object>>();
+        for (Document_Identifier di : this.getDocument_Identifiers()) {
+            Map<String, Object> identifier = new HashMap<String, Object>();
+            identifier.put("id", di.getId());
+            identifier.put("type", di.getType());
+            identifiers.add(identifier);
+        }
+        documentDocument.put("identifiers", identifiers);
+        
         return documentDocument;
+    }
+    
+    
+    /**
+     * @return the document_Identifiers
+     */
+    public void addDocument_Identifier(Document_Identifier di) {
+        if (this.document_Identifiers == null) {
+            this.document_Identifiers = new ArrayList<Document_Identifier>();
+        }
+        document_Identifiers.add(di);
     }
 
     /**
