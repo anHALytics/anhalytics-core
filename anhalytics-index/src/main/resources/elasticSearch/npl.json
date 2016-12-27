@@ -1725,6 +1725,7 @@
                             "$category": {
                                 "properties": {
                                     "category": {
+                                        "index": "not_analyzed",
                                         "type": "string"
                                     },
                                     "score": {
