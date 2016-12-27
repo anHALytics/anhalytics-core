@@ -142,7 +142,9 @@ public class Utilities {
 
     public static String completeDate(String date) {
         String val = "";
-        if (date.length() == 4) {
+        if(date.length() < 4) {
+            return val;
+        } else if (date.length() == 4) {
             val = date + "-12-31";
         } else if ((date.length() == 7) || (date.length() == 6)) {
             int ind = date.indexOf("-");
