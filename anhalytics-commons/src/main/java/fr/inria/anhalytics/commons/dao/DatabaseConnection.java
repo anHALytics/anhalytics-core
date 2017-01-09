@@ -1,16 +1,15 @@
 package fr.inria.anhalytics.commons.dao;
 
-import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.CommonsProperties;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 /**
- *
  * @author azhar
  */
 public class DatabaseConnection {
@@ -18,27 +17,34 @@ public class DatabaseConnection {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConnection.class);
     private static Connection connectDB;
     private static Connection connectBiblioDB;
-    
+
     public static Connection getDBInstance() {
         try {
-            if (connectDB == null ) {
+            if (connectDB == null) {
 
-                connectDB = DriverManager.getConnection("jdbc:mysql://"+CommonsProperties.getMysql_host() +
-                (CommonsProperties.getMysql_port().isEmpty() ? "":":" + CommonsProperties.getMysql_port())+"/"+ CommonsProperties.getMysql_db(), CommonsProperties.getMysql_user(), CommonsProperties.getMysql_pass());
+                final String mysqlPort = CommonsProperties.getMysql_port().isEmpty() ? "" : ":" + CommonsProperties.getMysql_port();
+                final String url = "jdbc:mysql://"
+                        + CommonsProperties.getMysql_host() +
+                        mysqlPort + "/" + CommonsProperties.getMysql_db() + "?characterEncoding=utf8";
 
+                connectDB = DriverManager.getConnection(url, CommonsProperties.getMysql_user(), CommonsProperties.getMysql_pass());
             }
         } catch (SQLException e) {
             throw new ServiceException("Can't connect to MySQL. ", e);
         }
         return connectDB;
     }
-    
+
     public static Connection getBiblioDBInstance() {
         try {
-            if (connectBiblioDB == null ) {
+            if (connectBiblioDB == null) {
 
-                connectBiblioDB = DriverManager.getConnection("jdbc:mysql://"+CommonsProperties.getMysql_host() +
-                (CommonsProperties.getMysql_port().isEmpty() ? "":":" + CommonsProperties.getMysql_port())+"/"+ CommonsProperties.getMysql_bibliodb(), CommonsProperties.getMysql_user(), CommonsProperties.getMysql_pass());
+                final String mysqlPort = CommonsProperties.getMysql_port().isEmpty() ? "" : ":" + CommonsProperties.getMysql_port();
+                final String url = "jdbc:mysql://"
+                        + CommonsProperties.getMysql_host() +
+                        mysqlPort + "/" + CommonsProperties.getMysql_bibliodb() + "?characterEncoding=utf8";
+
+                connectBiblioDB = DriverManager.getConnection(url);
 
             }
         } catch (SQLException e) {
@@ -46,5 +52,5 @@ public class DatabaseConnection {
         }
         return connectBiblioDB;
     }
-    
+
 }
