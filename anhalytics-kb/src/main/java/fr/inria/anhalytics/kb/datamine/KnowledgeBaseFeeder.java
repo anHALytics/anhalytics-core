@@ -560,7 +560,7 @@ public class KnowledgeBaseFeeder {
                                 } else if (personChildElt.getNodeName().equals("idno")) {
                                     Person_Identifier pi = new Person_Identifier();
                                     String id_type = personChildElt.getAttribute("type");
-                                    if (!"string".equals(personChildElt.getAttribute("notation"))) {
+                                    if (!"string".equals(personChildElt.getAttribute("notation")) && "idhal".equalsIgnoreCase(id_type)) {
                                         id_type = personChildElt.getAttribute("type") + "-"+ personChildElt.getAttribute("notation");
                                     }
 
