@@ -1,51 +1,33 @@
 package fr.inria.anhalytics.kb.datamine;
 
-import fr.inria.anhalytics.kb.exceptions.NumberOfCoAuthorsExceededException;
-import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
-import fr.inria.anhalytics.commons.managers.MongoFileManager;
-import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.commons.dao.AbstractDAOFactory;
-import fr.inria.anhalytics.commons.dao.AddressDAO;
+import fr.inria.anhalytics.commons.dao.*;
 import fr.inria.anhalytics.commons.dao.anhalytics.AffiliationDAO;
-import fr.inria.anhalytics.commons.dao.Conference_EventDAO;
-import fr.inria.anhalytics.commons.dao.anhalytics.LocationDAO;
-import fr.inria.anhalytics.commons.dao.DocumentDAO;
-import fr.inria.anhalytics.commons.dao.Document_OrganisationDAO;
-import fr.inria.anhalytics.commons.dao.In_SerialDAO;
-import fr.inria.anhalytics.commons.dao.MonographDAO;
-import fr.inria.anhalytics.commons.dao.anhalytics.OrganisationDAO;
-import fr.inria.anhalytics.commons.dao.PersonDAO;
-import fr.inria.anhalytics.commons.dao.PublicationDAO;
-import fr.inria.anhalytics.commons.dao.PublisherDAO;
 import fr.inria.anhalytics.commons.dao.anhalytics.DAOFactory;
+import fr.inria.anhalytics.commons.dao.anhalytics.LocationDAO;
+import fr.inria.anhalytics.commons.dao.anhalytics.OrganisationDAO;
 import fr.inria.anhalytics.commons.dao.biblio.AbstractBiblioDAOFactory;
 import fr.inria.anhalytics.commons.dao.biblio.BiblioDAOFactory;
 import fr.inria.anhalytics.commons.data.TEIFile;
-import fr.inria.anhalytics.commons.entities.Address;
-import fr.inria.anhalytics.commons.entities.Affiliation;
-import fr.inria.anhalytics.commons.entities.Author;
-import fr.inria.anhalytics.commons.entities.Collection;
-import fr.inria.anhalytics.commons.entities.Conference;
-import fr.inria.anhalytics.commons.entities.Conference_Event;
-import fr.inria.anhalytics.commons.entities.Country;
-import fr.inria.anhalytics.commons.entities.Document_Identifier;
-import fr.inria.anhalytics.commons.entities.Document_Organisation;
-import fr.inria.anhalytics.commons.entities.Editor;
-import fr.inria.anhalytics.commons.entities.In_Serial;
-import fr.inria.anhalytics.commons.entities.Journal;
-import fr.inria.anhalytics.commons.entities.Location;
-import fr.inria.anhalytics.commons.entities.Monograph;
-import fr.inria.anhalytics.commons.entities.Organisation;
-import fr.inria.anhalytics.commons.entities.Organisation_Identifier;
-import fr.inria.anhalytics.commons.entities.Organisation_Name;
-import fr.inria.anhalytics.commons.entities.PART_OF;
-import fr.inria.anhalytics.commons.entities.Person;
-import fr.inria.anhalytics.commons.entities.Person_Identifier;
-import fr.inria.anhalytics.commons.entities.Person_Name;
-import fr.inria.anhalytics.commons.entities.Publication;
-import fr.inria.anhalytics.commons.entities.Publisher;
-import fr.inria.anhalytics.commons.entities.Serial_Identifier;
+import fr.inria.anhalytics.commons.entities.*;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.KbProperties;
+import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.kb.exceptions.NumberOfCoAuthorsExceededException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,19 +36,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * Format and Extract HAL metadata to seed the KB.
@@ -591,6 +560,10 @@ public class KnowledgeBaseFeeder {
                                 } else if (personChildElt.getNodeName().equals("idno")) {
                                     Person_Identifier pi = new Person_Identifier();
                                     String id_type = personChildElt.getAttribute("type");
+                                    if (!"string".equals(personChildElt.getAttribute("notation"))) {
+                                        id_type = personChildElt.getAttribute("type") + "-"+ personChildElt.getAttribute("notation");
+                                    }
+
                                     String id_value = personChildElt.getTextContent().trim();
                                     if (id_type.equals("anhalyticsID")) {
                                         person.removeChild(personChildElt);
