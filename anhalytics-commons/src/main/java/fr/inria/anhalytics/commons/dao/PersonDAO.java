@@ -51,7 +51,7 @@ public class PersonDAO extends DAO<Person, Long> {
     private static final String READ_QUERY_AUTHORS
             = "SELECT DISTINCT personID FROM AUTHORSHIP";
 
-    private static final String READ_QUERY_PERSON_BY_IDENTIFIER = "SELECT pi.personID FROM PERSON_IDENTIFIER pi WHERE pi.ID = ?";
+    private static final String READ_QUERY_PERSON_BY_IDENTIFIER = "SELECT pi.personID FROM PERSON_IDENTIFIER pi WHERE pi.ID = ? AND pi.Type = ?";
 
     private static final String READ_QUERY_PERSON_IDENTIFIER = "SELECT * FROM PERSON_IDENTIFIER pi WHERE pi.ID = ? AND pi.type= ? AND pi.personID=?";
 
@@ -68,6 +68,7 @@ public class PersonDAO extends DAO<Person, Long> {
         PreparedStatement statement = connect.prepareStatement(READ_QUERY_PERSON_BY_IDENTIFIER);
         for (Person_Identifier id : toBeStored.getPerson_identifiers()) {
             statement.setString(1, id.getId());
+            statement.setString(2, id.getType());
             ResultSet rs = statement.executeQuery();
             if (rs.first()) {
                 personId = rs.getLong("pi.personID");
