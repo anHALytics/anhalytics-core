@@ -1,21 +1,11 @@
 package fr.inria.anhalytics.commons.dao.anhalytics;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
-import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.dao.DAO;
-import fr.inria.anhalytics.commons.entities.Affiliation;
-import fr.inria.anhalytics.commons.entities.Document;
-import fr.inria.anhalytics.commons.entities.Document_Organisation;
-import fr.inria.anhalytics.commons.entities.Organisation;
-import fr.inria.anhalytics.commons.entities.Organisation_Identifier;
-import fr.inria.anhalytics.commons.entities.Organisation_Name;
-import fr.inria.anhalytics.commons.entities.PART_OF;
-import fr.inria.anhalytics.commons.entities.Person;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import fr.inria.anhalytics.commons.entities.*;
+import fr.inria.anhalytics.commons.utilities.Utilities;
+
+import java.sql.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author azhar
  */
 public class OrganisationDAO extends DAO<Organisation, Long> {

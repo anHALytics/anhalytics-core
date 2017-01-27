@@ -630,9 +630,6 @@ public class KnowledgeBaseFeeder {
         return location;
     }
 
-    /**
-     *
-     */
     public void processCitations() throws SQLException {
         XPath xPath = XPathFactory.newInstance().newXPath();
         BiblioDAOFactory.initConnection();

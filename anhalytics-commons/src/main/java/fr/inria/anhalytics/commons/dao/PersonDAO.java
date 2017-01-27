@@ -2,7 +2,6 @@ package fr.inria.anhalytics.commons.dao;
 
 import fr.inria.anhalytics.commons.entities.*;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;

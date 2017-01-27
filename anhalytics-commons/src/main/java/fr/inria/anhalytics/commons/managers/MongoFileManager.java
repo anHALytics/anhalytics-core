@@ -7,7 +7,6 @@ import com.mongodb.gridfs.GridFSInputFile;
 import com.mongodb.util.JSON;
 import fr.inria.anhalytics.commons.data.Annotation;
 import fr.inria.anhalytics.commons.data.BinaryFile;
-import fr.inria.anhalytics.commons.data.File;
 import fr.inria.anhalytics.commons.data.Identifier;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.DataException;
@@ -303,6 +302,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //        indexFile++;
 //        return currentFileName;
 //    }
+
     /**
      * Inserts json entry representing annotation result.
      */

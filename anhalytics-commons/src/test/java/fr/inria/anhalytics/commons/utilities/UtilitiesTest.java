@@ -44,9 +44,13 @@ public class UtilitiesTest {
     }
 
     @Test
-    public void testDaysInMonth_february() throws Exception {
+    public void testDaysInMonth_february_nbOfDaysShouldAdaptAccordingToYear() throws Exception {
         assertThat(Utilities.daysInMonth(2400, 2), is(29));
         assertThat(Utilities.daysInMonth(1996, 2), is(29));
         assertThat(Utilities.daysInMonth(2003, 2), is(28));
     }
+    
+    
+    
+    
 }

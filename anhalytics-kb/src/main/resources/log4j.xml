@@ -11,14 +11,13 @@
                 </layout>
         </appender>
         <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
-                <param name="Threshold" value="DEBUG" />
-                <param name="datePattern" value="'.'yyyy-MM-dd" />
+                <param name="Threshold" value="INFO" />
                 <layout class="org.apache.log4j.PatternLayout">
                         <param name="ConversionPattern" value="[%-5p] %c: %m\n" />
                 </layout>
         </appender>
         <root>
-                <priority value="DEBUG"></priority>
+                <priority value="INFO"></priority>
                 <appender-ref ref="LOGFILE" />
                 <appender-ref ref="CONSOLE" />
         </root>

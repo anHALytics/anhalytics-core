@@ -1,22 +1,18 @@
 package fr.inria.anhalytics.commons.dao.anhalytics;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
-import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.dao.DAO;
 import fr.inria.anhalytics.commons.entities.Address;
 import fr.inria.anhalytics.commons.entities.Location;
 import fr.inria.anhalytics.commons.entities.Organisation;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import fr.inria.anhalytics.commons.utilities.Utilities;
+
+import java.sql.*;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author azhar
  */
 public class LocationDAO extends DAO<Location, Long> {
@@ -96,13 +92,13 @@ public class LocationDAO extends DAO<Location, Long> {
                 statement.setLong(1, obj.getOrganisation().getOrganisationId());
                 statement.setLong(2, obj.getAddress().getAddressId());
 
-                if (obj.getFrom_date()== null) {
+                if (obj.getFrom_date() == null) {
                     statement.setDate(3, new java.sql.Date(00000000L));
                 } else {
                     statement.setDate(3, new java.sql.Date(obj.getFrom_date().getTime()));
                 }
 
-                if (obj.getUntil_date()== null) {
+                if (obj.getUntil_date() == null) {
                     statement.setDate(4, new java.sql.Date(00000000L));
                 } else {
                     statement.setDate(4, new java.sql.Date(obj.getUntil_date().getTime()));
