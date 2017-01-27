@@ -50,8 +50,6 @@ public class KnowledgeBaseFeeder {
 
     private static final AbstractBiblioDAOFactory abdf = AbstractBiblioDAOFactory.getFactory(AbstractBiblioDAOFactory.DAO_FACTORY);
 
-    private static XPath xPath = XPathFactory.newInstance().newXPath();
-
     protected MongoFileManager mm = null;
 
     public KnowledgeBaseFeeder() {
@@ -62,6 +60,7 @@ public class KnowledgeBaseFeeder {
      * Initiates HAL knowledge base and creates working corpus TEI.
      */
     public void initKnowledgeBase() throws SQLException {
+        XPath xPath = XPathFactory.newInstance().newXPath();
         DAOFactory.initConnection();
         PublicationDAO pd = (PublicationDAO) adf.getPublicationDAO();
         DocumentDAO dd = (DocumentDAO) adf.getDocumentDAO();
@@ -635,6 +634,7 @@ public class KnowledgeBaseFeeder {
      *
      */
     public void processCitations() throws SQLException {
+        XPath xPath = XPathFactory.newInstance().newXPath();
         BiblioDAOFactory.initConnection();
         DocumentDAO dd = (DocumentDAO) abdf.getDocumentDAO();
 
