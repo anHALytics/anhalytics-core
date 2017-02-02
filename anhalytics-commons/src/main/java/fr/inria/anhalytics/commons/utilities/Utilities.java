@@ -29,8 +29,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -141,6 +139,10 @@ public class Utilities {
     }
 
     public static String completeDate(String date) {
+        if (date.endsWith("-")) {
+            date = date.substring(0, date.length()-1);
+        }
+
         String val = "";
         if (date.length() < 4) {
             return val;
@@ -165,7 +167,6 @@ public class Utilities {
                 val = date.substring(0, 4) + "-" + monthStr + "-31";
             }
         } else {
-
             int ind = date.indexOf("-");
             int ind2 = date.lastIndexOf("-");
             String monthStr = date.substring(ind + 1, ind + 3);

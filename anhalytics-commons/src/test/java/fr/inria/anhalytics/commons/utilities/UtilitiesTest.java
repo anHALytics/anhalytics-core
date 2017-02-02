@@ -50,7 +50,30 @@ public class UtilitiesTest {
         assertThat(Utilities.daysInMonth(2003, 2), is(28));
     }
     
-    
-    
+
+    @Test
+    public void testCompleteDate_alreadyCompletedDate_shouldWork() throws Exception {
+        assertThat(Utilities.completeDate("2015-06-16"), is("2015-06-16"));
+    }
+
+    @Test
+    public void testCompleteDate_emptyDate_shouldReturnEmptyValue() throws Exception {
+        assertThat(Utilities.completeDate(""), is(""));
+    }
+
+    @Test
+    public void testCompleteDate_onlyYear_shouldWork() throws Exception {
+        assertThat(Utilities.completeDate("2015-"), is("2015-12-31"));
+    }
+
+    @Test
+    public void testCompleteDate_onlyYearShort_shouldReturnEmptyValue() throws Exception {
+        assertThat(Utilities.completeDate("15"), is(""));
+    }
+
+    @Test
+    public void testCompleteDate_onlyYearComplete_shouldReturnCompletedDate() throws Exception {
+        assertThat(Utilities.completeDate("2015"), is("2015-12-31"));
+    }
     
 }
