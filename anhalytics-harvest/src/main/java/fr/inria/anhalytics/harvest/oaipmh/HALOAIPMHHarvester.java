@@ -69,8 +69,9 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
                 fetchDocumentsByDate(date);
             }
         } catch (MalformedURLException mue) {
-            mue.printStackTrace();
+            logger.error(mue.getMessage(), mue);
         } catch (ServiceException se) {
+            logger.error(se.getMessage(), se);
             mm.save(currentDate, "blockedHarvestProcess", se.getMessage(), currentDate);
         }
     }

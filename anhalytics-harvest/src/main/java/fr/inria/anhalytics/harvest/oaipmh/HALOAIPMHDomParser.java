@@ -96,8 +96,6 @@ public class HALOAIPMHDomParser {
                 }
 
             }
-        } else {
-            throw new ServiceException("No TEIs metadata found.");
         }
         return teis;
     }

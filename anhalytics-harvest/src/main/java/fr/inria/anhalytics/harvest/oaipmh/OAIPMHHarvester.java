@@ -54,18 +54,17 @@ abstract class OAIPMHHarvester implements HarvesterItf {
      */
     protected void processTeis(List<TEIFile> teis, String date, boolean withAnnexes) {
         for (TEIFile tei : teis) {
-            try {
-                String teiString = tei.getTei();
-                String pdfUrl = "";
-                if (tei.getPdfdocument() != null) {
-                    pdfUrl = tei.getPdfdocument().getUrl();
-                }
-                String repositoryDocId = tei.getRepositoryDocId();
-                logger.info("\t\t Processing TEI for " + repositoryDocId);
-                if (teiString.length() > 0) {
-                    logger.info("\t\t\t\t Storing TEI " + repositoryDocId);
-                    mm.insertTei(tei, date, MongoCollectionsInterface.METADATAS_TEIS);
-
+            String teiString = tei.getTei();
+            String pdfUrl = "";
+            if (tei.getPdfdocument() != null) {
+                pdfUrl = tei.getPdfdocument().getUrl();
+            }
+            String repositoryDocId = tei.getRepositoryDocId();
+            logger.info("\t\t Processing TEI for " + repositoryDocId);
+            if (teiString.length() > 0) {
+                logger.info("\t\t\t\t Storing TEI " + repositoryDocId);
+                mm.insertTei(tei, date, MongoCollectionsInterface.METADATAS_TEIS);
+                try {
                     if (tei.getPdfdocument() != null) {
                         logger.info("\t\t\t\t downloading PDF file.");
                         requestFile(tei.getPdfdocument(), date);
@@ -76,15 +75,15 @@ abstract class OAIPMHHarvester implements HarvesterItf {
                     if (withAnnexes) {
                         downloadAnnexes(tei.getAnnexes(), date);
                     }
-                } else {
-                    logger.info("\t\t\t No TEI metadata !!!");
+                } catch (BinaryNotAvailableException bna) {
+                    logger.error(bna.getMessage());
+                    mm.save(tei.getRepositoryDocId(), "harvestProcess", "file not downloaded", date);
+                } catch (ParseException | IOException e) {
+                    logger.error("\t\t Error occured while processing TEI for " + tei.getRepositoryDocId(), e);
+                    mm.save(tei.getRepositoryDocId(), "harvestProcess", "harvest error", date);
                 }
-            } catch (BinaryNotAvailableException bna) {
-                logger.error(bna.getMessage());
-                mm.save(tei.getRepositoryDocId(), "harvestProcess", "file not downloaded", date);
-            } catch (ParseException | IOException e) {
-                mm.save(tei.getRepositoryDocId(), "harvestProcess", "harvest error", date);
-                logger.error("\t\t Error occured while processing TEI for " + tei.getRepositoryDocId(), e);
+            } else {
+                logger.info("\t\t\t No TEI metadata !!!");
             }
         }
     }
