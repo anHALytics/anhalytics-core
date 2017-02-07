@@ -493,9 +493,6 @@ public class Utilities {
                 if (retry == retries) {
                     throw new ServiceException(url + ":" + connection.getResponseCode());
                 }
-            } catch (FileNotFoundException e) {
-                logger.warn("Cannot download " + url.getQuery() + ". Ignoring it. ", e);
-                throw new ServiceException("Cannot download " + url.getQuery() + ". Ignoring it.", e);
             } catch (IOException e) {
                 throw new ServiceException("The service is not reachable or something is happening.", e);
             }

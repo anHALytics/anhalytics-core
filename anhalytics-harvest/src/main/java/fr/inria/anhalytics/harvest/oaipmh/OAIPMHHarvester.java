@@ -111,23 +111,26 @@ abstract class OAIPMHHarvester implements HarvesterItf {
             logger.info("\t\t\t Downloading: " + bf.getUrl());
             try {
                 bf.setStream(Utilities.request(bf.getUrl()));
-                if (bf.getStream() == null) {
-                    mm.log(bf.getRepositoryDocId(), bf.getAnhalyticsId(), bf.getUrl(), bf.getDocumentType(), bf.isIsAnnexFile(), "nostream", date);
-                } else {
-                    if (!bf.isIsAnnexFile()) {
-                        mm.insertBinaryDocument(bf, date);
-                    } else {
-                        int n = bf.getUrl().lastIndexOf("/");
-                        String filename = bf.getUrl().substring(n + 1);
-                        bf.setFileName(filename);
-                        logger.info("\t\t\t\t Getting annex file " + filename + " for pub ID :" + bf.getRepositoryDocId());
-                        mm.insertAnnexDocument(bf, date);
-                    }
-                    bf.getStream().close();
-                }
             } catch (MalformedURLException | ServiceException se) {
+                logger.error(se.getMessage());
                 throw new BinaryNotAvailableException();
             }
+
+            if (bf.getStream() == null) {
+                mm.log(bf.getRepositoryDocId(), bf.getAnhalyticsId(), bf.getUrl(), bf.getDocumentType(), bf.isIsAnnexFile(), "nostream", date);
+            } else {
+                if (!bf.isIsAnnexFile()) {
+                    mm.insertBinaryDocument(bf, date);
+                } else {
+                    int n = bf.getUrl().lastIndexOf("/");
+                    String filename = bf.getUrl().substring(n + 1);
+                    bf.setFileName(filename);
+                    logger.info("\t\t\t\t Getting annex file " + filename + " for pub ID :" + bf.getRepositoryDocId());
+                    mm.insertAnnexDocument(bf, date);
+                }
+                bf.getStream().close();
+            }
+
             return true;
         } else {
             mm.log(bf.getRepositoryDocId(), bf.getAnhalyticsId(), bf.getUrl(), bf.getDocumentType(), bf.isIsAnnexFile(), "embargo", bf.getEmbargoDate());
