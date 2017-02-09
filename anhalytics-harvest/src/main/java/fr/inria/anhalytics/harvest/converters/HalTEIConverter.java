@@ -2,24 +2,24 @@ package fr.inria.anhalytics.harvest.converters;
 
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.grobid.GrobidService;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * Function for converting metadata from Hal stored to Standard Tei format close
@@ -72,7 +72,7 @@ public class HalTEIConverter implements MetadataConverter {
             Element dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"datePub\"]").evaluate(newTEICorpus, XPathConstants.NODE);
 
             Element submissionDateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/editionStmt/edition[@type=\"current\"]/date[@type=\"whenSubmitted\"]").evaluate(newTEICorpus, XPathConstants.NODE);
-            
+
             Element defendingElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"dateDefended\"]").evaluate(newTEICorpus, XPathConstants.NODE);
 
             Element startDateConferenceElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/meeting/date[@type=\"start\"]").evaluate(newTEICorpus, XPathConstants.NODE);
@@ -83,11 +83,11 @@ public class HalTEIConverter implements MetadataConverter {
             }
             if (pubDate.isEmpty()) {
                 String date = "";
-                
+
                 if (submissionDateElt != null) {
                     date = submissionDateElt.getTextContent().split(" ")[0];
                 }
-                
+
                 if (startDateConferenceElt != null) {
                     String confDate = Utilities.completeDate(startDateConferenceElt.getTextContent());
                     if (!confDate.isEmpty()) {
@@ -109,7 +109,7 @@ public class HalTEIConverter implements MetadataConverter {
                 newPubDate.setAttribute("when", pubDate);
                 newPubDate.setAttribute("type", "datePub");
                 newPubDate.setTextContent(pubDate);
-                
+
                 Element eltMonogr = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr").evaluate(newTEICorpus, XPathConstants.NODE);
                 Element eltImprint = (Element) eltMonogr.getElementsByTagName("imprint").item(0);
                 eltImprint = (eltImprint == null) ? newTEICorpus.createElement("imprint") : eltImprint;
@@ -223,7 +223,9 @@ public class HalTEIConverter implements MetadataConverter {
      */
     private Document transformMetadata(Document metadata) throws XPathExpressionException {
         Node title = (Node) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/analytic/title").evaluate(metadata, XPathConstants.NODE);
-        title.getParentNode().removeChild(title);
+        if (title != null) {
+            title.getParentNode().removeChild(title);
+        }
 
         NodeList authorsDuplicate = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/author").evaluate(metadata, XPathConstants.NODESET);
         for (int j = authorsDuplicate.getLength() - 1; j >= 0; j--) {
@@ -259,10 +261,12 @@ public class HalTEIConverter implements MetadataConverter {
                 if (relation.getAttribute("type").equals("direct")) {
                     String id = relation.getAttribute("active");
                     id = id.replace("#", "");
-                    Node rel = Utilities.findNode("xml:id",id, orgs);
-                    Node newRel = rel.cloneNode(true);
-                    moveOrgToAffiliation(aff, (Element) newRel, orgs);
-                    aff.appendChild(newRel);
+                    Node rel = Utilities.findNode("xml:id", id, orgs);
+                    if (rel != null) {
+                        Node newRel = rel.cloneNode(true);
+                        moveOrgToAffiliation(aff, (Element) newRel, orgs);
+                        aff.appendChild(newRel);
+                    }
                 }
             }
         }

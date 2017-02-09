@@ -75,5 +75,15 @@ public class UtilitiesTest {
     public void testCompleteDate_onlyYearComplete_shouldReturnCompletedDate() throws Exception {
         assertThat(Utilities.completeDate("2015"), is("2015-12-31"));
     }
+
+    @Test
+    public void testCompleteDate_onlyYM_shouldReturnCompletedDate() throws Exception {
+        assertThat(Utilities.completeDate("2015-12"), is("2015-12-31"));
+    }
+
+    @Test
+    public void testCompleteDate_onlyYM_Feb_shouldReturnCompletedDate() throws Exception {
+        assertThat(Utilities.completeDate("2015-02"), is("2015-02-28"));
+    }
     
 }
