@@ -868,10 +868,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         if (gfs == null || !gfs.getBucketName().equals(collectionName)) {
             gfs = new GridFS(db, collectionName);
 
-            gfs.getDB().getCollection(collectionName+".files")
+            gfs.getDB().getCollection(collectionName + ".files")
                     .createIndex(new BasicDBObject("uploadDate", 1).append("isWithFulltext", 1));
 
-            gfs.getDB().getCollection(collectionName)
+            gfs.getDB().getCollection(collectionName + ".files")
                     .createIndex(new BasicDBObject("uploadDate", 1));
 
         }
