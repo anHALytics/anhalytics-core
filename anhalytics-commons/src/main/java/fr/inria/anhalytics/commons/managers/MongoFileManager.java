@@ -21,7 +21,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -57,12 +56,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         initDatabase();
     }
 
-    /**
-     * Returns a static {@link MongoManager} object. If no one is set, then it
-     * creates one. {@inheritDoc #MongoFilesManager()}
-     *
-     * @return
-     */
     public static MongoFileManager getInstance(boolean isTest) {
         if (mongoManager == null) {
             return getNewInstance(isTest);
@@ -71,12 +64,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
     }
 
-    /**
-     * Creates a new {@link MongoFilesManager} object, initializes it and
-     * returns it. {@inheritDoc #MongoFilesManager()}
-     *
-     * @return MongoFilesManager
-     */
     protected static synchronized MongoFileManager getNewInstance(boolean isTest) {
         mongoManager = new MongoFileManager(isTest);
         return mongoManager;
@@ -134,7 +121,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      */
     public boolean initTeis(String date, String teiCollection) throws MongoException {
         try {
+            // Create indexes before using the data in it.
+            // Github issue: https://github.com/anHALytics/anHALytics-core/issues/60
             setGridFSCollection(teiCollection);
+
             BasicDBObject bdbo = new BasicDBObject();
             if (date != null) {
                 bdbo.append("uploadDate", Utilities.parseStringDate(date));
@@ -180,8 +170,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      *
      * @param date
      * @param annotationsCollection the annotation collection to initialize,
-     * e.g. MongoCollectionsInterface.NERD_ANNOTATIONS,
-     * MongoCollectionsInterface.KEYTERM_ANNOTATIONS, etc.
+     *                              e.g. MongoCollectionsInterface.NERD_ANNOTATIONS,
+     *                              MongoCollectionsInterface.KEYTERM_ANNOTATIONS, etc.
      */
     public boolean initAnnotations(String date, String annotationsCollection) throws MongoException {
         collection = getCollection(annotationsCollection);
@@ -877,6 +867,13 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public void setGridFSCollection(String collectionName) {
         if (gfs == null || !gfs.getBucketName().equals(collectionName)) {
             gfs = new GridFS(db, collectionName);
+
+            gfs.getDB().getCollection(collectionName+".files")
+                    .createIndex(new BasicDBObject("uploadDate", 1).append("isWithFulltext", 1));
+
+            gfs.getDB().getCollection(collectionName)
+                    .createIndex(new BasicDBObject("uploadDate", 1));
+
         }
     }
 
