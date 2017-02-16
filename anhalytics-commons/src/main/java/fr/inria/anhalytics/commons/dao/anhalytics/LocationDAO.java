@@ -37,8 +37,9 @@ public class LocationDAO extends DAO<Location, Long> {
 
     private Location getLocationIfAlreadyStored(Location obj) throws SQLException {
         Location location = null;
-        PreparedStatement statement = connect.prepareStatement(SQL_SELECT_LOCATION_BY_orgID_addrID);
+        PreparedStatement statement = null;
         try {
+            statement = connect.prepareStatement(SQL_SELECT_LOCATION_BY_orgID_addrID);
             statement.setLong(1, obj.getOrganisation().getOrganisationId());
             statement.setLong(2, obj.getAddress().getAddressId());
             ResultSet rs = statement.executeQuery();
@@ -58,7 +59,7 @@ public class LocationDAO extends DAO<Location, Long> {
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
-            statement.close();
+            closeQuietly(statement);
         }
         return location;
     }
@@ -70,9 +71,10 @@ public class LocationDAO extends DAO<Location, Long> {
             throw new IllegalArgumentException("Location is already created, the Location ID is not null.");
         }
 
-        PreparedStatement statement;
+        PreparedStatement statement = null;
         Location existingLocation = getLocationIfAlreadyStored(obj);
         if (existingLocation != null) {
+            try{
             statement = connect.prepareStatement(UPDATE_LOCATION, Statement.RETURN_GENERATED_KEYS);
             if (obj.getFrom_date().before(existingLocation.getFrom_date())) {
                 existingLocation.setFrom_date(obj.getFrom_date());
@@ -84,6 +86,9 @@ public class LocationDAO extends DAO<Location, Long> {
             statement.setLong(3, existingLocation.getLocationId());
             int code = statement.executeUpdate();
             result = true;
+            }finally{
+                closeQuietly(statement);
+            }
         } else {
             statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
             try {
@@ -108,7 +113,7 @@ public class LocationDAO extends DAO<Location, Long> {
             } catch (MySQLIntegrityConstraintViolationException e) {
                 //e.printStackTrace();
             } finally {
-                statement.close();
+                closeQuietly(statement);
             }
         }
         //}
@@ -128,8 +133,9 @@ public class LocationDAO extends DAO<Location, Long> {
     @Override
     public Location find(Long id) throws SQLException {
         Location location = new Location();
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
+        PreparedStatement preparedStatement = null;
         try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, id);
             ResultSet result = preparedStatement.executeQuery();
@@ -149,15 +155,16 @@ public class LocationDAO extends DAO<Location, Long> {
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return location;
     }
 
     public Long findAddressIdByOrganisationId(Long orgId) throws SQLException {
         Long addressId = null;
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
+        PreparedStatement preparedStatement = null;
         try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_LOCATION_BY_ID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, orgId);
             ResultSet result = preparedStatement.executeQuery();
@@ -167,7 +174,7 @@ public class LocationDAO extends DAO<Location, Long> {
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return addressId;
     }

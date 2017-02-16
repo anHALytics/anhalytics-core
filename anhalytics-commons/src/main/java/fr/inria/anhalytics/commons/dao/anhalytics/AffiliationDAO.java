@@ -22,27 +22,28 @@ import org.slf4j.LoggerFactory;
  * @author azhar
  */
 public class AffiliationDAO extends DAO<Affiliation, Long> {
-
+    
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AffiliationDAO.class);
-
+    
     private static final String SQL_INSERT
             = "INSERT INTO AFFILIATION (organisationID, personID, from_date, until_date) VALUES (?, ?, ?, ?)";
-
+    
     private static final String SQL_SELECT_AFF_BY_ID = "SELECT * FROM AFFILIATION WHERE affiliationID = ?";
-
+    
     private static final String SQL_SELECT_AFF_BY_PERSONID_ORGID
             = "SELECT * FROM AFFILIATION WHERE personID = ? AND organisationID = ?";
-
+    
     private static final String UPDATE_AFFILIATION = "UPDATE AFFILIATION SET from_date = ? ,until_date = ? WHERE affiliationID = ?";
-
+    
     public AffiliationDAO(Connection conn) {
         super(conn);
     }
-
+    
     private Affiliation getAffiliationIfAlreadyStored(Person pers, Organisation org) throws SQLException {
         Affiliation affiliation = null;
-        PreparedStatement statement = connect.prepareStatement(SQL_SELECT_AFF_BY_PERSONID_ORGID);
+        PreparedStatement statement = null;
         try {
+            statement = connect.prepareStatement(SQL_SELECT_AFF_BY_PERSONID_ORGID);
             statement.setLong(1, pers.getPersonId());
             statement.setLong(2, org.getOrganisationId());
             ResultSet rs = statement.executeQuery();
@@ -56,7 +57,7 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
                             Utilities.parseStringDate(rs.getString("until_date"))
                     );
                     affiliation.addOrganisation(org);
-
+                    
                 } catch (ParseException ex) {
                     Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -64,87 +65,93 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
-            statement.close();
+            closeQuietly(statement);
         }
         return affiliation;
     }
-
+    
     @Override
     public boolean create(Affiliation obj) throws SQLException {
         boolean result = false;
         if (obj.getAffiliationId() != null) {
             throw new IllegalArgumentException("Affiliation is already created, the Affiliation ID is not null.");
         }
-
-        PreparedStatement statement;
-
+        
+        PreparedStatement statement = null;
+        
         for (Organisation org : obj.getOrganisations()) {
-
+            
             Affiliation existingAff = getAffiliationIfAlreadyStored(obj.getPerson(), org);
             if (existingAff != null) {
-                statement = connect.prepareStatement(UPDATE_AFFILIATION, Statement.RETURN_GENERATED_KEYS);
-                if (obj.getFrom_date().before(existingAff.getFrom_date())) {
-                    existingAff.setFrom_date(obj.getFrom_date());
-                } else if (obj.getUntil_date().after(existingAff.getUntil_date())) {
-                    existingAff.setUntil_date(obj.getUntil_date());
-                }
-                statement.setDate(1, new java.sql.Date(existingAff.getFrom_date().getTime()));
-                statement.setDate(2, new java.sql.Date(existingAff.getUntil_date().getTime()));
-                statement.setLong(3, existingAff.getAffiliationId());
-
-                int code = statement.executeUpdate();
-                result = true;
-                statement.close();
-            } else {
-                statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                 try {
+                    statement = connect.prepareStatement(UPDATE_AFFILIATION, Statement.RETURN_GENERATED_KEYS);
+                    if (obj.getFrom_date().before(existingAff.getFrom_date())) {
+                        existingAff.setFrom_date(obj.getFrom_date());
+                    } else if (obj.getUntil_date().after(existingAff.getUntil_date())) {
+                        existingAff.setUntil_date(obj.getUntil_date());
+                    }
+                    statement.setDate(1, new java.sql.Date(existingAff.getFrom_date().getTime()));
+                    statement.setDate(2, new java.sql.Date(existingAff.getUntil_date().getTime()));
+                    statement.setLong(3, existingAff.getAffiliationId());
+                    
+                    int code = statement.executeUpdate();
+                    result = true;
+                } finally {
+                    closeQuietly(statement);
+                }
+            } else {
+                try {
+                    statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
                     statement.setLong(1, org.getOrganisationId());
                     statement.setLong(2, obj.getPerson().getPersonId());
-                    if (obj.getFrom_date()== null) {
+                    if (obj.getFrom_date() == null) {
                         statement.setDate(3, new java.sql.Date(00000000L));
                     } else {
                         statement.setDate(3, new java.sql.Date(obj.getFrom_date().getTime()));
                     }
-
-                    if (obj.getUntil_date()== null) {
+                    
+                    if (obj.getUntil_date() == null) {
                         statement.setDate(4, new java.sql.Date(00000000L));
                     } else {
                         statement.setDate(4, new java.sql.Date(obj.getUntil_date().getTime()));
                     }
                     int code = statement.executeUpdate();
                     ResultSet rs = statement.getGeneratedKeys();
-
+                    
                     if (rs.next()) {
                         obj.setAffiliationId(rs.getLong(1));
                     }
-
+                    
                     result = true;
-
+                    
                 } catch (MySQLIntegrityConstraintViolationException e) {
                     //e.printStackTrace();
+                }finally{
+                    closeQuietly(statement);
                 }
             }
-
-            statement.close();
+            
+            
         }
         return result;
     }
-
+    
     @Override
     public boolean delete(Affiliation obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     @Override
     public boolean update(Affiliation obj) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     @Override
     public Affiliation find(Long id) throws SQLException {
         Affiliation affiliation = new Affiliation();
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_AFF_BY_ID);
+        PreparedStatement preparedStatement = null;
         try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_AFF_BY_ID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, id);
             ResultSet result = preparedStatement.executeQuery();
@@ -164,9 +171,9 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return affiliation;
     }
-
+    
 }
