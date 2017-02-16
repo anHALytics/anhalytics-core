@@ -1,25 +1,17 @@
 package fr.inria.anhalytics.commons.dao;
 
+import fr.inria.anhalytics.commons.entities.*;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.commons.entities.Document;
-import fr.inria.anhalytics.commons.entities.Document_Identifier;
-import fr.inria.anhalytics.commons.entities.Monograph;
-import fr.inria.anhalytics.commons.entities.Publication;
-import fr.inria.anhalytics.commons.entities.Publisher;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import org.slf4j.LoggerFactory;
+
+import java.sql.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author azhar
  */
 public class PublicationDAO extends DAO<Publication, Long> {
@@ -52,41 +44,40 @@ public class PublicationDAO extends DAO<Publication, Long> {
             throw new IllegalArgumentException("Publication is already created, the Publication ID is not null.");
         }
 
-        PreparedStatement statement;
-        statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-        statement.setString(1, obj.getDocument().getDocID());
-        statement.setLong(2, obj.getMonograph().getMonographID());
-        if (obj.getPublisher().getPublisherID() == null) {
-            statement.setNull(3, java.sql.Types.INTEGER);
-        } else {
-            statement.setLong(3, obj.getPublisher().getPublisherID());
+        PreparedStatement statement = null;
+        try {
+            statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, obj.getDocument().getDocID());
+            statement.setLong(2, obj.getMonograph().getMonographID());
+            if (obj.getPublisher().getPublisherID() == null) {
+                statement.setNull(3, java.sql.Types.INTEGER);
+            } else {
+                statement.setLong(3, obj.getPublisher().getPublisherID());
+            }
+
+            statement.setString(4, obj.getType());
+            statement.setString(5, obj.getDoc_title());
+
+            if (obj.getDate_printed() == null) {
+                statement.setDate(6, new java.sql.Date(00000000L));
+            } else {
+                statement.setDate(6, new java.sql.Date(obj.getDate_printed().getTime()));
+            }
+
+            statement.setString(7, obj.getDate_eletronic());
+            statement.setString(8, obj.getFirst_page());
+            statement.setString(9, obj.getLast_page());
+            statement.setString(10, obj.getLanguage());
+
+            int code = statement.executeUpdate();
+            ResultSet rs = statement.getGeneratedKeys();
+
+            if (rs.next()) {
+                obj.setPublicationID(rs.getLong(1));
+            }
+        } finally {
+            closeQuietly(statement);
         }
-
-        statement.setString(4, obj.getType());
-
-        statement.setString(5, obj.getDoc_title());
-
-        if (obj.getDate_printed() == null) {
-            statement.setDate(6, new java.sql.Date(00000000L));
-        } else {
-            statement.setDate(6, new java.sql.Date(obj.getDate_printed().getTime()));
-        }
-
-        statement.setString(7, obj.getDate_eletronic());
-
-        statement.setString(8, obj.getFirst_page());
-
-        statement.setString(9, obj.getLast_page());
-
-        statement.setString(10, obj.getLanguage());
-
-        int code = statement.executeUpdate();
-        ResultSet rs = statement.getGeneratedKeys();
-
-        if (rs.next()) {
-            obj.setPublicationID(rs.getLong(1));
-        }
-        statement.close();
         result = true;
         return result;
     }
@@ -94,10 +85,14 @@ public class PublicationDAO extends DAO<Publication, Long> {
     @Override
     public boolean delete(Publication obj) throws SQLException {
         boolean result = false;
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_DELETE);
-        preparedStatement.setLong(1, obj.getPublicationID());
-        preparedStatement.executeUpdate();
-        preparedStatement.close();
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(SQL_DELETE);
+            preparedStatement.setLong(1, obj.getPublicationID());
+            preparedStatement.executeUpdate();
+        } finally {
+            closeQuietly(preparedStatement);
+        }
         result = true;
         return result;
     }
@@ -136,7 +131,7 @@ public class PublicationDAO extends DAO<Publication, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return publication;
     }
@@ -151,18 +146,18 @@ public class PublicationDAO extends DAO<Publication, Long> {
             while (rs.next()) {
                 try {
                     publications.add(new Publication(
-                            rs.getLong("PUBLICATION.publicationID"),
-                            new Document(doc_id, rs.getString("version"), new ArrayList<Document_Identifier>()),
-                            new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
-                            new Publisher(rs.getLong("publisherID"), rs.getString("name")),
-                            rs.getString("PUBLICATION.type"),
-                            rs.getString("doc_title"),
-                            Utilities.parseStringDate(rs.getString("date_printed")),
-                            rs.getString("date_electronic"),
-                            rs.getString("first_page"),
-                            rs.getString("last_page"),
-                            rs.getString("language")
-                    )
+                                    rs.getLong("PUBLICATION.publicationID"),
+                                    new Document(doc_id, rs.getString("version"), new ArrayList<Document_Identifier>()),
+                                    new Monograph(rs.getLong("monographID"), rs.getString("MONOGRAPH.type"), rs.getString("title"), rs.getString("shortname")),
+                                    new Publisher(rs.getLong("publisherID"), rs.getString("name")),
+                                    rs.getString("PUBLICATION.type"),
+                                    rs.getString("doc_title"),
+                                    Utilities.parseStringDate(rs.getString("date_printed")),
+                                    rs.getString("date_electronic"),
+                                    rs.getString("first_page"),
+                                    rs.getString("last_page"),
+                                    rs.getString("language")
+                            )
                     );
                 } catch (ParseException ex) {
                     Logger.getLogger(PublicationDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -172,7 +167,7 @@ public class PublicationDAO extends DAO<Publication, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return publications;
     }

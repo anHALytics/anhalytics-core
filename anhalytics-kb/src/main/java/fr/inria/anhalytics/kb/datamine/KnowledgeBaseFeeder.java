@@ -99,7 +99,13 @@ public class KnowledgeBaseFeeder {
                             Element teiHeader = (Element) xPath.compile(TeiPaths.MetadataElement).evaluate(teiDoc, XPathConstants.NODE);
                             NodeList authorsFromfulltextTeiHeader = (NodeList) xPath.compile(TeiPaths.FulltextTeiHeaderAuthors).evaluate(teiDoc, XPathConstants.NODESET);
 
-                            Element title = (Element) teiHeader.getElementsByTagName("title").item(0);
+                            Element title = null;
+                            if (teiHeader.getElementsByTagName("title") != null) {
+                                title = (Element) teiHeader.getElementsByTagName("title").item(0);
+                                if (title != null) {
+                                    pub.setDoc_title(title.getTextContent().trim());
+                                }
+                            }
                             Node language = (Node) xPath.compile(TeiPaths.LanguageElement).evaluate(teiDoc, XPathConstants.NODE);
                             Node type = (Node) xPath.compile(TeiPaths.TypologyElement).evaluate(teiDoc, XPathConstants.NODE);
                             Node submission_date = (Node) xPath.compile(TeiPaths.SubmissionDateElement).evaluate(teiDoc, XPathConstants.NODE);
@@ -123,7 +129,6 @@ public class KnowledgeBaseFeeder {
                             // for some pub types we just keep the submission date.
                             pub.setDate_eletronic(submission_date.getTextContent());
                             pub.setDate_printed(Utilities.parseStringDate(submission_date.getTextContent()));
-                            pub.setDoc_title(title.getTextContent().trim());
                             pub.setType(type.getTextContent());
                             pub.setLanguage(language.getTextContent());
                             processMonogr(monogr, pub);
@@ -560,7 +565,7 @@ public class KnowledgeBaseFeeder {
                                     Person_Identifier pi = new Person_Identifier();
                                     String id_type = personChildElt.getAttribute("type");
                                     if (!"string".equals(personChildElt.getAttribute("notation")) && "idhal".equalsIgnoreCase(id_type)) {
-                                        id_type = personChildElt.getAttribute("type") + "-"+ personChildElt.getAttribute("notation");
+                                        id_type = personChildElt.getAttribute("type") + "-" + personChildElt.getAttribute("notation");
                                     }
 
                                     String id_value = personChildElt.getTextContent().trim();
