@@ -62,48 +62,65 @@ public class PersonDAO extends DAO<Person, Long> {
         super(conn);
     }
 
-    private Long getEntityIdIfAlreadyStored(Person toBeStored) throws SQLException {
+    private Long getEntityIdIfAlreadyStored(Person toBeStored) {
         Long personId = null;
-        PreparedStatement statement = connect.prepareStatement(READ_QUERY_PERSON_BY_IDENTIFIER);
-        for (Person_Identifier id : toBeStored.getPerson_identifiers()) {
-            statement.setString(1, id.getId());
-            statement.setString(2, id.getType());
-            ResultSet rs = statement.executeQuery();
-            if (rs.first()) {
-                personId = rs.getLong("pi.personID");
-                return personId;
+        PreparedStatement statement = null;
+        try {
+            statement = connect.prepareStatement(READ_QUERY_PERSON_BY_IDENTIFIER);
+            for (Person_Identifier id : toBeStored.getPerson_identifiers()) {
+                try {
+                    statement.setString(1, id.getId());
+                    statement.setString(2, id.getType());
+                    ResultSet rs = statement.executeQuery();
+                    if (rs.first()) {
+                        personId = rs.getLong("pi.personID");
+                        return personId;
+                    }
+                } catch (SQLException se) {
+                    // continuing
+                }
             }
+        } catch (SQLException se) {
+            //ignoring errors, returning true
+        } finally {
+            closeQuietly(statement);
         }
-        statement.close();
         return personId;
     }
 
     public boolean createAuthor(Author author) throws SQLException {
         boolean result = false;
         create(author.getPerson());
-        PreparedStatement statement;
-        statement = connect.prepareStatement(SQL_INSERT_AUTHOR);
-        statement.setString(1, author.getDocument().getDocID());
-        statement.setLong(2, author.getPerson().getPersonId());
-        statement.setInt(3, author.getRank());
-        statement.setInt(4, author.getCorrep());
-        int code = statement.executeUpdate();
-        statement.close();
-        result = true;
+        PreparedStatement statement = null;
+        try {
+            statement = connect.prepareStatement(SQL_INSERT_AUTHOR);
+            statement.setString(1, author.getDocument().getDocID());
+            statement.setLong(2, author.getPerson().getPersonId());
+            statement.setInt(3, author.getRank());
+            statement.setInt(4, author.getCorrep());
+            statement.executeUpdate();
+            result = true;
+        } finally {
+            closeQuietly(statement);
+        }
+
         return result;
     }
 
     public boolean createEditor(Editor editor) throws SQLException {
         boolean result = false;
         create(editor.getPerson());
-        PreparedStatement statement;
-        statement = connect.prepareStatement(SQL_INSERT_EDITOR);
-        statement.setInt(1, editor.getRank());
-        statement.setLong(2, editor.getPerson().getPersonId());
-        statement.setLong(3, editor.getPublication().getPublicationID());
-        int code = statement.executeUpdate();
-        statement.close();
-        result = true;
+        PreparedStatement statement = null;
+        try {
+            statement = connect.prepareStatement(SQL_INSERT_EDITOR);
+            statement.setInt(1, editor.getRank());
+            statement.setLong(2, editor.getPerson().getPersonId());
+            statement.setLong(3, editor.getPublication().getPublicationID());
+            statement.executeUpdate();
+            result = true;
+        } finally {
+            closeQuietly(statement);
+        }
         return result;
     }
 
@@ -119,44 +136,49 @@ public class PersonDAO extends DAO<Person, Long> {
             obj.setPersonId(persId);
             update(obj);
         } else {
-            PreparedStatement statement;
-            PreparedStatement statement1;
-            PreparedStatement statement2;
-            statement = connect.prepareStatement(SQL_INSERT_PERSON, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, obj.getTitle());
-            statement.setString(2, obj.getPhoto());
-            statement.setString(3, obj.getUrl());
-            statement.setString(4, obj.getEmail());
-            statement.setString(5, obj.getPhone());
-            int code = statement.executeUpdate();
-            ResultSet rs = statement.getGeneratedKeys();
+            PreparedStatement statement = null;
+            PreparedStatement statement1 = null;
+            PreparedStatement statement2 = null;
+            try {
+                statement = connect.prepareStatement(SQL_INSERT_PERSON, Statement.RETURN_GENERATED_KEYS);
+                statement.setString(1, obj.getTitle());
+                statement.setString(2, obj.getPhoto());
+                statement.setString(3, obj.getUrl());
+                statement.setString(4, obj.getEmail());
+                statement.setString(5, obj.getPhone());
+                int code = statement.executeUpdate();
+                ResultSet rs = statement.getGeneratedKeys();
 
-            if (rs.next()) {
-                obj.setPersonId(rs.getLong(1));
-            }
-            statement.close();
+                if (rs.next()) {
+                    obj.setPersonId(rs.getLong(1));
+                }
 
-            statement1 = connect.prepareStatement(SQL_INSERT_PERSON_NAME);
-            for (Person_Name pn : obj.getPerson_names()) {
-                setPersonNameUpdateParameters(obj, statement1, pn);
+                statement1 = connect.prepareStatement(SQL_INSERT_PERSON_NAME);
+                for (Person_Name pn : obj.getPerson_names()) {
+                    setPersonNameUpdateParameters(obj, statement1, pn);
 
-                int code1 = statement1.executeUpdate();
-            }
+                    statement1.executeUpdate();
+                }
 
-            statement2 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
-            if (obj.getPerson_identifiers() != null) {
-                for (Person_Identifier pi : obj.getPerson_identifiers()) {
-                    if (!isIdentifierIfAlreadyExisting(pi, obj.getPersonId())) {
-                        statement2.setLong(1, obj.getPersonId());
-                        statement2.setString(2, pi.getId());
-                        statement2.setString(3, pi.getType());
 
-                        int code2 = statement2.executeUpdate();
+                if (obj.getPerson_identifiers() != null) {
+                    statement2 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
+                    for (Person_Identifier pi : obj.getPerson_identifiers()) {
+                        if (!isIdentifierIfAlreadyExisting(pi, obj.getPersonId())) {
+                            statement2.setLong(1, obj.getPersonId());
+                            statement2.setString(2, pi.getId());
+                            statement2.setString(3, pi.getType());
+
+                            statement2.executeUpdate();
+                        }
                     }
                 }
+                result = true;
+            } finally {
+                closeQuietly(statement);
+                closeQuietly(statement1);
+                closeQuietly(statement2);
             }
-            statement2.close();
-            result = true;
         }
         return result;
     }
@@ -164,11 +186,15 @@ public class PersonDAO extends DAO<Person, Long> {
     @Override
     public boolean delete(Person obj) throws SQLException {
         boolean result = false;
-        PreparedStatement preparedStatement = this.connect.prepareStatement(DELETE_PERSON);
-        preparedStatement.setLong(1, obj.getPersonId());
-        preparedStatement.executeUpdate();
-        preparedStatement.close();
-        result = true;
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = this.connect.prepareStatement(DELETE_PERSON);
+            preparedStatement.setLong(1, obj.getPersonId());
+            preparedStatement.executeUpdate();
+            result = true;
+        } finally {
+            closeQuietly(preparedStatement);
+        }
         return result;
     }
 
@@ -176,48 +202,49 @@ public class PersonDAO extends DAO<Person, Long> {
     public boolean update(Person obj) throws SQLException {
         boolean result = false;
         PreparedStatement preparedStatement = null, preparedStatement2 = null, preparedStatement3 = null;
-        preparedStatement = this.connect.prepareStatement(UPDATE_PERSON);
-        preparedStatement.setString(1, obj.getTitle());
-        preparedStatement.setString(2, obj.getPhoto());
-        preparedStatement.setString(3, obj.getUrl());
-        preparedStatement.setString(4, obj.getEmail());
-        preparedStatement.setString(5, obj.getPhone());
-        preparedStatement.setLong(6, obj.getPersonId());
-        int code1 = preparedStatement.executeUpdate();
-
-        preparedStatement2 = this.connect.prepareStatement(SQL_INSERT_PERSON_NAME);
-
-        for (Person_Name pn : obj.getPerson_names()) {
-            try {
-                setPersonNameUpdateParameters(obj, preparedStatement2, pn);
-                int code2 = preparedStatement2.executeUpdate();
-            } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e) {
-                //e.printStackTrace();
-            }
-        }
-        preparedStatement2.close();
+        try {
+            preparedStatement = this.connect.prepareStatement(UPDATE_PERSON);
+            preparedStatement.setString(1, obj.getTitle());
+            preparedStatement.setString(2, obj.getPhoto());
+            preparedStatement.setString(3, obj.getUrl());
+            preparedStatement.setString(4, obj.getEmail());
+            preparedStatement.setString(5, obj.getPhone());
+            preparedStatement.setLong(6, obj.getPersonId());
+            preparedStatement.executeUpdate();
 
 
-        preparedStatement3 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
+            preparedStatement2 = this.connect.prepareStatement(SQL_INSERT_PERSON_NAME);
 
-        if (obj.getPerson_identifiers() != null) {
-            for (Person_Identifier pi : obj.getPerson_identifiers()) {
+            for (Person_Name pn : obj.getPerson_names()) {
                 try {
-                    preparedStatement3.setLong(1, obj.getPersonId());
-                    preparedStatement3.setString(2, pi.getId());
-                    preparedStatement3.setString(3, pi.getType());
-
-                    int code3 = preparedStatement3.executeUpdate();
+                    setPersonNameUpdateParameters(obj, preparedStatement2, pn);
+                    int code2 = preparedStatement2.executeUpdate();
                 } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e) {
+                    //e.printStackTrace();
                 }
             }
-            preparedStatement3.close();
 
+            if (obj.getPerson_identifiers() != null) {
+                preparedStatement3 = connect.prepareStatement(SQL_INSERT_PERSON_IDENTIFIER);
+                for (Person_Identifier pi : obj.getPerson_identifiers()) {
+                    try {
+                        preparedStatement3.setLong(1, obj.getPersonId());
+                        preparedStatement3.setString(2, pi.getId());
+                        preparedStatement3.setString(3, pi.getType());
+
+                        int code3 = preparedStatement3.executeUpdate();
+                    } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e) {
+                    }
+                }
+
+            }
+            result = true;
+
+        } finally {
+            closeQuietly(preparedStatement);
+            closeQuietly(preparedStatement2);
+            closeQuietly(preparedStatement3);
         }
-
-        result = true;
-
-        preparedStatement.close();
         return result;
     }
 
@@ -297,9 +324,9 @@ public class PersonDAO extends DAO<Person, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            preparedStatement.close();
-            preparedStatement1.close();
-            preparedStatement2.close();
+            closeQuietly(preparedStatement);
+            closeQuietly(preparedStatement1);
+            closeQuietly(preparedStatement2);
         }
         return person;
     }
@@ -317,7 +344,7 @@ public class PersonDAO extends DAO<Person, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return persons;
     }
@@ -338,7 +365,7 @@ public class PersonDAO extends DAO<Person, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            ps.close();
+            closeQuietly(ps);
         }
         return persons;
     }
@@ -360,23 +387,26 @@ public class PersonDAO extends DAO<Person, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            ps.close();
+           closeQuietly(ps);
         }
         return persons;
 
     }
 
     private boolean isIdentifierIfAlreadyExisting(Person_Identifier id, Long personID) throws SQLException {
-        PreparedStatement statement;
-        statement = connect.prepareStatement(READ_QUERY_PERSON_IDENTIFIER);
-        statement.setString(1, id.getId());
-        statement.setString(2, id.getType());
-        statement.setLong(3, personID);
-        ResultSet rs = statement.executeQuery();
-        if (rs.first()) {
-            return true;
+        PreparedStatement statement = null;
+        try {
+            statement = connect.prepareStatement(READ_QUERY_PERSON_IDENTIFIER);
+            statement.setString(1, id.getId());
+            statement.setString(2, id.getType());
+            statement.setLong(3, personID);
+            ResultSet rs = statement.executeQuery();
+            if (rs.first()) {
+                return true;
+            }
+        } finally {
+            closeQuietly(statement);
         }
-        statement.close();
         return false;
     }
 
@@ -396,7 +426,7 @@ public class PersonDAO extends DAO<Person, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            ps.close();
+            closeQuietly(ps);
         }
         return persons;
     }
