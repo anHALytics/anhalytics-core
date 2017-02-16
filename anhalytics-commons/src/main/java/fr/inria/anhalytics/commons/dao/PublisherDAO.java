@@ -13,21 +13,21 @@ import org.slf4j.LoggerFactory;
  * @author azhar
  */
 public class PublisherDAO extends DAO<Publisher, Long> {
-
+    
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PublisherDAO.class);
     private static final String SQL_INSERT
             = "INSERT INTO PUBLISHER (name) VALUES (?)";
-
+    
     private static final String SQL_SELECT_PUBLISHER_BY_NAME
             = "SELECT * FROM PUBLISHER WHERE name = ?";
-
+    
     private static final String SQL_SELECT_PUBLISHER_BY_ID
             = "SELECT * FROM PUBLISHER WHERE publisherID = ?";
-
+    
     public PublisherDAO(Connection conn) {
         super(conn);
     }
-
+    
     @Override
     public boolean create(Publisher obj) throws SQLException {
         boolean result = false;
@@ -38,36 +38,40 @@ public class PublisherDAO extends DAO<Publisher, Long> {
         if (foundObj != null) {
             obj.setPublisherID(obj.getPublisherID());
         } else {
-            PreparedStatement statement;
-            statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, obj.getName());
-            int code = statement.executeUpdate();
-            ResultSet rs = statement.getGeneratedKeys();
-
-            if (rs.next()) {
-                obj.setPublisherID(rs.getLong(1));
+            PreparedStatement statement = null;
+            try {
+                statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                statement.setString(1, obj.getName());
+                int code = statement.executeUpdate();
+                ResultSet rs = statement.getGeneratedKeys();
+                
+                if (rs.next()) {
+                    obj.setPublisherID(rs.getLong(1));
+                }
+                
+                result = true;
+            } finally {
+                closeQuietly(statement);
             }
-
-            result = true;
-            statement.close();
         }
         return result;
     }
-
+    
     @Override
     public boolean delete(Publisher obj) {
         return false;
     }
-
+    
     @Override
     public boolean update(Publisher obj) {
         return false;
     }
-
+    
     @Override
     public Publisher find(Long publisher_id) throws SQLException {
         Publisher publisher = new Publisher();
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_ID);
+        PreparedStatement preparedStatement = null;
+        preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_ID);
         try {
             preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, publisher_id);
@@ -81,14 +85,15 @@ public class PublisherDAO extends DAO<Publisher, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return publisher;
     }
-
+    
     private Publisher findPublisherIfAlreadyStored(Publisher obj) throws SQLException {
         Publisher publisher = null;
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_NAME);
+        PreparedStatement preparedStatement = null;
+        preparedStatement = this.connect.prepareStatement(SQL_SELECT_PUBLISHER_BY_NAME);
         try {
             preparedStatement.setString(1, obj.getName());
             ResultSet rs = preparedStatement.executeQuery();
@@ -101,9 +106,9 @@ public class PublisherDAO extends DAO<Publisher, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return publisher;
-
+        
     }
 }

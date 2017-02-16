@@ -44,47 +44,53 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
         if (obj.getConf_eventID() != null) {
             throw new IllegalArgumentException("Conference_Event is already created, the Conference_Event ID is not null.");
         }
-        PreparedStatement statement;
-        PreparedStatement statement1;
+        PreparedStatement statement = null;
+        PreparedStatement statement1 = null;
         Conference conference = findConferenceByTitle(obj.getConference().getTitle());
         if (conference != null) {
             obj.getConference().setConfID(conference.getConfID());
         } else {
-            statement1 = connect.prepareStatement(SQL_INSERT_CONFERENCE, Statement.RETURN_GENERATED_KEYS);
-            if (obj.getConference().getTitle() == null) {
-                statement1.setNull(1, java.sql.Types.INTEGER);
+            try {
+                statement1 = connect.prepareStatement(SQL_INSERT_CONFERENCE, Statement.RETURN_GENERATED_KEYS);
+                if (obj.getConference().getTitle() == null) {
+                    statement1.setNull(1, java.sql.Types.INTEGER);
+                } else {
+                    statement1.setString(1, obj.getConference().getTitle());
+                }
+                int code1 = statement1.executeUpdate();
+                ResultSet rs1 = statement1.getGeneratedKeys();
+
+                if (rs1.next()) {
+                    obj.getConference().setConfID(rs1.getLong(1));
+                }
+            } finally {
+                closeQuietly(statement1);
+            }
+        }
+
+        try {
+            statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+
+            statement.setLong(1, obj.getConference().getConfID());
+
+            if (obj.getConference() == null) {
+                statement.setLong(2, java.sql.Types.INTEGER);
             } else {
-                statement1.setString(1, obj.getConference().getTitle());
+                statement.setLong(2, obj.getAddress().getAddressId());
             }
-            int code1 = statement1.executeUpdate();
-            ResultSet rs1 = statement1.getGeneratedKeys();
+            statement.setString(3, obj.getStart_date());
+            statement.setString(4, obj.getEnd_date());
+            statement.setLong(5, obj.getMonograph().getMonographID());
+            int code = statement.executeUpdate();
+            ResultSet rs = statement.getGeneratedKeys();
 
-            if (rs1.next()) {
-                obj.getConference().setConfID(rs1.getLong(1));
+            if (rs.next()) {
+                obj.setConf_eventID(rs.getLong(1));
             }
-            statement1.close();
+            result = true;
+        } finally {
+            closeQuietly(statement);
         }
-
-        statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-
-        statement.setLong(1, obj.getConference().getConfID());
-
-        if (obj.getConference() == null) {
-            statement.setLong(2, java.sql.Types.INTEGER);
-        } else {
-            statement.setLong(2, obj.getAddress().getAddressId());
-        }
-        statement.setString(3, obj.getStart_date());
-        statement.setString(4, obj.getEnd_date());
-        statement.setLong(5, obj.getMonograph().getMonographID());
-        int code = statement.executeUpdate();
-        ResultSet rs = statement.getGeneratedKeys();
-
-        if (rs.next()) {
-            obj.setConf_eventID(rs.getLong(1));
-        }
-        statement.close();
-        result = true;
         return result;
     }
 
@@ -101,7 +107,8 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
     @Override
     public Conference_Event find(Long id) throws SQLException {
         Conference_Event conference_event = null;
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
+        PreparedStatement preparedStatement = null;
+        preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
         try {
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, id);
@@ -119,15 +126,16 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return conference_event;
     }
 
     public Conference findConferenceByTitle(String title) throws SQLException {
         Conference conference = null;
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_CONFERENCE);
+        PreparedStatement preparedStatement = null;
         try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_CONFERENCE);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setString(1, title);
             ResultSet result = preparedStatement.executeQuery();
@@ -137,15 +145,16 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return conference;
     }
 
     public Conference_Event findByMonograph(Long id) throws SQLException {
         Conference_Event conference_event = null;
-        PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_CONFERENCE_BY_MONOGR);
+        PreparedStatement ps = null;
         try {
+            ps = this.connect.prepareStatement(SQL_SELECT_CONFERENCE_BY_MONOGR);
             ps.setLong(1, id);
             // process the results
             ResultSet rs = ps.executeQuery();
@@ -162,7 +171,7 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         } finally {
-            ps.close();
+            closeQuietly(ps);
         }
         return conference_event;
     }
