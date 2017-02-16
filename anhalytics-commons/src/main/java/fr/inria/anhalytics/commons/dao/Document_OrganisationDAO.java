@@ -3,13 +3,13 @@ package fr.inria.anhalytics.commons.dao;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import fr.inria.anhalytics.commons.entities.Document_Organisation;
 import fr.inria.anhalytics.commons.entities.Organisation;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- *
  * @author achraf
  */
 public class Document_OrganisationDAO extends DAO<Document_Organisation, Long> {
@@ -28,19 +28,25 @@ public class Document_OrganisationDAO extends DAO<Document_Organisation, Long> {
             throw new IllegalArgumentException("No Document nor organisation is already created, the Affiliation ID is not null.");
         }
 
-        PreparedStatement statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement statement = null;
 
-        for (Organisation org : obj.getOrgs()) {
-            try {
-                statement.setString(1, obj.getDoc().getDocID());
-                statement.setLong(2, org.getOrganisationId());
-                int code = statement.executeUpdate();
+        try {
+            statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
 
-                result = true;
-            } catch (MySQLIntegrityConstraintViolationException e) {
+
+            for (Organisation org : obj.getOrgs()) {
+                try {
+                    statement.setString(1, obj.getDoc().getDocID());
+                    statement.setLong(2, org.getOrganisationId());
+                    statement.executeUpdate();
+
+                    result = true;
+                } catch (MySQLIntegrityConstraintViolationException e) {
+                }
             }
+        } finally {
+            closeQuietly(statement);
         }
-        statement.close();
 
         return result;
     }
