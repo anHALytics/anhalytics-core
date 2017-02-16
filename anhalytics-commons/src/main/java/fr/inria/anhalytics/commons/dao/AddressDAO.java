@@ -2,15 +2,11 @@ package fr.inria.anhalytics.commons.dao;
 
 import fr.inria.anhalytics.commons.entities.Address;
 import fr.inria.anhalytics.commons.entities.Country;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import org.slf4j.LoggerFactory;
 
+import java.sql.*;
+
 /**
- *
  * @author azhar
  */
 public class AddressDAO extends DAO<Address, Long> {
@@ -52,29 +48,32 @@ public class AddressDAO extends DAO<Address, Long> {
             obj.setAddressId(foundObj.getAddressId());
         } else {
 
-            PreparedStatement statement;
+            PreparedStatement statement = null;
+            try {
 
-            statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, obj.getAddrLine());
-            statement.setString(2, obj.getPostBox());
-            statement.setString(3, obj.getPostCode());
-            statement.setString(4, obj.getSettlement());
-            statement.setString(5, obj.getRegion());
-            if (obj.getCountry() == null) {
-                statement.setNull(6, java.sql.Types.INTEGER);
-            } else {
-                statement.setLong(6, obj.getCountry().getCountryID());
+                statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+                statement.setString(1, obj.getAddrLine());
+                statement.setString(2, obj.getPostBox());
+                statement.setString(3, obj.getPostCode());
+                statement.setString(4, obj.getSettlement());
+                statement.setString(5, obj.getRegion());
+                if (obj.getCountry() == null) {
+                    statement.setNull(6, java.sql.Types.INTEGER);
+                } else {
+                    statement.setLong(6, obj.getCountry().getCountryID());
+                }
+
+                int code = statement.executeUpdate();
+                ResultSet rs = statement.getGeneratedKeys();
+
+                if (rs.next()) {
+                    obj.setAddressId(rs.getLong(1));
+                }
+
+                result = true;
+            } finally {
+                closeQuietly(statement);
             }
-
-            int code = statement.executeUpdate();
-            ResultSet rs = statement.getGeneratedKeys();
-
-            if (rs.next()) {
-                obj.setAddressId(rs.getLong(1));
-            }
-
-            result = true;
-            statement.close();
         }
         return result;
     }
@@ -92,8 +91,9 @@ public class AddressDAO extends DAO<Address, Long> {
     @Override
     public Address find(Long id) throws SQLException {
         Address address = new Address();
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_ID);
+        PreparedStatement preparedStatement = null;
         try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_ADDR_BY_ID);
             preparedStatement.setLong(1, id);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             ResultSet result = preparedStatement.executeQuery();
@@ -112,15 +112,16 @@ public class AddressDAO extends DAO<Address, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return address;
     }
 
-    public Country findCountry(String iso) throws SQLException {
+    public Country findCountry(String iso) {
         Country country = null;
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_COUNTRY_BY_ISO);
+        PreparedStatement preparedStatement = null;
         try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_COUNTRY_BY_ISO);
             preparedStatement.setString(1, iso);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             ResultSet result = preparedStatement.executeQuery();
@@ -134,7 +135,7 @@ public class AddressDAO extends DAO<Address, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return country;
     }
@@ -142,8 +143,9 @@ public class AddressDAO extends DAO<Address, Long> {
     public Address getOrganisationAddress(Long orgId) throws SQLException {
 
         Address address = null;
-        PreparedStatement ps = this.connect.prepareStatement(SQL_SELECT_LOCATIONSID_BY_ORGID);
+        PreparedStatement ps = null;
         try {
+            ps = this.connect.prepareStatement(SQL_SELECT_LOCATIONSID_BY_ORGID);
             ps.setLong(1, orgId);
             // process the results
             ResultSet rs = ps.executeQuery();
@@ -155,7 +157,7 @@ public class AddressDAO extends DAO<Address, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            ps.close();
+            closeQuietly(ps);
         }
         return address;
 
@@ -197,32 +199,36 @@ public class AddressDAO extends DAO<Address, Long> {
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
         } finally {
-            ps.close();
+            closeQuietly(ps);
         }
         return address;
     }
 
-    public Address createCountry(Address obj) throws SQLException {
-        PreparedStatement statement1;
+    public Address createCountry(Address obj) throws SQLException{
+        PreparedStatement statement1 = null;
         if (obj.getCountry() != null) {
             Country country = null;
             if (obj.getCountry().getIso() != null) {
                 country = findCountry(obj.getCountry().getIso());
             }
             if (country == null) {
-                statement1 = connect.prepareStatement(SQL_INSERT_COUNTRY, Statement.RETURN_GENERATED_KEYS);
-                if (obj.getCountry().getIso() == null) {
-                    statement1.setNull(1, java.sql.Types.VARCHAR);
-                } else {
-                    statement1.setString(1, obj.getCountry().getIso());
-                }
-                int code1 = statement1.executeUpdate();
-                ResultSet rs1 = statement1.getGeneratedKeys();
+                try {
+                    statement1 = connect.prepareStatement(SQL_INSERT_COUNTRY, Statement.RETURN_GENERATED_KEYS);
+                    if (obj.getCountry().getIso() == null) {
+                        statement1.setNull(1, java.sql.Types.VARCHAR);
+                    } else {
+                        statement1.setString(1, obj.getCountry().getIso());
+                    }
+                    int code1 = statement1.executeUpdate();
+                    ResultSet rs1 = statement1.getGeneratedKeys();
 
-                if (rs1.next()) {
-                    obj.getCountry().setCountryID(rs1.getLong(1));
+                    if (rs1.next()) {
+                        obj.getCountry().setCountryID(rs1.getLong(1));
+                    }
+
+                } finally {
+                    closeQuietly(statement1);
                 }
-                statement1.close();
             } else {
                 obj.getCountry().setCountryID(country.getCountryID());
             }

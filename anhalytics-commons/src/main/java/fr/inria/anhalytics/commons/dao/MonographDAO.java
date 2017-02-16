@@ -1,16 +1,12 @@
 package fr.inria.anhalytics.commons.dao;
 
 import fr.inria.anhalytics.commons.entities.Monograph;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author azhar
  */
 public class MonographDAO extends DAO<Monograph, Long> {
@@ -32,7 +28,7 @@ public class MonographDAO extends DAO<Monograph, Long> {
             throw new IllegalArgumentException("Monograph is already created, the Monograph ID is not null.");
         }
 
-        PreparedStatement statement;
+        PreparedStatement statement = null;
         try {
             statement = connect.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, obj.getType());
@@ -45,12 +41,14 @@ public class MonographDAO extends DAO<Monograph, Long> {
             if (rs.next()) {
                 obj.setMonographID(rs.getLong(1));
             }
-            statement.close();
+
             result = true;
         } catch (SQLException ex) {
             Logger.getLogger(DocumentDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            closeQuietly(statement);
         }
-        return false;
+        return result;
     }
 
     @Override
@@ -64,10 +62,11 @@ public class MonographDAO extends DAO<Monograph, Long> {
     }
 
     @Override
-    public Monograph find(Long monographID) throws SQLException {
+    public Monograph find(Long monographID) {
         Monograph monograph = new Monograph();
-        PreparedStatement preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
+        PreparedStatement preparedStatement = null;
         try {
+            preparedStatement = this.connect.prepareStatement(SQL_SELECT_MONOGR_BY_ID);
             //preparedStatement.setFetchSize(Integer.MIN_VALUE);
             preparedStatement.setLong(1, monographID);
             ResultSet result = preparedStatement.executeQuery();
@@ -81,7 +80,7 @@ public class MonographDAO extends DAO<Monograph, Long> {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            preparedStatement.close();
+            closeQuietly(preparedStatement);
         }
         return monograph;
     }
