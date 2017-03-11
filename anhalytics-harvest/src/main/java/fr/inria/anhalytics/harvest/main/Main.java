@@ -38,11 +38,12 @@ public class Main {
             //add("fetchEmbargoPublications");
             add("processGrobid");
             add("processGrobidDaily");
-            add("harvestIstex");
+            add("istexHarvest");
             //add("assetLegend");
             add("harvestDOI");
             add("crossRefDaily");
             add("openUrl");
+            add("istexQuantities");
         }
     };
 
@@ -111,6 +112,10 @@ public class Main {
 //        } 
         else if (process.equals("openUrl")) {
             ou.getIstexUrl();
+        }else if (process.equals("istexHarvest")) {
+            ih.sample();
+        }else if (process.equals("istexQuantities")) {
+        
         }
     }
 
