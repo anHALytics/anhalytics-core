@@ -32,17 +32,17 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
     private static final Logger logger = LoggerFactory.getLogger(NerdAnnotatorWorker.class);
 
     public NerdAnnotatorWorker(MongoFileManager mongoManager,
-            TEIFile tei,
+            TEIFile file,
             String date) {
-        super(mongoManager, tei, date, MongoCollectionsInterface.NERD_ANNOTATIONS);
-        this.tei = tei;
+        super(mongoManager, file, date, MongoCollectionsInterface.NERD_ANNOTATIONS);
+        this.file = file;
     }
 
     @Override
     protected void processCommand() {
         // get all the elements having an attribute id and annotate their text content
         mm.insertAnnotation(annotateDocument(), annotationsCollection);
-        logger.info("\t\t " + Thread.currentThread().getName() + ": " + tei.getRepositoryDocId() + " annotated by the NERD service.");
+        logger.info("\t\t " + Thread.currentThread().getName() + ": " + file.getRepositoryDocId() + " annotated by the NERD service.");
     }
 
     /**
@@ -58,7 +58,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
         try {
             docBuilder = docFactory.newDocumentBuilder();
             // parse the TEI
-            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(tei.getTei().getBytes("UTF-8"))));
+            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(((TEIFile)file).getTei().getBytes("UTF-8"))));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -87,8 +87,8 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
             }
         }*/
         StringBuffer json = new StringBuffer();
-        json.append("{ \"repositoryDocId\" : \"" + tei.getRepositoryDocId()
-                + "\",\"anhalyticsId\" : \"" + tei.getAnhalyticsId()
+        json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId()
+                + "\",\"anhalyticsId\" : \"" + file.getAnhalyticsId()
                 + "\", \"date\" :\"" + date
                 + "\", \"nerd\" : [");
         //check if any thing was added, throw exception if not (not insert entry)

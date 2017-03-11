@@ -35,7 +35,7 @@ abstract class MongoManager {
 
         try {
             mongo = new MongoClient(CommonsProperties.getMongodbServer(), CommonsProperties.getMongodbPort());
-        
+            LOGGER.info("Mongodb is running on server : "+CommonsProperties.getMongodbServer()+ " port : "+CommonsProperties.getMongodbPort());
         if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
             LOGGER.info("MongoDB database " + CommonsProperties.getMongodbDb() + " does not exist and will be created");
         }
@@ -51,6 +51,7 @@ abstract class MongoManager {
      */
     protected void initDatabase() {
         db = mongo.getDB(CommonsProperties.getMongodbDb());
+        LOGGER.info("Database : "+CommonsProperties.getMongodbDb());
         if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
             BasicDBObject commandArguments = new BasicDBObject();
             commandArguments.put("user", CommonsProperties.getMongodbUser());

@@ -27,6 +27,10 @@ public class AnnotateProperties {
     private static String keyterm_host = null;
 
     private static String keyterm_port = null;
+    
+    private static String quantities_host = null;
+
+    private static String quantities_port = null;
 
     private static boolean isMultiThread;
 
@@ -35,6 +39,10 @@ public class AnnotateProperties {
     private static int nerd_nbThreads = 1;
 
     private static int keyterm_nbThreads = 1;
+    
+    private static int quantities_nbThreads = 1;
+    
+    private static String tmp = null;
 
     /**
      * Loads and initializes properties from the file given the filename.
@@ -65,6 +73,16 @@ public class AnnotateProperties {
         } catch (java.lang.NumberFormatException e) {
             e.printStackTrace();
         }
+        
+        setQuantitiesHost(props.getProperty("annotate.quantities_host"));
+        setQuantitiesPort(props.getProperty("annotate.quantities_port"));
+        threads = props.getProperty("annotate.quantities.nbThreads");
+        try {
+            setQuantitiesNbThreads(Integer.parseInt(threads));
+        } catch (java.lang.NumberFormatException e) {
+            e.printStackTrace();
+        }
+        setTmp(props.getProperty("annotate.quantities.tmp"));
     }
 
     private static void checkPath(String path) {
@@ -173,6 +191,34 @@ public class AnnotateProperties {
     public static void setKeytermPort(String aKeyterm_port) {
         keyterm_port = aKeyterm_port;
     }
+    
+    /**
+     * @return the host name of the quantities extraction service
+     */
+    public static String getQuantitiesHost() {
+        return quantities_host;
+    }
+
+    /**
+     * @param aQuantities_host the host name for the quantities extraction service
+     */
+    public static void setQuantitiesHost(String aQuantities_host) {
+        quantities_host = aQuantities_host;
+    }
+
+    /**
+     * @return the port of the keyterm extraction service
+     */
+    public static String getQuantitiesPort() {
+        return quantities_port;
+    }
+
+    /**
+     * @param aQuantities_port the port for the keyterm extraction service
+     */
+    public static void setQuantitiesPort(String aQuantities_port) {
+        quantities_port = aQuantities_port;
+    }
 
     /**
      * @return the isMultiThread
@@ -215,6 +261,21 @@ public class AnnotateProperties {
     public static void setKeytermNbThreads(int aNbThreads) {
         keyterm_nbThreads = aNbThreads;
     }
+    
+    
+    /**
+     * @return return the number of threads to be used for calling the quantities extraction service
+     */
+    public static int getQuantitiesNbThreads() {
+        return quantities_nbThreads;
+    }
+
+    /**
+     * @param aNbThreads the number of threads to be used for calling the quantities extraction service
+     */
+    public static void setQuantitiesNbThreads(int aNbThreads) {
+        quantities_nbThreads = aNbThreads;
+    }
 
     /**
      * @return the processName
@@ -242,6 +303,20 @@ public class AnnotateProperties {
      */
     public static void setProcessByDate(boolean aProcessByDate) {
         processByDate = aProcessByDate;
+    }
+
+    /**
+     * @return the tmp
+     */
+    public static String getTmp() {
+        return tmp;
+    }
+
+    /**
+     * @param aTmp the tmp to set
+     */
+    public static void setTmp(String aTmp) {
+        tmp = aTmp;
     }
 
 }

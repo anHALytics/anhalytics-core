@@ -30,8 +30,11 @@ public interface MongoCollectionsInterface {
     // text mining annotation 
     public static final String NERD_ANNOTATIONS = "nerd_annotations";
     public static final String KEYTERM_ANNOTATIONS = "keyterm_annotations";
+    public static final String QUANTITIES_ANNOTATIONS = "quantities_annotations";
     //metadata harvested from other repositorues
     public static final String ISTEX_TEIS = "istex_teis";
+    
+    public static final String ISTEX_PDFS = "istex_pdfs";
     public static final String ARXIV_METADATA = "arxiv_metadata";
     public static String CROSSREF_METADATAS = "crossref_metadata";
 }

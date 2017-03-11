@@ -33,6 +33,8 @@ public class Main {
             add("annotateNerdDaily");
             add("annotateKeyTermDaily");
             add("annotateDaily");
+            add("annotateAllQuantities");
+            add("annotateQuantitiesFromPDFDaily");
         }
     };
 
@@ -48,6 +50,7 @@ public class Main {
             if (AnnotateProperties.getFromDate() != null || AnnotateProperties.getUntilDate() != null) {
                 Utilities.updateDates(AnnotateProperties.getUntilDate(), AnnotateProperties.getFromDate());
             }
+            Utilities.setTmpPath(AnnotateProperties.getTmp());
             Main main = new Main();
             main.processCommand();
         } else {
@@ -90,6 +93,10 @@ public class Main {
             } else if (process.equals("annotateAll")) {
                 annotator.annotate(Annotator_Type.NERD);
                 annotator.annotate(Annotator_Type.KEYTERM);
+            } else if (process.equals("annotateQuantitiesDaily")) {
+                annotator.annotate(Annotator_Type.QUANTITIES);
+            } else if (process.equals("annotateQuantitiesFromPDFDaily")) {
+                annotator.annotate(Annotator_Type.PDFQUANTITIES);
             }
         } catch (ServiceException se) {
             logger.error(se.getMessage());

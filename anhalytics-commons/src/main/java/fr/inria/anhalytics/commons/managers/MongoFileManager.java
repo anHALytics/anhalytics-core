@@ -8,6 +8,7 @@ import com.mongodb.util.JSON;
 import fr.inria.anhalytics.commons.data.Annotation;
 import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.commons.data.Identifier;
+import fr.inria.anhalytics.commons.data.IstexFile;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.exceptions.FileNotFoundException;
@@ -94,6 +95,40 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     /**
+     * This initializes cursor for binaries collection.
+     */
+    public boolean initIstexPdfs() {
+        setGridFSCollection(MongoCollectionsInterface.ISTEX_PDFS);
+        BasicDBObject bdbo = new BasicDBObject();
+        cursor = gfs.getFileList(bdbo);
+        cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT);
+        indexFile = 0;
+        if (cursor.size() > 0) {
+            logger.info(cursor.size() + " documents found");
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+     /**
+     * This initializes cursor for binaries collection.
+     */
+    public boolean initIstexTeis() {
+        setGridFSCollection(MongoCollectionsInterface.ISTEX_TEIS);
+        BasicDBObject bdbo = new BasicDBObject();
+        cursor = gfs.getFileList(bdbo);
+        cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT);
+        indexFile = 0;
+        if (cursor.size() > 0) {
+            logger.info(cursor.size() + " documents found");
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * This initializes cursor for annexes collection.
      */
     public boolean initAnnexes(String date) {
@@ -110,6 +145,24 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
         if (cursor.size() > 0) {
             logger.info(cursor.size() + " documents found for : " + date);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public boolean initQuantitiesAnnotations() throws MongoException {
+    collection = getCollection(MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
+        // index on filename and xml:id
+        BasicDBObject index = new BasicDBObject();
+        index.put("repositoryDocId", 1);
+        index.put("category", 1);
+        collection.ensureIndex(index, "index", true);
+        BasicDBObject bdbo = new BasicDBObject();
+
+        cursor = collection.find(bdbo);
+        indexFile = 0;
+        if (cursor.size() > 0) {
             return true;
         } else {
             return false;
@@ -170,8 +223,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      *
      * @param date
      * @param annotationsCollection the annotation collection to initialize,
-     *                              e.g. MongoCollectionsInterface.NERD_ANNOTATIONS,
-     *                              MongoCollectionsInterface.KEYTERM_ANNOTATIONS, etc.
+     * e.g. MongoCollectionsInterface.NERD_ANNOTATIONS,
+     * MongoCollectionsInterface.KEYTERM_ANNOTATIONS, etc.
      */
     public boolean initAnnotations(String date, String annotationsCollection) throws MongoException {
         collection = getCollection(annotationsCollection);
@@ -241,6 +294,16 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         indexFile++;
         return annotation;
     }
+    
+    public Annotation nextQuantitiesAnnotation() {
+        DBObject obj = cursor.next();
+        Annotation annotation = new Annotation(obj.toString(), (String) obj.get("repositoryDocId"), (String) obj.get("repositoryDocId"));
+        if (!cursor.hasNext()) {
+            cursor.close();
+        }
+        indexFile++;
+        return annotation;
+    }
 
     public TEIFile nextTeiDocument() {
         InputStream teiStream = null;
@@ -265,7 +328,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
         return tei;
     }
-
+    
     public BinaryFile nextBinaryDocument() {
         BinaryFile binaryFile = new BinaryFile();
         DBObject obj = cursor.next();
@@ -281,6 +344,34 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return binaryFile;
     }
 
+    public IstexFile nextIstexBinaryDocument() {
+        IstexFile istexBinaryFile = new IstexFile();
+        DBObject obj = cursor.next();
+        istexBinaryFile.setRepositoryDocId((String) obj.get("identifier"));
+        istexBinaryFile.setCategory((String) obj.get("category"));
+        GridFSDBFile binaryfile = gfs.findOne(istexBinaryFile.getRepositoryDocId() + ".pdf");
+        istexBinaryFile.setStream(binaryfile.getInputStream());
+        indexFile++;
+        return istexBinaryFile;
+    }
+    
+        public TEIFile nextIstexTeiDocument() {
+            InputStream teiStream = null;
+        TEIFile tei = new TEIFile();
+        DBObject obj = cursor.next();
+        tei.setRepositoryDocId((String) obj.get("identifier"));
+        GridFSDBFile binaryfile = gfs.findOne(tei.getRepositoryDocId() + ".tei.xml");
+        teiStream = binaryfile.getInputStream();
+        try {
+            tei.setTei(IOUtils.toString(teiStream));
+            teiStream.close();
+        } catch (IOException ex) {
+            logger.error(ex.getMessage(), ex.getCause());
+        }
+        indexFile++;
+        return tei;
+    }
+
 //    public String nextAsset() {
 //        InputStream input = null;
 //        DBObject obj = cursor.next();
@@ -292,7 +383,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //        indexFile++;
 //        return currentFileName;
 //    }
-
     /**
      * Inserts json entry representing annotation result.
      */
@@ -304,6 +394,29 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             BasicDBObject index = new BasicDBObject();
             index.put("repositoryDocId", 1);
             index.put("xml:id", 1);
+            c.ensureIndex(index, "index", true);
+            DBObject dbObject = (DBObject) JSON.parse(json);
+            WriteResult result = c.insert(dbObject);
+            CommandResult res = result.getCachedLastError();
+            if ((res != null) && (res.ok())) {
+                done = true;
+            } else {
+                done = false;
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e.getCause());
+        }
+        return done;
+    }
+    
+    public boolean insertQuantitiesAnnotation(String json, String annotationsCollection) {
+        boolean done = false;
+        try {
+            DBCollection c = null;
+            c = db.getCollection(annotationsCollection);
+            BasicDBObject index = new BasicDBObject();
+            index.put("repositoryDocId", 1);
+            index.put("category", 1);
             c.ensureIndex(index, "index", true);
             DBObject dbObject = (DBObject) JSON.parse(json);
             WriteResult result = c.insert(dbObject);
@@ -503,6 +616,43 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } catch (Exception e) {
             logger.error(e.getMessage(), e.getCause());
         }
+    }
+
+    /**
+     * inserts a Arxiv/istex TEI document in the GridFS.
+     */
+    public void insertPDFDocument(InputStream file, String identifier, String category, String namespace) {
+//        try {
+        GridFS gfs = new GridFS(db, namespace);
+        GridFSInputFile gfsFile = gfs.createFile(file, true);
+        //gfs.remove(identifier + ".pdf");
+        gfsFile.setFilename(identifier + ".pdf");
+        gfsFile.put("identifier", identifier);
+        gfsFile.put("anhalyticsId", identifier);
+        gfsFile.put("category", category);
+        gfsFile.save();
+//        } catch (ParseException e) {
+//            logger.error(e.getMessage(), e.getCause());
+//        }
+
+    }
+    
+    /**
+     * inserts a Arxiv/istex TEI document in the GridFS.
+     */
+    public void insertTEIDocument(InputStream file, String identifier, String category, String namespace) {
+//        try {
+        GridFS gfs = new GridFS(db, namespace);
+        GridFSInputFile gfsFile = gfs.createFile(file, true);
+        //gfs.remove(identifier + ".pdf");
+        gfsFile.setFilename(identifier + ".tei.xml");
+        gfsFile.put("identifier", identifier);
+        gfsFile.put("category", category);
+        gfsFile.save();
+//        } catch (ParseException e) {
+//            logger.error(e.getMessage(), e.getCause());
+//        }
+
     }
 
     /**
@@ -784,6 +934,22 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         whereQuery.put("anhalyticsId", anhalyticsId);
         GridFSDBFile file = gfs.findOne(whereQuery);
         return file;
+    }
+    
+    public String findGridFSDBfileIstexTeiById(String id) {
+        String tei = null;
+        try {
+        GridFS gfs = new GridFS(db, MongoCollectionsInterface.ISTEX_TEIS);
+        BasicDBObject whereQuery = new BasicDBObject();
+        whereQuery.put("identifier", id);
+        GridFSDBFile file = gfs.findOne(whereQuery);
+        InputStream teiStream = file.getInputStream();
+            tei = IOUtils.toString(teiStream);
+            teiStream.close();
+        } catch (Exception e) {
+            throw new DataException(e);
+        }
+        return tei;
     }
 
     /**

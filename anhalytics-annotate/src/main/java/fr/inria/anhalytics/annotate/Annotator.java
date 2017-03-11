@@ -4,6 +4,7 @@ import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.annotate.exceptions.UnreachableAnnotateServiceException;
 import fr.inria.anhalytics.annotate.exceptions.AnnotatorNotAvailableException;
 import fr.inria.anhalytics.annotate.services.AnnotateService;
+import fr.inria.anhalytics.commons.data.IstexFile;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
@@ -26,7 +27,9 @@ public class Annotator {
     public enum Annotator_Type {
 
         NERD("NERD"),
-        KEYTERM("KeyTerm");
+        KEYTERM("KeyTerm"),
+        QUANTITIES("Quantities"),
+        PDFQUANTITIES("PDFQuantities");
 
         private String name;
 
@@ -45,8 +48,14 @@ public class Annotator {
 
     public void annotate(Annotator_Type annotator_type) {
         try {
-            if (AnnotateProperties.isIsMultiThread()) {
-                annotateTeiCollectionMultiThreaded(annotator_type);
+            if (annotator_type == Annotator_Type.PDFQUANTITIES) {
+                annotatePDFQuantitiesCollection();
+            } else if (AnnotateProperties.isIsMultiThread()) {
+                if (annotator_type == Annotator_Type.QUANTITIES) {
+                    annotateQuantitiesTeiCollectionMultiThreaded();
+                } else {
+                    annotateTeiCollectionMultiThreaded(annotator_type);
+                }
             } else {
                 annotateTeiCollection(annotator_type);
             }
@@ -54,6 +63,57 @@ public class Annotator {
             logger.error(e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void annotatePDFQuantitiesCollection()
+            throws UnreachableAnnotateServiceException, AnnotatorNotAvailableException {
+        try {
+            if (AnnotateService.isAnnotateServiceReady(Annotator_Type.PDFQUANTITIES)) {
+                if (mm.initIstexPdfs()) {
+
+                    logger.info("processing...");
+                    while (mm.hasMore()) {
+                        IstexFile istexFile = mm.nextIstexBinaryDocument();
+                        Runnable worker = new PDFQuantitiesAnnotatorWorker(mm, istexFile, null);
+                        worker.run();
+//                            nb++;
+
+                    }
+
+                }
+
+            }
+        } finally {
+            mm.close();
+        }
+    }
+
+    /**
+     * Annotates quantities tei collection entries with text (multithread
+     * process).
+     */
+    private void annotateQuantitiesTeiCollectionMultiThreaded() {
+        try {
+            if (AnnotateService.isAnnotateServiceReady(Annotator_Type.QUANTITIES)) {
+
+            }
+            if (mm.initIstexTeis()) {
+
+                logger.info("processing...");
+                while (mm.hasMore()) {
+                    TEIFile istexFile = mm.nextIstexTeiDocument();
+                    Runnable worker = new QuantitiesAnnotatorWorker(mm, istexFile, null);
+                    worker.run();
+//                            nb++;
+
+                }
+
+            }
+
+        } finally {
+            mm.close();
+        }
+
     }
 
     /**
@@ -69,6 +129,8 @@ public class Annotator {
         } else if (annotator_type == Annotator_Type.KEYTERM) {
             annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
             teiCollection = MongoCollectionsInterface.GROBID_TEIS;
+        } else if (annotator_type == Annotator_Type.QUANTITIES) {
+            annotationsCollection = MongoCollectionsInterface.QUANTITIES_ANNOTATIONS;
         } else {
             throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
         }
@@ -106,6 +168,8 @@ public class Annotator {
                                 worker = new NerdAnnotatorWorker(mm, tei, date);
                             } else if (annotator_type == Annotator_Type.KEYTERM) {
                                 worker = new KeyTermAnnotatorWorker(mm, tei, date);
+                            } else if (annotator_type == Annotator_Type.QUANTITIES) {
+                                worker = new QuantitiesAnnotatorWorker(mm, tei, date);
                             }
                             worker.run();
                             nb++;
@@ -135,6 +199,8 @@ public class Annotator {
         } else if (annotator_type == Annotator_Type.KEYTERM) {
             annotationsCollection = MongoCollectionsInterface.KEYTERM_ANNOTATIONS;
             teiCollection = MongoCollectionsInterface.GROBID_TEIS;
+        } else if (annotator_type == Annotator_Type.QUANTITIES) {
+            annotationsCollection = MongoCollectionsInterface.QUANTITIES_ANNOTATIONS;
         } else {
             throw new AnnotatorNotAvailableException("type of annotations not supported: " + annotator_type);
         }
