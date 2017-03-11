@@ -74,6 +74,53 @@ abstract class Indexer {
     }
 
     /**
+     * set-up ElasticSearch by loading the mapping and river json for the HAL
+     * document database
+     */
+    public void setupQuantitiesIndex() {
+        try {
+            // delete previous index
+            deleteIndex("quantities");
+            // create new index and load the appropriate mapping
+            createQuantitiesIndex();
+        } catch (Exception e) {
+            logger.error("Sep-up of ElasticSearch failed for index " + "quantities" + ".", e);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     */
+    public boolean createQuantitiesIndex() {
+        boolean val = false;
+        if (!client.admin().indices().prepareExists("quantities").execute().actionGet().isExists()) {
+            // load custom analyzer
+            String analyserStr = null;
+            try {
+                ClassLoader classLoader = DocumentIndexer.class.getClassLoader();
+                analyserStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/analyzer.json"));
+            } catch (Exception e) {
+                throw new ElasticSearchConfigurationException("Cannot read analyzer for " + "quantities");
+            }
+
+            CreateIndexRequestBuilder createIndexRequestBuilder = this.client.admin().indices().prepareCreate("quantities").setSettings(analyserStr);
+
+            createIndexRequestBuilder.addMapping("quantities", loadMapping("quantities", "quantities"));
+
+            final CreateIndexResponse createResponse = createIndexRequestBuilder.execute().actionGet();
+            if (!createResponse.isAcknowledged()) {
+                throw new IndexingServiceException("Failed to create index <" + "quantities" + ">");
+            }
+            logger.info("Index {} created", "quantities");
+        } else {
+            logger.info("Index {} already exists", "quantities");
+        }
+        val = true;
+        return val;
+    }
+
+    /**
      *
      */
     private boolean deleteIndex(String indexName) {
@@ -151,6 +198,8 @@ abstract class Indexer {
                 } else {
                     mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kbpublications.json"));
                 }
+            } else if (indexName.contains("quantities")) {
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_quantities.json"));
             } else {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl.json"));
             }

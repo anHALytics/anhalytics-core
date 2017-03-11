@@ -2,6 +2,7 @@ package fr.inria.anhalytics.index;
 
 import fr.inria.anhalytics.commons.data.Annotation;
 import fr.inria.anhalytics.commons.data.TEIFile;
+import fr.inria.anhalytics.commons.exceptions.SystemException;
 import fr.inria.anhalytics.index.exceptions.IndexNotCreatedException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import java.util.*;
@@ -13,10 +14,22 @@ import org.json.JsonTapasML;
 import org.json.JSONObject;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.IndexProperties;
+import java.io.ByteArrayInputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.elasticsearch.action.search.SearchResponse;
+import org.json.JSONException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 /**
  * Method for management of the ElasticSearch cluster.
@@ -37,6 +50,65 @@ public class DocumentIndexer extends Indexer {
     public DocumentIndexer() {
         super();
         this.indexingPreprocess = new IndexingPreprocess(this.mm);
+    }
+
+    public int indexIstexQuantites() throws XPathExpressionException, JSONException {
+        int nb = 0;
+
+        int bulkSize = 100;
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
+        bulkRequest.setRefresh(true);
+        if (mm.initQuantitiesAnnotations()) {
+            while (mm.hasMore()) {
+                Annotation annotation = mm.nextQuantitiesAnnotation();
+                JSONObject jsonObj = new JSONObject(annotation.getJson());
+                String tei = mm.findGridFSDBfileIstexTeiById(annotation.getAnhalyticsId());
+                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+                docFactory.setValidating(false);
+                //docFactory.setNamespaceAware(true);
+                DocumentBuilder docBuilder;
+                try {
+                    docBuilder = docFactory.newDocumentBuilder();
+                } catch (ParserConfigurationException e) {
+                    throw new SystemException("Cannot instantiate TeiBuilder", e);
+                }
+                Document teiDoc = null;
+                try {
+                    teiDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(tei.getBytes("utf-8"))));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                XPath xPath = XPathFactory.newInstance().newXPath();
+                Node text = (Node) xPath.compile("/TEI/text").evaluate(teiDoc, XPathConstants.NODE);
+                if (text != null) {
+                    text.getParentNode().removeChild(text);
+                }
+                JSONObject json = JsonTapasML.toJSONObject(Utilities.toString(teiDoc));
+                json.put("quantities", jsonObj);
+                try {
+                    // index the json in ElasticSearch
+                    // beware the document type bellow and corresponding mapping!
+                    bulkRequest.add(client.prepareIndex(
+                            "quantities", "quantities",
+                            annotation.getAnhalyticsId()).setSource(json.toString()));
+
+                    nb++;
+                    if (nb % bulkSize == 0) {
+                        BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                        if (bulkResponse.hasFailures()) {
+                            // process failures by iterating through each bulk response item	
+                            logger.error(bulkResponse.buildFailureMessage());
+                        }
+                        bulkRequest = client.prepareBulk();
+                        bulkRequest.setRefresh(true);
+                        logger.info("\n Bulk number : " + nb / bulkSize);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return nb;
     }
 
     /**
@@ -341,10 +413,9 @@ public class DocumentIndexer extends Indexer {
         logger.info("validDocIDs: " + anhalyticsId);
         String request[] = toBeIndexed.toArray(new String[0]);
         String query = "{\"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
-        
+
         SearchResponse searchResponse = client.prepareSearch(IndexProperties.getFulltextTeisIndexName()).setQuery(query).addFields(request).execute().actionGet();
 
-        
         try {
             JsonNode resJsonStruct = mapper.readTree(searchResponse.toString());
             JsonNode hits = resJsonStruct.findPath("hits").findPath("hits");

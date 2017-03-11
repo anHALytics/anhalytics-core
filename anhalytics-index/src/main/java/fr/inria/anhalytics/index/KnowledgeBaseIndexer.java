@@ -74,6 +74,9 @@ public class KnowledgeBaseIndexer extends Indexer {
                 orgAddress = addr.getAddressDocument();
             }
             orgDocument.put("address", orgAddress);
+            for (PART_OF mother : org.getRels()) {
+                getAffiliations(organisations, mother.getOrganisation_mother(), begin_date, end_date);
+            }
             organisations.add(orgDocument);
         }
 

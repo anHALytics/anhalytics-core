@@ -28,7 +28,7 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands
-            = Arrays.asList("setup", "indexAll", "indexDaily", "indexMetadata", "indexFulltext", "indexAnnotations", "indexKB");
+            = Arrays.asList("setup", "indexAll", "indexDaily", "indexMetadata", "indexFulltext", "indexAnnotations", "indexKB", "indexQuantities", "setupQuantitiesIndex");
 
     public static void main(String[] args) throws UnknownHostException {
 
@@ -308,6 +308,15 @@ public class Main {
                     sqle.printStackTrace();
                 }
                 mi.close();
+            } else if (process.equals("indexQuantities")) {
+                try {
+                int nbDocs = esm.indexIstexQuantites();
+                } catch (Exception sqle) {
+                    sqle.printStackTrace();
+                }
+            } else if (process.equals("setupQuantitiesIndex")) {
+            
+            esm.setupQuantitiesIndex();
             }
             esm.close();
 

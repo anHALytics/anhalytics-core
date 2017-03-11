@@ -1,0 +1,384 @@
+{
+    "quantities": {
+        "_all": {
+            "enabled": false,
+            "store": true
+        },
+        "properties": {
+            "quantities": {
+                "properties": {
+                    "repositoryDocId": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "quantities": {
+                        "properties": {
+                            "pages": {
+                                "properties": {
+                                    "page_height": {
+                                        "type": "long"
+                                    },
+                                    "page_width": {
+                                        "type": "long"
+                                    }
+                                }
+                            },
+                            "measurements": {
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "quantityBase": {
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "rawValue": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "rawUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "long"
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "long"
+                                                    }
+                                                }
+                                            },
+                                            "parsedValue": {
+                                                "type": "double"
+                                            },
+                                            "normalizedQuantity": {
+                                                "type": "double"
+                                            },
+                                            "offsetStart": {
+                                                "type": "long"
+                                            },
+                                            "offsetEnd": {
+                                                "type": "long"
+                                            },
+                                            "quantified": {
+                                                "properties": {
+                                                    "rawName": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "normalizedName": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "long"
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "long"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "quantity": {
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "rawValue": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "rawUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "long"
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "long"
+                                                    }
+                                                }
+                                            },
+                                            "parsedValue": {
+                                                "type": "double"
+                                            },
+                                            "normalizedQuantity": {
+                                                "type": "double"
+                                            },
+                                            "offsetStart": {
+                                                "type": "long"
+                                            },
+                                            "offsetEnd": {
+                                                "type": "long"
+                                            },
+                                            "quantified": {
+                                                "properties": {
+                                                    "rawName": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "normalizedName": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "long"
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "long"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "quantityMost": {
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "rawValue": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "rawUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "long"
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "long"
+                                                    }
+                                                }
+                                            },
+                                            "parsedValue": {
+                                                "type": "double"
+                                            },
+                                            "normalizedQuantity": {
+                                                "type": "double"
+                                            },
+                                            "offsetStart": {
+                                                "type": "long"
+                                            },
+                                            "offsetEnd": {
+                                                "type": "long"
+                                            },
+                                            "quantified": {
+                                                "properties": {
+                                                    "rawName": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "normalizedName": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "long"
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "long"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "quantityLeast": {
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "rawValue": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "rawUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "long"
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "long"
+                                                    }
+                                                }
+                                            },
+                                            "parsedValue": {
+                                                "type": "double"
+                                            },
+                                            "normalizedQuantity": {
+                                                "type": "double"
+                                            },
+                                            "offsetStart": {
+                                                "type": "long"
+                                            },
+                                            "offsetEnd": {
+                                                "type": "long"
+                                            },
+                                            "quantified": {
+                                                "properties": {
+                                                    "rawName": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "normalizedName": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "long"
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "long"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "quantityRange": {
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "rawValue": {
+                                                "type": "string",
+                                                "index": "not_analyzed"
+                                            },
+                                            "rawUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "long"
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "long"
+                                                    }
+                                                }
+                                            },
+                                            "parsedValue": {
+                                                "type": "double"
+                                            },
+                                            "normalizedQuantity": {
+                                                "type": "double"
+                                            },
+                                            "offsetStart": {
+                                                "type": "long"
+                                            },
+                                            "offsetEnd": {
+                                                "type": "long"
+                                            },
+                                            "quantified": {
+                                                "properties": {
+                                                    "rawName": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "normalizedName": {
+                                                        "type": "string",
+                                                        "index": "not_analyzed"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "long"
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "long"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "quantities": {
+                                        "properties": {
+                                            "parsedValue": {
+                                                "type": "double"
+                                            }
+                                        }
+                                    },
+                                    "boundingBoxes": {
+                                        "properties": {
+                                            "w": {
+                                                "type": "double"
+                                            },
+                                            "x": {
+                                                "type": "double"
+                                            },
+                                            "y": {
+                                                "type": "double"
+                                            },
+                                            "h": {
+                                                "type": "double"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "$TEI": {
+                "properties": {
+                    "$teiHeader": {
+                        "properties": {
+                            "$revisionDesc": {
+                                "properties": {
+                                    "when": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    }
+                                }
+                            },
+                            "$fileDesc": {
+                                "properties": {
+                                    "$sourceDesc": {
+                                        "properties": {
+                                            "$biblStruct": {
+                                                "properties": {
+                                                    "$analytic": {
+                                                        "properties": {
+                                                            "$author": {
+                                                                "properties": {
+                                                                    "$note": {
+                                                                        "type": "object",
+                                                                        "enabled": false
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
