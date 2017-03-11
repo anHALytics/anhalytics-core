@@ -358,22 +358,31 @@
                                             "$biblStruct": {
                                                 "properties": {
                                                     "$analytic": {
-                                                        "properties": {
-                                                            "$author": {
-                                                                "properties": {
-                                                                    "$note": {
-                                                                        "type": "object",
+                                                        "type": "object",
                                                                         "enabled": false
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
+                                                    },
+                                                    "$monogr": {
+                                                        "type": "object",
+                                                                        "enabled": false
                                                     }
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "$publicationStmt":{
+                                        "properties": {
+                                         "$date": {
+                                                        "type": "date",
+                  "format": "strict_date_optional_time"
+                                        
+                                        }}
                                 }
+                                }
+                            }
+                            ,
+                            "$profileDesc": {
+                                "type": "object",
+                                                                        "enabled": false
                             }
                         }
                     }
