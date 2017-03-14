@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.harvest.oaipmh;
 
+import fr.inria.anhalytics.harvest.Harvester;
 import fr.inria.anhalytics.commons.data.File;
 import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.commons.data.TEIFile;
@@ -40,7 +41,7 @@ public class HALOAIPMHDomParser {
 
     protected static final Logger logger = LoggerFactory.getLogger(HALOAIPMHDomParser.class);
 
-    public final static String SOURCE = "hal";
+    private final static String source = Harvester.Source.HAL.toString();
 
     private List<TEIFile> teis = new ArrayList<TEIFile>();
     private Document doc;
@@ -83,7 +84,7 @@ public class HALOAIPMHDomParser {
                                 BinaryFile pdffile = getFile(record, Utilities.getHalIDFromHalDocID(completeRepositoryDocId), currentVersion, doi, type);
                                 if(pdffile != null)System.out.println(pdffile.getUrl());
                                 List<BinaryFile> annexes = getAnnexes(record, Utilities.getHalIDFromHalDocID(completeRepositoryDocId), currentVersion, doi, type);
-                                TEIFile teifile = new TEIFile(SOURCE, Utilities.getHalIDFromHalDocID(completeRepositoryDocId), pdffile, annexes, doi, type, tei, currentVersion, "");
+                                TEIFile teifile = new TEIFile(source, Utilities.getHalIDFromHalDocID(completeRepositoryDocId), pdffile, annexes, doi, type, tei, currentVersion, "");
                                 //String ref = getRef(record);
                                 teis.add(teifile);
 
@@ -182,7 +183,7 @@ public class HALOAIPMHDomParser {
                 if (dateNode != null) {
                     embargoDate = dateNode.getAttribute("notBefore");
                 }
-                file = new BinaryFile(SOURCE, url, repositoryDocId, doi , type, "application/pdf", repositoryDocId+".pdf", repositoryDocVersion, "", embargoDate);
+                file = new BinaryFile(source, url, repositoryDocId, doi , type, "application/pdf", repositoryDocId+".pdf", repositoryDocVersion, "", embargoDate);
                 file.setIsAnnexFile(false);
             } else {
                 throw new DataException();
@@ -207,7 +208,7 @@ public class HALOAIPMHDomParser {
             Element node = (Element) nodes.item(i);
             url = node.getAttribute("target");
             embargoDate = ((Element) node.getChildNodes().item(1)).getAttribute("notBefore");
-            BinaryFile annex = new BinaryFile(SOURCE, url, repositoryDocId, doi , type, "", "", repositoryDocVersion, "", embargoDate);
+            BinaryFile annex = new BinaryFile(source, url, repositoryDocId, doi , type, "", "", repositoryDocVersion, "", embargoDate);
             annex.setIsAnnexFile(true);
             annexes.add(annex);
         }
@@ -282,7 +283,7 @@ public class HALOAIPMHDomParser {
     /**
      * Adds data TEI extracted with grobid.
      */
-    private Document createTEICorpus(Document metadataDoc) {
+    public Document createTEICorpus(Document metadataDoc) {
         Document generatedTeiDoc = null;
         try {
             if (metadataDoc != null) {

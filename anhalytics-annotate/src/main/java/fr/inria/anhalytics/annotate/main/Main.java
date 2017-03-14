@@ -93,7 +93,7 @@ public class Main {
             } else if (process.equals("annotateAll")) {
                 annotator.annotate(Annotator_Type.NERD);
                 annotator.annotate(Annotator_Type.KEYTERM);
-            } else if (process.equals("annotateQuantitiesDaily")) {
+            } else if (process.equals("annotateAllQuantities")) {
                 annotator.annotate(Annotator_Type.QUANTITIES);
             } else if (process.equals("annotateQuantitiesFromPDFDaily")) {
                 annotator.annotate(Annotator_Type.PDFQUANTITIES);

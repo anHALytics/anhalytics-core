@@ -3,12 +3,15 @@ package fr.inria.anhalytics.harvest.main;
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.harvest.Harvester;
 import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
+import fr.inria.anhalytics.harvest.auxiliaries.IdListHarvester;
 import fr.inria.anhalytics.harvest.crossref.CrossRef;
 import fr.inria.anhalytics.harvest.crossref.OpenUrl;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
 import fr.inria.anhalytics.harvest.oaipmh.HALOAIPMHHarvester;
 import fr.inria.anhalytics.harvest.teibuild.TeiCorpusBuilderProcess;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.io.IOException;
+import org.xml.sax.SAXException;
 
 /**
  * Main class that implements commands for harvesting, extracting, inserting in
@@ -33,6 +38,7 @@ public class Main {
         {
             add("harvestAll");
             add("harvestDaily");
+            add("harvestHalList");
             add("appendFulltextTei");
             add("appendFulltextTeiDaily");
             //add("fetchEmbargoPublications");
@@ -47,7 +53,7 @@ public class Main {
         }
     };
 
-    public static void main(String[] args) throws UnknownHostException {
+    public static void main(String[] args) throws Exception {
         try {
             HarvestProperties.init("anhalytics.properties");
         } catch (PropertyException exp) {
@@ -70,7 +76,7 @@ public class Main {
         }
     }
 
-    private void processCommand() {
+    private void processCommand() throws Exception {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
@@ -78,15 +84,20 @@ public class Main {
         String process = HarvestProperties.getProcessName();
         GrobidProcess gp = new GrobidProcess();
         TeiCorpusBuilderProcess tcb = new TeiCorpusBuilderProcess();
-        HALOAIPMHHarvester oai = new HALOAIPMHHarvester();
+        //HALOAIPMHHarvester oai = new HALOAIPMHHarvester();
         IstexHarvester ih = new IstexHarvester();
         CrossRef cr = new CrossRef();
         OpenUrl ou = new OpenUrl();
+
+        Harvester harvester = null;
+
         if (process.equals("harvestAll")) {
-            oai.fetchAllDocuments();
+            harvester = new HALOAIPMHHarvester();
+            harvester.fetchAllDocuments();
         } else if (process.equals("harvestDaily")) {
+            harvester = new HALOAIPMHHarvester();
             Utilities.updateDates(todayDate, todayDate);
-            oai.fetchAllDocuments();
+            harvester.fetchAllDocuments();
         } else if (process.equals("appendFulltextTei")) {
             tcb.addFulltextToTEICorpus();
         } else if (process.equals("appendFulltextTeiDaily")) {
@@ -112,10 +123,13 @@ public class Main {
 //        } 
         else if (process.equals("openUrl")) {
             ou.getIstexUrl();
-        }else if (process.equals("istexHarvest")) {
+        } else if (process.equals("istexHarvest")) {
             ih.sample();
-        }else if (process.equals("istexQuantities")) {
+        } else if (process.equals("istexQuantities")) {
         
+        } else if (process.equals("harvestHalList")) {
+            harvester = new IdListHarvester();
+            harvester.fetchAllDocuments();
         }
     }
 
@@ -177,6 +191,13 @@ public class Main {
                     HarvestProperties.setCollection(command);
                     i++;
                     continue;
+                } else if (currArg.equals("-list")) {
+                    String command = pArgs[i + 1];
+
+                    //check collection exists
+                    HarvestProperties.setListFile(command);
+                    i++;
+                    continue;
                 } else if (currArg.equals("--reset")) {
                     HarvestProperties.setReset(true);
                     i++;
@@ -196,6 +217,8 @@ public class Main {
         help.append("-h: displays help\n");
         help.append("-dOAI: url of the OAI-PMH service\n");
         help.append("-set: select a specific set (INRIA, CNRS..), the available sets are for instance : https://api.archives-ouvertes.fr/oai/hal/?verb=ListSets \n");
+        help.append("-list: give a file with a list of HAL id to harvest, one HAL ID per line \n");
+        help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-dUntilDate: filter until date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-exe: gives the command to execute. The value should be one of these : \n");

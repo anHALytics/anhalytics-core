@@ -40,9 +40,10 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
     @Override
     protected void processCommand() {
 
-            // get all the elements having an attribute id and annotate their text content
-            mm.insertAnnotation(annotateDocument(), annotationsCollection);
-            logger.info("\t\t " + Thread.currentThread().getName() + ": " + file.getRepositoryDocId() + " annotated by the QUANTITIES service.");
+        // get all the elements having an attribute id and annotate their text content
+        mm.insertAnnotation(annotateDocument(), annotationsCollection);
+        logger.info("\t\t " + Thread.currentThread().getName() + ": " + 
+            file.getRepositoryDocId() + " annotated by the QUANTITIES service.");
            
     }
 
@@ -62,14 +63,15 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
         }
         
         StringBuffer json = new StringBuffer();
-            json.append("{ \"repositoryDocId\" : \"" + istexBinaryfile.getRepositoryDocId()
-                    + "\", \"category\" :\"" + istexBinaryfile.getCategory()
-                    + "\", \"quantities\" : ");
+            json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId() 
+                    + "\", \"category\" :\"" + "titi"
+                    + "\", \"quantities\" : [ ");
             
             //check if any thing was added, throw exception if not (not insert entry)
         annotateNode(docTei.getDocumentElement(), true, json, null);
-        json.append("] }");
-           return json.toString();
+        json.append("] }");      
+        
+        return json.toString();
     }
     
      /**

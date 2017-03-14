@@ -24,10 +24,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Harvests metadata&pdf from istex and stores it.
+ * Harvest metadata and pdf from istex and stores it.
  *
  * @author achraf
  */
+
+/* note: extend Harvester */
+
 public class IstexHarvester {
 
     protected static final Logger logger = LoggerFactory.getLogger(IstexHarvester.class);

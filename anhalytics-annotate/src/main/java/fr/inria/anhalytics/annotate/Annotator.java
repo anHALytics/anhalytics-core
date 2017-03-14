@@ -51,9 +51,9 @@ public class Annotator {
             if (annotator_type == Annotator_Type.PDFQUANTITIES) {
                 annotatePDFQuantitiesCollection();
             } else if (AnnotateProperties.isIsMultiThread()) {
-                if (annotator_type == Annotator_Type.QUANTITIES) {
+                /*if (annotator_type == Annotator_Type.QUANTITIES) {
                     annotateQuantitiesTeiCollectionMultiThreaded();
-                } else {
+                } else */{
                     annotateTeiCollectionMultiThreaded(annotator_type);
                 }
             } else {
@@ -131,6 +131,7 @@ public class Annotator {
             teiCollection = MongoCollectionsInterface.GROBID_TEIS;
         } else if (annotator_type == Annotator_Type.QUANTITIES) {
             annotationsCollection = MongoCollectionsInterface.QUANTITIES_ANNOTATIONS;
+            teiCollection = MongoCollectionsInterface.GROBID_TEIS;
         } else {
             throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
         }
@@ -201,6 +202,7 @@ public class Annotator {
             teiCollection = MongoCollectionsInterface.GROBID_TEIS;
         } else if (annotator_type == Annotator_Type.QUANTITIES) {
             annotationsCollection = MongoCollectionsInterface.QUANTITIES_ANNOTATIONS;
+            teiCollection = MongoCollectionsInterface.GROBID_TEIS;
         } else {
             throw new AnnotatorNotAvailableException("type of annotations not supported: " + annotator_type);
         }
@@ -237,8 +239,10 @@ public class Annotator {
                             Runnable worker = null;
                             if (annotator_type == Annotator_Type.NERD) {
                                 worker = new NerdAnnotatorWorker(mm, tei, date);
-                            } else {
+                            } else if (annotator_type == Annotator_Type.KEYTERM) {
                                 worker = new KeyTermAnnotatorWorker(mm, tei, date);
+                            } else if (annotator_type == Annotator_Type.QUANTITIES) {
+                                worker = new QuantitiesAnnotatorWorker(mm, tei, date);
                             }
 
                             executor.execute(worker);
@@ -268,7 +272,9 @@ public class Annotator {
             nbThreads = AnnotateProperties.getNerdNbThreads();
         } else if (annotator_type == annotator_type.KEYTERM) {
             nbThreads = AnnotateProperties.getKeytermNbThreads();
-        }
+        } else if (annotator_type == annotator_type.QUANTITIES) {
+            nbThreads = AnnotateProperties.getQuantitiesNbThreads();
+        } 
         ThreadPoolExecutor executor = new ThreadPoolExecutor(nbThreads, nbThreads, 60000,
                 TimeUnit.MILLISECONDS, blockingQueue);
 

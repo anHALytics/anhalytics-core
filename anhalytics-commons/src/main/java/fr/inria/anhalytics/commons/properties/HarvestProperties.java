@@ -36,7 +36,8 @@ public class HarvestProperties {
 
     private static int nbThreads = 1;
     
-        
+    private static String listFile;
+
     private static String crossrefId;
     private static String crossrefPwd;
     private static String crossrefHost;
@@ -173,6 +174,20 @@ public class HarvestProperties {
      */
     public static void setTmpPath(String tmppath) {
         tmpPath = tmppath;
+    }
+
+    /**
+     * @return the path of a file giving the list of HAL ID to be harvested
+     */
+    public static String getListFile() {
+        return listFile;
+    }
+
+    /**
+     * @param list the path of a file giving the list of HAL ID to be harvested
+     */
+    public static void setListFile(String list) {
+        listFile = list;
     }
 
     /**

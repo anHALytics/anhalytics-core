@@ -7,6 +7,9 @@ import org.w3c.dom.NodeList;
  *
  * @author Achraf
  */
+
+/* to be reviewed and moved !!*/
+
 public interface OAIPMHPathsItf {
     public final static String ListRecordsElement = "ListRecords";
     public final static String RecordElement = "record";
@@ -19,9 +22,9 @@ public interface OAIPMHPathsItf {
     public final static String EditionElement = "metadata/TEI/text/body/listBibl/biblFull/editionStmt/edition[@type='current']";
     public final static String RefPATH = "metadata/TEI/text/body/listBibl/biblFull/publicationStmt/idno[@type='halRef']";
     public final static String DoiPATH = "metadata/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct/idno[@type='doi']";
-    
-    enum ConsideredTypes {
 
+    /* note: these are HAL specific types */    
+    enum ConsideredTypes {
         ART, COMM, OUV, POSTER, DOUV, PATENT, REPORT, THESE, HDR, LECTURE, COUV, OTHER, UNDEFINED  //IMG, VIDEO, AUDIOS, SON, MAP
     };
 }

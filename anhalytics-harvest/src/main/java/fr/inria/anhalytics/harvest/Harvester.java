@@ -1,62 +1,77 @@
-package fr.inria.anhalytics.harvest.oaipmh;
+package fr.inria.anhalytics.harvest;
 
-import fr.inria.anhalytics.commons.data.BinaryFile;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.data.TEIFile;
+import fr.inria.anhalytics.commons.data.BinaryFile;
+import fr.inria.anhalytics.harvest.exceptions.BinaryNotAvailableException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
-import fr.inria.anhalytics.commons.managers.MongoFileManager;
-import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-//import fr.inria.anhalytics.harvest.HarvesterItf;
-import fr.inria.anhalytics.harvest.Harvester;
-import fr.inria.anhalytics.harvest.exceptions.BinaryNotAvailableException;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Date;
+import java.text.ParseException;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
+import java.net.MalformedURLException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
 
 /**
- * Process a list of TEI objects extracted from OAI-PMH services.
+ * Abstract class for all harvester of the system. A particular harvester will
+ * implement a specific harvesting and/or loading protocol for the acquisition 
+ * of bibliographical objects (e.g. an article with all its associated resources
+ * such as PDF, TEI, metadata header, annexes, suppplementary information), 
+ * possibly among several versions (because we are also addressing prepring archives).
  *
- * @author Achraf
  */
+public abstract class Harvester {
 
-/* note: class to be removed. or move here what is OAI-PMH specific (e.g. resumption token mechanism) if doable independently from HAL OAI-PMH */
+	protected static final Logger logger = LoggerFactory.getLogger(Harvester.class);
 
-public abstract class OAIPMHHarvester extends Harvester {
+	// Source of the harvesting
+	public enum Source {
+		HAL		("hal"),
+		ISTEX	("istex"),
+		ARXIV	("arxiv");
+		
+		private String name;
 
-    protected static final Logger logger = LoggerFactory.getLogger(OAIPMHHarvester.class);
+		private Source(String name) {
+          	this.name = name;
+		}
 
-    protected String oai_url = null;
+		public String getName() {
+			return name;
+		}
+	};
 
-    public OAIPMHHarvester() {
-        super();
-        //this.mm = MongoFileManager.getInstance(false);
-        this.oai_url = HarvestProperties.getApiUrl();
-//        if(this.oai_url.isEmpty() || this.oai_url == null)
-//            throw new PropertyException("No API URL is found, check the properties file.");
-    }
+	protected Source source = null;
+	protected MongoFileManager mm = null;
 
-    //protected MongoFileManager mm;
+	public Harvester() {
+		this.mm = MongoFileManager.getInstance(false);
+	}
 
-    /**
-     * Harvests the documents submitted on the given date.
-     */
-    protected void fetchDocumentsByDate(String date) throws IOException, SAXException, ParserConfigurationException, ParseException {
-    }
+	abstract public void fetchAllDocuments() throws IOException, SAXException, ParserConfigurationException, ParseException;
 
-    /**
+	public Source getSource() {
+		return source;
+	}
+
+	public void setSource(Source source) {
+		this.source = source;
+	}
+
+	/**
      * Stores the given teis and downloads attachements(main file(s), annexes
      * ..) .
      */
-    /*protected void processTeis(List<TEIFile> teis, String date, boolean withAnnexes) {
+    protected void processTeis(List<TEIFile> teis, String date, boolean withAnnexes) {
+    	if ( (teis == null) || (teis.size() == 0) )
+    		return;
         for (TEIFile tei : teis) {
             String teiString = tei.getTei();
             String pdfUrl = "";
@@ -90,24 +105,14 @@ public abstract class OAIPMHHarvester extends Harvester {
                 logger.info("\t\t\t No TEI metadata !!!");
             }
         }
-    }*/
+    }
 
-    /**
-     * Downloads publication annexes and stores them.
-     */
-    /*protected void downloadAnnexes(List<BinaryFile> annexes, String date) throws ParseException, IOException {
-        //annexes
-        for (BinaryFile file : annexes) {
-            requestFile(file, date);
-            // diagnose annexes (not found)?
-        }
-    }*/
 
-    /**
+     /**
      * Requests the given file if is not under embargo and register it either as
      * main file or as an annex.
      */
-    /*protected boolean requestFile(BinaryFile bf, String date) throws ParseException, IOException {
+    protected boolean requestFile(BinaryFile bf, String date) throws ParseException, IOException {
         Date embDate = Utilities.parseStringDate(bf.getEmbargoDate());
         Date today = new Date();
         if (embDate.before(today) || embDate.equals(today)) {
@@ -140,5 +145,16 @@ public abstract class OAIPMHHarvester extends Harvester {
             logger.info("\t\t\t file under embargo !");
             return false;
         }
-    }*/
+    }
+
+    /**
+     * Downloads publication annexes and stores them.
+     */
+    protected void downloadAnnexes(List<BinaryFile> annexes, String date) throws ParseException, IOException {
+        //annexes
+        for (BinaryFile file : annexes) {
+            requestFile(file, date);
+            // diagnose annexes (not found)?
+        }
+    }
 }

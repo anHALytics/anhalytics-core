@@ -111,10 +111,13 @@ public class QuantitiesService extends AnnotateService {
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; charset=utf8");
 
-            ObjectMapper mapper = new ObjectMapper();
+            /*ObjectMapper mapper = new ObjectMapper();
             ObjectNode node = mapper.createObjectNode();
             node.put("text", input);
-            byte[] postDataBytes = node.toString().getBytes("UTF-8");
+            byte[] postDataBytes = node.toString().getBytes("UTF-8");*/
+
+            String piece = "text="+input;
+            byte[] postDataBytes = piece.getBytes("UTF-8");
 
             OutputStream os = conn.getOutputStream();
             os.write(postDataBytes);

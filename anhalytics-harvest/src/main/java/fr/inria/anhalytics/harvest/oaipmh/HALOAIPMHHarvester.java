@@ -8,6 +8,7 @@ import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -113,4 +114,5 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
     public void setOaiDom(HALOAIPMHDomParser oaiDom) {
         this.oaiDom = oaiDom;
     }
+
 }
