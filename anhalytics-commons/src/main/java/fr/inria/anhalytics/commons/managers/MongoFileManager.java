@@ -388,6 +388,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      */
     public boolean insertAnnotation(String json, String annotationsCollection) {
         boolean done = false;
+        if ( (json == null) || (json.length() == 0) ) {
+            // there is nothing to insert, so we can assume that we are effectively doing
+            // nothing
+            return true;
+        }
         try {
             DBCollection c = null;
             c = db.getCollection(annotationsCollection);
@@ -409,14 +414,14 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return done;
     }
     
-    public boolean insertQuantitiesAnnotation(String json, String annotationsCollection) {
+    /*public boolean insertQuantitiesAnnotation(String json, String annotationsCollection) {
         boolean done = false;
         try {
             DBCollection c = null;
             c = db.getCollection(annotationsCollection);
             BasicDBObject index = new BasicDBObject();
             index.put("repositoryDocId", 1);
-            index.put("category", 1);
+            //index.put("category", 1);
             c.ensureIndex(index, "index", true);
             DBObject dbObject = (DBObject) JSON.parse(json);
             WriteResult result = c.insert(dbObject);
@@ -430,7 +435,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             logger.error(e.getMessage(), e.getCause());
         }
         return done;
-    }
+    }*/
 
     /**
      * Inserts generated tei using GridFS.

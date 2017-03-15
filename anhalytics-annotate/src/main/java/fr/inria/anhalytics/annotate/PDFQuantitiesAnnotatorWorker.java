@@ -1,7 +1,6 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.services.PDFQuantitiesService;
-import fr.inria.anhalytics.commons.data.IstexFile;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
@@ -29,6 +28,16 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
 
     @Override
     protected void processCommand() {
+        // get all the elements having an attribute id and annotate their text content
+        mm.insertAnnotation(annotateDocument(), annotationsCollection);
+        logger.info("\t\t " + Thread.currentThread().getName() + ": " + 
+            file.getRepositoryDocId() + " annotated by the QUANTITIES service.");
+           
+    }
+
+    @Override
+    protected String annotateDocument() {
+        StringBuffer json = new StringBuffer();
         try {
             /*String filepath = Utilities.storeTmpFile(((IstexFile)file).getStream());
             try {
@@ -37,15 +46,14 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
                 throw new DataException("File stream can't be closed.", ex);
             }*/
 
-            StringBuffer json = new StringBuffer();
             json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId()
  //                   + "\", \"category\" :\"" + ((IstexFile)file).getCategory()
-                    + "\", \"quantities\" : ");
+                    + "\", \"measurements\" : ");
             String jsonText = null;
             //QuantitiesService quantitiesService = new QuantitiesService(filepath);
             if (((TEIFile)file).getPdfdocument() == null) {
                 logger.info("\t\t " + Thread.currentThread().getName() + " PDF not found for " + file.getRepositoryDocId());
-                return;
+                return null;
             }
 
             PDFQuantitiesService quantitiesService = new PDFQuantitiesService(((TEIFile)file).getPdfdocument().getStream());
@@ -55,17 +63,11 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
             } else {
                 json.append("{} }");
             }
-            mm.insertQuantitiesAnnotation(json.toString(), annotationsCollection);
-            logger.info("\t\t " + Thread.currentThread().getName() + " annotated by the Quantities extraction.");
         } catch (Exception ex) {
             logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: ");
             ex.printStackTrace();
         }
-    }
-
-    @Override
-    protected String annotateDocument() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return json.toString();
     }
 
 }

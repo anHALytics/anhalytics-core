@@ -1,7 +1,6 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.services.QuantitiesService;
-import fr.inria.anhalytics.commons.data.IstexFile;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
@@ -29,13 +28,10 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(QuantitiesAnnotatorWorker.class);
 
-    protected IstexFile istexBinaryfile;
-
     public QuantitiesAnnotatorWorker(MongoFileManager mongoManager,
             TEIFile tei,
             String date) {
         super(mongoManager, tei, null, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
-        this.istexBinaryfile = istexBinaryfile;
     }
 
     @Override
@@ -66,7 +62,7 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
         StringBuffer json = new StringBuffer();
             json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId() 
  //                   + "\", \"category\" :\"" + "titi"
-                    + "\", \"quantities\" : [ ");
+                    + "\", \"measurements\" : [ ");
             
             //check if any thing was added, throw exception if not (not insert entry)
         annotateNode(docTei.getDocumentElement(), true, json, null);
