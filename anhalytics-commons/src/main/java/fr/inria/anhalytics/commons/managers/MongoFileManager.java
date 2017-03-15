@@ -154,8 +154,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
     }
     
-    public boolean initQuantitiesAnnotations() throws MongoException {
-    collection = getCollection(MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
+    /*public boolean initQuantitiesAnnotations() throws MongoException {
+        collection = getCollection(MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
         // index on filename and xml:id
         BasicDBObject index = new BasicDBObject();
         index.put("repositoryDocId", 1);
@@ -170,7 +170,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         } else {
             return false;
         }
-    }
+    }*/
 
     /**
      * This initializes cursor for tei generated collection.
@@ -298,7 +298,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return annotation;
     }
     
-    public Annotation nextQuantitiesAnnotation() {
+    /*public Annotation nextQuantitiesAnnotation() {
         DBObject obj = cursor.next();
         Annotation annotation = new Annotation(obj.toString(), (String) obj.get("repositoryDocId"), (String) obj.get("repositoryDocId"));
         if (!cursor.hasNext()) {
@@ -306,7 +306,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
         indexFile++;
         return annotation;
-    }
+    }*/
 
     public TEIFile nextTeiDocument() {
         InputStream teiStream = null;

@@ -424,9 +424,11 @@ public class DocumentIndexer extends Indexer {
         int bulkSize = 200;
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         bulkRequest.setRefresh(true);
-        if (mm.initQuantitiesAnnotations()) {
+        //if (mm.initQuantitiesAnnotations()) {
+        if (mm.initAnnotations(null, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS)) {
             while (mm.hasMore()) {
-                Annotation annotation = mm.nextQuantitiesAnnotation();
+                //Annotation annotation = mm.nextQuantitiesAnnotation();
+                Annotation annotation = mm.nextAnnotation();
                 if (annotation.getAnhalyticsId() == null || annotation.getAnhalyticsId().isEmpty()) {
                     logger.info("skipping " + annotation.getRepositoryDocId() + " No anHALytics id provided");
                     continue;
