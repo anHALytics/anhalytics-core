@@ -22,8 +22,12 @@ public class IndexProperties {
     private static String nerdAnnotsTypeName = "nerd";
     private static String keytermAnnotsIndexName = "annotations_keyterm";
     private static String keytermAnnotsTypeName = "keyterm";
+    private static String quantitiesAnnotsIndexName = "annotations_quantities";
+    private static String quantitiesAnnotsTypeName = "quantities";
+
     private static String fulltextTeisIndexName  = "anhalytics_fulltextteis_in";
     private static String fulltextTeisTypeName = "npl";
+
     private static String metadataTeisIndexName  = "anhalytics_metadatateis";
     private static String kbIndexName = "anhalytics_kb"; // to be rename, it's not metadata but KB
     private static String kbAuthorsTypeName = "authors"; // to be rename, it's not metadata but KB
@@ -50,6 +54,7 @@ public class IndexProperties {
         setElasticSearchClusterName(props.getProperty("index.elasticSearch_cluster"));
         setNerdAnnotsIndexName(props.getProperty("index.elasticSearch_nerdAnnotsIndexName"));
         setKeytermAnnotsIndexName(props.getProperty("index.elasticSearch_keytermAnnotsIndexName"));
+        setQuantitiesAnnotsIndexName(props.getProperty("index.elasticSearch_quantitiesAnnotsIndexName"));
         setFulltextTeisIndexName(props.getProperty("index.elasticSearch_fulltextTeisIndexName"));
         setMetadataTeisIndexName(props.getProperty("index.elasticSearch_metadataTeisIndexName"));
         setKbIndexName(props.getProperty("index.elasticSearch_kbIndexName"));
@@ -148,6 +153,19 @@ public class IndexProperties {
         keytermAnnotsIndexName = aKeytermAnnotsIndexName;
     }
 
+    /**
+     * @return the grobid-quantities annotation index name
+     */
+    public static String getQuantitiesAnnotsIndexName() {
+        return quantitiesAnnotsIndexName;
+    }
+
+    /**
+     * @param aQuantitiesAnnotsIndexName the grobid-quantities annotation index name to set
+     */
+    public static void setQuantitiesAnnotsIndexName(String aQuantitiesAnnotsIndexName) {
+        quantitiesAnnotsIndexName = aQuantitiesAnnotsIndexName;
+    }
 
     /**
      * @return the fromDate
@@ -259,6 +277,20 @@ public class IndexProperties {
      */
     public static void setKeytermAnnotsTypeName(String aKeytermAnnotsTypeName) {
         keytermAnnotsTypeName = aKeytermAnnotsTypeName;
+    }
+
+    /**
+     * @return the quantitiesAnnotsTypeName
+     */
+    public static String getQuantitiesAnnotsTypeName() {
+        return quantitiesAnnotsTypeName;
+    }
+
+    /**
+     * @param aQuantitiesAnnotsTypeName the quantitiesAnnotsTypeName to set
+     */
+    public static void setQuantitiesAnnotsTypeName(String aQuantitiesAnnotsTypeName) {
+        quantitiesAnnotsTypeName = aQuantitiesAnnotsTypeName;
     }
 
     /**

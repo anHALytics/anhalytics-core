@@ -28,7 +28,8 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands
-            = Arrays.asList("setup", "indexAll", "indexDaily", "indexMetadata", "indexFulltext", "indexAnnotations", "indexKB", "indexQuantities", "setupQuantitiesIndex");
+            = Arrays.asList("setup", "indexAll", "indexDaily", "indexMetadata", "indexFulltext", 
+                "indexAnnotations", "indexKB", "setupQuantitiesIndex");
 
     public static void main(String[] args) throws UnknownHostException {
 
@@ -186,6 +187,18 @@ public class Main {
                     int nbKeytermAnnot = esm.indexKeytermAnnotations();
                     logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 }
+
+                try {
+                    int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
+                    logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getQuantitiesAnnotsIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getQuantitiesAnnotsIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getQuantitiesAnnotsIndexName());
+                    int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
+                    logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
+                }
+
 //KB indexing
             } else if (process.equals("indexDaily")) {
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -236,6 +249,18 @@ public class Main {
                     int nbKeytermAnnot = esm.indexKeytermAnnotations();
                     logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 }
+
+                try {
+                    int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
+                    logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getQuantitiesAnnotsIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getQuantitiesAnnotsIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getQuantitiesAnnotsIndexName());
+                    int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
+                    logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
+                }
+
                 // TBD: daily KB refresh and indexing ?
             } else if (process.equals("indexFulltext")) {
                 try {
@@ -281,6 +306,17 @@ public class Main {
                     int nbKeytermAnnot = esm.indexKeytermAnnotations();
                     logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 }
+
+                try {
+                    int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
+                    logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getQuantitiesAnnotsIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getQuantitiesAnnotsIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getQuantitiesAnnotsIndexName());
+                    int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
+                    logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
+                }
             } else if (process.equals("indexKB")) {
                 KnowledgeBaseIndexer mi = new KnowledgeBaseIndexer(); // this is the KB in fact !
                 try {
@@ -308,7 +344,7 @@ public class Main {
                     sqle.printStackTrace();
                 }
                 mi.close();
-            } else if (process.equals("indexQuantities")) {
+            } /*else if (process.equals("indexQuantities")) {
                 try {
                 int nbDocs = esm.indexIstexQuantites();
                 } catch (Exception sqle) {
@@ -317,7 +353,7 @@ public class Main {
             } else if (process.equals("setupQuantitiesIndex")) {
             
             esm.setupQuantitiesIndex();
-            }
+            }*/
             esm.close();
 
         } catch (ServiceException se) {

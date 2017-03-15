@@ -38,7 +38,9 @@ abstract class Indexer {
             Settings settings = Settings.settingsBuilder()
                     .put("cluster.name", IndexProperties.getElasticSearchClusterName()).build();
             this.client = TransportClient.builder().settings(settings).build()
-                    .addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(IndexProperties.getElasticSearch_host(), Integer.parseInt(IndexProperties.getElasticSearch_port()))));
+                    .addTransportAddress(new InetSocketTransportAddress(
+                        new InetSocketAddress(IndexProperties.getElasticSearch_host(), 
+                            Integer.parseInt(IndexProperties.getElasticSearch_port()))));
             int nodes = this.client.connectedNodes().size();
             if (nodes == 0) {
                 throw new ServiceException("Cannot find elasticsearch cluster.");

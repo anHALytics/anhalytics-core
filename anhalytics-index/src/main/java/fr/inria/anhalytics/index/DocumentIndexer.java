@@ -52,7 +52,7 @@ public class DocumentIndexer extends Indexer {
         this.indexingPreprocess = new IndexingPreprocess(this.mm);
     }
 
-    public int indexIstexQuantites() throws XPathExpressionException, JSONException {
+    /*public int indexIstexQuantites() throws XPathExpressionException, JSONException {
         int nb = 0;
 
         int bulkSize = 100;
@@ -109,7 +109,7 @@ public class DocumentIndexer extends Indexer {
             }
         }
         return nb;
-    }
+    }*/
 
     /**
      * Indexing of the document collection in ElasticSearch
@@ -403,6 +403,48 @@ public class DocumentIndexer extends Indexer {
             if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item	
                 logger.error(bulkResponse.buildFailureMessage());
+            }
+        }
+        return nb;
+    }
+
+    /**
+     * Indexing of the grobid-quantities annotations in ElasticSearch
+     */
+    public int indexQuantitiesAnnotations() {
+        int nb = 0;
+        int bulkSize = 200;
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
+        bulkRequest.setRefresh(true);
+        if (mm.initQuantitiesAnnotations()) {
+            while (mm.hasMore()) {
+                Annotation annotation = mm.nextQuantitiesAnnotation();
+                if (annotation.getAnhalyticsId() == null || annotation.getAnhalyticsId().isEmpty()) {
+                    logger.info("skipping " + annotation.getRepositoryDocId() + " No anHALytics id provided");
+                    continue;
+                }
+
+                try {
+                    // index the json in ElasticSearch
+                    // beware the document type bellow and corresponding mapping!
+                    bulkRequest.add(client.prepareIndex(
+                            IndexProperties.getQuantitiesAnnotsIndexName(), IndexProperties.getQuantitiesAnnotsTypeName(),
+                            annotation.getAnhalyticsId()).setSource(annotation.getJson()));
+
+                    nb++;
+                    if (nb % bulkSize == 0) {
+                        BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                        if (bulkResponse.hasFailures()) {
+                            // process failures by iterating through each bulk response item    
+                            logger.error(bulkResponse.buildFailureMessage());
+                        }
+                        bulkRequest = client.prepareBulk();
+                        bulkRequest.setRefresh(true);
+                        logger.info("\n Bulk number : " + nb / bulkSize);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         return nb;
