@@ -66,6 +66,8 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
         
         StringBuffer json = new StringBuffer();
             json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId() 
+                    + "\",\"anhalyticsId\" : \"" + file.getAnhalyticsId()
+                    + "\", \"date\" :\"" + date
  //                   + "\", \"category\" :\"" + "titi"
                     + "\", \"annotation\" : [ ");
             

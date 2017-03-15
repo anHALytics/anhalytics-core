@@ -353,12 +353,13 @@ public class Utilities {
     }
 
     public static String getHalIDFromHalDocID(String halDocID) {
+        if ( (halDocID == null) || (halDocID.length() == 0) ) 
+            return "";
         int ind = halDocID.indexOf("v");
-        String halID = "";
-        if (ind > -1) {
-            halID = halDocID.substring(0, ind);
-        }
-        return halID;
+        if (ind != -1) {
+            return halDocID.substring(0, ind);
+        } else
+            return halDocID;
     }
 
     public static String getVersionFromURI(String uri) {
