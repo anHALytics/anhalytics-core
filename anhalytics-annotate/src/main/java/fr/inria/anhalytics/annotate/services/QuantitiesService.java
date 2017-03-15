@@ -29,71 +29,10 @@ public class QuantitiesService extends AnnotateService {
 
     private static final Logger logger = LoggerFactory.getLogger(QuantitiesService.class);
 
-    static private String REQUEST_PDF_QUANTITIES = "annotateQuantityPDF";
-
     static private String REQUEST_TEXT_QUANTITIES = "processQuantityText";
 
-    public QuantitiesService(String input) {
+    public QuantitiesService(InputStream input) {
         super(input);
-    }
-
-    /**
-     * Call the Quantities full text annotation service on server.
-     *
-     * @return the resulting annotation in JSON
-     */
-    public String processPDFQuantities() {
-        StringBuffer output = new StringBuffer();
-        try {
-            URL url = new URL("http://" + AnnotateProperties.getQuantitiesHost()
-                    + (AnnotateProperties.getQuantitiesPort().isEmpty() ? "" : ":" + AnnotateProperties.getQuantitiesPort()) + "/" + REQUEST_PDF_QUANTITIES);
-            logger.info("http://" + AnnotateProperties.getQuantitiesHost()
-                    + (AnnotateProperties.getQuantitiesPort().isEmpty() ? "" : ":" + AnnotateProperties.getQuantitiesPort()) + "/" + REQUEST_PDF_QUANTITIES);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(true);
-            conn.setRequestMethod("POST");
-            logger.info("Processing : "+input);
-            FileBody fileBody = new FileBody(new File(input));
-            MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.STRICT);
-            multipartEntity.addPart("input", fileBody);
-
-            conn.setRequestProperty("Content-Type", multipartEntity.getContentType().getValue());
-            OutputStream out = conn.getOutputStream();
-            try {
-                multipartEntity.writeTo(out);
-            } finally {
-                out.close();
-            }
-            if (conn.getResponseCode() == HttpURLConnection.HTTP_UNAVAILABLE) {
-                throw new HttpRetryException("Failed : HTTP error code : "
-                        + conn.getResponseCode(), conn.getResponseCode());
-            }
-
-            //int status = connection.getResponseCode();
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode() + " " + IOUtils.toString(conn.getErrorStream(), "UTF-8"));
-            }
-            logger.info("Response "+conn.getResponseCode());
-            InputStream in = conn.getInputStream();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader((in)));
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                output.append(line);
-                output.append(" ");
-            }
-
-            IOUtils.closeQuietly(in);
-            conn.disconnect();
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //System.out.println(output.toString().trim());
-        return output.toString().trim();
     }
 
     /**
@@ -116,7 +55,8 @@ public class QuantitiesService extends AnnotateService {
             node.put("text", input);
             byte[] postDataBytes = node.toString().getBytes("UTF-8");*/
 
-            String piece = "text="+input;
+            String inputString = IOUtils.toString(input, "UTF-8");
+            String piece = "text="+inputString;
             byte[] postDataBytes = piece.getBytes("UTF-8");
 
             OutputStream os = conn.getOutputStream();

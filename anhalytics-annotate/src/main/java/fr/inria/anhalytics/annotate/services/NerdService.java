@@ -8,12 +8,14 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.codehaus.jackson.node.*;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Call of Nerd process via its REST web services.
@@ -28,9 +30,9 @@ public class NerdService extends AnnotateService {
 
     static private String REQUEST = "processERDQuery";
 
-    public NerdService(String input, String language) {
+    public NerdService(InputStream input, String language) {
         super(input);
-	this.language = language;
+        this.language = language;
     }
 
     /**
@@ -50,7 +52,8 @@ public class NerdService extends AnnotateService {
 
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode node = mapper.createObjectNode();
-            node.put("text", input);
+            String inputString = IOUtils.toString(input, "UTF-8");
+            node.put("text", inputString);
             ArrayNode dataTable = mapper.createArrayNode();
             dataTable.add("fr");
             dataTable.add("de");

@@ -1,6 +1,6 @@
 package fr.inria.anhalytics.annotate;
 
-import fr.inria.anhalytics.annotate.services.QuantitiesService;
+import fr.inria.anhalytics.annotate.services.PDFQuantitiesService;
 import fr.inria.anhalytics.commons.data.IstexFile;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.DataException;
@@ -11,6 +11,7 @@ import fr.inria.anhalytics.commons.data.File;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -29,21 +30,25 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
     @Override
     protected void processCommand() {
         try {
-
-            String filepath = Utilities.storeTmpFile(((IstexFile)file).getStream());
-
+            /*String filepath = Utilities.storeTmpFile(((IstexFile)file).getStream());
             try {
                 ((IstexFile)file).getStream().close();
             } catch (IOException ex) {
                 throw new DataException("File stream can't be closed.", ex);
-            }
+            }*/
 
             StringBuffer json = new StringBuffer();
-            json.append("{ \"repositoryDocId\" : \"" + ((IstexFile)file).getRepositoryDocId()
-                    + "\", \"category\" :\"" + ((IstexFile)file).getCategory()
+            json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId()
+ //                   + "\", \"category\" :\"" + ((IstexFile)file).getCategory()
                     + "\", \"quantities\" : ");
             String jsonText = null;
-            QuantitiesService quantitiesService = new QuantitiesService(filepath);
+            //QuantitiesService quantitiesService = new QuantitiesService(filepath);
+            if (((TEIFile)file).getPdfdocument() == null) {
+                logger.info("\t\t " + Thread.currentThread().getName() + " PDF not found for " + file.getRepositoryDocId());
+                return;
+            }
+
+            PDFQuantitiesService quantitiesService = new PDFQuantitiesService(((TEIFile)file).getPdfdocument().getStream());
             jsonText = quantitiesService.processPDFQuantities();
             if (jsonText != null) {
                 json.append(jsonText).append("}");

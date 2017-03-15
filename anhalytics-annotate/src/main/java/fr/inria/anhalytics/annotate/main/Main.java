@@ -34,7 +34,7 @@ public class Main {
             add("annotateKeyTermDaily");
             add("annotateDaily");
             add("annotateAllQuantities");
-            add("annotateQuantitiesFromPDFDaily");
+            add("annotateQuantitiesFromPDF");
         }
     };
 
@@ -95,7 +95,7 @@ public class Main {
                 annotator.annotate(Annotator_Type.KEYTERM);
             } else if (process.equals("annotateAllQuantities")) {
                 annotator.annotate(Annotator_Type.QUANTITIES);
-            } else if (process.equals("annotateQuantitiesFromPDFDaily")) {
+            } else if (process.equals("annotateQuantitiesFromPDF")) {
                 annotator.annotate(Annotator_Type.PDFQUANTITIES);
             }
         } catch (ServiceException se) {

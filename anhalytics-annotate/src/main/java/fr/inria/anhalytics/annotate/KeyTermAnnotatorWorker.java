@@ -5,8 +5,10 @@ import fr.inria.anhalytics.commons.data.File;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
+import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Runnable that uses the NERD REST service for annotating HAL TEI
@@ -71,17 +73,22 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
             }
         }*/
         StringBuffer json = new StringBuffer();
-        json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId()
-                + "\",\"anhalyticsId\" : \"" + file.getAnhalyticsId()
-                + "\", \"date\" :\"" + date
-                + "\", \"keyterm\" : ");
-        String jsonText = null;
-        KeyTermExtractionService keyTermService = new KeyTermExtractionService(((TEIFile)file).getTei());
-        jsonText = keyTermService.runKeyTermExtraction();
-        if (jsonText != null) {
-            json.append(jsonText).append("}");
-        } else {
-            json.append("{} }");
+        try {
+            json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId()
+                    + "\",\"anhalyticsId\" : \"" + file.getAnhalyticsId()
+                    + "\", \"date\" :\"" + date
+                    + "\", \"keyterm\" : ");
+            String jsonText = null;
+            KeyTermExtractionService keyTermService = new KeyTermExtractionService(IOUtils.toInputStream(((TEIFile)file).getTei(), "UTF-8"));
+            jsonText = keyTermService.runKeyTermExtraction();
+            if (jsonText != null) {
+                json.append(jsonText).append("}");
+            } else {
+                json.append("{} }");
+            }
+        } catch(IOException e) {
+            logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + file.getRepositoryDocId());
+            e.printStackTrace();
         }
         return json.toString();
     }

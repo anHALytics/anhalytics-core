@@ -8,6 +8,7 @@ import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import java.io.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.net.HttpRetryException;
 import java.net.ConnectException;
@@ -18,6 +19,8 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * Perform a key term extraction for a document and disambiguate the resulting
@@ -33,8 +36,8 @@ public class KeyTermExtractionService extends AnnotateService {
 
     static private String RESOURCEPATH = "processKeyTermArticleTEI";
 
-    public KeyTermExtractionService(String tei) {
-        super(tei);
+    public KeyTermExtractionService(InputStream teiStream) {
+        super(teiStream);
     }
 
     /**
@@ -51,7 +54,10 @@ public class KeyTermExtractionService extends AnnotateService {
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
 
-            StringBody contentBody = new StringBody(input, Charset.forName("UTF-8"));
+            // Note: to be review, we could maybe use the InputStream to stream the file part of the 
+            // multipartEntity without the intermediate String conversion 
+            String inputString = IOUtils.toString(input, "UTF-8");
+            StringBody contentBody = new StringBody(inputString, Charset.forName("UTF-8"));
             MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.STRICT);
             multipartEntity.addPart("file", contentBody);
 

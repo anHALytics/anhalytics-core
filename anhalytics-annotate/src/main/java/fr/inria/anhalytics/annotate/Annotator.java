@@ -48,9 +48,10 @@ public class Annotator {
 
     public void annotate(Annotator_Type annotator_type) {
         try {
-            if (annotator_type == Annotator_Type.PDFQUANTITIES) {
+            /*if (annotator_type == Annotator_Type.PDFQUANTITIES) {
                 annotatePDFQuantitiesCollection();
-            } else if (AnnotateProperties.isIsMultiThread()) {
+            } else */
+            if (AnnotateProperties.isIsMultiThread()) {
                 /*if (annotator_type == Annotator_Type.QUANTITIES) {
                     annotateQuantitiesTeiCollectionMultiThreaded();
                 } else */{
@@ -65,7 +66,7 @@ public class Annotator {
         }
     }
 
-    private void annotatePDFQuantitiesCollection()
+    /*private void annotatePDFQuantitiesCollection()
             throws UnreachableAnnotateServiceException, AnnotatorNotAvailableException {
         try {
             if (AnnotateService.isAnnotateServiceReady(Annotator_Type.PDFQUANTITIES)) {
@@ -76,8 +77,6 @@ public class Annotator {
                         IstexFile istexFile = mm.nextIstexBinaryDocument();
                         Runnable worker = new PDFQuantitiesAnnotatorWorker(mm, istexFile, null);
                         worker.run();
-//                            nb++;
-
                     }
 
                 }
@@ -86,13 +85,13 @@ public class Annotator {
         } finally {
             mm.close();
         }
-    }
+    }*/
 
     /**
      * Annotates quantities tei collection entries with text (multithread
      * process).
      */
-    private void annotateQuantitiesTeiCollectionMultiThreaded() {
+    /*private void annotateQuantitiesTeiCollectionMultiThreaded() {
         try {
             if (AnnotateService.isAnnotateServiceReady(Annotator_Type.QUANTITIES)) {
 
@@ -104,8 +103,6 @@ public class Annotator {
                     TEIFile istexFile = mm.nextIstexTeiDocument();
                     Runnable worker = new QuantitiesAnnotatorWorker(mm, istexFile, null);
                     worker.run();
-//                            nb++;
-
                 }
 
             }
@@ -113,8 +110,7 @@ public class Annotator {
         } finally {
             mm.close();
         }
-
-    }
+    }*/
 
     /**
      * Annotates tei collection entries with fulltext.
@@ -123,6 +119,7 @@ public class Annotator {
             throws UnreachableAnnotateServiceException, AnnotatorNotAvailableException {
         int nb = 0;
         String annotationsCollection = null, teiCollection = null;
+        // Note: why not MongoCollectionsInterface.METADATA_WITHFULLTEXT_TEIS all the time?
         if (annotator_type == Annotator_Type.NERD) {
             annotationsCollection = MongoCollectionsInterface.NERD_ANNOTATIONS;
             teiCollection = MongoCollectionsInterface.METADATA_WITHFULLTEXT_TEIS;
@@ -132,6 +129,9 @@ public class Annotator {
         } else if (annotator_type == Annotator_Type.QUANTITIES) {
             annotationsCollection = MongoCollectionsInterface.QUANTITIES_ANNOTATIONS;
             teiCollection = MongoCollectionsInterface.GROBID_TEIS;
+        } else if (annotator_type == Annotator_Type.PDFQUANTITIES) {
+            annotationsCollection = MongoCollectionsInterface.QUANTITIES_ANNOTATIONS;
+            teiCollection = MongoCollectionsInterface.GROBID_TEIS; 
         } else {
             throw new AnnotatorNotAvailableException("type of annotations not available: " + annotator_type);
         }
@@ -171,6 +171,8 @@ public class Annotator {
                                 worker = new KeyTermAnnotatorWorker(mm, tei, date);
                             } else if (annotator_type == Annotator_Type.QUANTITIES) {
                                 worker = new QuantitiesAnnotatorWorker(mm, tei, date);
+                            } else if (annotator_type == Annotator_Type.PDFQUANTITIES) {
+                                worker = new PDFQuantitiesAnnotatorWorker(mm, tei, date);
                             }
                             worker.run();
                             nb++;
@@ -194,6 +196,7 @@ public class Annotator {
             throws UnreachableAnnotateServiceException, AnnotatorNotAvailableException {
         int nb = 0;
         String annotationsCollection = null, teiCollection = null;
+        // Note: why not MongoCollectionsInterface.METADATA_WITHFULLTEXT_TEIS all the time?
         if (annotator_type == Annotator_Type.NERD) {
             annotationsCollection = MongoCollectionsInterface.NERD_ANNOTATIONS;
             teiCollection = MongoCollectionsInterface.METADATA_WITHFULLTEXT_TEIS;
@@ -203,7 +206,10 @@ public class Annotator {
         } else if (annotator_type == Annotator_Type.QUANTITIES) {
             annotationsCollection = MongoCollectionsInterface.QUANTITIES_ANNOTATIONS;
             teiCollection = MongoCollectionsInterface.GROBID_TEIS;
-        } else {
+        } else if (annotator_type == Annotator_Type.PDFQUANTITIES) {
+            annotationsCollection = MongoCollectionsInterface.QUANTITIES_ANNOTATIONS;
+            teiCollection = MongoCollectionsInterface.GROBID_TEIS; 
+        }else {
             throw new AnnotatorNotAvailableException("type of annotations not supported: " + annotator_type);
         }
         try {
@@ -243,6 +249,8 @@ public class Annotator {
                                 worker = new KeyTermAnnotatorWorker(mm, tei, date);
                             } else if (annotator_type == Annotator_Type.QUANTITIES) {
                                 worker = new QuantitiesAnnotatorWorker(mm, tei, date);
+                            } else if (annotator_type == Annotator_Type.PDFQUANTITIES) {
+                                worker = new PDFQuantitiesAnnotatorWorker(mm, tei, date);
                             }
 
                             executor.execute(worker);

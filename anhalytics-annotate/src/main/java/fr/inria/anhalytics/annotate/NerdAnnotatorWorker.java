@@ -14,6 +14,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Runnable that uses the NERD REST service for annotating HAL TEI
@@ -118,7 +119,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
                 if ((text != null) && (text.trim().length() > 1)) {
                     String jsonText = null;
                     try {
-                        NerdService nerdService = new NerdService(text, language);
+                        NerdService nerdService = new NerdService(IOUtils.toInputStream(text, "UTF-8"), language);
                         jsonText = nerdService.runNerd();
                     } catch (Exception ex) {
                         logger.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by NERD: " + text);

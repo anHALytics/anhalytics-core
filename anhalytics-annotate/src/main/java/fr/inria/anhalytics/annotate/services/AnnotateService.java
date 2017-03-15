@@ -5,23 +5,27 @@ import fr.inria.anhalytics.annotate.Annotator;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.annotate.exceptions.UnreachableAnnotateServiceException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.io.IOUtils;
+
 /**
- * Call of annotate services via its REST web services.
+ * Call of annotate services via its REST web services. Data to be sent to the service 
+ * is given as a stream, which could be textual, xml, PDF or whatever.
  *
- * @author Achraf
  */
 public abstract class AnnotateService {
 
     private static final Logger logger = LoggerFactory.getLogger(AnnotateService.class);
 
-    protected String input = null;
+    //protected String input = null;
+    protected InputStream input = null;
 
-    public AnnotateService(String input) {
+    public AnnotateService(InputStream input) {
         this.input = input;
     }
 

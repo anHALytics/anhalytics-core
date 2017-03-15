@@ -19,6 +19,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -64,7 +65,7 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
         
         StringBuffer json = new StringBuffer();
             json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId() 
-                    + "\", \"category\" :\"" + "titi"
+ //                   + "\", \"category\" :\"" + "titi"
                     + "\", \"quantities\" : [ ");
             
             //check if any thing was added, throw exception if not (not insert entry)
@@ -95,7 +96,7 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
                 if ((text != null) && (text.trim().length() > 1)) {
                     String jsonText = null;
                     try {
-                        QuantitiesService quantitiesService = new QuantitiesService(text);
+                        QuantitiesService quantitiesService = new QuantitiesService(IOUtils.toInputStream(text, "UTF-8"));
                         jsonText = quantitiesService.processTextQuantities();
                     } catch (Exception ex) {
                         logger.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by QUANTITIES: " + text);
