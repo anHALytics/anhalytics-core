@@ -9,8 +9,10 @@ import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.*;
 
 /**

@@ -5,6 +5,7 @@ import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 import com.mongodb.util.JSON;
+
 import fr.inria.anhalytics.commons.data.Annotation;
 import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.commons.data.Identifier;
@@ -13,7 +14,9 @@ import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.exceptions.FileNotFoundException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+
 import org.apache.commons.io.IOUtils;
+
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

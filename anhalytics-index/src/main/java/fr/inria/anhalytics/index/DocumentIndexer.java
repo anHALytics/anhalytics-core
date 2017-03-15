@@ -22,9 +22,17 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.codehaus.jackson.JsonNode;
+
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.io.*;
+
+/*import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
+import org.codehaus.jackson.node.ObjectNode;*/
+
 import org.elasticsearch.action.search.SearchResponse;
 import org.json.JSONException;
 import org.w3c.dom.Document;
@@ -343,11 +351,11 @@ public class DocumentIndexer extends Indexer {
                         JsonNode jn = jsonAnnotation.findPath("nerd");
 
                         JsonNode newNode = mapper.createObjectNode();
-                        Iterator<JsonNode> ite = jn.getElements();
+                        Iterator<JsonNode> ite = jn.elements();
                         while (ite.hasNext()) {
                             JsonNode temp = ite.next();
                             JsonNode idNode = temp.findValue("xml:id");
-                            String xmlID = idNode.getTextValue();
+                            String xmlID = idNode.textValue();
 
                             if (!validIDs.contains(xmlID)) {
                                 continue;
@@ -464,14 +472,14 @@ public class DocumentIndexer extends Indexer {
                 JsonNode hit0 = hits.get(0);
                 if (hit0 != null) {
                     JsonNode fields = hit0.findPath("fields");
-                    Iterator<JsonNode> ite = fields.getElements();
+                    Iterator<JsonNode> ite = fields.elements();
                     while (ite.hasNext()) {
                         JsonNode idNodes = (JsonNode) ite.next();
                         if (idNodes.isArray()) {
-                            Iterator<JsonNode> ite2 = idNodes.getElements();
+                            Iterator<JsonNode> ite2 = idNodes.elements();
                             while (ite2.hasNext()) {
                                 JsonNode node = (JsonNode) ite2.next();
-                                results.add(node.getTextValue());
+                                results.add(node.textValue());
                             }
                         }
                     }

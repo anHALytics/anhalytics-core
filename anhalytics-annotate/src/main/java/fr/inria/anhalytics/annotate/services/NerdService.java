@@ -13,8 +13,16 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.codehaus.jackson.node.*;
-import org.codehaus.jackson.map.ObjectMapper;
+
+/*import org.codehaus.jackson.node.*;
+import org.codehaus.jackson.map.ObjectMapper;*/
+
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.io.*;
+
 import org.apache.commons.io.IOUtils;
 
 /**

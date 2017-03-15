@@ -4,16 +4,21 @@ import fr.inria.anhalytics.annotate.services.NerdService;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.*;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.xml.sax.InputSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
+
+
 import org.apache.commons.io.IOUtils;
 
 /**

@@ -3,6 +3,7 @@ package fr.inria.anhalytics.annotate;
 import fr.inria.anhalytics.commons.data.File;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
