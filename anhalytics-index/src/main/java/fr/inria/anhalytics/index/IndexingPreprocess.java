@@ -20,7 +20,16 @@ import org.w3c.dom.Node;
 /**
  * Additional Java pre-processing of the JSON string.
  *
- * @author PL
+ * First, the TEI structure in JSON is expanded to put some attributes like @lang and @type 
+ * for certain elements in the json path in order to make possible ElasticSearch queries 
+ * with these attributes. All the structures of the TEI will be searchable with TEI paths 
+ * expressed in JSON. Those TEI/JSON paths can be used to query the ElasticSearch indexes 
+ * so that there is no need to learn and define an additional index structure
+ * for full text. 
+ * 
+ * Second, some part of the annotations we want to use for searching documents by combining
+ * of the annotations and the TEI full text structures are injected in the standoff node.  
+ * 
  */
 public class IndexingPreprocess {
 
@@ -42,11 +51,13 @@ public class IndexingPreprocess {
         this.mm = mm;
     }
 
-    // maximum number of keyterm to be indexed
+    // maximum number of annotations to be indexed in combination with the full text TEI structure
     private static final int MAX_INDEXED_KEYTERM = 20;
     private static final int MAX_INDEXED_CONCEPT = 20;
     private static final int MAX_INDEXED_NERD = 50;
     private static int MAX_NERD_INDEXED_PARAGRAPHS = 10;
+    private static int MAX_QUANTITIES_INDEXED_PARAGRAPHS = 200;
+    private static final int MAX_INDEXED_QUANTITIES = 500;
 
     /**
      * Format jsonStr to fit with ES structure.
@@ -67,6 +78,7 @@ public class IndexingPreprocess {
         if ((teiRoot != null) && (!teiRoot.isMissingNode())) {
             JsonNode standoffNode = getStandoffNerd(mapper, anhalyticsId);
             standoffNode = getStandoffKeyTerm(mapper, anhalyticsId, standoffNode);
+            standoffNode = getStandoffQuantities(mapper, anhalyticsId, standoffNode);
             if (standoffNode != null) {
                 ((ArrayNode) teiRoot).add(standoffNode);
             }
@@ -473,6 +485,9 @@ public class IndexingPreprocess {
         }
     }
 
+    /**
+     * Get the (N)ERD annotations and inject them in the document structure in a standoff node
+     */
     public JsonNode getStandoffNerd(ObjectMapper mapper, String anhalyticsId) throws Exception {
         JsonNode standoffNode = null;
         String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.NERD_ANNOTATIONS);
@@ -549,6 +564,9 @@ public class IndexingPreprocess {
         return standoffNode;
     }
 
+    /**
+     * Get the grobid-keyterm annotations and inject them in the document structure in a standoff node
+     */
     public JsonNode getStandoffKeyTerm(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
         String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
         if ((annotation != null) && (annotation.trim().length() > 0)) {
@@ -718,6 +736,57 @@ public class IndexingPreprocess {
                     }
                 }
 
+            }
+        }
+        return standoffNode;
+    }
+
+    /**
+     * Get the grobid quantities annotations and inject them in the document structure in a standoff node
+     */
+    public JsonNode getStandoffQuantities(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
+        String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
+        if ((annotation != null) && (annotation.trim().length() > 0)) {
+            JsonNode jsonAnnotation = mapper.readTree(annotation);
+            if ((jsonAnnotation != null) && (!jsonAnnotation.isMissingNode())) {
+                Iterator<JsonNode> iter0 = jsonAnnotation.getElements();
+                JsonNode annotNode = mapper.createArrayNode();
+                int n = 0;
+                int m = 0;
+                while (iter0.hasNext()
+                        && (n < MAX_QUANTITIES_INDEXED_PARAGRAPHS)
+                        && (m < MAX_INDEXED_QUANTITIES)) {
+                    JsonNode jsonLocalAnnotation = (JsonNode) iter0.next();
+
+                    // we only get what should be searched together with the document metadata and content
+                    // so ignoring coordinates, offsets, ...
+                    JsonNode quantities = jsonLocalAnnotation.findPath("quantities");
+                    JsonNode measurements = quantities.findPath("measurements");
+                    if ((measurements != null) && (!measurements.isMissingNode())) {
+                        Iterator<JsonNode> iter = measurements.getElements();
+
+                        while (iter.hasNext()) {
+                            JsonNode piece = (JsonNode) iter.next();
+
+                            // ...
+
+                            JsonNode newNode = mapper.createArrayNode();
+
+                            // ...
+
+                            ((ArrayNode) annotNode).add(newNode);
+                            m++;
+                        }
+                    }
+                    n++;
+                }
+                JsonNode quantitiesStandoffNode = mapper.createObjectNode();
+                ((ObjectNode) quantitiesStandoffNode).put("$quantities", annotNode);
+
+                JsonNode annotationArrayNode = mapper.createArrayNode();
+                ((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
+
+                ((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
             }
         }
         return standoffNode;
