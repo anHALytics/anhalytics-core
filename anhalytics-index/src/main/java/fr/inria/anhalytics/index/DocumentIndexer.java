@@ -430,7 +430,6 @@ public class DocumentIndexer extends Indexer {
                     bulkRequest.add(client.prepareIndex(
                             IndexProperties.getQuantitiesAnnotsIndexName(), IndexProperties.getQuantitiesAnnotsTypeName(),
                             annotation.getAnhalyticsId()).setSource(annotation.getJson()));
-
                     nb++;
                     if (nb % bulkSize == 0) {
                         BulkResponse bulkResponse = bulkRequest.execute().actionGet();

@@ -79,7 +79,7 @@ abstract class Indexer {
      * set-up ElasticSearch by loading the mapping and river json for the HAL
      * document database
      */
-    public void setupQuantitiesIndex() {
+    /*public void setupQuantitiesIndex() {
         try {
             // delete previous index
             deleteIndex("quantities");
@@ -89,12 +89,12 @@ abstract class Indexer {
             logger.error("Sep-up of ElasticSearch failed for index " + "quantities" + ".", e);
             e.printStackTrace();
         }
-    }
+    }*/
 
     /**
      *
      */
-    public boolean createQuantitiesIndex() {
+    /*public boolean createQuantitiesIndex() {
         boolean val = false;
         if (!client.admin().indices().prepareExists("quantities").execute().actionGet().isExists()) {
             // load custom analyzer
@@ -120,7 +120,7 @@ abstract class Indexer {
         }
         val = true;
         return val;
-    }
+    }*/
 
     /**
      *
