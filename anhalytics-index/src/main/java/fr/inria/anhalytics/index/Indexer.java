@@ -164,6 +164,8 @@ abstract class Indexer {
                 createIndexRequestBuilder.addMapping(IndexProperties.getNerdAnnotsTypeName(), loadMapping(indexName, IndexProperties.getNerdAnnotsTypeName()));
             } else if (indexName.equals(IndexProperties.getKeytermAnnotsIndexName())) {
                 createIndexRequestBuilder.addMapping(IndexProperties.getKeytermAnnotsTypeName(), loadMapping(indexName, IndexProperties.getKeytermAnnotsTypeName()));
+            } else if (indexName.equals(IndexProperties.getQuantitiesAnnotsIndexName())) {
+                createIndexRequestBuilder.addMapping(IndexProperties.getQuantitiesAnnotsTypeName(), loadMapping(indexName, IndexProperties.getQuantitiesAnnotsTypeName()));
             } else if (indexName.equals(IndexProperties.getKbIndexName())) {
                 createIndexRequestBuilder.addMapping(IndexProperties.getKbAuthorsTypeName(), loadMapping(indexName, IndexProperties.getKbAuthorsTypeName()));
                 createIndexRequestBuilder.addMapping(IndexProperties.getKbOrganisationsTypeName(), loadMapping(indexName, IndexProperties.getKbOrganisationsTypeName()));
@@ -200,7 +202,7 @@ abstract class Indexer {
                 } else {
                     mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kbpublications.json"));
                 }
-            } else if (indexName.contains("quantities")) {
+            } else if (indexName.equals(IndexProperties.getQuantitiesAnnotsIndexName())) {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_quantities.json"));
             } else {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl.json"));

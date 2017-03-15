@@ -51,7 +51,7 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
 
             json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId()
  //                   + "\", \"category\" :\"" + ((IstexFile)file).getCategory()
-                    + "\", \"measurements\" : ");
+                    + "\", \"annotation\" : ");
             String jsonText = null;
             //QuantitiesService quantitiesService = new QuantitiesService(filepath);
             if (((TEIFile)file).getPdfdocument() == null) {

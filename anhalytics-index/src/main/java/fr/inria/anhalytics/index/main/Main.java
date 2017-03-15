@@ -138,6 +138,12 @@ public class Main {
                     esm.setUpIndex(IndexProperties.getKeytermAnnotsIndexName());
                 }
 
+                System.out.println("The existing index (" + IndexProperties.getQuantitiesAnnotsIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
+                reponse = sc.nextLine().charAt(0);
+                if (reponse != 'N') {
+                    esm.setUpIndex(IndexProperties.getQuantitiesAnnotsIndexName());
+                }
+
                 System.out.println("The existing index (" + IndexProperties.getKbIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
                 reponse = sc.nextLine().charAt(0);
                 if (reponse != 'N') {

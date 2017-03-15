@@ -67,7 +67,7 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
         StringBuffer json = new StringBuffer();
             json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId() 
  //                   + "\", \"category\" :\"" + "titi"
-                    + "\", \"measurements\" : [ ");
+                    + "\", \"annotation\" : [ ");
             
             //check if any thing was added, throw exception if not (not insert entry)
         annotateNode(docTei.getDocumentElement(), true, json, null);

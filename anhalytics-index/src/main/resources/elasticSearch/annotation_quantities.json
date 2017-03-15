@@ -5,7 +5,7 @@
             "store": true
         },
         "properties": {
-            "quantities": {
+            "annotation": {
                 "properties": {
                     "repositoryDocId": {
                         "type": "string",
@@ -16,10 +16,10 @@
                             "pages": {
                                 "properties": {
                                     "page_height": {
-                                        "type": "long"
+                                        "type": "integer"
                                     },
                                     "page_width": {
-                                        "type": "long"
+                                        "type": "integer"
                                     }
                                 }
                             },
@@ -46,10 +46,10 @@
                                                         "index": "not_analyzed"
                                                     },
                                                     "offsetStart": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     },
                                                     "offsetEnd": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     }
                                                 }
                                             },
@@ -60,10 +60,10 @@
                                                 "type": "double"
                                             },
                                             "offsetStart": {
-                                                "type": "long"
+                                                "type": "integer"
                                             },
                                             "offsetEnd": {
-                                                "type": "long"
+                                                "type": "integer"
                                             },
                                             "quantified": {
                                                 "properties": {
@@ -76,10 +76,10 @@
                                                         "index": "not_analyzed"
                                                     },
                                                     "offsetStart": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     },
                                                     "offsetEnd": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     }
                                                 }
                                             }
@@ -102,10 +102,10 @@
                                                         "index": "not_analyzed"
                                                     },
                                                     "offsetStart": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     },
                                                     "offsetEnd": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     }
                                                 }
                                             },
@@ -116,10 +116,10 @@
                                                 "type": "double"
                                             },
                                             "offsetStart": {
-                                                "type": "long"
+                                                "type": "integer"
                                             },
                                             "offsetEnd": {
-                                                "type": "long"
+                                                "type": "integer"
                                             },
                                             "quantified": {
                                                 "properties": {
@@ -132,10 +132,10 @@
                                                         "index": "not_analyzed"
                                                     },
                                                     "offsetStart": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     },
                                                     "offsetEnd": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     }
                                                 }
                                             }
@@ -158,10 +158,10 @@
                                                         "index": "not_analyzed"
                                                     },
                                                     "offsetStart": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     },
                                                     "offsetEnd": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     }
                                                 }
                                             },
@@ -172,10 +172,10 @@
                                                 "type": "double"
                                             },
                                             "offsetStart": {
-                                                "type": "long"
+                                                "type": "integer"
                                             },
                                             "offsetEnd": {
-                                                "type": "long"
+                                                "type": "integer"
                                             },
                                             "quantified": {
                                                 "properties": {
@@ -188,10 +188,10 @@
                                                         "index": "not_analyzed"
                                                     },
                                                     "offsetStart": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     },
                                                     "offsetEnd": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     }
                                                 }
                                             }
@@ -214,10 +214,10 @@
                                                         "index": "not_analyzed"
                                                     },
                                                     "offsetStart": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     },
                                                     "offsetEnd": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     }
                                                 }
                                             },
@@ -228,10 +228,10 @@
                                                 "type": "double"
                                             },
                                             "offsetStart": {
-                                                "type": "long"
+                                                "type": "integer"
                                             },
                                             "offsetEnd": {
-                                                "type": "long"
+                                                "type": "integer"
                                             },
                                             "quantified": {
                                                 "properties": {
@@ -244,10 +244,10 @@
                                                         "index": "not_analyzed"
                                                     },
                                                     "offsetStart": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     },
                                                     "offsetEnd": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     }
                                                 }
                                             }
@@ -270,10 +270,10 @@
                                                         "index": "not_analyzed"
                                                     },
                                                     "offsetStart": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     },
                                                     "offsetEnd": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     }
                                                 }
                                             },
@@ -284,10 +284,10 @@
                                                 "type": "double"
                                             },
                                             "offsetStart": {
-                                                "type": "long"
+                                                "type": "integer"
                                             },
                                             "offsetEnd": {
-                                                "type": "long"
+                                                "type": "integer"
                                             },
                                             "quantified": {
                                                 "properties": {
@@ -300,19 +300,12 @@
                                                         "index": "not_analyzed"
                                                     },
                                                     "offsetStart": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     },
                                                     "offsetEnd": {
-                                                        "type": "long"
+                                                        "type": "integer"
                                                     }
                                                 }
-                                            }
-                                        }
-                                    },
-                                    "quantities": {
-                                        "properties": {
-                                            "parsedValue": {
-                                                "type": "double"
                                             }
                                         }
                                     },
@@ -335,56 +328,10 @@
                                 }
                             }
                         }
-                    }
-                }
-            },
-
-            "$TEI": {
-                "properties": {
-                    "$teiHeader": {
-                        "properties": {
-                            "$revisionDesc": {
-                                "properties": {
-                                    "when": {
-                                        "type": "string",
-                                        "index": "not_analyzed"
-                                    }
-                                }
-                            },
-                            "$fileDesc": {
-                                "properties": {
-                                    "$sourceDesc": {
-                                        "properties": {
-                                            "$biblStruct": {
-                                                "properties": {
-                                                    "$analytic": {
-                                                        "type": "object",
-                                                                        "enabled": false
-                                                    },
-                                                    "$monogr": {
-                                                        "type": "object",
-                                                                        "enabled": false
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "$publicationStmt":{
-                                        "properties": {
-                                         "$date": {
-                                                        "type": "date",
-                  "format": "strict_date_optional_time"
-                                        
-                                        }}
-                                }
-                                }
-                            }
-                            ,
-                            "$profileDesc": {
-                                "type": "object",
-                                                                        "enabled": false
-                            }
-                        }
+                    },
+                    "xml:id": {
+                        "type": "string",
+                        "index": "not_analyzed"
                     }
                 }
             }
