@@ -422,6 +422,7 @@ public class DocumentIndexer extends Indexer {
     public int indexQuantitiesAnnotations() {
         int nb = 0;
         int bulkSize = 200;
+        ObjectMapper mapper = new ObjectMapper();
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         bulkRequest.setRefresh(true);
         //if (mm.initQuantitiesAnnotations()) {
@@ -432,30 +433,72 @@ public class DocumentIndexer extends Indexer {
                 if (annotation.getAnhalyticsId() == null || annotation.getAnhalyticsId().isEmpty()) {
                     logger.info("skipping " + annotation.getRepositoryDocId() + " No anHALytics id provided");
                     continue;
-                }
+                } 
 
                 try {
-                    // index the json in ElasticSearch
-                    // beware the document type bellow and corresponding mapping!
-                    bulkRequest.add(client.prepareIndex(
-                            IndexProperties.getQuantitiesAnnotsIndexName(), IndexProperties.getQuantitiesAnnotsTypeName(),
-                            annotation.getAnhalyticsId()).setSource(annotation.getJson()));
-                    nb++;
-                    if (nb % bulkSize == 0) {
-                        BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                        if (bulkResponse.hasFailures()) {
-                            // process failures by iterating through each bulk response item    
-                            logger.error(bulkResponse.buildFailureMessage());
+                    JsonNode jsonAnnotation = mapper.readTree(annotation.getJson());
+                    JsonNode jn = jsonAnnotation.findPath("annotation");
+                    Iterator<JsonNode> ite = jn.elements();
+                    while (ite.hasNext()) {
+                        JsonNode temp = ite.next();
+                        JsonNode idNode = temp.findValue("xml:id");
+                        if ( (idNode == null) || (idNode.isMissingNode()) )
+                            continue;
+                        String xmlID = idNode.textValue();
+
+                        // we do not index the empty annotation results! 
+                        // the nerd subdoc has no entites field
+                        JsonNode annotNode = temp.findPath("quantities");
+                        if ((annotNode == null) || (annotNode.isMissingNode())) 
+                            continue;
+                        JsonNode annotNode2 = annotNode.findPath("measurements");
+                        if ((annotNode2 == null) || (annotNode2.isMissingNode())) 
+                            continue;
+                        Iterator<JsonNode> ite2 = annotNode2.elements();
+                        int rank = 0;
+                        while (ite2.hasNext()) {
+                            JsonNode temp2 = ite2.next();
+                            ((ObjectNode) temp2).put("xml:id", xmlID);
+                            ((ObjectNode) temp2).put("anHALyticsID", annotation.getAnhalyticsId());
+                            JsonNode newNode = mapper.createObjectNode();
+                            ((ObjectNode) newNode).put("measurement", temp2);
+                            String annotJson = newNode.toString();
+
+                            // index the json in ElasticSearch
+                            // beware the document type bellow and corresponding mapping!
+                            bulkRequest.add(client.prepareIndex(
+                                    IndexProperties.getQuantitiesAnnotsIndexName(), IndexProperties.getQuantitiesAnnotsTypeName(), 
+                                    xmlID+"_"+rank).setSource(annotJson));
+                            nb++;
+                            rank++;
+                            if (nb % bulkSize == 0) {
+                                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                                if (bulkResponse.hasFailures()) {
+                                    // process failures by iterating through each bulk response item    
+                                    logger.error(bulkResponse.buildFailureMessage());
+                                }
+                                bulkRequest = client.prepareBulk();
+                                bulkRequest.setRefresh(true);
+                                logger.info("\n Bulk number : " + nb / bulkSize);
+                            }
                         }
-                        bulkRequest = client.prepareBulk();
-                        bulkRequest.setRefresh(true);
-                        logger.info("\n Bulk number : " + nb / bulkSize);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
+
+        // last bulk
+        if (nb % bulkSize != 0) {
+            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+            logger.info("\n One Last Bulk.");
+            if (bulkResponse.hasFailures()) {
+                // process failures by iterating through each bulk response item    
+                logger.error(bulkResponse.buildFailureMessage());
+            }
+        }
+
         return nb;
     }
 

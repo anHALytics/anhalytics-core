@@ -51,8 +51,8 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
 
             json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId()
                     + "\",\"anhalyticsId\" : \"" + file.getAnhalyticsId()
-                    + "\", \"date\" :\"" + date
- //                   + "\", \"category\" :\"" + ((IstexFile)file).getCategory()
+//                    + "\", \"date\" :\"" + date
+//                    + "\", \"category\" :\"" + ((IstexFile)file).getCategory()
                     + "\", \"annotation\" : ");
             String jsonText = null;
             //QuantitiesService quantitiesService = new QuantitiesService(filepath);
