@@ -5,333 +5,371 @@
             "store": true
         },
         "properties": {
-            "annotation": {
+            "measurement": {
                 "properties": {
-                    "repositoryDocId": {
+                    "type": {
                         "type": "string",
                         "index": "not_analyzed"
                     },
-                    "quantities": {
+                    "xml:id": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "anHALyticsID": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "quantityBase": {
                         "properties": {
-                            "pages": {
+                            "type": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "rawValue": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "rawUnit": {
                                 "properties": {
-                                    "page_height": {
+                                    "name": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "offsetStart": {
                                         "type": "integer"
                                     },
-                                    "page_width": {
+                                    "offsetEnd": {
                                         "type": "integer"
                                     }
                                 }
                             },
-                            "measurements": {
+                            "parsedValue": {
+                                "type": "double"
+                            },
+                            "normalizedQuantity": {
+                                "type": "double"
+                            },
+                            "offsetStart": {
+                                "type": "integer"
+                            },
+                            "offsetEnd": {
+                                "type": "integer"
+                            },
+                            "quantified": {
                                 "properties": {
-                                    "type": {
+                                    "rawName": {
                                         "type": "string",
                                         "index": "not_analyzed"
                                     },
-                                    "quantityBase": {
-                                        "properties": {
-                                            "type": {
-                                                "type": "string",
-                                                "index": "not_analyzed"
-                                            },
-                                            "rawValue": {
-                                                "type": "string",
-                                                "index": "not_analyzed"
-                                            },
-                                            "rawUnit": {
-                                                "properties": {
-                                                    "name": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "offsetStart": {
-                                                        "type": "integer"
-                                                    },
-                                                    "offsetEnd": {
-                                                        "type": "integer"
-                                                    }
-                                                }
-                                            },
-                                            "parsedValue": {
-                                                "type": "double"
-                                            },
-                                            "normalizedQuantity": {
-                                                "type": "double"
-                                            },
-                                            "offsetStart": {
-                                                "type": "integer"
-                                            },
-                                            "offsetEnd": {
-                                                "type": "integer"
-                                            },
-                                            "quantified": {
-                                                "properties": {
-                                                    "rawName": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "normalizedName": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "offsetStart": {
-                                                        "type": "integer"
-                                                    },
-                                                    "offsetEnd": {
-                                                        "type": "integer"
-                                                    }
-                                                }
-                                            }
-                                        }
+                                    "normalizedName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
                                     },
-                                    "quantity": {
-                                        "properties": {
-                                            "type": {
-                                                "type": "string",
-                                                "index": "not_analyzed"
-                                            },
-                                            "rawValue": {
-                                                "type": "string",
-                                                "index": "not_analyzed"
-                                            },
-                                            "rawUnit": {
-                                                "properties": {
-                                                    "name": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "offsetStart": {
-                                                        "type": "integer"
-                                                    },
-                                                    "offsetEnd": {
-                                                        "type": "integer"
-                                                    }
-                                                }
-                                            },
-                                            "parsedValue": {
-                                                "type": "double"
-                                            },
-                                            "normalizedQuantity": {
-                                                "type": "double"
-                                            },
-                                            "offsetStart": {
-                                                "type": "integer"
-                                            },
-                                            "offsetEnd": {
-                                                "type": "integer"
-                                            },
-                                            "quantified": {
-                                                "properties": {
-                                                    "rawName": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "normalizedName": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "offsetStart": {
-                                                        "type": "integer"
-                                                    },
-                                                    "offsetEnd": {
-                                                        "type": "integer"
-                                                    }
-                                                }
-                                            }
-                                        }
+                                    "offsetStart": {
+                                        "type": "integer"
                                     },
-                                    "quantityMost": {
-                                        "properties": {
-                                            "type": {
-                                                "type": "string",
-                                                "index": "not_analyzed"
-                                            },
-                                            "rawValue": {
-                                                "type": "string",
-                                                "index": "not_analyzed"
-                                            },
-                                            "rawUnit": {
-                                                "properties": {
-                                                    "name": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "offsetStart": {
-                                                        "type": "integer"
-                                                    },
-                                                    "offsetEnd": {
-                                                        "type": "integer"
-                                                    }
-                                                }
-                                            },
-                                            "parsedValue": {
-                                                "type": "double"
-                                            },
-                                            "normalizedQuantity": {
-                                                "type": "double"
-                                            },
-                                            "offsetStart": {
-                                                "type": "integer"
-                                            },
-                                            "offsetEnd": {
-                                                "type": "integer"
-                                            },
-                                            "quantified": {
-                                                "properties": {
-                                                    "rawName": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "normalizedName": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "offsetStart": {
-                                                        "type": "integer"
-                                                    },
-                                                    "offsetEnd": {
-                                                        "type": "integer"
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "quantityLeast": {
-                                        "properties": {
-                                            "type": {
-                                                "type": "string",
-                                                "index": "not_analyzed"
-                                            },
-                                            "rawValue": {
-                                                "type": "string",
-                                                "index": "not_analyzed"
-                                            },
-                                            "rawUnit": {
-                                                "properties": {
-                                                    "name": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "offsetStart": {
-                                                        "type": "integer"
-                                                    },
-                                                    "offsetEnd": {
-                                                        "type": "integer"
-                                                    }
-                                                }
-                                            },
-                                            "parsedValue": {
-                                                "type": "double"
-                                            },
-                                            "normalizedQuantity": {
-                                                "type": "double"
-                                            },
-                                            "offsetStart": {
-                                                "type": "integer"
-                                            },
-                                            "offsetEnd": {
-                                                "type": "integer"
-                                            },
-                                            "quantified": {
-                                                "properties": {
-                                                    "rawName": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "normalizedName": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "offsetStart": {
-                                                        "type": "integer"
-                                                    },
-                                                    "offsetEnd": {
-                                                        "type": "integer"
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "quantityRange": {
-                                        "properties": {
-                                            "type": {
-                                                "type": "string",
-                                                "index": "not_analyzed"
-                                            },
-                                            "rawValue": {
-                                                "type": "string",
-                                                "index": "not_analyzed"
-                                            },
-                                            "rawUnit": {
-                                                "properties": {
-                                                    "name": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "offsetStart": {
-                                                        "type": "integer"
-                                                    },
-                                                    "offsetEnd": {
-                                                        "type": "integer"
-                                                    }
-                                                }
-                                            },
-                                            "parsedValue": {
-                                                "type": "double"
-                                            },
-                                            "normalizedQuantity": {
-                                                "type": "double"
-                                            },
-                                            "offsetStart": {
-                                                "type": "integer"
-                                            },
-                                            "offsetEnd": {
-                                                "type": "integer"
-                                            },
-                                            "quantified": {
-                                                "properties": {
-                                                    "rawName": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "normalizedName": {
-                                                        "type": "string",
-                                                        "index": "not_analyzed"
-                                                    },
-                                                    "offsetStart": {
-                                                        "type": "integer"
-                                                    },
-                                                    "offsetEnd": {
-                                                        "type": "integer"
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "boundingBoxes": {
-                                        "properties": {
-                                            "w": {
-                                                "type": "double"
-                                            },
-                                            "x": {
-                                                "type": "double"
-                                            },
-                                            "y": {
-                                                "type": "double"
-                                            },
-                                            "h": {
-                                                "type": "double"
-                                            }
-                                        }
+                                    "offsetEnd": {
+                                        "type": "integer"
                                     }
                                 }
                             }
                         }
                     },
-                    "xml:id": {
-                        "type": "string",
-                        "index": "not_analyzed"
+                    "quantity": {
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "rawValue": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "rawUnit": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "offsetStart": {
+                                        "type": "integer"
+                                    },
+                                    "offsetEnd": {
+                                        "type": "integer"
+                                    }
+                                }
+                            },
+                            "parsedValue": {
+                                "type": "double"
+                            },
+                            "normalizedQuantity": {
+                                "type": "double"
+                            },
+                            "offsetStart": {
+                                "type": "integer"
+                            },
+                            "offsetEnd": {
+                                "type": "integer"
+                            },
+                            "quantified": {
+                                "properties": {
+                                    "rawName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "normalizedName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "offsetStart": {
+                                        "type": "integer"
+                                    },
+                                    "offsetEnd": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "quantities": {
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "rawValue": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "rawUnit": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "offsetStart": {
+                                        "type": "integer"
+                                    },
+                                    "offsetEnd": {
+                                        "type": "integer"
+                                    }
+                                }
+                            },
+                            "parsedValue": {
+                                "type": "double"
+                            },
+                            "normalizedQuantity": {
+                                "type": "double"
+                            },
+                            "offsetStart": {
+                                "type": "integer"
+                            },
+                            "offsetEnd": {
+                                "type": "integer"
+                            },
+                            "quantified": {
+                                "properties": {
+                                    "rawName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "normalizedName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "offsetStart": {
+                                        "type": "integer"
+                                    },
+                                    "offsetEnd": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "quantityMost": {
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "rawValue": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "rawUnit": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "offsetStart": {
+                                        "type": "integer"
+                                    },
+                                    "offsetEnd": {
+                                        "type": "integer"
+                                    }
+                                }
+                            },
+                            "parsedValue": {
+                                "type": "double"
+                            },
+                            "normalizedQuantity": {
+                                "type": "double"
+                            },
+                            "offsetStart": {
+                                "type": "integer"
+                            },
+                            "offsetEnd": {
+                                "type": "integer"
+                            },
+                            "quantified": {
+                                "properties": {
+                                    "rawName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "normalizedName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "offsetStart": {
+                                        "type": "integer"
+                                    },
+                                    "offsetEnd": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "quantityLeast": {
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "rawValue": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "rawUnit": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "offsetStart": {
+                                        "type": "integer"
+                                    },
+                                    "offsetEnd": {
+                                        "type": "integer"
+                                    }
+                                }
+                            },
+                            "parsedValue": {
+                                "type": "double"
+                            },
+                            "normalizedQuantity": {
+                                "type": "double"
+                            },
+                            "offsetStart": {
+                                "type": "integer"
+                            },
+                            "offsetEnd": {
+                                "type": "integer"
+                            },
+                            "quantified": {
+                                "properties": {
+                                    "rawName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "normalizedName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "offsetStart": {
+                                        "type": "integer"
+                                    },
+                                    "offsetEnd": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "quantityRange": {
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "rawValue": {
+                                "type": "string",
+                                "index": "not_analyzed"
+                            },
+                            "rawUnit": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "offsetStart": {
+                                        "type": "integer"
+                                    },
+                                    "offsetEnd": {
+                                        "type": "integer"
+                                    }
+                                }
+                            },
+                            "parsedValue": {
+                                "type": "double"
+                            },
+                            "normalizedQuantity": {
+                                "type": "double"
+                            },
+                            "offsetStart": {
+                                "type": "integer"
+                            },
+                            "offsetEnd": {
+                                "type": "integer"
+                            },
+                            "quantified": {
+                                "properties": {
+                                    "rawName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "normalizedName": {
+                                        "type": "string",
+                                        "index": "not_analyzed"
+                                    },
+                                    "offsetStart": {
+                                        "type": "integer"
+                                    },
+                                    "offsetEnd": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "boundingBoxes": {
+                        "properties": {
+                            "w": {
+                                "type": "double"
+                            },
+                            "x": {
+                                "type": "double"
+                            },
+                            "y": {
+                                "type": "double"
+                            },
+                            "h": {
+                                "type": "double"
+                            }
+                        }
                     }
                 }
             }

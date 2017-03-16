@@ -805,10 +805,10 @@ public class IndexingPreprocess {
                             JsonNode quantityLeast = jsonLocalAnnotation.findPath("quantityLeast");
 
                         } else if (type.equals("listc")) {
-                            JsonNode quantity = jsonLocalAnnotation.findPath("quantity");
-                            if ((quantity == null) || (quantity.isMissingNode())) 
+                            JsonNode quantitiesList = jsonLocalAnnotation.findPath("quantities");
+                            if ((quantitiesList == null) || (quantitiesList.isMissingNode())) 
                                 continue;
-                            // quantity here is a list with a list of quantity values
+                            // quantitiesList here is a list with a list of quantity values
 
                         }  
                         m++;

@@ -430,7 +430,7 @@ public class DocumentIndexer extends Indexer {
     }
 
     /**
-     * Indexing of the grobid-quantities annotations in ElasticSearch
+     * Indexing of the grobid-quantities annotations as independent documents in ElasticSearch
      */
     public int indexQuantitiesAnnotations() {
         int nb = 0;
