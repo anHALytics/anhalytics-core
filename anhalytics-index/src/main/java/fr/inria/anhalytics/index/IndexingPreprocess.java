@@ -788,10 +788,22 @@ public class IndexingPreprocess {
                 JsonNode quantitiesStandoffNode = mapper.createObjectNode();
                 ((ObjectNode) quantitiesStandoffNode).put("$quantities", annotNode);
 
-                JsonNode annotationArrayNode = mapper.createArrayNode();
-                ((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
+                //JsonNode annotationArrayNode = mapper.createArrayNode();
+                //((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
 
-                ((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
+                //((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
+                if (standoffNode == null) {
+                    standoffNode = mapper.createArrayNode();
+
+                    JsonNode annotationArrayNode = mapper.createArrayNode();
+                    ((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
+
+                    ((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
+                } else {
+                    JsonNode annotationArrayNode = standoffNode.findValue("$standoff");
+                    ((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
+                }
+
             }
         }
         return standoffNode;

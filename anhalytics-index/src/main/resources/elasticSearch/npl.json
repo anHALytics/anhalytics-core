@@ -128,22 +128,19 @@
                                                                                 "type": "string"
                                                                             },
                                                                             "$lang_en": {
-                                                                                "type": "string",
-                                                                                "index": "analyzed",
+                                                                                "type": "text",
                                                                                 "analyzer": "english",
                                                                                 "store": "yes",
                                                                                 "term_vector": "with_positions_offsets"
                                                                             },
                                                                             "$lang_de": {
-                                                                                "type": "string",
-                                                                                "index": "analyzed",
+                                                                                "type": "text",
                                                                                 "analyzer": "german",
                                                                                 "store": "yes",
                                                                                 "term_vector": "with_positions_offsets"
                                                                             },
                                                                             "$lang_fr": {
-                                                                                "type": "string",
-                                                                                "index": "analyzed",
+                                                                                "type": "text",
                                                                                 "analyzer": "french",
                                                                                 "store": "yes",
                                                                                 "term_vector": "with_positions_offsets"
@@ -242,22 +239,19 @@
                                                                                 "type": "string"
                                                                             },
                                                                             "$lang_en": {
-                                                                                "type": "string",
-                                                                                "index": "analyzed",
+                                                                                "type": "text",
                                                                                 "analyzer": "english",
                                                                                 "store": "yes",
                                                                                 "term_vector": "with_positions_offsets"
                                                                             },
                                                                             "$lang_fr": {
-                                                                                "type": "string",
-                                                                                "index": "analyzed",
+                                                                                "type": "text",
                                                                                 "analyzer": "french",
                                                                                 "store": "yes",
                                                                                 "term_vector": "with_positions_offsets"
                                                                             },
                                                                             "$lang_de": {
-                                                                                "type": "string",
-                                                                                "index": "analyzed",
+                                                                                "type": "text",
                                                                                 "analyzer": "german",
                                                                                 "store": "yes",
                                                                                 "term_vector": "with_positions_offsets"
@@ -278,22 +272,19 @@
                                                                                         "type": "string"
                                                                                     },
                                                                                     "$lang_en": {
-                                                                                        "type": "string",
-                                                                                        "index": "analyzed",
+                                                                                        "type": "text",
                                                                                         "analyzer": "english",
                                                                                         "store": "yes",
                                                                                         "term_vector": "with_positions_offsets"
                                                                                     },
                                                                                     "$lang_fr": {
-                                                                                        "type": "string",
-                                                                                        "index": "analyzed",
+                                                                                        "type": "text",
                                                                                         "analyzer": "french",
                                                                                         "store": "yes",
                                                                                         "term_vector": "with_positions_offsets"
                                                                                     },
                                                                                     "$lang_de": {
-                                                                                        "type": "string",
-                                                                                        "index": "analyzed",
+                                                                                        "type": "text",
                                                                                         "analyzer": "german",
                                                                                         "store": "yes",
                                                                                         "term_vector": "with_positions_offsets"
@@ -350,22 +341,19 @@
                                                                 "type": "string"
                                                             },
                                                             "$lang_en": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
+                                                                "type": "text",
                                                                 "analyzer": "english",
                                                                 "store": "yes",
                                                                 "term_vector": "with_positions_offsets"
                                                             },
                                                             "$lang_fr": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
+                                                                "type": "text",
                                                                 "analyzer": "french",
                                                                 "store": "yes",
                                                                 "term_vector": "with_positions_offsets"
                                                             },
                                                             "$lang_de": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
+                                                                "type": "text",
                                                                 "analyzer": "german",
                                                                 "store": "yes",
                                                                 "term_vector": "with_positions_offsets"
@@ -389,22 +377,19 @@
                                                     "$p": {
                                                         "properties": {
                                                             "$lang_en": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
+                                                                "type": "text",
                                                                 "analyzer": "english",
                                                                 "store": "yes",
                                                                 "term_vector": "with_positions_offsets"
                                                             },
                                                             "$lang_fr": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
+                                                                "type": "text",
                                                                 "analyzer": "french",
                                                                 "store": "yes",
                                                                 "term_vector": "with_positions_offsets"
                                                             },
                                                             "$lang_de": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
+                                                                "type": "text",
                                                                 "analyzer": "german",
                                                                 "store": "yes",
                                                                 "term_vector": "with_positions_offsets"
@@ -461,8 +446,7 @@
                                                                 "dynamic": "false",
                                                                 "properties": {
                                                                     "$lang_en": {
-                                                                        "type": "string",
-                                                                        "index": "analyzed",
+                                                                        "type": "text",
                                                                         "analyzer": "english",
                                                                         "store": "yes",
                                                                         "term_vector": "with_positions_offsets"
@@ -520,8 +504,7 @@
                                                                                     "$title": {
                                                                                         "properties": {
                                                                                             "$lang_en": {
-                                                                                                "type": "string",
-                                                                                                "index": "analyzed",
+                                                                                                "type": "text",
                                                                                                 "analyzer": "english",
                                                                                                 "store": "yes",
                                                                                                 "term_vector": "with_positions_offsets"
@@ -618,8 +601,7 @@
                                                                                     "$title": {
                                                                                         "properties": {
                                                                                             "$lang_en": {
-                                                                                                "type": "string",
-                                                                                                "index": "analyzed",
+                                                                                                "type": "text",
                                                                                                 "analyzer": "english",
                                                                                                 "store": "yes",
                                                                                                 "term_vector": "with_positions_offsets"
@@ -668,8 +650,7 @@
                                                                 "dynamic": "false",
                                                                 "properties": {
                                                                     "$lang_en": {
-                                                                        "type": "string",
-                                                                        "index": "analyzed",
+                                                                        "type": "text",
                                                                         "analyzer": "english",
                                                                         "store": "yes",
                                                                         "term_vector": "with_positions_offsets"
@@ -711,8 +692,7 @@
                                                                 "dynamic": "false",
                                                                 "properties": {
                                                                     "$lang_en": {
-                                                                        "type": "string",
-                                                                        "index": "analyzed",
+                                                                        "type": "text",
                                                                         "analyzer": "english",
                                                                         "store": "yes",
                                                                         "term_vector": "with_positions_offsets"
@@ -733,8 +713,7 @@
                                                         "dynamic": "false",
                                                         "properties": {
                                                             "$lang_en": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
+                                                                "type": "text",
                                                                 "analyzer": "english",
                                                                 "store": "yes",
                                                                 "term_vector": "with_positions_offsets"
@@ -745,8 +724,7 @@
                                                         "dynamic": "false",
                                                         "properties": {
                                                             "$lang_en": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
+                                                                "type": "text",
                                                                 "analyzer": "english",
                                                                 "store": "yes",
                                                                 "term_vector": "with_positions_offsets"
@@ -771,8 +749,7 @@
                                                         "dynamic": "false",
                                                         "properties": {
                                                             "$lang_en": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
+                                                                "type": "text",
                                                                 "analyzer": "english",
                                                                 "store": "yes",
                                                                 "term_vector": "with_positions_offsets"
@@ -800,8 +777,7 @@
                                                         "dynamic": "false",
                                                         "properties": {
                                                             "$lang_en": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
+                                                                "type": "text",
                                                                 "analyzer": "english",
                                                                 "store": "yes",
                                                                 "term_vector": "with_positions_offsets"
@@ -812,8 +788,7 @@
                                                         "dynamic": "false",
                                                         "properties": {
                                                             "$lang_en": {
-                                                                "type": "string",
-                                                                "index": "analyzed",
+                                                                "type": "text",
                                                                 "analyzer": "english",
                                                                 "store": "yes",
                                                                 "term_vector": "with_positions_offsets"
@@ -859,22 +834,19 @@
                                                         "type": "string"
                                                     },
                                                     "$lang_en": {
-                                                        "type": "string",
-                                                        "index": "analyzed",
+                                                        "type": "text",
                                                         "analyzer": "english",
                                                         "store": "yes",
                                                         "term_vector": "with_positions_offsets"
                                                     },
                                                     "$lang_fr": {
-                                                        "type": "string",
-                                                        "index": "analyzed",
+                                                        "type": "text",
                                                         "analyzer": "french",
                                                         "store": "yes",
                                                         "term_vector": "with_positions_offsets"
                                                     },
                                                     "$lang_de": {
-                                                        "type": "string",
-                                                        "index": "analyzed",
+                                                        "type": "text",
                                                         "analyzer": "german",
                                                         "store": "yes",
                                                         "term_vector": "with_positions_offsets"
@@ -1425,22 +1397,19 @@
                                                                         "type": "string"
                                                                     },
                                                                     "$lang_en": {
-                                                                        "type": "string",
-                                                                        "index": "analyzed",
+                                                                        "type": "text",
                                                                         "analyzer": "english",
                                                                         "store": "yes",
                                                                         "term_vector": "with_positions_offsets"
                                                                     },
                                                                     "$lang_de": {
-                                                                        "type": "string",
-                                                                        "index": "analyzed",
+                                                                        "type": "text",
                                                                         "analyzer": "german",
                                                                         "store": "yes",
                                                                         "term_vector": "with_positions_offsets"
                                                                     },
                                                                     "$lang_fr": {
-                                                                        "type": "string",
-                                                                        "index": "analyzed",
+                                                                        "type": "text",
                                                                         "analyzer": "french",
                                                                         "store": "yes",
                                                                         "term_vector": "with_positions_offsets"
@@ -1461,22 +1430,19 @@
                                                                                 "type": "string"
                                                                             },
                                                                             "$lang_en": {
-                                                                                "type": "string",
-                                                                                "index": "analyzed",
+                                                                                "type": "text",
                                                                                 "analyzer": "english",
                                                                                 "store": "yes",
                                                                                 "term_vector": "with_positions_offsets"
                                                                             },
                                                                             "$lang_fr": {
-                                                                                "type": "string",
-                                                                                "index": "analyzed",
+                                                                                "type": "text",
                                                                                 "analyzer": "french",
                                                                                 "store": "yes",
                                                                                 "term_vector": "with_positions_offsets"
                                                                             },
                                                                             "$lang_de": {
-                                                                                "type": "string",
-                                                                                "index": "analyzed",
+                                                                                "type": "text",
                                                                                 "analyzer": "german",
                                                                                 "store": "yes",
                                                                                 "term_vector": "with_positions_offsets"
@@ -1564,22 +1530,19 @@
                                     "$abstract": {
                                         "properties": {
                                             "$lang_en": {
-                                                "type": "string",
-                                                "index": "analyzed",
+                                                "type": "text",
                                                 "analyzer": "english",
                                                 "store": "yes",
                                                 "term_vector": "with_positions_offsets"
                                             },
                                             "$lang_fr": {
-                                                "type": "string",
-                                                "index": "analyzed",
+                                                "type": "text",
                                                 "analyzer": "french",
                                                 "store": "yes",
                                                 "term_vector": "with_positions_offsets"
                                             },
                                             "$lang_de": {
-                                                "type": "string",
-                                                "index": "analyzed",
+                                                "type": "text",
                                                 "analyzer": "german",
                                                 "store": "yes",
                                                 "term_vector": "with_positions_offsets"
@@ -1733,6 +1696,16 @@
                                     },
                                     "wikipediaExternalRef": {
                                         "type": "string"
+                                    }
+                                }
+                            },
+                            "$quantities": {
+                                "properties": {
+                                    "mass": {
+                                        "type": "double_range"
+                                    },
+                                    "length": {
+                                        "type": "double_range"
                                     }
                                 }
                             }

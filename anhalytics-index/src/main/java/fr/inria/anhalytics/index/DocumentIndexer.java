@@ -8,6 +8,7 @@ import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import java.util.*;
 
 import org.elasticsearch.action.bulk.*;
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.json.JsonTapasML;
@@ -34,6 +35,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;*/
 
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.index.query.*;
 import org.json.JSONException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -126,7 +129,8 @@ public class DocumentIndexer extends Indexer {
         int nb = 0;
         int bulkSize = 100;
         BulkRequestBuilder bulkRequest = client.prepareBulk();
-        bulkRequest.setRefresh(true);
+        //bulkRequest.setRefresh(true);
+        bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
         for (String date : Utilities.getDates()) {
 
             if (!IndexProperties.isProcessByDate()) {
@@ -154,7 +158,9 @@ public class DocumentIndexer extends Indexer {
 
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
-                        bulkRequest.add(client.prepareIndex(IndexProperties.getMetadataTeisIndexName(), IndexProperties.getFulltextTeisTypeName(), tei.getAnhalyticsId()).setSource(jsonStr));
+                        bulkRequest.add(client.prepareIndex(IndexProperties.getMetadataTeisIndexName(), 
+                            IndexProperties.getFulltextTeisTypeName(), 
+                            tei.getAnhalyticsId()).setSource(jsonStr));
 
                         nb++;
                         if (nb % bulkSize == 0) {
@@ -164,7 +170,8 @@ public class DocumentIndexer extends Indexer {
                                 logger.error(bulkResponse.buildFailureMessage());
                             }
                             bulkRequest = client.prepareBulk();
-                            bulkRequest.setRefresh(true);
+                            //bulkRequest.setRefresh(true);
+                            bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
                             logger.info("\n Bulk number : " + nb / bulkSize);
                         }
                     } catch (Exception e) {
@@ -197,7 +204,8 @@ public class DocumentIndexer extends Indexer {
         if (isIndexExists(IndexProperties.getFulltextTeisIndexName())) {
             int bulkSize = 100;
             BulkRequestBuilder bulkRequest = client.prepareBulk();
-            bulkRequest.setRefresh(true);
+            //bulkRequest.setRefresh(true);
+            bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
             for (String date : Utilities.getDates()) {
 
                 if (!IndexProperties.isProcessByDate()) {
@@ -234,7 +242,8 @@ public class DocumentIndexer extends Indexer {
                                     logger.error(bulkResponse.buildFailureMessage());
                                 }
                                 bulkRequest = client.prepareBulk();
-                                bulkRequest.setRefresh(true);
+                                //bulkRequest.setRefresh(true);
+                                bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
                                 logger.info("\n Bulk number : " + nb / bulkSize);
                             }
                         } catch (Exception e) {
@@ -269,7 +278,8 @@ public class DocumentIndexer extends Indexer {
 
         int bulkSize = 200;
         BulkRequestBuilder bulkRequest = client.prepareBulk();
-        bulkRequest.setRefresh(true);
+        //bulkRequest.setRefresh(true);
+        bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
         for (String date : Utilities.getDates()) {
             if (!IndexProperties.isProcessByDate()) {
                 date = null;
@@ -297,7 +307,8 @@ public class DocumentIndexer extends Indexer {
                                 logger.error(bulkResponse.buildFailureMessage());
                             }
                             bulkRequest = client.prepareBulk();
-                            bulkRequest.setRefresh(true);
+                            //bulkRequest.setRefresh(true);
+                            bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
                             logger.info("\n Bulk number : " + nb / bulkSize);
                         }
                     } catch (Exception e) {
@@ -328,7 +339,8 @@ public class DocumentIndexer extends Indexer {
         int nb = 0;
         int bulkSize = 200;
         BulkRequestBuilder bulkRequest = client.prepareBulk();
-        bulkRequest.setRefresh(true);
+        //bulkRequest.setRefresh(true);
+        bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
         ObjectMapper mapper = new ObjectMapper();
         for (String date : Utilities.getDates()) {
             if (!IndexProperties.isProcessByDate()) {
@@ -389,7 +401,8 @@ public class DocumentIndexer extends Indexer {
                                     logger.error(bulkResponse.buildFailureMessage());
                                 }
                                 bulkRequest = client.prepareBulk();
-                                bulkRequest.setRefresh(true);
+                                //bulkRequest.setRefresh(true);
+                                bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
                                 logger.info("\n Bulk number : " + nb / bulkSize);
                             }
                         }
@@ -424,7 +437,8 @@ public class DocumentIndexer extends Indexer {
         int bulkSize = 200;
         ObjectMapper mapper = new ObjectMapper();
         BulkRequestBuilder bulkRequest = client.prepareBulk();
-        bulkRequest.setRefresh(true);
+        //bulkRequest.setRefresh(true);
+        bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
         //if (mm.initQuantitiesAnnotations()) {
         if (mm.initAnnotations(null, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS)) {
             while (mm.hasMore()) {
@@ -478,7 +492,8 @@ public class DocumentIndexer extends Indexer {
                                     logger.error(bulkResponse.buildFailureMessage());
                                 }
                                 bulkRequest = client.prepareBulk();
-                                bulkRequest.setRefresh(true);
+                                //bulkRequest.setRefresh(true);
+                                bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
                                 logger.info("\n Bulk number : " + nb / bulkSize);
                             }
                         }
@@ -505,11 +520,15 @@ public class DocumentIndexer extends Indexer {
     private List<String> validDocIDs(String anhalyticsId, ObjectMapper mapper) {
         List<String> results = new ArrayList<String>();
         logger.info("validDocIDs: " + anhalyticsId);
-        String request[] = toBeIndexed.toArray(new String[0]);
+        //String request[] = toBeIndexed.toArray(new String[0]);
         String query = "{\"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
+        WrapperQueryBuilder builder = QueryBuilders.wrapperQuery(query);
 
-        SearchResponse searchResponse = client.prepareSearch(IndexProperties.getFulltextTeisIndexName()).setQuery(query).addFields(request).execute().actionGet();
-
+        SearchRequestBuilder srb = client.prepareSearch(IndexProperties.getFulltextTeisIndexName()).setQuery(builder);
+        for(String field : toBeIndexed) {
+            srb.addStoredField(field);
+        }
+        SearchResponse searchResponse = srb.execute().actionGet();
         try {
             JsonNode resJsonStruct = mapper.readTree(searchResponse.toString());
             JsonNode hits = resJsonStruct.findPath("hits").findPath("hits");

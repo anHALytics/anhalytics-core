@@ -48,6 +48,8 @@ import com.fasterxml.jackson.core.io.*;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +103,8 @@ public class KnowledgeBaseIndexer extends Indexer {
             int bulkSize = 100;
             Iterator it = persons.entrySet().iterator();
             BulkRequestBuilder bulkRequest = client.prepareBulk();
-            bulkRequest.setRefresh(true);
+            //bulkRequest.setRefresh(true);
+            bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
                 Long personId = (Long) pair.getKey();
@@ -143,7 +146,8 @@ public class KnowledgeBaseIndexer extends Indexer {
                         logger.error(bulkResponse.buildFailureMessage());
                     }
                     bulkRequest = client.prepareBulk();
-                    bulkRequest.setRefresh(true);
+                    //bulkRequest.setRefresh(true);
+                    bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
                     logger.info("\n Bulk number : " + nb / bulkSize);
                 }
             }
@@ -183,7 +187,8 @@ public class KnowledgeBaseIndexer extends Indexer {
             Conference_EventDAO ced = (Conference_EventDAO) adf.getConference_EventDAO();
             List<Document> documents = ddao.findAllDocuments();
             BulkRequestBuilder bulkRequest = client.prepareBulk();
-            bulkRequest.setRefresh(true);
+            //bulkRequest.setRefresh(true);
+            bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
             for (Document doc : documents) {
                 Map<String, Object> documentDocument = doc.getDocumentDocument();
 
@@ -294,7 +299,8 @@ public class KnowledgeBaseIndexer extends Indexer {
                         logger.error(bulkResponse.buildFailureMessage());
                     }
                     bulkRequest = client.prepareBulk();
-                    bulkRequest.setRefresh(true);
+                    //bulkRequest.setRefresh(true);
+                    bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
                     logger.info("\n Bulk number : " + nb / bulkSize);
                 }
             }
@@ -325,7 +331,8 @@ public class KnowledgeBaseIndexer extends Indexer {
             AddressDAO adao = (AddressDAO) adf.getAddressDAO();
             PersonDAO pdao = (PersonDAO) adf.getPersonDAO();
             BulkRequestBuilder bulkRequest = client.prepareBulk();
-            bulkRequest.setRefresh(true);
+            //bulkRequest.setRefresh(true);
+            bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
             for (Organisation org : organisations) {
                 Map<String, Object> organisationDocument = org.getOrganisationDocument();
                 Address addr = (adao.getOrganisationAddress(org.getOrganisationId()));
@@ -374,7 +381,8 @@ public class KnowledgeBaseIndexer extends Indexer {
                         logger.error(bulkResponse.buildFailureMessage());
                     }
                     bulkRequest = client.prepareBulk();
-                    bulkRequest.setRefresh(true);
+                    //bulkRequest.setRefresh(true);
+                    bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
                     logger.info("\n Bulk number : " + nb / bulkSize);
                 }
             }

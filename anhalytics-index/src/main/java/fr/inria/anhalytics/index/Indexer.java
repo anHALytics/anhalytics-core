@@ -7,6 +7,7 @@ import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.IndexProperties;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
@@ -17,6 +18,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.IndexNotFoundException;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,17 +37,26 @@ abstract class Indexer {
     public Indexer() {
         this.mm = MongoFileManager.getInstance(false);
         try {
-            Settings settings = Settings.settingsBuilder()
+            Settings settings = Settings.builder()
                     .put("cluster.name", IndexProperties.getElasticSearchClusterName()).build();
-            this.client = TransportClient.builder().settings(settings).build()
-                    .addTransportAddress(new InetSocketTransportAddress(
-                        new InetSocketAddress(IndexProperties.getElasticSearch_host(), 
-                            Integer.parseInt(IndexProperties.getElasticSearch_port()))));
+            this.client = new PreBuiltTransportClient(settings)
+                .addTransportAddress(new InetSocketTransportAddress(
+                    InetAddress.getByName(IndexProperties.getElasticSearch_host()), 
+                    Integer.parseInt(IndexProperties.getElasticSearch_port())));
+
+            //Settings settings = Settings.settingsBuilder()
+            //        .put("cluster.name", IndexProperties.getElasticSearchClusterName()).build();
+            //this.client = TransportClient.builder().settings(settings).build()
+            //        .addTransportAddress(new InetSocketTransportAddress(
+            //            new InetSocketAddress(IndexProperties.getElasticSearch_host(), 
+            //               Integer.parseInt(IndexProperties.getElasticSearch_port()))));
             int nodes = this.client.connectedNodes().size();
             if (nodes == 0) {
                 throw new ServiceException("Cannot find elasticsearch cluster.");
             }
-        } catch (ElasticsearchException e) {
+        } /*catch (ElasticsearchException e) {
+            throw new ServiceException("Cannot find elasticsearch cluster", e);
+        }*/ catch (java.net.UnknownHostException e) {
             throw new ServiceException("Cannot find elasticsearch cluster", e);
         }
     }
