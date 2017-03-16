@@ -50,11 +50,9 @@
                 <version>3.0</version>
                 <configuration>
                     <!--argLine>-Dlog4j.debug=true</argLine-->
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    
-                    
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
             
