@@ -72,8 +72,10 @@ public class QuantitiesService extends AnnotateService {
             OutputStream os = conn.getOutputStream();
             os.write(postDataBytes);
             os.flush();
-            logger.info("Response "+conn.getResponseCode());
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            //logger.info("Response "+conn.getResponseCode());
+            // note: HTTP_NO_CONTENT = no quantities found in the text
+            if ( (conn.getResponseCode() != HttpURLConnection.HTTP_OK) || 
+                 (conn.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT) ) { 
                 logger.error("Failed annotating text segment: HTTP error code : "
                         + conn.getResponseCode());
                 return null;
