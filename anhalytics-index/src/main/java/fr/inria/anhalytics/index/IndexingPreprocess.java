@@ -767,22 +767,53 @@ public class IndexingPreprocess {
 
                     // we only get what should be searched together with the document metadata and content
                     // so ignoring coordinates, offsets, ...
-                    JsonNode measurements = jsonLocalAnnotation.findPath("measurements");
-                    JsonNode quantities = measurements.findPath("quantities");
-                    // quantities is an array
-                    if ((quantities != null) && (!quantities.isMissingNode())) {
-                        Iterator<JsonNode> iter = quantities.elements();
+                    JsonNode quantities = jsonLocalAnnotation.findPath("quantities");
+                    if ((quantities == null) || (quantities.isMissingNode())) 
+                        continue;
+                    JsonNode measurements = quantities.findPath("measurements");
+                    if ((measurements == null) || (measurements.isMissingNode())) 
+                        continue;
+                    // measurements is an array
+                    Iterator<JsonNode> iter = measurements.elements();
+                    while (iter.hasNext()) {
+                        JsonNode piece = (JsonNode) iter.next();
+//logger.info(piece.toString());
+                        JsonNode typeNode = jsonLocalAnnotation.findPath("type");
+                        if ((typeNode == null) || (typeNode.isMissingNode())) 
+                            continue;
+                        String type = typeNode.textValue();
 
-                        while (iter.hasNext()) {
-                            JsonNode piece = (JsonNode) iter.next();
+                        if (type.equals("value")) {
                             //JsonNode newNode = mapper.createArrayNode();
+                            JsonNode quantity = jsonLocalAnnotation.findPath("quantity");
+                            if ((quantity == null) || (quantity.isMissingNode())) 
+                                continue;
+                            JsonNode typeMeasure = quantity.findPath("type");
+                            if ((typeMeasure == null) || (typeMeasure.isMissingNode()))
+                                continue;
+                            JsonNode normalizedQuantity = quantity.findPath("normalizedQuantity");
+                            if ((normalizedQuantity == null) || (normalizedQuantity.isMissingNode()))
+                                continue;
+
+
                             JsonNode newNode = piece.deepCopy();
                             // we copy quantity annotation
 
                             ((ArrayNode) annotNode).add(newNode);
-                            m++;
-                        }
+                        } else if (type.equals("interval")) {
+                            JsonNode quantityMost = jsonLocalAnnotation.findPath("quantityMost");
+                            JsonNode quantityLeast = jsonLocalAnnotation.findPath("quantityLeast");
+
+                        } else if (type.equals("listc")) {
+                            JsonNode quantity = jsonLocalAnnotation.findPath("quantity");
+                            if ((quantity == null) || (quantity.isMissingNode())) 
+                                continue;
+                            // quantity here is a list with a list of quantity values
+
+                        }  
+                        m++;
                     }
+                    
                     n++;
                 }
                 JsonNode quantitiesStandoffNode = mapper.createObjectNode();
@@ -792,16 +823,18 @@ public class IndexingPreprocess {
                 //((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
 
                 //((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
-                if (standoffNode == null) {
-                    standoffNode = mapper.createArrayNode();
+                if (m > 0) {
+                    if (standoffNode == null) {
+                        standoffNode = mapper.createArrayNode();
 
-                    JsonNode annotationArrayNode = mapper.createArrayNode();
-                    ((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
+                        JsonNode annotationArrayNode = mapper.createArrayNode();
+                        ((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
 
-                    ((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
-                } else {
-                    JsonNode annotationArrayNode = standoffNode.findValue("$standoff");
-                    ((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
+                        ((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
+                    } else {
+                        JsonNode annotationArrayNode = standoffNode.findValue("$standoff");
+                        ((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
+                    }
                 }
             }
         }
