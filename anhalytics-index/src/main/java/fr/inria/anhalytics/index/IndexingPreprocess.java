@@ -803,6 +803,68 @@ public class IndexingPreprocess {
                     JsonNode annotationArrayNode = standoffNode.findValue("$standoff");
                     ((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
                 }
+            }
+        }
+        return standoffNode;
+    }
+
+    /**
+     * Get the grobid quantities annotations and inject them in the document structure in a standoff node.
+     * We aggregate here the different measure type into ranges, in order to use range type in 
+     * elasticsearch.
+     */
+    public JsonNode getStandoffQuantities2(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
+        String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
+        if ((annotation != null) && (annotation.trim().length() > 0)) {
+            JsonNode jsonAnnotation = mapper.readTree(annotation);
+            if ((jsonAnnotation != null) && (!jsonAnnotation.isMissingNode())) {
+                Iterator<JsonNode> iter0 = jsonAnnotation.elements();
+                JsonNode annotNode = mapper.createArrayNode();
+                int n = 0;
+                int m = 0;
+                while (iter0.hasNext()
+                        && (n < MAX_QUANTITIES_INDEXED_PARAGRAPHS)
+                        && (m < MAX_INDEXED_QUANTITIES)) {
+                    JsonNode jsonLocalAnnotation = (JsonNode) iter0.next();
+
+                    // we only get what should be searched together with the document metadata and content
+                    // so ignoring coordinates, offsets, ...
+                    JsonNode measurements = jsonLocalAnnotation.findPath("measurements");
+                    JsonNode quantities = measurements.findPath("quantities");
+                    // quantities is an array
+                    if ((quantities != null) && (!quantities.isMissingNode())) {
+                        Iterator<JsonNode> iter = quantities.elements();
+
+                        while (iter.hasNext()) {
+                            JsonNode piece = (JsonNode) iter.next();
+                            //JsonNode newNode = mapper.createArrayNode();
+                            JsonNode newNode = piece.deepCopy();
+                            // we copy quantity annotation
+
+                            ((ArrayNode) annotNode).add(newNode);
+                            m++;
+                        }
+                    }
+                    n++;
+                }
+                JsonNode quantitiesStandoffNode = mapper.createObjectNode();
+                ((ObjectNode) quantitiesStandoffNode).put("$quantities", annotNode);
+
+                //JsonNode annotationArrayNode = mapper.createArrayNode();
+                //((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
+
+                //((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
+                if (standoffNode == null) {
+                    standoffNode = mapper.createArrayNode();
+
+                    JsonNode annotationArrayNode = mapper.createArrayNode();
+                    ((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
+
+                    ((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
+                } else {
+                    JsonNode annotationArrayNode = standoffNode.findValue("$standoff");
+                    ((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
+                }
 
             }
         }
