@@ -1682,9 +1682,6 @@
                         "properties": {
                             "$nerd": {
                                 "properties": {
-                                    "freeBaseExternalRef": {
-                                        "type": "string"
-                                    },
                                     "nerd_score": {
                                         "type": "string"
                                     },
@@ -1713,9 +1710,6 @@
                                     "wikipediaExternalRef": {
                                         "type": "string"
                                     },
-                                    "freeBaseExternalRef": {
-                                        "type": "string"
-                                    },
                                     "nerd_score": {
                                         "type": "string"
                                     }
@@ -1738,9 +1732,64 @@
                             "$quantities": {
                                 "properties": {
                                     "mass": {
-                                        "type": "double_range"
+                                        "type": "double"
+                                    },
+                                    "time": {
+                                        "type": "double"
                                     },
                                     "length": {
+                                        "type": "double"
+                                    },
+                                    "amount_of_substance": {
+                                        "type": "double"
+                                    },
+                                    "temperature": {
+                                        "type": "double"
+                                    },
+                                    "voltage": {
+                                        "type": "double"
+                                    },
+                                    "absorbed_dose": {
+                                        "type": "double"
+                                    },
+                                    "power": {
+                                        "type": "double"
+                                    },
+                                    "frequency": {
+                                        "type": "double"
+                                    },
+                                    "energy": {
+                                        "type": "double"
+                                    },
+
+                                    "mass_range": {
+                                        "type": "double_range"
+                                    },
+                                    "time_range": {
+                                        "type": "double_range"
+                                    },
+                                    "length_range": {
+                                        "type": "double_range"
+                                    },
+                                    "amount_of_substance_range": {
+                                        "type": "double_range"
+                                    },
+                                    "temperature_range": {
+                                        "type": "double_range"
+                                    },
+                                    "voltage_range": {
+                                        "type": "double_range"
+                                    },
+                                    "absorbed_dose_range": {
+                                        "type": "double_range"
+                                    },
+                                    "power_range": {
+                                        "type": "double_range"
+                                    },
+                                    "frequency_range": {
+                                        "type": "double_range"
+                                    },
+                                    "energy_range": {
                                         "type": "double_range"
                                     }
                                 }

@@ -125,6 +125,7 @@ public class DocumentIndexer extends Indexer {
     /**
      * Indexing of the document collection in ElasticSearch
      */
+    /* PL: not clear what is it for? metadata are already in the TEI full text normally */
     public int indexTeiMetadataCollection() {
         int nb = 0;
         int bulkSize = 100;
@@ -150,8 +151,8 @@ public class DocumentIndexer extends Indexer {
                         JSONObject json = JsonTapasML.toJSONObject(tei.getTei());
                         jsonStr = json.toString();
 
+                        // PL: this will add all the annotations in the "TeiMetadata" collection, do we want/need this? 
                         jsonStr = indexingPreprocess.process(jsonStr, tei.getRepositoryDocId(), tei.getAnhalyticsId());
-
                         if (jsonStr == null) {
                             continue;
                         }
@@ -475,6 +476,52 @@ public class DocumentIndexer extends Indexer {
                             ((ObjectNode) temp2).put("xml:id", xmlID);
                             ((ObjectNode) temp2).put("anHALyticsID", annotation.getAnhalyticsId());
                             JsonNode newNode = mapper.createObjectNode();
+
+                            // we try to enrich with a range or atomic value
+                            JsonNode typeNode = temp2.findPath("type");
+                            if ((typeNode != null) && (!typeNode.isMissingNode())) {
+                                String type = typeNode.textValue();
+
+                                if (type.equals("value")) {
+                                    //JsonNode newNode = mapper.createArrayNode();
+                                    JsonNode quantity = temp2.findPath("quantity");
+                                    if ((quantity != null) && (!quantity.isMissingNode())) {                                        
+                                        JsonNode normalizedQuantity = quantity.findPath("normalizedQuantity");
+                                        if ((normalizedQuantity != null) && (!normalizedQuantity.isMissingNode())) {
+                                            Double val = normalizedQuantity.doubleValue();
+                                            ((ObjectNode) temp2).put("atomic", val);
+                                        }
+                                    }
+                                } else if (type.equals("interval")) {
+                                    JsonNode quantityMost = temp2.findPath("quantityMost");
+                                    JsonNode quantityLeast = temp2.findPath("quantityLeast");
+
+                                    if ((quantityMost != null) && (!quantityMost.isMissingNode()) &&
+                                        (quantityLeast != null) && (!quantityLeast.isMissingNode()) ) {  
+
+                                        JsonNode normalizedQuantityLeast = quantityLeast.findPath("normalizedQuantity");
+                                        if ((normalizedQuantityLeast != null) && (!normalizedQuantityLeast.isMissingNode())) {
+                                            Double valLeast = normalizedQuantityLeast.doubleValue();
+
+                                            JsonNode normalizedQuantityMost = quantityMost.findPath("normalizedQuantity");
+                                            if ((normalizedQuantityMost != null) && (!normalizedQuantityMost.isMissingNode())) {
+                                                Double valMost = normalizedQuantityMost.doubleValue();
+                                                JsonNode range = mapper.createObjectNode();
+                                                ((ObjectNode) range).put("lte", valMost);
+                                                ((ObjectNode) range).put("gte", valLeast);
+                                                ((ObjectNode) temp2).put("range", range);
+                                            }
+                                        }
+                                    }
+                                } else if (type.equals("listc")) {
+                                    JsonNode quantitiesList = temp2.findPath("quantities");
+                                    if ((quantitiesList == null) || (quantitiesList.isMissingNode())) 
+                                        continue;
+                                    // quantitiesList here is a list with a list of quantity values
+                                    // to be done...
+                                }  
+                            } 
+                            
                             ((ObjectNode) newNode).put("measurement", temp2);
                             String annotJson = newNode.toString();
 

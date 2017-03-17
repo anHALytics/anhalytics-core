@@ -84,9 +84,7 @@ public class PDFQuantitiesService extends AnnotateService {
             }
 
             //int status = connection.getResponseCode();
-            // note: HTTP_NO_CONTENT = no quantities found in the text 
-            if ( (conn.getResponseCode() != HttpURLConnection.HTTP_OK) || 
-                 (conn.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT) ) { 
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new RuntimeException("Failed : HTTP error code : "
                         + conn.getResponseCode() + " " + IOUtils.toString(conn.getErrorStream(), "UTF-8"));
             }

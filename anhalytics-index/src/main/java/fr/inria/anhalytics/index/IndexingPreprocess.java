@@ -753,10 +753,14 @@ public class IndexingPreprocess {
      */
     public JsonNode getStandoffQuantities(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
         String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
-        if ((annotation != null) && (annotation.trim().length() > 0)) {
+        if ((annotation != null) && (annotation.trim().length() > 0)) {           
             JsonNode jsonAnnotation = mapper.readTree(annotation);
             if ((jsonAnnotation != null) && (!jsonAnnotation.isMissingNode())) {
-                Iterator<JsonNode> iter0 = jsonAnnotation.elements();
+                JsonNode annotationNode = jsonAnnotation.findPath("annotation");
+                if ((annotationNode == null) || (annotationNode.isMissingNode())) 
+                    return standoffNode;
+
+                Iterator<JsonNode> iter0 = annotationNode.elements();
                 JsonNode annotNode = mapper.createArrayNode();
                 int n = 0;
                 int m = 0;
@@ -778,34 +782,81 @@ public class IndexingPreprocess {
                     while (iter.hasNext()) {
                         JsonNode piece = (JsonNode) iter.next();
 //logger.info(piece.toString());
-                        JsonNode typeNode = jsonLocalAnnotation.findPath("type");
+                        JsonNode typeNode = piece.findPath("type");
                         if ((typeNode == null) || (typeNode.isMissingNode())) 
                             continue;
                         String type = typeNode.textValue();
-
+//logger.info("type is " + type + " / " + piece.toString());
+                        
                         if (type.equals("value")) {
-                            //JsonNode newNode = mapper.createArrayNode();
-                            JsonNode quantity = jsonLocalAnnotation.findPath("quantity");
+                            JsonNode quantity = piece.findPath("quantity");
                             if ((quantity == null) || (quantity.isMissingNode())) 
                                 continue;
                             JsonNode typeMeasure = quantity.findPath("type");
                             if ((typeMeasure == null) || (typeMeasure.isMissingNode()))
                                 continue;
+                            String valueTypeMeasure = typeMeasure.textValue();
+                            
                             JsonNode normalizedQuantity = quantity.findPath("normalizedQuantity");
                             if ((normalizedQuantity == null) || (normalizedQuantity.isMissingNode()))
                                 continue;
+                            Double val = normalizedQuantity.doubleValue();
 
-
-                            JsonNode newNode = piece.deepCopy();
-                            // we copy quantity annotation
-
+                            JsonNode newNode = mapper.createObjectNode();
+                            ((ObjectNode) newNode).put(valueTypeMeasure.replace(" ", "_"), val);
                             ((ArrayNode) annotNode).add(newNode);
+//logger.info("type is " + type + " / " + annotNode.toString());
+
                         } else if (type.equals("interval")) {
-                            JsonNode quantityMost = jsonLocalAnnotation.findPath("quantityMost");
-                            JsonNode quantityLeast = jsonLocalAnnotation.findPath("quantityLeast");
+//logger.info("type is " + type + " / " + piece.toString());
+                            JsonNode quantityMost = piece.findPath("quantityMost");
+                            JsonNode quantityLeast = piece.findPath("quantityLeast");
+                            String valueTypeMeasure = null;
+                            JsonNode range = null;
+                            Double valLeast;
+                            Double valMost;
+
+                            if ((quantityMost != null) && (!quantityMost.isMissingNode())) {
+                                JsonNode typeMeasure = quantityMost.findPath("type");
+                                if ((typeMeasure == null) || (typeMeasure.isMissingNode()))
+                                    continue;
+                                valueTypeMeasure = typeMeasure.textValue();
+
+                                JsonNode normalizedQuantityMost = quantityMost.findPath("normalizedQuantity");
+                                if ((normalizedQuantityMost != null) && (!normalizedQuantityMost.isMissingNode())) {
+                                    if (range == null)
+                                        range = mapper.createObjectNode();
+                                    valMost = normalizedQuantityMost.doubleValue();    
+                                    ((ObjectNode) range).put("lte", valMost);
+                                }
+                            } 
+
+                            if ((quantityLeast != null) && (!quantityLeast.isMissingNode())) {  
+                                JsonNode typeMeasure = quantityLeast.findPath("type");
+                                typeMeasure = quantityLeast.findPath("type");
+                                if ((typeMeasure == null) || (typeMeasure.isMissingNode()))
+                                    continue;
+                                valueTypeMeasure = typeMeasure.textValue();
+
+                                JsonNode normalizedQuantityLeast = quantityLeast.findPath("normalizedQuantity");
+                                if ((normalizedQuantityLeast != null) && (!normalizedQuantityLeast.isMissingNode())) {
+                                    if (range == null)
+                                        range = mapper.createObjectNode();
+                                    valLeast = normalizedQuantityLeast.doubleValue();
+                                    ((ObjectNode) range).put("gte", valLeast);
+                                }  
+                            }
+
+                            if (range != null) {
+                                JsonNode newNode = mapper.createObjectNode();
+                                ((ObjectNode) newNode).put(valueTypeMeasure.replace(" ", "_")+"_range", range);
+                                ((ArrayNode) annotNode).add(newNode);
+
+logger.info("type is " + type + " / " + annotNode.toString());
+                            }
 
                         } else if (type.equals("listc")) {
-                            JsonNode quantitiesList = jsonLocalAnnotation.findPath("quantities");
+                            JsonNode quantitiesList = piece.findPath("quantities");
                             if ((quantitiesList == null) || (quantitiesList.isMissingNode())) 
                                 continue;
                             // quantitiesList here is a list with a list of quantity values
@@ -813,8 +864,7 @@ public class IndexingPreprocess {
                         }  
                         m++;
                     }
-                    
-                    n++;
+                    //n++;
                 }
                 JsonNode quantitiesStandoffNode = mapper.createObjectNode();
                 ((ObjectNode) quantitiesStandoffNode).put("$quantities", annotNode);
