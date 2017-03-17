@@ -114,8 +114,8 @@ public class IdListHarvester extends Harvester {
                                             currentVersion, 
                                             "");
                 teis.add(teifile);
-                processTeis(teis, date, false);
             }
+            processTeis(teis, date, false);
         } catch (MalformedURLException mue) {
             logger.error(mue.getMessage(), mue);
         } catch (ServiceException se) {
