@@ -568,9 +568,9 @@ public class DocumentIndexer extends Indexer {
         List<String> results = new ArrayList<String>();
         logger.info("validDocIDs: " + anhalyticsId);
         //String request[] = toBeIndexed.toArray(new String[0]);
-        String query = "{\"query\": { \"filtered\": { \"query\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
-        WrapperQueryBuilder builder = QueryBuilders.wrapperQuery(query);
+        //String query = "{\"query\": { \"bool\": { \"must\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
 
+        BoolQueryBuilder builder = QueryBuilders.boolQuery().must(new TermQueryBuilder("_id",anhalyticsId));
         SearchRequestBuilder srb = client.prepareSearch(IndexProperties.getFulltextTeisIndexName()).setQuery(builder);
         for(String field : toBeIndexed) {
             srb.addStoredField(field);

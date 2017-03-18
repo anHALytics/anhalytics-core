@@ -1761,6 +1761,9 @@
                                     "energy": {
                                         "type": "double"
                                     },
+                                    "pressure": {
+                                        "type": "double"
+                                    },
 
                                     "mass_range": {
                                         "type": "double_range"
@@ -1790,6 +1793,9 @@
                                         "type": "double_range"
                                     },
                                     "energy_range": {
+                                        "type": "double_range"
+                                    },
+                                    "pressure_range": {
                                         "type": "double_range"
                                     }
                                 }
