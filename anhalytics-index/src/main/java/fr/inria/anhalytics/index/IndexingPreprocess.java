@@ -844,7 +844,7 @@ public class IndexingPreprocess {
                                         range = mapper.createObjectNode();
                                     valLeast = normalizedQuantityLeast.doubleValue();
                                     ((ObjectNode) range).put("gte", valLeast);
-                                }  
+                                }
                             }
 
                             if (range != null) {

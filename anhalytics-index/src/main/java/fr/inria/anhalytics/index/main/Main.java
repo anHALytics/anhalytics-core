@@ -29,7 +29,7 @@ public class Main {
 
     private static List<String> availableCommands
             = Arrays.asList("setup", "indexAll", "indexDaily", "indexMetadata", "indexFulltext", 
-                "indexAnnotations", "indexKB", "setupQuantitiesIndex");
+                "indexAnnotations", "indexKB");
 
     public static void main(String[] args) throws UnknownHostException {
 
