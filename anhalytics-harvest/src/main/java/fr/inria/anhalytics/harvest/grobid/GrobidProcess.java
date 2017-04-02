@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.harvest.grobid;
 
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.harvest.exceptions.UnreachableGrobidServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
@@ -31,48 +32,45 @@ public class GrobidProcess {
             = Arrays.asList("ART", "COMM", "OUV", "POSTER", "DOUV", "PATENT", "REPORT", "COUV", "OTHER", "UNDEFINED");
 
     public void processFulltexts() {
+        BinaryFile bf = null;
         try {
             if (GrobidService.isGrobidOk()) {
                 ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
                 int start = -1;
                 int end = -1;
-                for (String date : Utilities.getDates()) {
+                if (mm.initObjects()) {
+                    while (mm.hasMore()) {
+                        BiblioObject biblioObject = mm.nextBiblioObject();
+                        if (toBeGrobidified.contains(biblioObject.getPublicationType().split("_")[0])) {
 
-                    if (!HarvestProperties.isProcessByDate()) {
-                        date = null;
-                    }
-                    if (mm.initBinaries(date)) {
-                        while (mm.hasMore()) {
-                            BinaryFile bf = mm.nextBinaryDocument();
-                            if (toBeGrobidified.contains(bf.getDocumentType())) {
-                                if (bf.getAnhalyticsId() == null || bf.getAnhalyticsId().isEmpty()) {
-                                    logger.info("skipping " + bf.getRepositoryDocId() + " No anHALytics id provided");
-                                    continue;
-                                }
-                                if (!HarvestProperties.isReset()) {
-                                    if (mm.isGrobidified(bf.getRepositoryDocId(), bf.getRepositoryDocVersion())) {
-                                        logger.info("skipping " + bf.getRepositoryDocId() +bf.getRepositoryDocVersion()+ " Already grobidified");
-                                        continue;
-                                    }
-                                }
+                            if (!biblioObject.getIsWithFulltext()) {
+                                logger.info("\t\t No fulltext available, Skipping...");
+                                continue;
+                            }
+                            if (!HarvestProperties.isReset() && biblioObject.getIsProcessedByGrobid()) {
+                                logger.info("\t\t Already grobidified, Skipping...");
+                                continue;
+                            }
 
-                                try {
-                                    if (bf.getSource().equalsIgnoreCase("hal")) {
-                                        start = 2;
-                                    }
-                                    Runnable worker = new GrobidSimpleFulltextWorker(bf, date, start, end);
-                                    executor.execute(worker);
-                                } catch (ParserConfigurationException exp) {
-                                    logger.error("An error occured while processing the file " + bf.getRepositoryDocId()
-                                            + ". Continuing the process for the other files" + exp.getMessage());
+                            try {
+                                bf = new BinaryFile();
+                                
+                                if (biblioObject.getSource().equalsIgnoreCase("hal")) {
+                                    start = 2;
                                 }
+                                
+                                bf.setStream(mm.getFulltext(biblioObject));
+                                biblioObject.setPdf(bf);
+                                Runnable worker = new GrobidSimpleFulltextWorker(biblioObject, start, end);
+                                executor.execute(worker);
+                            } catch (ParserConfigurationException exp) {
+                                logger.error("An error occured while processing the file " + bf.getRepositoryDocId()
+                                        + ". Continuing the process for the other files" + exp.getMessage());
                             }
                         }
                     }
-                    if (!HarvestProperties.isProcessByDate()) {
-                        break;
-                    }
                 }
+
                 executor.shutdown();
                 while (!executor.isTerminated()) {
                 }

@@ -219,9 +219,9 @@ public class Utilities {
         lsSerializer.getDomConfig().setParameter("xml-declaration", false);
         NodeList childNodes = node.getChildNodes();
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            sb.append(lsSerializer.writeToString(childNodes.item(i)));
-        }
+        //for (int i = 0; i < childNodes.getLength(); i++) {
+            sb.append(lsSerializer.writeToString(node));
+        //}
         return sb.toString();
     }
 

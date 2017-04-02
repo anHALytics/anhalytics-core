@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.services.QuantitiesService;
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
@@ -34,9 +35,8 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
     private static final Logger logger = LoggerFactory.getLogger(QuantitiesAnnotatorWorker.class);
 
     public QuantitiesAnnotatorWorker(MongoFileManager mongoManager,
-            TEIFile tei,
-            String date) {
-        super(mongoManager, tei, null, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
+            BiblioObject biblioObject) {
+        super(mongoManager, biblioObject, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
     }
 
     @Override
@@ -44,8 +44,10 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
 
         // get all the elements having an attribute id and annotate their text content
         mm.insertAnnotation(annotateDocument(), annotationsCollection);
+        biblioObject.setIsProcessedByTextQuantities(Boolean.TRUE);
+        mm.updateBiblioObjectStatus(biblioObject);
         logger.info("\t\t " + Thread.currentThread().getName() + ": " + 
-            file.getRepositoryDocId() + " annotated by the QUANTITIES service.");
+            biblioObject.getRepositoryDocId() + " annotated by the QUANTITIES service.");
            
     }
 
@@ -59,16 +61,16 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
         try {
             docBuilder = docFactory.newDocumentBuilder();
             // parse the TEI
-            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(((TEIFile)file).getTei().getBytes("UTF-8"))));
+            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(biblioObject.getGrobidTei().getBytes("UTF-8"))));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         
         StringBuffer json = new StringBuffer();
-            json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId() 
-                    + "\",\"anhalyticsId\" : \"" + file.getAnhalyticsId()
+            json.append("{ \"repositoryDocId\" : \"" + biblioObject.getRepositoryDocId() 
+                    + "\",\"anhalyticsId\" : \"" + biblioObject.getAnhalyticsId()
 //                    + "\", \"date\" :\"" + date
-//                    + "\", \"category\" :\"" + "titi"
+                    + "\", \"isIndexed\" :\"" + false
                     + "\", \"annotation\" : [ ");
             
             //check if any thing was added, throw exception if not (not insert entry)

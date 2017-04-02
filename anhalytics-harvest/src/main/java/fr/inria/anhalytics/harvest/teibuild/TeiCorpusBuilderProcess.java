@@ -1,8 +1,7 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
-import fr.inria.anhalytics.commons.data.TEIFile;
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.exceptions.DataException;
-import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
@@ -31,52 +30,66 @@ public class TeiCorpusBuilderProcess {
     }
 
     /**
+     * Initialize the teiCorpus.
+     */
+    public void transformMetadata() {
+        if (mm.initObjects()) {
+            while (mm.hasMore()) {
+                BiblioObject biblioObject = mm.nextBiblioObject();
+                if (!HarvestProperties.isReset() && biblioObject.getIsProcessedByPub2TEI()) {
+                    logger.info("\t\t Already transformed, Skipping...");
+                    continue;
+                }
+                Document generatedTEIcorpus = null;
+                String metadata = mm.getMetadata(biblioObject);
+                generatedTEIcorpus = tb.createTEICorpus(metadata);
+                mm.insertTEIcorpus(Utilities.toString(generatedTEIcorpus), biblioObject.getAnhalyticsId());
+                biblioObject.setIsProcessedByPub2TEI(Boolean.TRUE);
+                //We re-initialize everything
+                biblioObject.setIsIndexed(Boolean.FALSE);
+                biblioObject.setIsProcessedByGrobid(Boolean.FALSE);
+                biblioObject.setIsProcessedByNerd(Boolean.FALSE);
+                biblioObject.setIsProcessedByKeyterm(Boolean.FALSE);
+                biblioObject.setIsProcessedByTextQuantities(Boolean.FALSE);
+                biblioObject.setIsProcessedByPDFQuantities(Boolean.FALSE);
+                mm.updateBiblioObjectStatus(biblioObject);
+            }
+        }
+    }
+
+    /**
      * Clean up metadatas , add grobid TEI and build a corpus tei.
      */
-    public void addFulltextToTEICorpus() {
+    public void addGrobidFulltextToTEICorpus() {
         try {
             if (GrobidService.isGrobidOk()) {
-                for (String date : Utilities.getDates()) {
-                    if (!HarvestProperties.isProcessByDate()) {
-                        date = null;
-                    }
-                    if (mm.initTeis(date, MongoCollectionsInterface.GROBID_TEIS)) {
+                    if (mm.initObjects()) {
                         while (mm.hasMore()) {
-                            TEIFile tei = mm.nextTeiDocument();
+                            BiblioObject biblioObject = mm.nextBiblioObject();
                             Document generatedTEIcorpus = null;
-                            if (tei.getAnhalyticsId() == null || tei.getAnhalyticsId().isEmpty()) {
-                                logger.info("skipping " + tei.getRepositoryDocId() + " No anHALytics id provided");
+                            //grobid tei and teicorpus with metadata initialisation should be available.
+                            if(!biblioObject.getIsProcessedByPub2TEI() || !biblioObject.getIsProcessedByGrobid()){
+                                logger.info("\t\t Metadata TEI or Grobid TEI not found, first consider creating TEI from metadata and extracting TEI using Grobid, Skipping...");
                                 continue;
                             }
-                            logger.info("\t Building TEI for: " + tei.getRepositoryDocId());
-                           tei.setTei(Utilities.trimEncodedCharaters(tei.getTei()));
+                            logger.info("\t Building TEI for: " + biblioObject.getRepositoryDocId());
+                            //tei.setTei(Utilities.trimEncodedCharaters(tei.getTei()));
                             try {
-                                String metadataTei = getMetadataTei(tei.getAnhalyticsId());
-                                generatedTEIcorpus = tb.addGrobidTEIToTEICorpus(metadataTei, tei.getTei());
+                                String TEICorpus = mm.getTEICorpus(biblioObject);
+                                String grobidTei = mm.getGrobidTei(biblioObject);
+                                generatedTEIcorpus = tb.addGrobidTEIToTEICorpus(TEICorpus, grobidTei);
                             } catch (DataException de) {
                                 logger.error("No corresponding fulltext TEI was found.");
                             }
-                            tei.setTei(Utilities.toString(generatedTEIcorpus));
-                            mm.insertTei(tei, date, MongoCollectionsInterface.METADATA_WITHFULLTEXT_TEIS);
+//                            tei.setTei(Utilities.toString(generatedTEIcorpus));
+                            mm.insertTEIcorpus(Utilities.toString(generatedTEIcorpus), biblioObject.getAnhalyticsId());
                         }
                     }
-                    if (!HarvestProperties.isProcessByDate()) {
-                        break;
-                    }
-                }
+                
             }
             logger.info("Done");
         } catch (UnreachableGrobidServiceException ugse) {
             logger.error(ugse.getMessage());
         }
-    }
-
-
-
-    /*
-     Get correponding Metadata to process..anhalyticsId is necessary for identification
-     */
-    private String getMetadataTei(String anhalyticsId) {
-        return mm.findMetadataTeiById(anhalyticsId);
     }
 }

@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.services.PDFQuantitiesService;
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
@@ -24,18 +25,19 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
     private static final Logger logger = LoggerFactory.getLogger(PDFQuantitiesAnnotatorWorker.class);
 
     public PDFQuantitiesAnnotatorWorker(MongoFileManager mongoManager,
-            File tei,
-            String date) {
-        super(mongoManager, tei, null, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
+            BiblioObject biblioObject) {
+        super(mongoManager, biblioObject, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
     }
 
     @Override
     protected void processCommand() {
         // get all the elements having an attribute id and annotate their text content
         mm.insertAnnotation(annotateDocument(), annotationsCollection);
-        logger.info("\t\t " + Thread.currentThread().getName() + ": " + 
-            file.getRepositoryDocId() + " annotated by the QUANTITIES service.");
-           
+        biblioObject.setIsProcessedByPDFQuantities(Boolean.TRUE);
+        mm.updateBiblioObjectStatus(biblioObject);
+        logger.info("\t\t " + Thread.currentThread().getName() + ": "
+                + biblioObject.getRepositoryDocId() + " annotated by the QUANTITIES service.");
+
     }
 
     @Override
@@ -49,25 +51,21 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
                 throw new DataException("File stream can't be closed.", ex);
             }*/
 
-            json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId()
-                    + "\",\"anhalyticsId\" : \"" + file.getAnhalyticsId()
-//                    + "\", \"date\" :\"" + date
-//                    + "\", \"category\" :\"" + ((IstexFile)file).getCategory()
+            json.append("{ \"repositoryDocId\" : \"" + biblioObject.getRepositoryDocId()
+                    + "\",\"anhalyticsId\" : \"" + biblioObject.getAnhalyticsId()
+                    //                    + "\", \"date\" :\"" + date
+                    + "\",\"isIndexed\" : \"" + false
                     + "\", \"annotation\" : ");
             String jsonText = null;
-            //QuantitiesService quantitiesService = new QuantitiesService(filepath);
-            if (((TEIFile)file).getPdfdocument() == null) {
-                logger.info("\t\t " + Thread.currentThread().getName() + " PDF not found for " + file.getRepositoryDocId());
-                return null;
-            }
 
-            PDFQuantitiesService quantitiesService = new PDFQuantitiesService(((TEIFile)file).getPdfdocument().getStream());
+            PDFQuantitiesService quantitiesService = new PDFQuantitiesService(biblioObject.getPdf().getStream());
             jsonText = quantitiesService.processPDFQuantities();
             if (jsonText != null) {
                 json.append(jsonText).append("}");
             } else {
                 json.append("{} }");
             }
+            biblioObject.getPdf().getStream().close();
         } catch (Exception ex) {
             logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: ");
             ex.printStackTrace();

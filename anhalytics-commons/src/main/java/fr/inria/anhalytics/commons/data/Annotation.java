@@ -8,11 +8,13 @@ public class Annotation {
     private String json;
     private String repositoryDocId;
     private String anhalyticsId;
-
-    public Annotation(String json, String repositoryDocId, String anhalyticsId) {
+    private boolean isIndexed;
+    
+    public Annotation(String json, String repositoryDocId, String anhalyticsId, boolean isIndexed) {
         this.json = json;
         this.repositoryDocId = repositoryDocId;
         this.anhalyticsId = anhalyticsId;
+        this.isIndexed = isIndexed;
     }
 
     /**
@@ -55,5 +57,19 @@ public class Annotation {
      */
     public void setAnhalyticsId(String anhalyticsId) {
         this.anhalyticsId = anhalyticsId;
+    }
+
+    /**
+     * @return the isIndexed
+     */
+    public boolean isIsIndexed() {
+        return isIndexed;
+    }
+
+    /**
+     * @param isIndexed the isIndexed to set
+     */
+    public void setIsIndexed(boolean isIndexed) {
+        this.isIndexed = isIndexed;
     }
 }

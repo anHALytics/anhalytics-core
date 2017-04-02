@@ -29,11 +29,11 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.io.*;
+import fr.inria.anhalytics.commons.data.BiblioObject;
 
 /*import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;*/
-
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.index.query.*;
@@ -121,7 +121,6 @@ public class DocumentIndexer extends Indexer {
         }
         return nb;
     }*/
-
     /**
      * Indexing of the document collection in ElasticSearch
      */
@@ -132,59 +131,53 @@ public class DocumentIndexer extends Indexer {
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         //bulkRequest.setRefresh(true);
         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-        for (String date : Utilities.getDates()) {
 
-            if (!IndexProperties.isProcessByDate()) {
-                date = null;
-            }
-            if (mm.initTeis(date, MongoCollectionsInterface.METADATAS_TEIS)) {
-                while (mm.hasMore()) {
-                    TEIFile tei = mm.nextTeiDocument();
-                    if (tei.getAnhalyticsId() == null || tei.getAnhalyticsId().isEmpty()) {
-                        logger.info("skipping " + tei.getRepositoryDocId() + " No anHALytics id provided");
+        if (mm.initObjects()) {
+            while (mm.hasMore()) {
+                BiblioObject biblioObject = mm.nextBiblioObject();
+                if (!IndexProperties.isReset() && biblioObject.getIsIndexed()) {
+                    logger.info("\t\t Already indexed, Skipping...");
+                    continue;
+                }
+                String jsonStr = null;
+                try {
+                    // convert the TEI document into JSON via JsonML
+                    String tei = mm.getTEICorpus(biblioObject);
+                    JSONObject json = JsonTapasML.toJSONObject(tei);
+                    jsonStr = json.toString();
+
+                    // PL: this will add all the annotations in the "TeiMetadata" collection, do we want/need this? 
+                    jsonStr = indexingPreprocess.process(jsonStr, biblioObject.getRepositoryDocId(), biblioObject.getAnhalyticsId());
+                    if (jsonStr == null) {
                         continue;
                     }
-                    String jsonStr = null;
-                    try {
-                        // convert the TEI document into JSON via JsonML
-                        //System.out.println(halID);
-                        JSONObject json = JsonTapasML.toJSONObject(tei.getTei());
-                        jsonStr = json.toString();
 
-                        // PL: this will add all the annotations in the "TeiMetadata" collection, do we want/need this? 
-                        jsonStr = indexingPreprocess.process(jsonStr, tei.getRepositoryDocId(), tei.getAnhalyticsId());
-                        if (jsonStr == null) {
-                            continue;
+                    // index the json in ElasticSearch
+                    // beware the document type bellow and corresponding mapping!
+                    bulkRequest.add(client.prepareIndex(IndexProperties.getMetadataTeisIndexName(),
+                            IndexProperties.getFulltextTeisTypeName(),
+                            biblioObject.getAnhalyticsId()).setSource(jsonStr));
+
+                    nb++;
+                    if (nb % bulkSize == 0) {
+                        BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                        if (bulkResponse.hasFailures()) {
+                            // process failures by iterating through each bulk response item	
+                            logger.error(bulkResponse.buildFailureMessage());
                         }
-
-                        // index the json in ElasticSearch
-                        // beware the document type bellow and corresponding mapping!
-                        bulkRequest.add(client.prepareIndex(IndexProperties.getMetadataTeisIndexName(), 
-                            IndexProperties.getFulltextTeisTypeName(), 
-                            tei.getAnhalyticsId()).setSource(jsonStr));
-
-                        nb++;
-                        if (nb % bulkSize == 0) {
-                            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                            if (bulkResponse.hasFailures()) {
-                                // process failures by iterating through each bulk response item	
-                                logger.error(bulkResponse.buildFailureMessage());
-                            }
-                            bulkRequest = client.prepareBulk();
-                            //bulkRequest.setRefresh(true);
-                            bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                            logger.info("\n Bulk number : " + nb / bulkSize);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        bulkRequest = client.prepareBulk();
+                        //bulkRequest.setRefresh(true);
+                        bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
+                        logger.info("\n Bulk number : " + nb / bulkSize);
                     }
+                    biblioObject.setIsIndexed(Boolean.TRUE);
+                    mm.updateBiblioObjectStatus(biblioObject);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-
-            if (!IndexProperties.isProcessByDate()) {
-                break;
-            }
         }
+
         // last bulk
         if (nb % bulkSize != 0) {
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -207,55 +200,54 @@ public class DocumentIndexer extends Indexer {
             BulkRequestBuilder bulkRequest = client.prepareBulk();
             //bulkRequest.setRefresh(true);
             bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-            for (String date : Utilities.getDates()) {
 
-                if (!IndexProperties.isProcessByDate()) {
-                    date = null;
-                }
-                if (mm.initTeis(date, MongoCollectionsInterface.METADATA_WITHFULLTEXT_TEIS)) {
+            if (mm.initObjects()) {
 
-                    while (mm.hasMore()) {
-                        TEIFile tei = mm.nextTeiDocument();
-                        if (tei.getAnhalyticsId() == null || tei.getAnhalyticsId().isEmpty()) {
-                            logger.info("skipping " + tei.getRepositoryDocId() + " No anHALytics id provided");
+                while (mm.hasMore()) {
+                    BiblioObject biblioObject = mm.nextBiblioObject();
+                    if (!biblioObject.getIsWithFulltext()) {
+                        logger.info("\t\t No fulltext available, Skipping...");
+                        continue;
+                    }
+                    if (!IndexProperties.isReset() && biblioObject.getIsIndexed()) {
+                        logger.info("\t\t Already indexed, Skipping...");
+                        continue;
+                    }
+                    String jsonStr = null;
+                    try {
+                        // convert the TEI document into JSON via JsonML
+                        String tei = mm.getTEICorpus(biblioObject);
+                        JSONObject json = JsonTapasML.toJSONObject(tei);
+                        jsonStr = json.toString();
+
+                        jsonStr = indexingPreprocess.process(jsonStr, biblioObject.getRepositoryDocId(), biblioObject.getAnhalyticsId());
+                        if (jsonStr == null) {
                             continue;
                         }
-                        String jsonStr = null;
-                        try {
-                            // convert the TEI document into JSON via JsonML
-                            //System.out.println(halID);
-                            JSONObject json = JsonTapasML.toJSONObject(tei.getTei());
-                            jsonStr = json.toString();
 
-                            jsonStr = indexingPreprocess.process(jsonStr, tei.getRepositoryDocId(), tei.getAnhalyticsId());
-                            if (jsonStr == null) {
-                                continue;
+                        // index the json in ElasticSearch
+                        // beware the document type bellow and corresponding mapping!
+                        bulkRequest.add(client.prepareIndex(IndexProperties.getFulltextTeisIndexName(), IndexProperties.getFulltextTeisTypeName(), biblioObject.getAnhalyticsId()).setSource(jsonStr));
+                        nb++;
+                        if (nb % bulkSize == 0) {
+                            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                            if (bulkResponse.hasFailures()) {
+                                // process failures by iterating through each bulk response item
+                                logger.error(bulkResponse.buildFailureMessage());
                             }
-
-                            // index the json in ElasticSearch
-                            // beware the document type bellow and corresponding mapping!
-                            bulkRequest.add(client.prepareIndex(IndexProperties.getFulltextTeisIndexName(), IndexProperties.getFulltextTeisTypeName(), tei.getAnhalyticsId()).setSource(jsonStr));
-                            nb++;
-                            if (nb % bulkSize == 0) {
-                                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                                if (bulkResponse.hasFailures()) {
-                                    // process failures by iterating through each bulk response item
-                                    logger.error(bulkResponse.buildFailureMessage());
-                                }
-                                bulkRequest = client.prepareBulk();
-                                //bulkRequest.setRefresh(true);
-                                bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                                logger.info("\n Bulk number : " + nb / bulkSize);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                            bulkRequest = client.prepareBulk();
+                            //bulkRequest.setRefresh(true);
+                            bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
+                            logger.info("\n Bulk number : " + nb / bulkSize);
                         }
+                        biblioObject.setIsIndexed(Boolean.TRUE);
+                        mm.updateBiblioObjectStatus(biblioObject);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
-                if (!IndexProperties.isProcessByDate()) {
-                    break;
-                }
             }
+
             // last bulk
             if (nb % bulkSize != 0) {
                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -281,46 +273,40 @@ public class DocumentIndexer extends Indexer {
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         //bulkRequest.setRefresh(true);
         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-        for (String date : Utilities.getDates()) {
-            if (!IndexProperties.isProcessByDate()) {
-                date = null;
-            }
-            if (mm.initAnnotations(date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS)) {
-                while (mm.hasMore()) {
-                    Annotation annotation = mm.nextAnnotation();
-                    annotation.setJson(annotation.getJson().replaceAll("_id", "id"));
-                    if (annotation.getAnhalyticsId() == null || annotation.getAnhalyticsId().isEmpty()) {
-                        logger.info("skipping " + annotation.getRepositoryDocId() + " No anHALytics id provided");
-                        continue;
-                    }
-                    try {
-                        // index the json in ElasticSearch
-                        // beware the document type bellow and corresponding mapping!
-                        bulkRequest.add(client.prepareIndex(
-                                IndexProperties.getKeytermAnnotsIndexName(), IndexProperties.getKeytermAnnotsTypeName(),
-                                annotation.getAnhalyticsId()).setSource(annotation.getJson()));
+        if (mm.initObjects()) {
+            while (mm.hasMore()) {
+                BiblioObject biblioObject = mm.nextBiblioObject();
+                Annotation annotation = mm.getNerdAnnotations(biblioObject.getAnhalyticsId());
+                annotation.setJson(annotation.getJson().replaceAll("_id", "id"));
+                if (!IndexProperties.isReset() && annotation.isIsIndexed()) {
+                    logger.info("\t\t Already indexed annotations for " + biblioObject.getAnhalyticsId() + ", Skipping...");
+                    continue;
+                }
+                try {
+                    // index the json in ElasticSearch
+                    // beware the document type bellow and corresponding mapping!
+                    bulkRequest.add(client.prepareIndex(
+                            IndexProperties.getKeytermAnnotsIndexName(), IndexProperties.getKeytermAnnotsTypeName(),
+                            annotation.getAnhalyticsId()).setSource(annotation.getJson()));
 
-                        nb++;
-                        if (nb % bulkSize == 0) {
-                            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                            if (bulkResponse.hasFailures()) {
-                                // process failures by iterating through each bulk response item	
-                                logger.error(bulkResponse.buildFailureMessage());
-                            }
-                            bulkRequest = client.prepareBulk();
-                            //bulkRequest.setRefresh(true);
-                            bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                            logger.info("\n Bulk number : " + nb / bulkSize);
+                    nb++;
+                    if (nb % bulkSize == 0) {
+                        BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                        if (bulkResponse.hasFailures()) {
+                            // process failures by iterating through each bulk response item	
+                            logger.error(bulkResponse.buildFailureMessage());
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        bulkRequest = client.prepareBulk();
+                        //bulkRequest.setRefresh(true);
+                        bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
+                        logger.info("\n Bulk number : " + nb / bulkSize);
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-            if (!IndexProperties.isProcessByDate()) {
-                break;
-            }
         }
+
         if (nb % bulkSize != 0) {
             // last bulk
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -343,78 +329,71 @@ public class DocumentIndexer extends Indexer {
         //bulkRequest.setRefresh(true);
         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
         ObjectMapper mapper = new ObjectMapper();
-        for (String date : Utilities.getDates()) {
-            if (!IndexProperties.isProcessByDate()) {
-                date = null;
-            }
-            if (mm.initAnnotations(date, MongoCollectionsInterface.NERD_ANNOTATIONS)) {
-                while (mm.hasMore()) {
-                    Annotation annotation = mm.nextAnnotation();
-                    if (annotation.getAnhalyticsId() == null || annotation.getAnhalyticsId().isEmpty()) {
-                        logger.info("skipping " + annotation.getRepositoryDocId() + " No anHALytics id provided");
-                        continue;
-                    }
-
-                    try {
-                        // get the xml:id of the elements we want to index from the document
-                        // we only index title, abstract and keyphrase annotations !
-                        List<String> validIDs = validDocIDs(annotation.getAnhalyticsId(), mapper);
-
-                        JsonNode jsonAnnotation = mapper.readTree(annotation.getJson());
-                        JsonNode jn = jsonAnnotation.findPath("nerd");
-
-                        JsonNode newNode = mapper.createObjectNode();
-                        Iterator<JsonNode> ite = jn.elements();
-                        while (ite.hasNext()) {
-                            JsonNode temp = ite.next();
-                            JsonNode idNode = temp.findValue("xml:id");
-                            String xmlID = idNode.textValue();
-
-                            if (!validIDs.contains(xmlID)) {
-                                continue;
-                            }
-                            ((ObjectNode) newNode).put("annotation", temp);
-                            String annotJson = newNode.toString();
-
-                            // we do not index the empty annotation results! 
-                            // the nerd subdoc has no entites field
-                            JsonNode annotNode = temp.findPath("nerd");
-                            JsonNode entitiesNode = null;
-                            if ((annotNode != null) && (!annotNode.isMissingNode())) {
-                                entitiesNode = annotNode.findPath("entities");
-                            }
-
-                            if ((entitiesNode == null) || entitiesNode.isMissingNode()) {
-                                //System.out.println("Skipping " + annotJson);
-                                continue;
-                            }
-
-                            // index the json in ElasticSearch
-                            // beware the document type bellow and corresponding mapping!
-                            bulkRequest.add(client.prepareIndex(
-                                    IndexProperties.getNerdAnnotsIndexName(), IndexProperties.getNerdAnnotsTypeName(), xmlID).setSource(annotJson));
-
-                            nb++;
-                            if (nb % bulkSize == 0) {
-                                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                                if (bulkResponse.hasFailures()) {
-                                    // process failures by iterating through each bulk response item	
-                                    logger.error(bulkResponse.buildFailureMessage());
-                                }
-                                bulkRequest = client.prepareBulk();
-                                //bulkRequest.setRefresh(true);
-                                bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                                logger.info("\n Bulk number : " + nb / bulkSize);
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+        if (mm.initObjects()) {
+            while (mm.hasMore()) {
+                BiblioObject biblioObject = mm.nextBiblioObject();
+                Annotation annotation = mm.getNerdAnnotations(biblioObject.getAnhalyticsId());
+                annotation.setJson(annotation.getJson().replaceAll("_id", "id"));
+                if (!IndexProperties.isReset() && annotation.isIsIndexed()) {
+                    logger.info("\t\t Already indexed annotations for " + biblioObject.getAnhalyticsId() + ", Skipping...");
+                    continue;
                 }
-            }
 
-            if (!IndexProperties.isProcessByDate()) {
-                break;
+                try {
+                    // get the xml:id of the elements we want to index from the document
+                    // we only index title, abstract and keyphrase annotations !
+                    List<String> validIDs = validDocIDs(annotation.getAnhalyticsId(), mapper);
+
+                    JsonNode jsonAnnotation = mapper.readTree(annotation.getJson());
+                    JsonNode jn = jsonAnnotation.findPath("nerd");
+
+                    JsonNode newNode = mapper.createObjectNode();
+                    Iterator<JsonNode> ite = jn.elements();
+                    while (ite.hasNext()) {
+                        JsonNode temp = ite.next();
+                        JsonNode idNode = temp.findValue("xml:id");
+                        String xmlID = idNode.textValue();
+
+                        if (!validIDs.contains(xmlID)) {
+                            continue;
+                        }
+                        ((ObjectNode) newNode).put("annotation", temp);
+                        String annotJson = newNode.toString();
+
+                        // we do not index the empty annotation results! 
+                        // the nerd subdoc has no entites field
+                        JsonNode annotNode = temp.findPath("nerd");
+                        JsonNode entitiesNode = null;
+                        if ((annotNode != null) && (!annotNode.isMissingNode())) {
+                            entitiesNode = annotNode.findPath("entities");
+                        }
+
+                        if ((entitiesNode == null) || entitiesNode.isMissingNode()) {
+                            //System.out.println("Skipping " + annotJson);
+                            continue;
+                        }
+
+                        // index the json in ElasticSearch
+                        // beware the document type bellow and corresponding mapping!
+                        bulkRequest.add(client.prepareIndex(
+                                IndexProperties.getNerdAnnotsIndexName(), IndexProperties.getNerdAnnotsTypeName(), xmlID).setSource(annotJson));
+
+                        nb++;
+                        if (nb % bulkSize == 0) {
+                            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                            if (bulkResponse.hasFailures()) {
+                                // process failures by iterating through each bulk response item	
+                                logger.error(bulkResponse.buildFailureMessage());
+                            }
+                            bulkRequest = client.prepareBulk();
+                            //bulkRequest.setRefresh(true);
+                            bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
+                            logger.info("\n Bulk number : " + nb / bulkSize);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -431,7 +410,8 @@ public class DocumentIndexer extends Indexer {
     }
 
     /**
-     * Indexing of the grobid-quantities annotations as independent documents in ElasticSearch
+     * Indexing of the grobid-quantities annotations as independent documents in
+     * ElasticSearch
      */
     public int indexQuantitiesAnnotations() {
         int nb = 0;
@@ -441,14 +421,15 @@ public class DocumentIndexer extends Indexer {
         //bulkRequest.setRefresh(true);
         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
         //if (mm.initQuantitiesAnnotations()) {
-        if (mm.initAnnotations(null, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS)) {
+        if (mm.initObjects()) {
             while (mm.hasMore()) {
-                //Annotation annotation = mm.nextQuantitiesAnnotation();
-                Annotation annotation = mm.nextAnnotation();
-                if (annotation.getAnhalyticsId() == null || annotation.getAnhalyticsId().isEmpty()) {
-                    logger.info("skipping " + annotation.getRepositoryDocId() + " No anHALytics id provided");
+                BiblioObject biblioObject = mm.nextBiblioObject();
+                Annotation annotation = mm.getNerdAnnotations(biblioObject.getAnhalyticsId());
+                annotation.setJson(annotation.getJson().replaceAll("_id", "id"));
+                if (!IndexProperties.isReset() && annotation.isIsIndexed()) {
+                    logger.info("\t\t Already indexed annotations for " + biblioObject.getAnhalyticsId() + ", Skipping...");
                     continue;
-                } 
+                }
 
                 try {
                     JsonNode jsonAnnotation = mapper.readTree(annotation.getJson());
@@ -457,18 +438,21 @@ public class DocumentIndexer extends Indexer {
                     while (ite.hasNext()) {
                         JsonNode temp = ite.next();
                         JsonNode idNode = temp.findValue("xml:id");
-                        if ( (idNode == null) || (idNode.isMissingNode()) )
+                        if ((idNode == null) || (idNode.isMissingNode())) {
                             continue;
+                        }
                         String xmlID = idNode.textValue();
 
-                        // we do not index the empty annotation results! 
+                        // we do not index the empty annotation results! ls
                         // the nerd subdoc has no entites field
                         JsonNode annotNode = temp.findPath("quantities");
-                        if ((annotNode == null) || (annotNode.isMissingNode())) 
+                        if ((annotNode == null) || (annotNode.isMissingNode())) {
                             continue;
+                        }
                         JsonNode annotNode2 = annotNode.findPath("measurements");
-                        if ((annotNode2 == null) || (annotNode2.isMissingNode())) 
+                        if ((annotNode2 == null) || (annotNode2.isMissingNode())) {
                             continue;
+                        }
                         Iterator<JsonNode> ite2 = annotNode2.elements();
                         int rank = 0;
                         while (ite2.hasNext()) {
@@ -485,7 +469,7 @@ public class DocumentIndexer extends Indexer {
                                 if (type.equals("value")) {
                                     //JsonNode newNode = mapper.createArrayNode();
                                     JsonNode quantity = temp2.findPath("quantity");
-                                    if ((quantity != null) && (!quantity.isMissingNode())) {                                        
+                                    if ((quantity != null) && (!quantity.isMissingNode())) {
                                         JsonNode normalizedQuantity = quantity.findPath("normalizedQuantity");
                                         if ((normalizedQuantity != null) && (!normalizedQuantity.isMissingNode())) {
                                             Double val = normalizedQuantity.doubleValue();
@@ -496,8 +480,8 @@ public class DocumentIndexer extends Indexer {
                                     JsonNode quantityMost = temp2.findPath("quantityMost");
                                     JsonNode quantityLeast = temp2.findPath("quantityLeast");
 
-                                    if ((quantityMost != null) && (!quantityMost.isMissingNode()) &&
-                                        (quantityLeast != null) && (!quantityLeast.isMissingNode()) ) {  
+                                    if ((quantityMost != null) && (!quantityMost.isMissingNode())
+                                            && (quantityLeast != null) && (!quantityLeast.isMissingNode())) {
 
                                         JsonNode normalizedQuantityLeast = quantityLeast.findPath("normalizedQuantity");
                                         if ((normalizedQuantityLeast != null) && (!normalizedQuantityLeast.isMissingNode())) {
@@ -515,21 +499,22 @@ public class DocumentIndexer extends Indexer {
                                     }
                                 } else if (type.equals("listc")) {
                                     JsonNode quantitiesList = temp2.findPath("quantities");
-                                    if ((quantitiesList == null) || (quantitiesList.isMissingNode())) 
+                                    if ((quantitiesList == null) || (quantitiesList.isMissingNode())) {
                                         continue;
+                                    }
                                     // quantitiesList here is a list with a list of quantity values
                                     // to be done...
-                                }  
-                            } 
-                            
+                                }
+                            }
+
                             ((ObjectNode) newNode).put("measurement", temp2);
                             String annotJson = newNode.toString();
 
                             // index the json in ElasticSearch
                             // beware the document type bellow and corresponding mapping!
                             bulkRequest.add(client.prepareIndex(
-                                    IndexProperties.getQuantitiesAnnotsIndexName(), IndexProperties.getQuantitiesAnnotsTypeName(), 
-                                    xmlID+"_"+rank).setSource(annotJson));
+                                    IndexProperties.getQuantitiesAnnotsIndexName(), IndexProperties.getQuantitiesAnnotsTypeName(),
+                                    xmlID + "_" + rank).setSource(annotJson));
                             nb++;
                             rank++;
                             if (nb % bulkSize == 0) {
@@ -570,9 +555,9 @@ public class DocumentIndexer extends Indexer {
         //String request[] = toBeIndexed.toArray(new String[0]);
         //String query = "{\"query\": { \"bool\": { \"must\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
 
-        BoolQueryBuilder builder = QueryBuilders.boolQuery().must(new TermQueryBuilder("_id",anhalyticsId));
+        BoolQueryBuilder builder = QueryBuilders.boolQuery().must(new TermQueryBuilder("_id", anhalyticsId));
         SearchRequestBuilder srb = client.prepareSearch(IndexProperties.getFulltextTeisIndexName()).setQuery(builder);
-        for(String field : toBeIndexed) {
+        for (String field : toBeIndexed) {
             srb.addStoredField(field);
         }
         SearchResponse searchResponse = srb.execute().actionGet();

@@ -1,12 +1,7 @@
 package fr.inria.anhalytics.harvest.grobid;
 
-import fr.inria.anhalytics.commons.data.BinaryFile;
-import fr.inria.anhalytics.commons.utilities.Utilities;
-import java.io.File;
-import java.io.InputStream;
-import java.net.UnknownHostException;
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +14,8 @@ public class GrobidFulltextWorker extends GrobidWorker {
 
     private static final Logger logger = LoggerFactory.getLogger(GrobidFulltextWorker.class);
     
-    public GrobidFulltextWorker(BinaryFile bf, String date, int start, int end) throws ParserConfigurationException {
-        super(bf, date, start, end);
+    public GrobidFulltextWorker(BiblioObject biblioObject, String date, int start, int end) throws ParserConfigurationException {
+        super(biblioObject, start, end);
     }
     
 //    @Override

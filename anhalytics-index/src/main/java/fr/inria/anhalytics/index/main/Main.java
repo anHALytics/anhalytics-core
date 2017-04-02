@@ -28,8 +28,8 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands
-            = Arrays.asList("setup", "indexAll", "indexDaily", "indexMetadata", "indexFulltext", 
-                "indexAnnotations", "indexKB");
+            = Arrays.asList("setup", "indexAll", "indexMetadata", "indexFulltext",
+                    "indexAnnotations", "indexKB");
 
     public static void main(String[] args) throws UnknownHostException {
 
@@ -60,10 +60,6 @@ public class Main {
             if (currArg.equals("-h")) {
                 System.out.println(getHelp());
                 continue;
-            } else if (currArg.equals("-nodates")) {
-                IndexProperties.setProcessByDate(false);
-                i++;
-                continue;
             } else if (currArg.equals("-exe")) {
                 String command = args[i + 1];
                 if (availableCommands.contains(command)) {
@@ -75,36 +71,11 @@ public class Main {
                     result = false;
                     break;
                 }
-            } else if (currArg.equals("-dFromDate")) {
-                String stringDate = args[i + 1];
-                if (!stringDate.isEmpty()) {
-                    if (Utilities.isValidDate(stringDate)) {
-                        IndexProperties.setFromDate(args[i + 1]);
-                    } else {
-                        System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
-                        result = false;
-                    }
-                }
+            } else if (currArg.equals("--reset")) {
+                IndexProperties.setReset(true);
                 i++;
                 continue;
-            } else if (currArg.equals("-dUntilDate")) {
-                String stringDate = args[i + 1];
-                if (!stringDate.isEmpty()) {
-                    if (Utilities.isValidDate(stringDate)) {
-                        IndexProperties.setUntilDate(stringDate);
-                    } else {
-                        System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
-                        result = false;
-                    }
-                }
-                i++;
-                continue;
-            } //            else if (currArg.equals("--reset")) {
-            //                IndexProperties.setReset(true);
-            //                i++;
-            //                continue;
-            //            } 
-            else {
+            } else {
                 result = false;
             }
             i++;
@@ -206,68 +177,6 @@ public class Main {
                 }
 
 //KB indexing
-            } else if (process.equals("indexDaily")) {
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.DATE, -1);
-                String todayDate = dateFormat.format(cal.getTime());
-                Utilities.updateDates(todayDate, todayDate);
-                try {
-                    int nbDoc = esm.indexTeiFulltextCollection();
-                    logger.info("Total: " + nbDoc + " fulltext documents indexed.");
-                } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getFulltextTeisIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getFulltextTeisIndexName() + " will be created.");
-                    esm.createIndex(IndexProperties.getFulltextTeisIndexName());
-                    int nbDoc = esm.indexTeiFulltextCollection();
-                    logger.info("Total: " + nbDoc + " fulltext documents indexed.");
-                }
-
-                try {
-                    int nbDoc1 = esm.indexTeiMetadataCollection();
-                    logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
-                } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getMetadataTeisIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getMetadataTeisIndexName() + " will be created.");
-                    esm.createIndex(IndexProperties.getMetadataTeisIndexName());
-                    int nbDoc1 = esm.indexTeiMetadataCollection();
-                    logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
-                }
-
-                try {
-                    int nbNerdAnnot = esm.indexNerdAnnotations();
-                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
-                } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getNerdAnnotsIndexName() + " will be created.");
-                    esm.createIndex(IndexProperties.getNerdAnnotsIndexName());
-                    int nbNerdAnnot = esm.indexNerdAnnotations();
-                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
-                }
-
-                try {
-                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
-                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
-                } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getKeytermAnnotsIndexName() + " will be created.");
-                    esm.createIndex(IndexProperties.getKeytermAnnotsIndexName());
-                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
-                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
-                }
-
-                try {
-                    int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
-                    logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
-                } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getQuantitiesAnnotsIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getQuantitiesAnnotsIndexName() + " will be created.");
-                    esm.createIndex(IndexProperties.getQuantitiesAnnotsIndexName());
-                    int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
-                    logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
-                }
-
-                // TBD: daily KB refresh and indexing ?
             } else if (process.equals("indexFulltext")) {
                 try {
                     int nbDoc = esm.indexTeiFulltextCollection();
@@ -350,7 +259,8 @@ public class Main {
                     sqle.printStackTrace();
                 }
                 mi.close();
-            } /*else if (process.equals("indexQuantities")) {
+            }
+            /*else if (process.equals("indexQuantities")) {
                 try {
                 int nbDocs = esm.indexIstexQuantites();
                 } catch (Exception sqle) {

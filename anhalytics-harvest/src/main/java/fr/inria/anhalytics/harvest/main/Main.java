@@ -40,16 +40,14 @@ public class Main {
             add("harvestDaily");
             add("harvestHalList");
             add("appendFulltextTei");
-            add("appendFulltextTeiDaily");
             //add("fetchEmbargoPublications");
             add("processGrobid");
-            add("processGrobidDaily");
             add("istexHarvest");
             //add("assetLegend");
             add("harvestDOI");
-            add("crossRefDaily");
             add("openUrl");
             add("istexQuantities");
+            add("transformMetadata");
         }
     };
 
@@ -92,41 +90,27 @@ public class Main {
         Harvester harvester = null;
 
         if (process.equals("harvestAll")) {
+            //HAL uses OAI PMH providing updated/new documents on daily basis.
             harvester = new HALOAIPMHHarvester();
             harvester.fetchAllDocuments();
         } else if (process.equals("harvestDaily")) {
             harvester = new HALOAIPMHHarvester();
             Utilities.updateDates(todayDate, todayDate);
             harvester.fetchAllDocuments();
-        } else if (process.equals("appendFulltextTei")) {
-            tcb.addFulltextToTEICorpus();
-        } else if (process.equals("appendFulltextTeiDaily")) {
-            Utilities.updateDates(todayDate, todayDate);
-            tcb.addFulltextToTEICorpus();
+        } else if (process.equals("transformMetadata")) {
+            tcb.transformMetadata();
         } else if (process.equals("processGrobid")) {
             gp.processFulltexts();
-        } else if (process.equals("processGrobidDaily")) {
-            Utilities.updateDates(todayDate, todayDate);
-            gp.processFulltexts();
-        } 
-//        else if (process.equals("fetchEmbargoPublications")) {
-//            oai.fetchEmbargoPublications();
-//        } 
-        else if (process.equals("harvestDOI")) {
+        } else if (process.equals("appendFulltextTei")) {
+            tcb.addGrobidFulltextToTEICorpus();
+        } else if (process.equals("harvestDOI")) {
             cr.findDois();
-        } else if (process.equals("harvestDOIDaily")) {
-            Utilities.updateDates(todayDate, todayDate);
-            cr.findDois();
-        } 
-//        else if (process.equals("assetLegend")) {
-//            gp.addAssetsLegend();
-//        } 
-        else if (process.equals("openUrl")) {
+        } else if (process.equals("openUrl")) {
             ou.getIstexUrl();
         } else if (process.equals("istexHarvest")) {
             ih.sample();
         } else if (process.equals("istexQuantities")) {
-        
+
         } else if (process.equals("harvestHalList")) {
             harvester = new IdListHarvester();
             harvester.fetchAllDocuments();

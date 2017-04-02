@@ -34,6 +34,7 @@ public class IndexProperties {
     private static String kbPublicationsTypeName = "publications"; // to be rename, it's not metadata but KB
     private static String kbOrganisationsTypeName = "organisations"; // to be rename, it's not metadata but KB
     
+    private static boolean reset;
     
     private static String fromDate;
 
@@ -347,6 +348,20 @@ public class IndexProperties {
      */
     public static void setKbOrganisationsTypeName(String aKbOrganisationsTypeName) {
         kbOrganisationsTypeName = aKbOrganisationsTypeName;
+    }
+
+    /**
+     * @return the reset
+     */
+    public static boolean isReset() {
+        return reset;
+    }
+
+    /**
+     * @param aReset the reset to set
+     */
+    public static void setReset(boolean aReset) {
+        reset = aReset;
     }
     
 

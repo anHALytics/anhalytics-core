@@ -1,11 +1,9 @@
 package fr.inria.anhalytics.harvest.oaipmh;
 
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.harvest.Harvester;
-import fr.inria.anhalytics.commons.data.File;
 import fr.inria.anhalytics.commons.data.BinaryFile;
-import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.DataException;
-import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.teibuild.TeiBuilder;
 import java.io.ByteArrayInputStream;
@@ -28,8 +26,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 /**
@@ -43,7 +39,6 @@ public class HALOAIPMHDomParser {
 
     private final static String source = Harvester.Source.HAL.toString();
 
-    private List<TEIFile> teis = new ArrayList<TEIFile>();
     private Document doc;
     private String token;
     private XPath xPath;
@@ -55,8 +50,7 @@ public class HALOAIPMHDomParser {
         this.tb = new TeiBuilder();
     }
 
-    public List<TEIFile> getTeis(InputStream in) {
-        teis = new ArrayList<TEIFile>();
+    public List<BiblioObject> getGrabbedObjects(InputStream in, List<BiblioObject> biblioobjs) {
         setDoc(parse(in));
         if (doc != null) {
             Element rootElement = doc.getDocumentElement();
@@ -71,26 +65,20 @@ public class HALOAIPMHDomParser {
                 for (int i = listRecords.getLength() - 1; i >= 0; i--) {
                     if ((listRecords.item(i) instanceof Element)) {
                         Element record = (Element) listRecords.item(i);
-                        String type = getDocumentType(record.getElementsByTagName(OAIPMHPathsItf.TypeElement));
-                        if (isConsideredType(type)) {
-                            String completeRepositoryDocId = getRepositoryDocId(record.getElementsByTagName(OAIPMHPathsItf.IdElement));
-                            String currentVersion = getCurrentVersion(record);
-                            String docVersion = Utilities.getVersionFromURI(completeRepositoryDocId);
-                            //if not the current version normally we don't need the update.
-                            if (docVersion.equals(currentVersion)) {
-                                String tei = getTei(record.getElementsByTagName(OAIPMHPathsItf.TeiElement));
-                                String doi = getDoi(record);
 
-                                BinaryFile pdffile = getFile(record, Utilities.getHalIDFromHalDocID(completeRepositoryDocId), currentVersion, doi, type);
-                                if(pdffile != null)System.out.println(pdffile.getUrl());
-                                List<BinaryFile> annexes = getAnnexes(record, Utilities.getHalIDFromHalDocID(completeRepositoryDocId), currentVersion, doi, type);
-                                TEIFile teifile = new TEIFile(source, Utilities.getHalIDFromHalDocID(completeRepositoryDocId), pdffile, annexes, doi, type, tei, currentVersion, "");
-                                //String ref = getRef(record);
-                                teis.add(teifile);
+                        Element metadata = (Element) record.getElementsByTagName(OAIPMHPathsItf.TeiElement).item(0);
+                        NodeList metadataNodes = metadata.getChildNodes();
+                        for (int o = metadataNodes.getLength() - 1; o >= 0; o--) {
+                            if ((metadataNodes.item(o) instanceof Element)) {
+                                Element element = (Element) metadataNodes.item(o);
+                                element.setAttribute("xmlns:tei", "http://www.tei-c.org/ns/1.0");//BOF
+                                //HAL OAI PMH adds a tei namespace before each tag
+                                renameNode(element);
 
-                                logger.info("\t \t \t tei of " + completeRepositoryDocId + " extracted.");
-                            } else {
-                                logger.info("\t \t \t skipping " + completeRepositoryDocId + " , it's not a current version.");
+                                BiblioObject biblioObject = processRecord(element);
+                                if (biblioObject != null) {
+                                    biblioobjs.add(biblioObject);
+                                }
                             }
                         }
                     }
@@ -98,7 +86,44 @@ public class HALOAIPMHDomParser {
 
             }
         }
-        return teis;
+        return biblioobjs;
+    }
+
+    public BiblioObject processRecord(Element record) {
+        BiblioObject biblioObj = null;
+
+        String type = getPublicationType(record);
+        if (isConsideredType(type.split("_")[0])) {
+            String repositoryDocId = getRepositoryDocId(record);
+            String currentVersion = getCurrentVersion(record);
+//            String docVersion = Utilities.getVersionFromURI(completeRepositoryDocId);
+            //if not the current version normally we don't need the update.
+//            if (docVersion.equals(currentVersion)) {
+            String tei = getTei(record);
+            biblioObj = new BiblioObject(null, source, repositoryDocId, tei);
+            biblioObj.setRepositoryDocId(repositoryDocId);
+            biblioObj.setRepositoryDocVersion(currentVersion);
+            biblioObj.setDoi(getDoi(record));
+
+            biblioObj.setPublicationType(type);
+            biblioObj.setDomains(getDomains(record));
+
+            biblioObj.setPdf(getFile(record, repositoryDocId, currentVersion, biblioObj.getDoi(), type));
+
+            biblioObj.setMetadataURL("https://hal.archives-ouvertes.fr/" + repositoryDocId + "/tei");
+
+            if (biblioObj.getPdf() != null) {
+                System.out.println(biblioObj.getPdf().getUrl());
+            }
+            List<BinaryFile> annexes = getAnnexes(record, repositoryDocId, currentVersion, "", type);
+            biblioObj.setAnnexes(annexes);
+
+            logger.info("\t \t \t tei of " + repositoryDocId + " extracted.");
+//            } else {
+//                logger.info("\t \t \t skipping " + completeRepositoryDocId + " , it's not a current version.");
+//            }
+        }
+        return biblioObj;
     }
 
     public String getCurrentVersion(Node record) {
@@ -143,6 +168,42 @@ public class HALOAIPMHDomParser {
         return doi;
     }
 
+    public List<String> getDomains(Node ref) {
+        List<String> domains = new ArrayList<String>();
+        try {
+            NodeList nodes = (NodeList) xPath.compile(OAIPMHPathsItf.DomainsPATH).evaluate(ref, XPathConstants.NODESET);
+            if (nodes != null) {
+                if (nodes.getLength() >= 1) {
+                    for (int i = nodes.getLength() - 1; i >= 0; i--) {
+                        if ((nodes.item(i) instanceof Element)) {
+                            domains.add(((Element) nodes.item(i)).getAttribute("n") + "_" + ((Element) nodes.item(i)).getTextContent());
+                        }
+                    }
+                }
+            } else {
+                throw new DataException();
+            }
+        } catch (DataException | XPathExpressionException | DOMException ex) {
+            logger.info("\t \t \t \t no publication type found");
+        }
+        return domains;
+    }
+
+    public String getPublicationType(Node ref) {
+        String type = null;
+        try {
+            Element node = (Element) xPath.compile(OAIPMHPathsItf.PublicationTypePATH).evaluate(ref, XPathConstants.NODE);
+            if (node != null) {
+                type = node.getAttribute("n") + "_" + node.getTextContent();
+            } else {
+                throw new DataException();
+            }
+        } catch (DataException | XPathExpressionException | DOMException ex) {
+            logger.info("\t \t \t \t no publication type found");
+        }
+        return type;
+    }
+
     public String getToken() {
         return this.token;
     }
@@ -178,12 +239,12 @@ public class HALOAIPMHDomParser {
             if (node != null) {
 
                 String url = node.getAttribute("target");
-                Element dateNode = (Element) node.getChildNodes().item(1);
+                Element dateNode = (Element) node.getElementsByTagName("date").item(0);
                 String embargoDate = "";
                 if (dateNode != null) {
                     embargoDate = dateNode.getAttribute("notBefore");
                 }
-                file = new BinaryFile(source, url, repositoryDocId, doi , type, "application/pdf", repositoryDocId+".pdf", repositoryDocVersion, "", embargoDate);
+                file = new BinaryFile(source, url, repositoryDocId, doi, type, "application/pdf", repositoryDocId + ".pdf", repositoryDocVersion, "", embargoDate);
                 file.setIsAnnexFile(false);
             } else {
                 throw new DataException();
@@ -194,7 +255,7 @@ public class HALOAIPMHDomParser {
         return file;
     }
 
-    public List<BinaryFile> getAnnexes(Node record,  String repositoryDocId, String repositoryDocVersion, String doi, String type) {
+    public List<BinaryFile> getAnnexes(Node record, String repositoryDocId, String repositoryDocVersion, String doi, String type) {
         List<BinaryFile> annexes = new ArrayList<BinaryFile>();
         NodeList nodes = null;
         try {
@@ -205,28 +266,23 @@ public class HALOAIPMHDomParser {
         String url = null;
         String embargoDate = null;
         for (int i = nodes.getLength() - 1; i >= 0; i--) {
-            Element node = (Element) nodes.item(i);
-            url = node.getAttribute("target");
-            embargoDate = ((Element) node.getChildNodes().item(1)).getAttribute("notBefore");
-            BinaryFile annex = new BinaryFile(source, url, repositoryDocId, doi , type, "", "", repositoryDocVersion, "", embargoDate);
-            annex.setIsAnnexFile(true);
-            annexes.add(annex);
+            if ((nodes.item(i) instanceof Element)) {
+                Element node = (Element) nodes.item(i);
+                url = node.getAttribute("target");
+                embargoDate = ((Element) node.getElementsByTagName("date").item(0)).getAttribute("notBefore");
+                BinaryFile annex = new BinaryFile(source, url, repositoryDocId, doi, type, "", "", repositoryDocVersion, "", embargoDate);
+                annex.setIsAnnexFile(true);
+                annexes.add(annex);
+            }
         }
         return annexes;
     }
 
-    public String getTei(NodeList tei) {
+    public String getTei(Node tei) {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        NodeList teiNodes = tei.item(0).getChildNodes();
-        for (int i = teiNodes.getLength() - 1; i >= 0; i--) {
-            if (teiNodes.item(i) instanceof Element) {
-                Element teiElement = (Element) teiNodes.item(i);
-                teiElement.setAttribute("xmlns:tei", "http://www.tei-c.org/ns/1.0");//BOF
-                renameNode(teiElement);
-            }
-        }
-        String teiString = sb.append(Utilities.innerXmlToString(tei.item(0))).toString();
+
+        String teiString = sb.append(Utilities.innerXmlToString(tei)).toString();
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
         Document teiDoc = null;
@@ -237,9 +293,9 @@ public class HALOAIPMHDomParser {
             e.printStackTrace();
         }
 
-        teiDoc = createTEICorpus(teiDoc);
-
-        Utilities.generateIDs(teiDoc);
+//        teiDoc = createTEICorpus(teiDoc);
+//
+//        Utilities.generateIDs(teiDoc);
         try {
             teiString = Utilities.toString(teiDoc);
         } catch (DataException de) {
@@ -249,18 +305,31 @@ public class HALOAIPMHDomParser {
     }
 
     private void renameNode(Element teiElement) {
-        doc.renameNode(teiElement, null, teiElement.getTagName().split(":")[1]);
-        NodeList nodes = teiElement.getChildNodes();
-        for (int i = nodes.getLength() - 1; i >= 0; i--) {
-            if (nodes.item(i) instanceof Element) {
-                Element element = (Element) nodes.item(i);
-                renameNode(element);
+        if (teiElement.getTagName().contains(":")) {
+            doc.renameNode(teiElement, null, teiElement.getTagName().split(":")[1]);
+            NodeList nodes = teiElement.getChildNodes();
+            for (int i = nodes.getLength() - 1; i >= 0; i--) {
+                if (nodes.item(i) instanceof Element) {
+                    Element element = (Element) nodes.item(i);
+                    renameNode(element);
+                }
             }
         }
     }
 
-    public String getRepositoryDocId(NodeList identifier) {
-        return identifier.item(0).getTextContent().split(":")[2];
+    public String getRepositoryDocId(Node record) {
+        String repositoryDocId = null;
+        try {
+            Element node = (Element) xPath.compile(OAIPMHPathsItf.IdElementPath).evaluate(record, XPathConstants.NODE);
+            if (node != null) {
+                repositoryDocId = node.getTextContent();
+            } else {
+                throw new DataException();
+            }
+        } catch (DataException | XPathExpressionException | DOMException ex) {
+            logger.info("\t \t \t \t no publication repository id found");
+        }
+        return repositoryDocId;
     }
 
     public String getDocumentType(NodeList sets) {
@@ -278,21 +347,6 @@ public class HALOAIPMHDomParser {
 
     private NodeList getRecords(Element rootElement) {
         return rootElement.getElementsByTagName(OAIPMHPathsItf.RecordElement);
-    }
-
-    /**
-     * Adds data TEI extracted with grobid.
-     */
-    public Document createTEICorpus(Document metadataDoc) {
-        Document generatedTeiDoc = null;
-        try {
-            if (metadataDoc != null) {
-                generatedTeiDoc = tb.createTEICorpus(metadataDoc);
-            }
-        } catch (Exception xpe) {
-            xpe.printStackTrace();
-        }
-        return generatedTeiDoc;
     }
 
     private boolean isConsideredType(String setSpec) {

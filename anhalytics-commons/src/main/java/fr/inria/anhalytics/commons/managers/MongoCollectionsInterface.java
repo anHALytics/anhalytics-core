@@ -9,6 +9,10 @@ public interface MongoCollectionsInterface {
 
     // PL note: could be changed to an enum class
 
+    
+    // files that can't be donwloaded and will be processed later
+    public static final String BIBLIO_OBJECTS = "biblio_objects";
+    
     // where anhalytics identifiers are generated
     public static final String IDENTIFIERS = "identifiers";
     // mainly for grobid process to analyze extraction performance
@@ -21,6 +25,8 @@ public interface MongoCollectionsInterface {
     public static final String BINARIES = "binaries";
     // publications annexes
     public static final String PUB_ANNEXES = "pub_annexes";
+    // tei generated using metadata and fulltext
+    public static final String TEI_CORPUS = "tei_corpus";
     // tei generated using metadata and fulltext
     public static final String METADATA_WITHFULLTEXT_TEIS = "metadata_teis_fulltext";
     // tei extracted using grobid

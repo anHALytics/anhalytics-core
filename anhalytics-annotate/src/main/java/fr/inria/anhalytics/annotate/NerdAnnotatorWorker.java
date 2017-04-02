@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.services.NerdService;
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
@@ -38,17 +39,17 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
     private static final Logger logger = LoggerFactory.getLogger(NerdAnnotatorWorker.class);
 
     public NerdAnnotatorWorker(MongoFileManager mongoManager,
-            TEIFile file,
-            String date) {
-        super(mongoManager, file, date, MongoCollectionsInterface.NERD_ANNOTATIONS);
-        this.file = file;
+            BiblioObject biblioObject) {
+        super(mongoManager, biblioObject, MongoCollectionsInterface.NERD_ANNOTATIONS);
     }
 
     @Override
     protected void processCommand() {
         // get all the elements having an attribute id and annotate their text content
         mm.insertAnnotation(annotateDocument(), annotationsCollection);
-        logger.info("\t\t " + Thread.currentThread().getName() + ": " + file.getRepositoryDocId() + " annotated by the NERD service.");
+        biblioObject.setIsProcessedByNerd(Boolean.TRUE);
+        mm.updateBiblioObjectStatus(biblioObject);
+        logger.info("\t\t " + Thread.currentThread().getName() + ": " + biblioObject.getRepositoryDocId() + " annotated by the NERD service.");
     }
 
     /**
@@ -64,7 +65,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
         try {
             docBuilder = docFactory.newDocumentBuilder();
             // parse the TEI
-            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(((TEIFile)file).getTei().getBytes("UTF-8"))));
+            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(biblioObject.getTeiCorpus().getBytes("UTF-8"))));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -93,10 +94,11 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
             }
         }*/
         StringBuffer json = new StringBuffer();
-        json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId()
-                + "\",\"anhalyticsId\" : \"" + file.getAnhalyticsId()
-                + "\", \"date\" :\"" + date
-                + "\", \"nerd\" : [");
+        json.append("{ \"repositoryDocId\" : \"" + biblioObject.getRepositoryDocId()
+                + "\",\"anhalyticsId\" : \"" + biblioObject.getAnhalyticsId()
+                + "\",\"isIndexed\" : \"" + false
+                + "\", \"nerd\" : ["
+        );
         //check if any thing was added, throw exception if not (not insert entry)
         annotateNode(docTei.getDocumentElement(), true, json, null);
         json.append("] }");

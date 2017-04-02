@@ -20,7 +20,6 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +39,7 @@ public class GrobidService {
 
     int TIMEOUT_VALUE = 30000;
 
-    public GrobidService(int start, int end, boolean generateIDs, String date) {
-        this.start = start;
+    public GrobidService(int start, int end, boolean generateIDs) {
         this.end = end;
         this.generateIDs = generateIDs;
 

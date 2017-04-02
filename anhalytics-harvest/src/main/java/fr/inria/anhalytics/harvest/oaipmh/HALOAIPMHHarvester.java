@@ -1,6 +1,5 @@
 package fr.inria.anhalytics.harvest.oaipmh;
 
-import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
@@ -8,8 +7,6 @@ import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
 
 /**
  * HAL OAI-PMH implementation.
@@ -44,8 +41,8 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
             logger.info("\t Sending: " + request);
 
             InputStream in = Utilities.request(request);
-            List<TEIFile> teis = this.oaiDom.getTeis(in);
-            processTeis(teis, date, true);
+            grabbedObjects = this.oaiDom.getGrabbedObjects(in, grabbedObjects);
+            saveObjects(grabbedObjects);
 
             // token if any:
             tokenn = oaiDom.getToken();
@@ -73,7 +70,7 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
             logger.error(mue.getMessage(), mue);
         } catch (ServiceException se) {
             logger.error(se.getMessage(), se);
-            mm.save(currentDate, "blockedHarvestProcess", se.getMessage(), currentDate);
+            mm.save(currentDate, "blockedHarvestProcess", se.getMessage());
         }
     }
 //

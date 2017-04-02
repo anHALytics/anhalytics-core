@@ -28,12 +28,9 @@ public class Main {
     private static List<String> availableCommands = new ArrayList<String>() {
         {
             add("annotateAll");
-            add("annotateAllNerd");
-            add("annotateAllKeyTerm");
-            add("annotateNerdDaily");
-            add("annotateKeyTermDaily");
-            add("annotateDaily");
-            add("annotateAllQuantities");
+            add("annotateNerd");
+            add("annotateKeyTerm");
+            add("annotateQuantities");
             add("annotateQuantitiesFromPDF");
         }
     };
@@ -64,36 +61,14 @@ public class Main {
 
         try {
             Annotator annotator = new Annotator();
-            if (process.equals("annotateNerdDaily")) {
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.DATE, -1);
-                String todayDate = dateFormat.format(cal.getTime());
-                Utilities.updateDates(todayDate, todayDate);
+            if (process.equals("annotateNerd")) {
                 annotator.annotate(Annotator_Type.NERD);
-            } else if (process.equals("annotateKeyTermDaily")) {
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.DATE, -1);
-                String todayDate = dateFormat.format(cal.getTime());
-                Utilities.updateDates(todayDate, todayDate);
-                annotator.annotate(Annotator_Type.KEYTERM);
-            } else if (process.equals("annotateDaily")) {
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.DATE, -1);
-                String todayDate = dateFormat.format(cal.getTime());
-                Utilities.updateDates(todayDate, todayDate);
-                annotator.annotate(Annotator_Type.NERD);
-                annotator.annotate(Annotator_Type.KEYTERM);
-            } else if (process.equals("annotateAllNerd")) {
-                annotator.annotate(Annotator_Type.NERD);
-            } else if (process.equals("annotateAllKeyTerm")) {
+            } else if (process.equals("annotateKeyTerm")) {
                 annotator.annotate(Annotator_Type.KEYTERM);
             } else if (process.equals("annotateAll")) {
                 annotator.annotate(Annotator_Type.NERD);
                 annotator.annotate(Annotator_Type.KEYTERM);
-            } else if (process.equals("annotateAllQuantities")) {
+            } else if (process.equals("annotateQuantities")) {
                 annotator.annotate(Annotator_Type.QUANTITIES);
             } else if (process.equals("annotateQuantitiesFromPDF")) {
                 annotator.annotate(Annotator_Type.PDFQUANTITIES);
@@ -111,35 +86,7 @@ public class Main {
             if (currArg.equals("-h")) {
                 System.out.println(getHelp());
                 continue;
-            } else if (currArg.equals("-nodates")) {
-                AnnotateProperties.setProcessByDate(false);
-                i++;
-                continue;
-            } else if (currArg.equals("-dFromDate")) {
-                String stringDate = args[i + 1];
-                if (!stringDate.isEmpty()) {
-                    if (Utilities.isValidDate(stringDate)) {
-                        AnnotateProperties.setFromDate(args[i + 1]);
-                    } else {
-                        System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
-                        result = false;
-                    }
-                }
-                i++;
-                continue;
-            } else if (currArg.equals("-dUntilDate")) {
-                String stringDate = args[i + 1];
-                if (!stringDate.isEmpty()) {
-                    if (Utilities.isValidDate(stringDate)) {
-                        AnnotateProperties.setUntilDate(stringDate);
-                    } else {
-                        System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
-                        result = false;
-                    }
-                }
-                i++;
-                continue;
-            } else if (currArg.equals("-multiThread")) {
+            }else if (currArg.equals("-multiThread")) {
                 AnnotateProperties.setIsMultiThread(true);
                 continue;
             } else if (currArg.equals("-exe")) {

@@ -13,6 +13,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.w3c.dom.Attr;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 /**
@@ -26,7 +27,7 @@ public class TeiBuilder {
 
     private DocumentBuilder docBuilder;
 
-    public TeiBuilder()  {
+    public TeiBuilder() {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
         //docFactory.setNamespaceAware(true);
@@ -43,8 +44,16 @@ public class TeiBuilder {
      * returns new Document representing TEICorpus with harvested metadata in
      * TEI header.
      */
-    public Document createTEICorpus(Document metadataDoc) {
-        HalTEIConverter htc = new HalTEIConverter();//
+    public Document createTEICorpus(String metadata) {
+
+        Document metadataDoc = null;
+        HalTEIConverter htc = new HalTEIConverter();
+        try {
+            metadataDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(metadata.getBytes("utf-8"))));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Document newTEICorpus = docBuilder.newDocument();
         Element teiHeader = htc.convertMetadataToTEIHeader(metadataDoc, newTEICorpus);
         Element teiCorpus = newTEICorpus.createElement("teiCorpus");
@@ -53,6 +62,7 @@ public class TeiBuilder {
         teiCorpus.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
         newTEICorpus.appendChild(teiCorpus);
         htc.updatePublicationDate(teiHeader, newTEICorpus);
+        Utilities.generateIDs(newTEICorpus);
         return newTEICorpus;
     }
 
@@ -70,6 +80,20 @@ public class TeiBuilder {
         }
         Document doc = null;
 
+        //Remove if already existing.
+        NodeList elements = (NodeList) teiCorpusDoc.getElementsByTagName("TEI");
+        if (elements != null) {
+
+            Element tei = null;
+            for (int i = elements.getLength() - 1; i >= 0; i--) {
+                if (elements.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                    tei = (Element) elements.item(i);
+                    if (tei.getAttribute("xml:id").equals("grobid")) {
+                        tei.getParentNode().removeChild(tei);
+                    }
+                }
+            }
+        }
         try {
             Element grobidTeiElement = null;
             if (grobidTei != null) {
@@ -97,7 +121,7 @@ public class TeiBuilder {
      * Appends new element to TEICorpus.
      */
     private static Document addNewElementToTEI(Document doc, Node newNode) {
-        
+
         if (newNode != null) {
             newNode = (Element) doc.importNode(newNode, true);
             Element teiCorpus = (Element) doc.getElementsByTagName("teiCorpus").item(0);

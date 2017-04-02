@@ -497,7 +497,7 @@ public class IndexingPreprocess {
      */
     public JsonNode getStandoffNerd(ObjectMapper mapper, String anhalyticsId) throws Exception {
         JsonNode standoffNode = null;
-        String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.NERD_ANNOTATIONS);
+        String annotation = mm.getNerdAnnotations(anhalyticsId).getJson();
         if ((annotation != null) && (annotation.trim().length() > 0)) {
             JsonNode jsonAnnotation = mapper.readTree(annotation);
             if ((jsonAnnotation != null) && (!jsonAnnotation.isMissingNode())) {
@@ -575,7 +575,7 @@ public class IndexingPreprocess {
      * Get the grobid-keyterm annotations and inject them in the document structure in a standoff node
      */
     public JsonNode getStandoffKeyTerm(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
-        String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
+        String annotation = mm.getKeytermAnnotations(anhalyticsId).getJson();
         if ((annotation != null) && (annotation.trim().length() > 0)) {
             JsonNode jsonAnnotation = mapper.readTree(annotation);
 
@@ -752,7 +752,7 @@ public class IndexingPreprocess {
      * Get the grobid quantities annotations and inject them in the document structure in a standoff node
      */
     public JsonNode getStandoffQuantities(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
-        String annotation = mm.getAnnotations(anhalyticsId, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
+        String annotation = mm.getQuantitiesAnnotations(anhalyticsId).getJson();
         if ((annotation != null) && (annotation.trim().length() > 0)) {           
             JsonNode jsonAnnotation = mapper.readTree(annotation);
             if ((jsonAnnotation != null) && (!jsonAnnotation.isMissingNode())) {

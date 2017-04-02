@@ -34,6 +34,7 @@ public abstract class OAIPMHHarvester extends Harvester {
 
     protected static final Logger logger = LoggerFactory.getLogger(OAIPMHHarvester.class);
 
+    
     protected String oai_url = null;
 
     public OAIPMHHarvester() {

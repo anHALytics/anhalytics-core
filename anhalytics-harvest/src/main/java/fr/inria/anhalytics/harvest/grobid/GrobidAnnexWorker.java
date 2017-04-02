@@ -1,6 +1,6 @@
 package fr.inria.anhalytics.harvest.grobid;
 
-import fr.inria.anhalytics.commons.data.BinaryFile;
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import java.io.File;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -11,8 +11,8 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class GrobidAnnexWorker extends GrobidWorker {
 
-    public GrobidAnnexWorker(BinaryFile bf, String date, int start, int end) throws ParserConfigurationException {
-        super(bf, date, start, end);
+    public GrobidAnnexWorker(BiblioObject biblioObject, String date, int start, int end) throws ParserConfigurationException {
+        super(biblioObject, start, end);
     }
 
     @Override

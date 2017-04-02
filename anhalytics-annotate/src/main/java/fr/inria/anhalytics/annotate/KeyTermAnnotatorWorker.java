@@ -1,8 +1,7 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.services.KeyTermExtractionService;
-import fr.inria.anhalytics.commons.data.File;
-import fr.inria.anhalytics.commons.data.TEIFile;
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 
@@ -30,18 +29,19 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
     private static final Logger logger = LoggerFactory.getLogger(KeyTermAnnotatorWorker.class);
 
     public KeyTermAnnotatorWorker(MongoFileManager mongoManager,
-            File tei,
-            String date) {
-        super(mongoManager, tei, date, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
+            BiblioObject biblioObject) {
+        super(mongoManager, biblioObject, MongoCollectionsInterface.KEYTERM_ANNOTATIONS);
     }
 
     @Override
     protected void processCommand() {
         try {
             mm.insertAnnotation(annotateDocument(), annotationsCollection);
-            logger.info("\t\t " + Thread.currentThread().getName() + ": "+ file.getRepositoryDocId() + " annotated by the KeyTerm extraction and disambiguation service.");
+            biblioObject.setIsProcessedByKeyterm(Boolean.TRUE);
+            mm.updateBiblioObjectStatus(biblioObject);
+            logger.info("\t\t " + Thread.currentThread().getName() + ": "+ biblioObject.getRepositoryDocId() + " annotated by the KeyTerm extraction and disambiguation service.");
         } catch (Exception ex) {
-            logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + file.getRepositoryDocId());
+            logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + biblioObject.getRepositoryDocId());
             ex.printStackTrace();
         }
     }
@@ -77,12 +77,12 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
         }*/
         StringBuffer json = new StringBuffer();
         try {
-            json.append("{ \"repositoryDocId\" : \"" + file.getRepositoryDocId()
-                    + "\",\"anhalyticsId\" : \"" + file.getAnhalyticsId()
-                    + "\", \"date\" :\"" + date
+            json.append("{ \"repositoryDocId\" : \"" + biblioObject.getRepositoryDocId()
+                    + "\",\"anhalyticsId\" : \"" + biblioObject.getAnhalyticsId()
+                    + "\",\"isIndexed\" : \"" + false
                     + "\", \"keyterm\" : ");
             String jsonText = null;
-            KeyTermExtractionService keyTermService = new KeyTermExtractionService(IOUtils.toInputStream(((TEIFile)file).getTei(), "UTF-8"));
+            KeyTermExtractionService keyTermService = new KeyTermExtractionService(IOUtils.toInputStream(biblioObject.getGrobidTei(), "UTF-8"));
             jsonText = keyTermService.runKeyTermExtraction();
             if (jsonText != null) {
                 json.append(jsonText).append("}");
@@ -90,7 +90,7 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
                 json.append("{} }");
             }
         } catch(IOException e) {
-            logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + file.getRepositoryDocId());
+            logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + biblioObject.getRepositoryDocId());
             e.printStackTrace();
         }
         return json.toString();
