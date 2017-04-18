@@ -1,0 +1,3 @@
+[submodule "anhalytics-er"]
+	path = anhalytics-er
+	url = https://github.com/anHALytics/anhalytics-er.git
