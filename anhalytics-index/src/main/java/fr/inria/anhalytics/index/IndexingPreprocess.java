@@ -1,18 +1,14 @@
 package fr.inria.anhalytics.index;
 
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
-import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 
 /*import org.codehaus.jackson.*;
 import org.codehaus.jackson.node.*;
 import org.codehaus.jackson.map.ObjectMapper;*/
 
-import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.core.io.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +18,6 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.*;
 import java.text.SimpleDateFormat;
-import org.w3c.dom.Node;
 
 /**
  * Additional Java pre-processing of the JSON string.
@@ -86,6 +81,7 @@ public class IndexingPreprocess {
             JsonNode standoffNode = getStandoffNerd(mapper, anhalyticsId);
             standoffNode = getStandoffKeyTerm(mapper, anhalyticsId, standoffNode);
             standoffNode = getStandoffQuantities(mapper, anhalyticsId, standoffNode);
+//            standoffNode = getStandoffPDFQuantities(mapper, anhalyticsId, standoffNode);
             if (standoffNode != null) {
                 ((ArrayNode) teiRoot).add(standoffNode);
             }
@@ -104,14 +100,11 @@ public class IndexingPreprocess {
     /**
      * Process subJson Node and iterate through sub-nodes.
      */
-    /**
-     * Process subJson Node and iterate through sub-nodes.
-     */
     private JsonNode process(JsonNode subJson,
             ObjectMapper mapper,
             String currentLang,
             boolean fromArray,
-            boolean expandLang,
+                boolean expandLang,
             boolean isDate,
             String anhalyticsId) throws Exception {
         if (subJson.isContainerNode()) {

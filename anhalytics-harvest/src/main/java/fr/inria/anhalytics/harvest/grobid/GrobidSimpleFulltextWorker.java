@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.harvest.grobid;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
+import fr.inria.anhalytics.commons.data.Processings;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.harvest.exceptions.GrobidTimeoutException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
@@ -43,12 +44,14 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
                 logger.info("\t\t TEI extraction for : " + biblioObject.getRepositoryDocId() + " sizing :" + mb + "mb");
                 String tei = grobidService.runFullTextGrobid(filepath).trim();
                 tei = generateIdsGrobidTeiDoc(tei);
-                
-                mm.insertGrobidTei(tei, biblioObject.getAnhalyticsId());
-                this.saveExtractedDOI(tei);
-                biblioObject.setIsProcessedByGrobid(Boolean.TRUE);
-                mm.updateBiblioObjectStatus(biblioObject);
-                logger.info("\t\t " + biblioObject.getRepositoryDocId() + " processed.");
+
+                boolean inserted = mm.insertGrobidTei(tei, biblioObject.getAnhalyticsId());
+                if (inserted) {
+                    this.saveExtractedDOI(tei);
+                    mm.updateBiblioObjectStatus(biblioObject, Processings.GROBID, false);
+                    logger.info("\t\t " + biblioObject.getRepositoryDocId() + " processed.");
+                } else
+                    logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " grobid TEI.");
             } else {
                 logger.info("\t\t can't extract TEI for : " + biblioObject.getRepositoryDocId() + "size too large : " + mb + "mb");
             }

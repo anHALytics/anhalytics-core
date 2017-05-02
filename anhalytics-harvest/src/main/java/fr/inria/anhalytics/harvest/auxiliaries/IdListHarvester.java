@@ -88,7 +88,7 @@ public class IdListHarvester extends Harvester {
                     biblioObjects.add(biblioObject);
                 }
             }
-            saveObjects(biblioObjects);
+            saveObjects();
         } catch (MalformedURLException mue) {
             logger.error(mue.getMessage(), mue);
         } catch (ServiceException se) {

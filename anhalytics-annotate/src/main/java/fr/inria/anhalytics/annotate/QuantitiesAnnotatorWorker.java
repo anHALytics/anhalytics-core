@@ -2,6 +2,7 @@ package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.services.QuantitiesService;
 import fr.inria.anhalytics.commons.data.BiblioObject;
+import fr.inria.anhalytics.commons.data.Processings;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
@@ -43,12 +44,16 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
     protected void processCommand() {
 
         // get all the elements having an attribute id and annotate their text content
-        mm.insertAnnotation(annotateDocument(), annotationsCollection);
-        biblioObject.setIsProcessedByTextQuantities(Boolean.TRUE);
-        mm.updateBiblioObjectStatus(biblioObject);
-        logger.info("\t\t " + Thread.currentThread().getName() + ": " + 
-            biblioObject.getRepositoryDocId() + " annotated by the QUANTITIES service.");
-           
+        boolean inserted = mm.insertAnnotation(annotateDocument(), annotationsCollection);
+        if (inserted) {
+            mm.updateBiblioObjectStatus(biblioObject, Processings.QUANTITIES, false);
+            logger.info("\t\t " + Thread.currentThread().getName() + ": "
+                    + biblioObject.getRepositoryDocId() + " annotated by the QUANTITIES service.");
+        } else {
+            logger.info("\t\t " + Thread.currentThread().getName() + ": "
+                    + biblioObject.getRepositoryDocId() + " error occured trying to annotate with QUANTITIES.");
+        }
+
     }
 
     @Override
@@ -65,22 +70,22 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
         StringBuffer json = new StringBuffer();
-            json.append("{ \"repositoryDocId\" : \"" + biblioObject.getRepositoryDocId() 
-                    + "\",\"anhalyticsId\" : \"" + biblioObject.getAnhalyticsId()
-//                    + "\", \"date\" :\"" + date
-                    + "\", \"isIndexed\" :\"" + false
-                    + "\", \"annotation\" : [ ");
-            
-            //check if any thing was added, throw exception if not (not insert entry)
+        json.append("{ \"repositoryDocId\" : \"" + biblioObject.getRepositoryDocId()
+                + "\",\"anhalyticsId\" : \"" + biblioObject.getAnhalyticsId()
+                //                    + "\", \"date\" :\"" + date
+                + "\", \"isIndexed\" :\"" + false
+                + "\", \"annotation\" : [ ");
+
+        //check if any thing was added, throw exception if not (not insert entry)
         annotateNode(docTei.getDocumentElement(), true, json, null);
-        json.append("] }");      
-        
+        json.append("] }");
+
         return json.toString();
     }
-    
-     /**
+
+    /**
      * Recursive tree walk for annotating every nodes having a random xml:id.
      */
     private boolean annotateNode(Node node,

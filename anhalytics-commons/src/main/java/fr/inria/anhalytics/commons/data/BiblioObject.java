@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- *
+ * Utility bibliographic object.
  * @author azhar
  */
 public class BiblioObject {
@@ -25,6 +25,7 @@ public class BiblioObject {
     private String metadata="";
     private String teiCorpus="";
     private String grobidTei="";
+    
     private String repositoryDocId="";
     private String repositoryDocVersion="";
     private String source="";
@@ -33,12 +34,9 @@ public class BiblioObject {
     private List<BinaryFile> annexes;
     private List<String> domains;
     private Boolean isProcessedByPub2TEI = false;
+    private Boolean isFulltextAppended = false;
     private Boolean isWithFulltext = false;
-    private Boolean isProcessedByGrobid = false;
-    private Boolean isProcessedByNerd = false;
-    private Boolean isProcessedByKeyterm = false;
-    private Boolean isProcessedByTextQuantities = false;
-    private Boolean isProcessedByPDFQuantities = false;
+    private Boolean isMined = false;
     private Boolean isIndexed = false;
 
     /**
@@ -184,76 +182,6 @@ public class BiblioObject {
     }
 
     /**
-     * @return the isProcessedByGrobid
-     */
-    public Boolean getIsProcessedByGrobid() {
-        return isProcessedByGrobid;
-    }
-
-    /**
-     * @param isProcessedByGrobid the isProcessedByGrobid to set
-     */
-    public void setIsProcessedByGrobid(Boolean isProcessedByGrobid) {
-        this.isProcessedByGrobid = isProcessedByGrobid;
-    }
-
-    /**
-     * @return the isProcessedByNerd
-     */
-    public Boolean getIsProcessedByNerd() {
-        return isProcessedByNerd;
-    }
-
-    /**
-     * @param isProcessedByNerd the isProcessedByNerd to set
-     */
-    public void setIsProcessedByNerd(Boolean isProcessedByNerd) {
-        this.isProcessedByNerd = isProcessedByNerd;
-    }
-
-    /**
-     * @return the isProcessedByKeyterm
-     */
-    public Boolean getIsProcessedByKeyterm() {
-        return isProcessedByKeyterm;
-    }
-
-    /**
-     * @param isProcessedByKeyterm the isProcessedByKeyterm to set
-     */
-    public void setIsProcessedByKeyterm(Boolean isProcessedByKeyterm) {
-        this.isProcessedByKeyterm = isProcessedByKeyterm;
-    }
-
-    /**
-     * @return the isProcessedByTextQuantities
-     */
-    public Boolean getIsProcessedByTextQuantities() {
-        return isProcessedByTextQuantities;
-    }
-
-    /**
-     * @param isProcessedByTextQuantities the isProcessedByTextQuantities to set
-     */
-    public void setIsProcessedByTextQuantities(Boolean isProcessedByTextQuantities) {
-        this.isProcessedByTextQuantities = isProcessedByTextQuantities;
-    }
-
-    /**
-     * @return the isProcessedByPDFQuantities
-     */
-    public Boolean getIsProcessedByPDFQuantities() {
-        return isProcessedByPDFQuantities;
-    }
-
-    /**
-     * @param isProcessedByPDFQuantities the isProcessedByPDFQuantities to set
-     */
-    public void setIsProcessedByPDFQuantities(Boolean isProcessedByPDFQuantities) {
-        this.isProcessedByPDFQuantities = isProcessedByPDFQuantities;
-    }
-
-    /**
      * @return the domains
      */
     public List<String> getDomains() {
@@ -336,6 +264,37 @@ public class BiblioObject {
     public void setIsIndexed(Boolean isIndexed) {
         this.isIndexed = isIndexed;
     }
+
+    /**
+     * @return the isMined
+     */
+    public Boolean getIsMined() {
+        return isMined;
+    }
+
+    /**
+     * @param isMined the isMined to set
+     */
+    public void setIsMined(Boolean isMined) {
+        this.isMined = isMined;
+    }
     
-    
+    @Override
+    public String toString() {
+        return "BiblioObject{" + "anhalyticsId=" + anhalyticsId + ",metadataURL=" + metadataURL + ",metadata=" + metadata + ",teiCorpus=" + teiCorpus+ ",doi=" + doi+ ",publicationType=" + publicationType+ ",isWithFulltext=" + isWithFulltext +",domains=" + domains + '}';
+    }
+
+    /**
+     * @return the isFulltextAppended
+     */
+    public Boolean getIsFulltextAppended() {
+        return isFulltextAppended;
+    }
+
+    /**
+     * @param isFulltextAppended the isFulltextAppended to set
+     */
+    public void setIsFulltextAppended(Boolean isFulltextAppended) {
+        this.isFulltextAppended = isFulltextAppended;
+    }
 }

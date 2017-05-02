@@ -1,10 +1,7 @@
 package fr.inria.anhalytics.index;
 
 import fr.inria.anhalytics.commons.data.Annotation;
-import fr.inria.anhalytics.commons.data.TEIFile;
-import fr.inria.anhalytics.commons.exceptions.SystemException;
 import fr.inria.anhalytics.index.exceptions.IndexNotCreatedException;
-import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import java.util.*;
 
 import org.elasticsearch.action.bulk.*;
@@ -13,22 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.json.JsonTapasML;
 import org.json.JSONObject;
-import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.IndexProperties;
-import java.io.ByteArrayInputStream;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.core.io.*;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 
 /*import org.codehaus.jackson.JsonNode;
@@ -37,10 +21,6 @@ import org.codehaus.jackson.node.ObjectNode;*/
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.index.query.*;
-import org.json.JSONException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 
 /**
  * Method for management of the ElasticSearch cluster.
@@ -132,7 +112,7 @@ public class DocumentIndexer extends Indexer {
         //bulkRequest.setRefresh(true);
         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
 
-        if (mm.initObjects()) {
+        if (mm.initObjects(null)) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 if (!IndexProperties.isReset() && biblioObject.getIsIndexed()) {
@@ -171,7 +151,7 @@ public class DocumentIndexer extends Indexer {
                         logger.info("\n Bulk number : " + nb / bulkSize);
                     }
                     biblioObject.setIsIndexed(Boolean.TRUE);
-                    mm.updateBiblioObjectStatus(biblioObject);
+                    mm.updateBiblioObjectStatus(biblioObject, null, false);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -201,7 +181,7 @@ public class DocumentIndexer extends Indexer {
             //bulkRequest.setRefresh(true);
             bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
 
-            if (mm.initObjects()) {
+            if (mm.initObjects(null)) {
 
                 while (mm.hasMore()) {
                     BiblioObject biblioObject = mm.nextBiblioObject();
@@ -241,7 +221,7 @@ public class DocumentIndexer extends Indexer {
                             logger.info("\n Bulk number : " + nb / bulkSize);
                         }
                         biblioObject.setIsIndexed(Boolean.TRUE);
-                        mm.updateBiblioObjectStatus(biblioObject);
+                        mm.updateBiblioObjectStatus(biblioObject, null, false);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -273,7 +253,7 @@ public class DocumentIndexer extends Indexer {
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         //bulkRequest.setRefresh(true);
         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-        if (mm.initObjects()) {
+        if (mm.initObjects(null)) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 Annotation annotation = mm.getNerdAnnotations(biblioObject.getAnhalyticsId());
@@ -329,7 +309,7 @@ public class DocumentIndexer extends Indexer {
         //bulkRequest.setRefresh(true);
         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
         ObjectMapper mapper = new ObjectMapper();
-        if (mm.initObjects()) {
+        if (mm.initObjects(null)) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 Annotation annotation = mm.getNerdAnnotations(biblioObject.getAnhalyticsId());
@@ -421,7 +401,7 @@ public class DocumentIndexer extends Indexer {
         //bulkRequest.setRefresh(true);
         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
         //if (mm.initQuantitiesAnnotations()) {
-        if (mm.initObjects()) {
+        if (mm.initObjects(null)) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 Annotation annotation = mm.getNerdAnnotations(biblioObject.getAnhalyticsId());

@@ -42,7 +42,7 @@ public class HALOAIPMHHarvester extends OAIPMHHarvester {
 
             InputStream in = Utilities.request(request);
             grabbedObjects = this.oaiDom.getGrabbedObjects(in, grabbedObjects);
-            saveObjects(grabbedObjects);
+            saveObjects();
 
             // token if any:
             tokenn = oaiDom.getToken();

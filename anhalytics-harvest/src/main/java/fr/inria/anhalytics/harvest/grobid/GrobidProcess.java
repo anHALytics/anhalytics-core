@@ -2,6 +2,7 @@ package fr.inria.anhalytics.harvest.grobid;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.BinaryFile;
+import fr.inria.anhalytics.commons.data.Processings;
 import fr.inria.anhalytics.harvest.exceptions.UnreachableGrobidServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.utilities.Utilities;
@@ -38,16 +39,16 @@ public class GrobidProcess {
                 ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
                 int start = -1;
                 int end = -1;
-                if (mm.initObjects()) {
+                if (mm.initObjects(null)) {
                     while (mm.hasMore()) {
                         BiblioObject biblioObject = mm.nextBiblioObject();
-                        if (toBeGrobidified.contains(biblioObject.getPublicationType().split("_")[0])) {
+//                        if (toBeGrobidified.contains(biblioObject.getPublicationType().split("_")[0])) {
 
                             if (!biblioObject.getIsWithFulltext()) {
-                                logger.info("\t\t No fulltext available, Skipping...");
+                                logger.info("\t\t No fulltext available for : "+biblioObject.getRepositoryDocId()+", Skipping...");
                                 continue;
                             }
-                            if (!HarvestProperties.isReset() && biblioObject.getIsProcessedByGrobid()) {
+                            if (!HarvestProperties.isReset() && mm.isProcessed(Processings.GROBID)) {
                                 logger.info("\t\t Already grobidified, Skipping...");
                                 continue;
                             }
@@ -67,7 +68,7 @@ public class GrobidProcess {
                                 logger.error("An error occured while processing the file " + bf.getRepositoryDocId()
                                         + ". Continuing the process for the other files" + exp.getMessage());
                             }
-                        }
+//                        }
                     }
                 }
 

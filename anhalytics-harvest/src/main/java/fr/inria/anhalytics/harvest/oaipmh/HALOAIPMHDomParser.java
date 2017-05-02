@@ -37,7 +37,7 @@ public class HALOAIPMHDomParser {
 
     protected static final Logger logger = LoggerFactory.getLogger(HALOAIPMHDomParser.class);
 
-    private final static String source = Harvester.Source.HAL.toString();
+    private final static String source = Harvester.Source.HAL.getName();
 
     private Document doc;
     private String token;

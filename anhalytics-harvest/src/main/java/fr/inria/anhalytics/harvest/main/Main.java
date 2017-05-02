@@ -38,16 +38,20 @@ public class Main {
         {
             add("harvestAll");
             add("harvestDaily");
-            add("harvestHalList");
-            add("appendFulltextTei");
-            //add("fetchEmbargoPublications");
-            add("processGrobid");
-            add("istexHarvest");
-            //add("assetLegend");
-            add("harvestDOI");
-            add("openUrl");
-            add("istexQuantities");
+            
             add("transformMetadata");
+            add("processGrobid");
+            
+            add("appendFulltextTei");
+            
+            add("harvestIstex");
+            
+            add("sampleIstex");
+            
+            add("harvestHalList");
+            
+//            add("harvestDOI");
+//            add("openUrl");
         }
     };
 
@@ -82,16 +86,19 @@ public class Main {
         String process = HarvestProperties.getProcessName();
         GrobidProcess gp = new GrobidProcess();
         TeiCorpusBuilderProcess tcb = new TeiCorpusBuilderProcess();
-        //HALOAIPMHHarvester oai = new HALOAIPMHHarvester();
-        IstexHarvester ih = new IstexHarvester();
         CrossRef cr = new CrossRef();
         OpenUrl ou = new OpenUrl();
 
         Harvester harvester = null;
 
         if (process.equals("harvestAll")) {
-            //HAL uses OAI PMH providing updated/new documents on daily basis.
-            harvester = new HALOAIPMHHarvester();
+            if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) 
+            {
+                //HAL uses OAI PMH providing updated/new documents on daily basis.
+                harvester = new HALOAIPMHHarvester();
+            } else {
+                harvester = new IstexHarvester();
+            }
             harvester.fetchAllDocuments();
         } else if (process.equals("harvestDaily")) {
             harvester = new HALOAIPMHHarvester();
@@ -103,18 +110,22 @@ public class Main {
             gp.processFulltexts();
         } else if (process.equals("appendFulltextTei")) {
             tcb.addGrobidFulltextToTEICorpus();
-        } else if (process.equals("harvestDOI")) {
-            cr.findDois();
-        } else if (process.equals("openUrl")) {
-            ou.getIstexUrl();
-        } else if (process.equals("istexHarvest")) {
+        } else if (process.equals("harvestIstex")) {
+            harvester = new IstexHarvester();
+            harvester.fetchAllDocuments();
+        }else if (process.equals("sampleIstex")) {
+            IstexHarvester ih = new IstexHarvester();
             ih.sample();
-        } else if (process.equals("istexQuantities")) {
-
         } else if (process.equals("harvestHalList")) {
             harvester = new IdListHarvester();
             harvester.fetchAllDocuments();
         }
+        
+//        else if (process.equals("harvestDOI")) {
+//            cr.findDois();
+//        } else if (process.equals("openUrl")) {
+//            ou.getIstexUrl();
+//        }
     }
 
     protected static boolean processArgs(final String[] pArgs) {

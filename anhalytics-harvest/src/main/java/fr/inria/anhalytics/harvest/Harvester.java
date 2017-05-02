@@ -2,16 +2,13 @@ package fr.inria.anhalytics.harvest;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
-import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.harvest.exceptions.BinaryNotAvailableException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
-import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Date;
 import java.text.ParseException;
@@ -76,11 +73,11 @@ public abstract class Harvester {
      * Stores the given teis and downloads attachements(main file(s), annexes
      * ..) .
      */
-    protected void saveObjects(List<BiblioObject> objects) {
-        if ((objects == null) || (objects.size() == 0)) {
+    protected void saveObjects() {
+        if ((grabbedObjects == null) || (grabbedObjects.size() == 0)) {
             return;
         }
-        for (BiblioObject object : objects) {
+        for (BiblioObject object : grabbedObjects) {
             String metadataString = object.getMetadata();
             String pdfUrl = "";
             if (object.getPdf() != null) {

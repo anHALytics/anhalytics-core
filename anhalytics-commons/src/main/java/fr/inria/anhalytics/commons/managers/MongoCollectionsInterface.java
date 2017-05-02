@@ -37,6 +37,7 @@ public interface MongoCollectionsInterface {
     public static final String NERD_ANNOTATIONS = "nerd_annotations";
     public static final String KEYTERM_ANNOTATIONS = "keyterm_annotations";
     public static final String QUANTITIES_ANNOTATIONS = "quantities_annotations";
+    public static final String PDF_QUANTITIES_ANNOTATIONS = "pdf_quantities_annotations";
     //metadata harvested from other repositorues
     public static final String ISTEX_TEIS = "istex_teis";
     

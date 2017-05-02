@@ -9,6 +9,7 @@ import com.mongodb.util.JSON;
 import fr.inria.anhalytics.commons.data.Annotation;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.BinaryFile;
+import fr.inria.anhalytics.commons.data.Processings;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 
@@ -96,7 +97,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * This initializes cursor for existing objects.
      */
-    public boolean initObjects() throws MongoException {
+    public boolean initObjects(String source) throws MongoException {
 
         collection = getCollection(MongoCollectionsInterface.BIBLIO_OBJECTS);
         BasicDBObject index = new BasicDBObject();
@@ -104,7 +105,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         index.put("anhalyticsId", 1);
         collection.ensureIndex(index, "index", true);
         BasicDBObject bdbo = new BasicDBObject();
-
+        if (source != null) {
+            bdbo.append("source", source);
+        }
         cursor = collection.find(bdbo);
         indexFile = 0;
         if (cursor.size() > 0) {
@@ -116,11 +119,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     /**
-     * Updates object status(Processings).
-     *
+     * Updates object status(Processings) and resets status if new TEICorpus was created (resetStatus).
      * @param biblioObject
      */
-    public void updateBiblioObjectStatus(BiblioObject biblioObject) {
+    public void updateBiblioObjectStatus(BiblioObject biblioObject, Processings processing, boolean resetStatus) {
         DBCollection collection = db.getCollection(MongoCollectionsInterface.BIBLIO_OBJECTS);
         BasicDBObject newDocument = new BasicDBObject();
         ObjectId objectId = new ObjectId(biblioObject.getAnhalyticsId());
@@ -134,13 +136,20 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         newDocument.put("doi", biblioObject.getDoi());
         newDocument.put("domains", biblioObject.getDomains());
         newDocument.put("isWithFulltext", biblioObject.getIsWithFulltext());
-        newDocument.put("isProcessedByGrobid", biblioObject.getIsProcessedByGrobid());
+        newDocument.put("isFulltextAppended", biblioObject.getIsFulltextAppended());
         newDocument.put("isProcessedPub2TEI", biblioObject.getIsProcessedByPub2TEI());
-        newDocument.put("isProcessedByKeyterm", biblioObject.getIsProcessedByKeyterm());
-        newDocument.put("isProcessedByNerd", biblioObject.getIsProcessedByNerd());
-        newDocument.put("isProcessedByTextQuantites", biblioObject.getIsProcessedByTextQuantities());
-        newDocument.put("isProcessedByPDFQuantities", biblioObject.getIsProcessedByPDFQuantities());
+        newDocument.put("isMined", biblioObject.getIsMined());
         newDocument.put("isIndexed", biblioObject.getIsIndexed());
+        if (processing != null) {
+            newDocument.put(processing.getName(), true);
+        } 
+        
+        if (resetStatus) {
+            for (Processings p : Processings.values()) {
+                newDocument.put(p.getName(), false);
+            }
+        }
+
         BasicDBObject searchQuery = new BasicDBObject().append("anhalyticsId", biblioObject.getAnhalyticsId());
 
         collection.update(searchQuery, newDocument);
@@ -178,12 +187,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         document.put("doi", biblioObject.getDoi());
         document.put("domains", biblioObject.getDomains());
         document.put("isWithFulltext", biblioObject.getIsWithFulltext());
-        document.put("isProcessedByGrobid", biblioObject.getIsProcessedByGrobid());
+        document.put("isFulltextAppended", biblioObject.getIsFulltextAppended());
         document.put("isProcessedPub2TEI", biblioObject.getIsProcessedByPub2TEI());
-        document.put("isProcessedByKeyterm", biblioObject.getIsProcessedByKeyterm());
-        document.put("isProcessedByNerd", biblioObject.getIsProcessedByNerd());
-        document.put("isProcessedByTextQuantites", biblioObject.getIsProcessedByTextQuantities());
-        document.put("isProcessedByPDFQuantities", biblioObject.getIsProcessedByPDFQuantities());
+        document.put("isMined", biblioObject.getIsMined());
         document.put("isIndexed", biblioObject.getIsIndexed());
 
         try {
@@ -232,11 +238,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     public String getGrobidTei(BiblioObject biblioObject) {
-        try {
-            return this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.GROBID_TEIS);
-        } catch (DataException de) {
-            return null;
-        }
+        return this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.GROBID_TEIS);
     }
 
     private String getTei(String anhalyticsId, String collection) {
@@ -257,23 +259,20 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     public BiblioObject nextBiblioObject() {
         BiblioObject biblioObject = new BiblioObject();
-        DBObject obj = cursor.next();
-        biblioObject.setRepositoryDocId((String) obj.get("repositoryDocId"));
-        biblioObject.setAnhalyticsId((String) obj.get("anhalyticsId"));
-        biblioObject.setDomains((List<String>) obj.get("domains"));
-        biblioObject.setDoi((String) obj.get("doi"));
-        biblioObject.setIsWithFulltext((boolean) obj.get("isWithFulltext"));
-        biblioObject.setIsProcessedByGrobid((boolean) obj.get("isProcessedByGrobid"));
-        biblioObject.setIsProcessedByPub2TEI((boolean) obj.get("isProcessedPub2TEI"));
-        biblioObject.setIsProcessedByKeyterm((boolean) obj.get("isProcessedByKeyterm"));
-        biblioObject.setIsProcessedByNerd((boolean) obj.get("isProcessedByNerd"));
-        biblioObject.setIsProcessedByTextQuantities((boolean) obj.get("isProcessedPub2TEI"));
-        biblioObject.setIsProcessedByPDFQuantities((boolean) obj.get("isProcessedByPDFQuantities"));
-        biblioObject.setIsIndexed((boolean) obj.get("isIndexed"));
-        biblioObject.setPublicationType((String) obj.get("publicationType"));
-        biblioObject.setSource((String) obj.get("source"));
-        biblioObject.setRepositoryDocVersion((String) obj.get("repositoryDocVersion"));
-        biblioObject.setMetadataURL((String) obj.get("metadataURL"));
+        temp = cursor.next();
+        biblioObject.setRepositoryDocId((String) temp.get("repositoryDocId"));
+        biblioObject.setAnhalyticsId((String) temp.get("anhalyticsId"));
+        biblioObject.setDomains((List<String>) temp.get("domains"));
+        biblioObject.setDoi((String) temp.get("doi"));
+        biblioObject.setIsFulltextAppended((boolean) temp.get("isFulltextAppended"));
+        biblioObject.setIsWithFulltext((boolean) temp.get("isWithFulltext"));
+        biblioObject.setIsProcessedByPub2TEI((boolean) temp.get("isProcessedPub2TEI"));
+        biblioObject.setIsMined((boolean) temp.get("isMined"));
+        biblioObject.setIsIndexed((boolean) temp.get("isIndexed"));
+        biblioObject.setPublicationType((String) temp.get("publicationType"));
+        biblioObject.setSource((String) temp.get("source"));
+        biblioObject.setRepositoryDocVersion((String) temp.get("repositoryDocVersion"));
+        biblioObject.setMetadataURL((String) temp.get("metadataURL"));
         indexFile++;
         return biblioObject;
     }
@@ -296,6 +295,12 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //        index.put("xml:id", 1);
             c.ensureIndex(index, "index", true);
             DBObject dbObject = (DBObject) JSON.parse(json);
+
+            BasicDBObject document = new BasicDBObject();
+            document.put("anhalyticsId", dbObject.get("anhalyticsId"));
+            System.out.println(dbObject.get("anhalyticsId"));
+            c.findAndRemove(document);
+
             WriteResult result = c.insert(dbObject);
             CommandResult res = result.getCachedLastError();
             if ((res != null) && (res.ok())) {
@@ -304,6 +309,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 done = false;
             }
         } catch (Exception e) {
+            System.out.println(json);
             logger.error(e.getMessage(), e.getCause());
         }
         return done;
@@ -335,7 +341,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /**
      * inserts a Arxiv/istex TEI document in the GridFS.
      */
-    public void insertPDFDocument(InputStream file, String anhalyticsId) throws MongoException, IOException {
+    public boolean insertPDFDocument(InputStream file, String anhalyticsId) throws MongoException, IOException {
 //        try {
         GridFS gfs = new GridFS(db, MongoCollectionsInterface.BINARIES);
         GridFSInputFile gfsFile = gfs.createFile(file, true);
@@ -347,13 +353,13 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //        } catch (ParseException e) {
 //            logger.error(e.getMessage(), e.getCause());
 //        }
-
+        return true;
     }
 
     /**
      * inserts a Arxiv/istex TEI document in the GridFS.
      */
-    public void insertTEIcorpus(String TEIcorpus, String anhalyticsId) throws MongoException {
+    public boolean insertTEIcorpus(String TEIcorpus, String anhalyticsId) throws MongoException {
 //        try {
         GridFS gfs = new GridFS(db, MongoCollectionsInterface.TEI_CORPUS);
         GridFSInputFile gfsFile = gfs.createFile(new ByteArrayInputStream(TEIcorpus.getBytes()), true);
@@ -364,13 +370,13 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //        } catch (ParseException e) {
 //            logger.error(e.getMessage(), e.getCause());
 //        }
-
+        return true;
     }
 
     /**
      * inserts a Arxiv/istex TEI document in the GridFS.
      */
-    public void insertGrobidTei(String grobidTei, String anhalyticsId) throws MongoException {
+    public boolean insertGrobidTei(String grobidTei, String anhalyticsId) throws MongoException {
 //        try {
         GridFS gfs = new GridFS(db, MongoCollectionsInterface.GROBID_TEIS);
         GridFSInputFile gfsFile = gfs.createFile(new ByteArrayInputStream(grobidTei.getBytes()), true);
@@ -381,13 +387,13 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //        } catch (ParseException e) {
 //            logger.error(e.getMessage(), e.getCause());
 //        }
-
+        return true;
     }
 
     /**
      * inserts a Arxiv/istex TEI document in the GridFS.
      */
-    public void insertMetadataDocument(String metadata, String anhalyticsId) throws MongoException {
+    public boolean insertMetadataDocument(String metadata, String anhalyticsId) throws MongoException {
 //        try {
         GridFS gfs = new GridFS(db, MongoCollectionsInterface.METADATAS_TEIS);
         GridFSInputFile gfsFile = gfs.createFile(new ByteArrayInputStream(metadata.getBytes()), true);
@@ -399,12 +405,13 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //            logger.error(e.getMessage(), e.getCause());
 //        }
 
+        return true;
     }
 
     /**
      * Inserts publication annex document.
      */
-    public void insertAnnexDocument(BinaryFile bf, String anhalyticsId) throws MongoException, IOException {
+    public boolean insertAnnexDocument(BinaryFile bf, String anhalyticsId) throws MongoException, IOException {
         GridFS gfs = new GridFS(db, MongoCollectionsInterface.PUB_ANNEXES);
         BasicDBObject whereQuery = new BasicDBObject();
         whereQuery.put("anhalyticsId", anhalyticsId);
@@ -416,6 +423,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         gfsFile.put("anhalyticsId", bf.getAnhalyticsId());
         gfsFile.save();
         bf.getStream().close();
+        return true;
     }
 
     public Annotation getNerdAnnotations(String anhalyticsId) {
@@ -543,4 +551,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //
 //        }
 //    }
+    public boolean isProcessed(Processings processing) {
+        return (boolean) temp.get(processing.getName());
+    }
 }

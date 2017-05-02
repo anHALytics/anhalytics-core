@@ -1,16 +1,13 @@
 package fr.inria.anhalytics.annotate.main;
 
 import fr.inria.anhalytics.annotate.Annotator;
-import fr.inria.anhalytics.annotate.Annotator.Annotator_Type;
+import fr.inria.anhalytics.commons.data.Processings;
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import java.net.UnknownHostException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,16 +59,16 @@ public class Main {
         try {
             Annotator annotator = new Annotator();
             if (process.equals("annotateNerd")) {
-                annotator.annotate(Annotator_Type.NERD);
+                annotator.annotate(Processings.NERD);
             } else if (process.equals("annotateKeyTerm")) {
-                annotator.annotate(Annotator_Type.KEYTERM);
+                annotator.annotate(Processings.KEYTERM);
             } else if (process.equals("annotateAll")) {
-                annotator.annotate(Annotator_Type.NERD);
-                annotator.annotate(Annotator_Type.KEYTERM);
+                annotator.annotate(Processings.NERD);
+                annotator.annotate(Processings.KEYTERM);
             } else if (process.equals("annotateQuantities")) {
-                annotator.annotate(Annotator_Type.QUANTITIES);
+                annotator.annotate(Processings.QUANTITIES);
             } else if (process.equals("annotateQuantitiesFromPDF")) {
-                annotator.annotate(Annotator_Type.PDFQUANTITIES);
+                annotator.annotate(Processings.PDFQUANTITIES);
             }
         } catch (ServiceException se) {
             logger.error(se.getMessage());
@@ -116,8 +113,6 @@ public class Main {
         help.append("HELP ANHALYTICS-ANNOTATE \n");
         help.append("-h: displays help\n");
         help.append("-multiThread: enables using multiple threads to annotate\n");
-        help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
-        help.append("-dUntilDate: filter until date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-nodates: fetches entries from database with no date filtering.\n");
         help.append("-exe: gives the command to execute. The value should be one of these : \n");
         help.append("--reset: updates all the documents (beware about versions/updates) : \n");

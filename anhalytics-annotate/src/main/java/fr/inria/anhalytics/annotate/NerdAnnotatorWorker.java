@@ -2,6 +2,7 @@ package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.services.NerdService;
 import fr.inria.anhalytics.commons.data.BiblioObject;
+import fr.inria.anhalytics.commons.data.Processings;
 import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
@@ -18,7 +19,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
-
 
 import org.apache.commons.io.IOUtils;
 
@@ -46,10 +46,14 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
     @Override
     protected void processCommand() {
         // get all the elements having an attribute id and annotate their text content
-        mm.insertAnnotation(annotateDocument(), annotationsCollection);
-        biblioObject.setIsProcessedByNerd(Boolean.TRUE);
-        mm.updateBiblioObjectStatus(biblioObject);
-        logger.info("\t\t " + Thread.currentThread().getName() + ": " + biblioObject.getRepositoryDocId() + " annotated by the NERD service.");
+        boolean inserted = mm.insertAnnotation(annotateDocument(), annotationsCollection);
+        if (inserted) {
+            mm.updateBiblioObjectStatus(biblioObject, Processings.NERD, false);
+            logger.info("\t\t " + Thread.currentThread().getName() + ": " + biblioObject.getRepositoryDocId() + " annotated by the NERD service.");
+        } else {
+            logger.info("\t\t " + Thread.currentThread().getName() + ": "
+                    + biblioObject.getRepositoryDocId() + " error occured trying to annotate with NERD.");
+        }
     }
 
     /**
@@ -62,10 +66,20 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = null;
         Document docTei = null;
+        StringBuffer json = new StringBuffer();
         try {
             docBuilder = docFactory.newDocumentBuilder();
             // parse the TEI
             docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(biblioObject.getTeiCorpus().getBytes("UTF-8"))));
+
+            json.append("{ \"repositoryDocId\" : \"" + biblioObject.getRepositoryDocId()
+                    + "\",\"anhalyticsId\" : \"" + biblioObject.getAnhalyticsId()
+                    + "\",\"isIndexed\" : \"" + false
+                    + "\", \"nerd\" : ["
+            );
+            //check if any thing was added, throw exception if not (not insert entry)
+            annotateNode(docTei.getDocumentElement(), true, json, null);
+            json.append("] }");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -93,15 +107,6 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
                 }
             }
         }*/
-        StringBuffer json = new StringBuffer();
-        json.append("{ \"repositoryDocId\" : \"" + biblioObject.getRepositoryDocId()
-                + "\",\"anhalyticsId\" : \"" + biblioObject.getAnhalyticsId()
-                + "\",\"isIndexed\" : \"" + false
-                + "\", \"nerd\" : ["
-        );
-        //check if any thing was added, throw exception if not (not insert entry)
-        annotateNode(docTei.getDocumentElement(), true, json, null);
-        json.append("] }");
         return json.toString();
     }
 

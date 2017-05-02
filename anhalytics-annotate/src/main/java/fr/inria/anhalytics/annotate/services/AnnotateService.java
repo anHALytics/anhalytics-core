@@ -1,9 +1,8 @@
 package fr.inria.anhalytics.annotate.services;
 
-import com.sun.org.apache.xerces.internal.util.URI;
-import fr.inria.anhalytics.annotate.Annotator;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.annotate.exceptions.UnreachableAnnotateServiceException;
+import fr.inria.anhalytics.commons.data.Processings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -11,7 +10,6 @@ import java.net.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.io.IOUtils;
 
 /**
  * Call of annotate services via its REST web services. Data to be sent to the service 
@@ -34,16 +32,16 @@ public abstract class AnnotateService {
      *
      * @return boolean
      */
-    public static boolean isAnnotateServiceReady(Annotator.Annotator_Type annotator_type) throws UnreachableAnnotateServiceException {
+    public static boolean isAnnotateServiceReady(Processings annotator_type) throws UnreachableAnnotateServiceException {
         logger.info("Checking " + annotator_type + " service...");
         int responseCode = 0;
         HttpURLConnection conn = null;
         try {
             String urlString = "";
-            if (annotator_type == Annotator.Annotator_Type.NERD) {
+            if (annotator_type == Processings.NERD) {
                 urlString = "http://" + AnnotateProperties.getNerdHost()
                         + (AnnotateProperties.getNerdPort().isEmpty() ? "" : ":" + AnnotateProperties.getNerdPort()) + "/service/isalive";
-            } else if (annotator_type == Annotator.Annotator_Type.QUANTITIES) {
+            } else if (annotator_type == Processings.QUANTITIES) {
                 urlString = "http://" + AnnotateProperties.getQuantitiesHost()
                         + (AnnotateProperties.getQuantitiesPort().isEmpty() ? "" : ":" + AnnotateProperties.getQuantitiesPort()) + "/isalive";
             } else {
@@ -53,6 +51,7 @@ public abstract class AnnotateService {
             }
             URL url = new URL(urlString);
             conn = (HttpURLConnection) url.openConnection();
+            System.out.println(urlString);
             conn.setDoOutput(true);
             conn.setRequestMethod("GET");
             responseCode = conn.getResponseCode();

@@ -106,149 +106,149 @@ public class CrossRef {
      * service based on core metadata
      */
     public void findDois() {
-        String doi = "";
-        String aut = "";
-        String title = "";
-        String journalTitle = "";
-        String volume = "";
-        String firstPage = "";
-        String pageRange = "";
-        int beginPage;
-        String subpath = "";
-        int i = 0;
-        for (String date : Utilities.getDates()) {
-            if (!HarvestProperties.isProcessByDate()) {
-                date = null;
-            }
-            if (mm.initTeis(date, MongoCollectionsInterface.METADATAS_TEIS)) {
-                while (mm.hasMore()) {
-
-                    TEIFile tei = mm.nextTeiDocument();
-                    String metadataString = tei.getTei();
-                    String currentRepositoryDocId = tei.getRepositoryDocId();
-                    String currentAnhalyticsId = tei.getAnhalyticsId();
-
-                    InputStream metadataStream = new ByteArrayInputStream(metadataString.getBytes());
-
-                    Document metadata = null;
-
-                    try {
-                        logger.info("###################" + currentRepositoryDocId + "#######################");
-                        doi = mm.getDocumentDoi(currentAnhalyticsId);
-                        if (doi == null || doi.isEmpty()) {
-                            metadata = docBuilder.parse(metadataStream);
-                            metadataStream.close();
-                            Element rootElement = metadata.getDocumentElement();
-                            Node node = (Node) xPath.compile("text/body/listBibl/biblFull/titleStmt/title")
-                                    .evaluate(rootElement, XPathConstants.NODE);
-                            if (node != null) {
-                                title = node.getTextContent();
-                            }
-                            node = (Element) xPath.compile("text/body/listBibl/biblFull/titleStmt/author/persName/surname").evaluate(rootElement, XPathConstants.NODE);
-                            if (node != null) {
-                                aut = node.getTextContent();
-                            }
-                            if (aut != null) {
-                                aut = Utilities.removeAccents(aut);
-                            }
-                            if (title != null) {
-                                title = Utilities.removeAccents(title);
-                            }
-
-                            if (StringUtils.isNotBlank(title)
-                                    && StringUtils.isNotBlank(aut)) {
-                                logger.info("test retrieval per title, author");
-                                logger.info(String.format("persName=%s, title=%s", aut, title));
-                                subpath = String.format(TITLE_BASE_QUERY,
-                                        HarvestProperties.getCrossrefId(),
-                                        HarvestProperties.getCrossrefPwd(),
-                                        URLEncoder.encode(title, "UTF-8"),
-                                        URLEncoder.encode(aut, "UTF-8"));
-                                doi = queryCrossref(subpath);
-                            }
-                            if (doi.isEmpty()) {
-                                node = (Element) xPath.compile("text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/title")
-                                        .evaluate(rootElement, XPathConstants.NODE);
-                                if (node != null) {
-                                    journalTitle = node.getTextContent();
-                                    if (journalTitle != null) {
-                                        journalTitle = Utilities.removeAccents(journalTitle);
-                                    }
-                                }
-                                node = (Element) xPath.compile("text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/imprint/biblScope[@unit='pp']")
-                                        .evaluate(rootElement, XPathConstants.NODE);
-                                if (node != null) {
-                                    pageRange = node.getTextContent();
-                                }
-                                if (pageRange != null) {
-                                    pageRange = pageRange.replaceAll("[A-Za-z.,\\s+]", "");
-                                    StringTokenizer st = new StringTokenizer(pageRange, "-");
-                                    if (st.countTokens() == 2) {
-                                        firstPage = st.nextToken();
-                                    } else if (st.countTokens() == 1) {
-                                        firstPage = pageRange;
-                                    }
-                                }
-                                node = (Element) xPath.compile("text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/imprint/biblScope[@unit='volume']")
-                                        .evaluate(rootElement, XPathConstants.NODE);
-                                if (node != null) {
-                                    volume = node.getTextContent();
-                                }
-                            }
-
-                            if (doi.isEmpty() && StringUtils.isNotBlank(journalTitle)
-                                    && StringUtils.isNotBlank(volume)
-                                    //&& StringUtils.isNotBlank(aut)
-                                    && StringUtils.isNotBlank(firstPage)) {
-                                // retrieval per journal title, author, volume, first page
-                                logger.info("test retrieval per journal title, author, volume, first page");
-                                logger.info(String.format("aut=%s, firstPage=%s, journalTitle=%s, volume=%s",
-                                        aut, firstPage, journalTitle, volume));
-                                if (StringUtils.isNotBlank(aut)) {
-                                    subpath = String.format(JOURNAL_AUTHOR_BASE_QUERY,
-                                            HarvestProperties.getCrossrefId(),
-                                            HarvestProperties.getCrossrefPwd(),
-                                            URLEncoder.encode(journalTitle, "UTF-8"),
-                                            URLEncoder.encode(aut, "UTF-8"),
-                                            URLEncoder.encode(volume, "UTF-8"),
-                                            firstPage);
-                                } else {
-                                    subpath = String.format(JOURNAL_BASE_QUERY,
-                                            HarvestProperties.getCrossrefId(),
-                                            HarvestProperties.getCrossrefPwd(),
-                                            URLEncoder.encode(journalTitle, "UTF-8"),
-                                            URLEncoder.encode(volume, "UTF-8"),
-                                            firstPage);
-                                }
-                                doi = queryCrossref(subpath);
-                            }
-                            if (!doi.isEmpty()) {
-                                i++;
-                                mm.updateDoi(currentAnhalyticsId, doi);
-                            }
-                        }
-
-                        if (!doi.isEmpty()) {
-                            String crossRefMetadata = getMetadataByDoi(doi);
-                            System.out.println(crossRefMetadata);
-                            if (!crossRefMetadata.isEmpty()) {
-                                crossRefMetadata = "{ \"repositoryDocId\" : \"" + currentRepositoryDocId
-                                        + "\",\"anhalyticsId\" : \"" + currentAnhalyticsId + "\""
-                                        + "," + crossRefMetadata + "}";
-                                mm.insertCrossRefMetadata(currentAnhalyticsId, currentRepositoryDocId, crossRefMetadata);
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (!HarvestProperties.isProcessByDate()) {
-                    break;
-                }
-            }
-            logger.info("Done");
-        }
-        logger.info("nb of found doi : " + i);
+//        String doi = "";
+//        String aut = "";
+//        String title = "";
+//        String journalTitle = "";
+//        String volume = "";
+//        String firstPage = "";
+//        String pageRange = "";
+//        int beginPage;
+//        String subpath = "";
+//        int i = 0;
+//        for (String date : Utilities.getDates()) {
+//            if (!HarvestProperties.isProcessByDate()) {
+//                date = null;
+//            }
+//            if (mm.initTeis(date, MongoCollectionsInterface.METADATAS_TEIS)) {
+//                while (mm.hasMore()) {
+//
+//                    TEIFile tei = mm.nextTeiDocument();
+//                    String metadataString = tei.getTei();
+//                    String currentRepositoryDocId = tei.getRepositoryDocId();
+//                    String currentAnhalyticsId = tei.getAnhalyticsId();
+//
+//                    InputStream metadataStream = new ByteArrayInputStream(metadataString.getBytes());
+//
+//                    Document metadata = null;
+//
+//                    try {
+//                        logger.info("###################" + currentRepositoryDocId + "#######################");
+//                        doi = mm.getDocumentDoi(currentAnhalyticsId);
+//                        if (doi == null || doi.isEmpty()) {
+//                            metadata = docBuilder.parse(metadataStream);
+//                            metadataStream.close();
+//                            Element rootElement = metadata.getDocumentElement();
+//                            Node node = (Node) xPath.compile("text/body/listBibl/biblFull/titleStmt/title")
+//                                    .evaluate(rootElement, XPathConstants.NODE);
+//                            if (node != null) {
+//                                title = node.getTextContent();
+//                            }
+//                            node = (Element) xPath.compile("text/body/listBibl/biblFull/titleStmt/author/persName/surname").evaluate(rootElement, XPathConstants.NODE);
+//                            if (node != null) {
+//                                aut = node.getTextContent();
+//                            }
+//                            if (aut != null) {
+//                                aut = Utilities.removeAccents(aut);
+//                            }
+//                            if (title != null) {
+//                                title = Utilities.removeAccents(title);
+//                            }
+//
+//                            if (StringUtils.isNotBlank(title)
+//                                    && StringUtils.isNotBlank(aut)) {
+//                                logger.info("test retrieval per title, author");
+//                                logger.info(String.format("persName=%s, title=%s", aut, title));
+//                                subpath = String.format(TITLE_BASE_QUERY,
+//                                        HarvestProperties.getCrossrefId(),
+//                                        HarvestProperties.getCrossrefPwd(),
+//                                        URLEncoder.encode(title, "UTF-8"),
+//                                        URLEncoder.encode(aut, "UTF-8"));
+//                                doi = queryCrossref(subpath);
+//                            }
+//                            if (doi.isEmpty()) {
+//                                node = (Element) xPath.compile("text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/title")
+//                                        .evaluate(rootElement, XPathConstants.NODE);
+//                                if (node != null) {
+//                                    journalTitle = node.getTextContent();
+//                                    if (journalTitle != null) {
+//                                        journalTitle = Utilities.removeAccents(journalTitle);
+//                                    }
+//                                }
+//                                node = (Element) xPath.compile("text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/imprint/biblScope[@unit='pp']")
+//                                        .evaluate(rootElement, XPathConstants.NODE);
+//                                if (node != null) {
+//                                    pageRange = node.getTextContent();
+//                                }
+//                                if (pageRange != null) {
+//                                    pageRange = pageRange.replaceAll("[A-Za-z.,\\s+]", "");
+//                                    StringTokenizer st = new StringTokenizer(pageRange, "-");
+//                                    if (st.countTokens() == 2) {
+//                                        firstPage = st.nextToken();
+//                                    } else if (st.countTokens() == 1) {
+//                                        firstPage = pageRange;
+//                                    }
+//                                }
+//                                node = (Element) xPath.compile("text/body/listBibl/biblFull/sourceDesc/biblStruct/monogr/imprint/biblScope[@unit='volume']")
+//                                        .evaluate(rootElement, XPathConstants.NODE);
+//                                if (node != null) {
+//                                    volume = node.getTextContent();
+//                                }
+//                            }
+//
+//                            if (doi.isEmpty() && StringUtils.isNotBlank(journalTitle)
+//                                    && StringUtils.isNotBlank(volume)
+//                                    //&& StringUtils.isNotBlank(aut)
+//                                    && StringUtils.isNotBlank(firstPage)) {
+//                                // retrieval per journal title, author, volume, first page
+//                                logger.info("test retrieval per journal title, author, volume, first page");
+//                                logger.info(String.format("aut=%s, firstPage=%s, journalTitle=%s, volume=%s",
+//                                        aut, firstPage, journalTitle, volume));
+//                                if (StringUtils.isNotBlank(aut)) {
+//                                    subpath = String.format(JOURNAL_AUTHOR_BASE_QUERY,
+//                                            HarvestProperties.getCrossrefId(),
+//                                            HarvestProperties.getCrossrefPwd(),
+//                                            URLEncoder.encode(journalTitle, "UTF-8"),
+//                                            URLEncoder.encode(aut, "UTF-8"),
+//                                            URLEncoder.encode(volume, "UTF-8"),
+//                                            firstPage);
+//                                } else {
+//                                    subpath = String.format(JOURNAL_BASE_QUERY,
+//                                            HarvestProperties.getCrossrefId(),
+//                                            HarvestProperties.getCrossrefPwd(),
+//                                            URLEncoder.encode(journalTitle, "UTF-8"),
+//                                            URLEncoder.encode(volume, "UTF-8"),
+//                                            firstPage);
+//                                }
+//                                doi = queryCrossref(subpath);
+//                            }
+//                            if (!doi.isEmpty()) {
+//                                i++;
+//                                mm.updateDoi(currentAnhalyticsId, doi);
+//                            }
+//                        }
+//
+//                        if (!doi.isEmpty()) {
+//                            String crossRefMetadata = getMetadataByDoi(doi);
+//                            System.out.println(crossRefMetadata);
+//                            if (!crossRefMetadata.isEmpty()) {
+//                                crossRefMetadata = "{ \"repositoryDocId\" : \"" + currentRepositoryDocId
+//                                        + "\",\"anhalyticsId\" : \"" + currentAnhalyticsId + "\""
+//                                        + "," + crossRefMetadata + "}";
+//                                mm.insertCrossRefMetadata(currentAnhalyticsId, currentRepositoryDocId, crossRefMetadata);
+//                            }
+//                        }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                if (!HarvestProperties.isProcessByDate()) {
+//                    break;
+//                }
+//            }
+//            logger.info("Done");
+//        }
+//        logger.info("nb of found doi : " + i);
 
     }
 
