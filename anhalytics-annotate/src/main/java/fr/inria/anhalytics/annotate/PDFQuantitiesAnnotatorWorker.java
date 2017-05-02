@@ -11,8 +11,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- *
- * @author azhar
+ * Annotates the PDF with the quantities along with the boudingBoxes.
  */
 public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
 

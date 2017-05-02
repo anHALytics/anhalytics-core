@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.harvest.auxiliaries;
+package fr.inria.anhalytics.harvest.harvesters;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.BinaryFile;
@@ -27,16 +27,15 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
- * Harvest metadata and pdf from istex and stores it.
+ * Harvest implementation for ISTEX.
  *
  * @author achraf
  */
-
-/* note: extend Harvester */
 public class IstexHarvester extends Harvester {
 
     protected static final Logger logger = LoggerFactory.getLogger(IstexHarvester.class);
     private static IstexHarvester harvester = null;
+    
     private static final String istexApiUrl = "https://api.istex.fr/document";
     private MongoFileManager mm = null;
 
@@ -51,6 +50,9 @@ public class IstexHarvester extends Harvester {
         this.mm = MongoFileManager.getInstance(false);
     }
 
+    /**
+    * Samples sampleSize from each category.
+    */
     public void sample() {
         HttpURLConnection urlConn = null;
         String request, params = null;
@@ -60,12 +62,12 @@ public class IstexHarvester extends Harvester {
         BiblioObject bo = new BiblioObject();
 
         try {
-
             for (String category : categories) {
                 String[] cat = category.split("\\.");
                 logger.info("Sampling " + sampleSize + " documents from category : " + cat[1]);
-                count = getClassCount(cat);
+                count = getCategoryDocCount(cat);
                 rands = new ArrayList<>();
+                //we pick some pages randomly because we have no idea how istex is building pages..
                 for (int i = 0; i < sampleSize; i++) {
                     rands.add((int) (Math.random() * ((count) - 1)));
                 }
@@ -135,7 +137,10 @@ public class IstexHarvester extends Harvester {
         }
     }
 
-    private int getClassCount(String[] cat) {
+    /**
+    * Returns docCount from each category.
+    */
+    private int getCategoryDocCount(String[] cat) {
         HttpURLConnection urlConn = null;
         String request = null;
         String json = null;
@@ -167,11 +172,13 @@ public class IstexHarvester extends Harvester {
         return total.intValue();
     }
 
+    /**
+    * Downloads and store the objects.
+    */
     private void processRecords() throws MalformedURLException, IOException {
         HttpURLConnection urlConn = null;
         String request = istexApiUrl;
         for (BiblioObject bo : grabbedObjects) {
-            System.out.println("bo" + bo);
             request = istexApiUrl + "/" + bo.getRepositoryDocId() + "/fulltext/pdf";
 
             URL url = new URL(request);
@@ -188,7 +195,6 @@ public class IstexHarvester extends Harvester {
                 logger.info("saved");
             }
             request = istexApiUrl + "/" + bo.getRepositoryDocId() + "/fulltext/tei";
-
             logger.info("Downloading fulltext TEI document :" + bo.getRepositoryDocId());
             bo.setMetadataURL(request);
             bo.setMetadata(IOUtils.toString(new URL(request), "UTF-8"));

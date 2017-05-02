@@ -5,7 +5,6 @@ import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.commons.data.Processings;
 import fr.inria.anhalytics.harvest.exceptions.UnreachableGrobidServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
-import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Processes the PDFs using Grobid.
  * @author Achraf
  */
 public class GrobidProcess {
@@ -32,6 +31,9 @@ public class GrobidProcess {
     static final public List<String> toBeGrobidified
             = Arrays.asList("ART", "COMM", "OUV", "POSTER", "DOUV", "PATENT", "REPORT", "COUV", "OTHER", "UNDEFINED");
 
+    /**
+    * Extracts the TEI using the available PDF.
+    */
     public void processFulltexts() {
         BinaryFile bf = null;
         try {
@@ -81,60 +83,4 @@ public class GrobidProcess {
             logger.error(ugse.getMessage());
         }
     }
-//
-//    public void processAnnexes() throws IOException {
-//        if (GrobidService.isGrobidOk()) {
-//            ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
-//            mm.setGridFSCollection(MongoCollectionsInterface.PUB_ANNEXES);
-//            for (String date : Utilities.getDates()) {
-//                if (mm.initAnnexes(date)) {
-//                    while (mm.hasMore()) {
-//                        BinaryFile bf = mm.nextBinaryDocument();
-//                        String anhalyticsId = mm.getCurrentAnhalyticsId();
-//                        if (mm.getCurrentFileType().contains(".pdf")) {
-//                            String id = mm.getCurrentRepositoryDocId();
-//                            try {
-//                                Runnable worker = new GrobidAnnexWorker(content, id, anhalyticsId, date, -1, -1);
-//                                executor.execute(worker);
-//                            } catch (final Exception exp) {
-//                                logger.error("An error occured while processing the file " + id
-//                                        + ". Continuing the process for the other files" + exp.getMessage());
-//                            }
-//                            content.close();
-//                        }
-//                    }
-//                }
-//            }
-//            executor.shutdown();
-//            while (!executor.isTerminated()) {
-//            }
-//            logger.info("Finished all threads");
-//        }
-//    }
-//
-//    public void addAssetsLegend() {
-//        try {
-//            for (String date : Utilities.getDates()) {
-//                if (mm.initAssets(date)) {
-//                    while (mm.hasMoreBinaryDocuments()) {
-//                        String filename = mm.nextAsset();
-//                        String currentRepositoryId = mm.getCurrentRepositoryDocId();
-//                        String currentAnhalyticsId = mm.getCurrentAnhalyticsId();
-//                        System.out.println(currentRepositoryId);
-//                        String tei = mm.findGrobidTeiById(currentRepositoryId);
-//                        InputStream teiStream = new ByteArrayInputStream(tei.getBytes());
-//                        String legend = AssetLegendExtracter.extractLegendFromTei(filename, teiStream);
-//                        teiStream.close();
-//                        if (legend != null) {
-//                            System.out.println(legend);
-//                            //mm.addLegendToAsset(legend);
-//                        }
-//                    }
-//                }
-//            }
-//
-//        } catch (Exception exp) {
-//            exp.printStackTrace();
-//        }
-//    }
 }

@@ -14,10 +14,6 @@ import fr.inria.anhalytics.commons.properties.IndexProperties;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
 import fr.inria.anhalytics.commons.data.BiblioObject;
-
-/*import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;*/
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.index.query.*;
@@ -43,137 +39,10 @@ public class DocumentIndexer extends Indexer {
         this.indexingPreprocess = new IndexingPreprocess(this.mm);
     }
 
-    /*public int indexIstexQuantites() throws XPathExpressionException, JSONException {
-        int nb = 0;
-
-        int bulkSize = 100;
-        BulkRequestBuilder bulkRequest = client.prepareBulk();
-        bulkRequest.setRefresh(true);
-        if (mm.initQuantitiesAnnotations()) {
-            while (mm.hasMore()) {
-                Annotation annotation = mm.nextQuantitiesAnnotation();
-                JSONObject jsonObj = new JSONObject(annotation.getJson());
-                String tei = mm.findGridFSDBfileIstexTeiById(annotation.getAnhalyticsId());
-                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-                docFactory.setValidating(false);
-                //docFactory.setNamespaceAware(true);
-                DocumentBuilder docBuilder;
-                try {
-                    docBuilder = docFactory.newDocumentBuilder();
-                } catch (ParserConfigurationException e) {
-                    throw new SystemException("Cannot instantiate TeiBuilder", e);
-                }
-                Document teiDoc = null;
-                try {
-                    teiDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(tei.getBytes("utf-8"))));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                XPath xPath = XPathFactory.newInstance().newXPath();
-                Node text = (Node) xPath.compile("/TEI/text").evaluate(teiDoc, XPathConstants.NODE);
-                if (text != null) {
-                    text.getParentNode().removeChild(text);
-                }
-                JSONObject json = JsonTapasML.toJSONObject(Utilities.toString(teiDoc));
-                json.put("quantities", jsonObj);
-                try {
-                    // index the json in ElasticSearch
-                    // beware the document type bellow and corresponding mapping!
-                    bulkRequest.add(client.prepareIndex(
-                            "quantities", "quantities",
-                            annotation.getAnhalyticsId()).setSource(json.toString()));
-
-                    nb++;
-                    if (nb % bulkSize == 0) {
-                        BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                        if (bulkResponse.hasFailures()) {
-                            // process failures by iterating through each bulk response item	
-                            logger.error(bulkResponse.buildFailureMessage());
-                        }
-                        bulkRequest = client.prepareBulk();
-                        bulkRequest.setRefresh(true);
-                        logger.info("\n Bulk number : " + nb / bulkSize);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return nb;
-    }*/
     /**
-     * Indexing of the document collection in ElasticSearch
+     * Indexing of the fulltext document collection in ElasticSearch.
      */
-    /* PL: not clear what is it for? metadata are already in the TEI full text normally */
-    public int indexTeiMetadataCollection() {
-        int nb = 0;
-        int bulkSize = 100;
-        BulkRequestBuilder bulkRequest = client.prepareBulk();
-        //bulkRequest.setRefresh(true);
-        bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-
-        if (mm.initObjects(null)) {
-            while (mm.hasMore()) {
-                BiblioObject biblioObject = mm.nextBiblioObject();
-                if (!IndexProperties.isReset() && biblioObject.getIsIndexed()) {
-                    logger.info("\t\t Already indexed, Skipping...");
-                    continue;
-                }
-                String jsonStr = null;
-                try {
-                    // convert the TEI document into JSON via JsonML
-                    String tei = mm.getTEICorpus(biblioObject);
-                    JSONObject json = JsonTapasML.toJSONObject(tei);
-                    jsonStr = json.toString();
-
-                    // PL: this will add all the annotations in the "TeiMetadata" collection, do we want/need this? 
-                    jsonStr = indexingPreprocess.process(jsonStr, biblioObject.getRepositoryDocId(), biblioObject.getAnhalyticsId());
-                    if (jsonStr == null) {
-                        continue;
-                    }
-
-                    // index the json in ElasticSearch
-                    // beware the document type bellow and corresponding mapping!
-                    bulkRequest.add(client.prepareIndex(IndexProperties.getMetadataTeisIndexName(),
-                            IndexProperties.getFulltextTeisTypeName(),
-                            biblioObject.getAnhalyticsId()).setSource(jsonStr));
-
-                    nb++;
-                    if (nb % bulkSize == 0) {
-                        BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                        if (bulkResponse.hasFailures()) {
-                            // process failures by iterating through each bulk response item	
-                            logger.error(bulkResponse.buildFailureMessage());
-                        }
-                        bulkRequest = client.prepareBulk();
-                        //bulkRequest.setRefresh(true);
-                        bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                        logger.info("\n Bulk number : " + nb / bulkSize);
-                    }
-                    biblioObject.setIsIndexed(Boolean.TRUE);
-                    mm.updateBiblioObjectStatus(biblioObject, null, false);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        // last bulk
-        if (nb % bulkSize != 0) {
-            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            logger.info("\n One Last Bulk.");
-            if (bulkResponse.hasFailures()) {
-                // process failures by iterating through each bulk response item	
-                logger.error(bulkResponse.buildFailureMessage());
-            }
-        }
-        return nb;
-    }
-
-    /**
-     * Indexing of the document collection in ElasticSearch
-     */
-    public int indexTeiFulltextCollection() {
+    public int indexTeiCorpus() {
         int nb = 0;
         if (isIndexExists(IndexProperties.getFulltextTeisIndexName())) {
             int bulkSize = 100;
@@ -244,7 +113,7 @@ public class DocumentIndexer extends Indexer {
     }
 
     /**
-     * Indexing of the keyterm annotations in ElasticSearch
+     * Indexing of the keyterm annotations in ElasticSearch.
      */
     public int indexKeytermAnnotations() {
         int nb = 0;
@@ -300,7 +169,7 @@ public class DocumentIndexer extends Indexer {
     }
 
     /**
-     * Indexing of the NERD annotations in ElasticSearch
+     * Indexing of the NERD annotations in ElasticSearch.
      */
     public int indexNerdAnnotations() {
         int nb = 0;

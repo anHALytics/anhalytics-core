@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.harvest.oaipmh;
+package fr.inria.anhalytics.harvest.parsers;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

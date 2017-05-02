@@ -1,9 +1,6 @@
 package fr.inria.anhalytics.harvest.crossref;
 
-import fr.inria.anhalytics.commons.data.Identifier;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

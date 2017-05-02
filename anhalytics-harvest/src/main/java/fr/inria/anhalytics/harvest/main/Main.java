@@ -4,25 +4,22 @@ import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.Harvester;
-import fr.inria.anhalytics.harvest.auxiliaries.IstexHarvester;
-import fr.inria.anhalytics.harvest.auxiliaries.IdListHarvester;
+import fr.inria.anhalytics.harvest.harvesters.IstexHarvester;
+import fr.inria.anhalytics.harvest.harvesters.IdListHarvester;
 import fr.inria.anhalytics.harvest.crossref.CrossRef;
 import fr.inria.anhalytics.harvest.crossref.OpenUrl;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
-import fr.inria.anhalytics.harvest.oaipmh.HALOAIPMHHarvester;
+import fr.inria.anhalytics.harvest.harvesters.HALOAIPMHHarvester;
 import fr.inria.anhalytics.harvest.teibuild.TeiCorpusBuilderProcess;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.io.IOException;
-import org.xml.sax.SAXException;
 
 /**
  * Main class that implements commands for harvesting, extracting, inserting in
@@ -94,7 +91,6 @@ public class Main {
         if (process.equals("harvestAll")) {
             if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) 
             {
-                //HAL uses OAI PMH providing updated/new documents on daily basis.
                 harvester = new HALOAIPMHHarvester();
             } else {
                 harvester = new IstexHarvester();

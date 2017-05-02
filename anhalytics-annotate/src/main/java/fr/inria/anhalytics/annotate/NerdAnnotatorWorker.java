@@ -3,7 +3,6 @@ package fr.inria.anhalytics.annotate;
 import fr.inria.anhalytics.annotate.services.NerdService;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.Processings;
-import fr.inria.anhalytics.commons.data.TEIFile;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 

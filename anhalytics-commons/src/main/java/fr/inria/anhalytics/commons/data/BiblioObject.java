@@ -1,6 +1,5 @@
 package fr.inria.anhalytics.commons.data;
 
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -19,24 +18,41 @@ public class BiblioObject {
         this.metadata = metadata;
     }
 
+    //UID mongoDB generated
     private String anhalyticsId="";
+    //the URL of the metadata
     private String metadataURL="";
+    //the fulltext binary file
     private BinaryFile pdf;
+    //metadata string
     private String metadata="";
+    //the generated teiCorpus
     private String teiCorpus="";
+    //the extracted Grobid TEI
     private String grobidTei="";
-    
+    //the id of the document in the source repository
     private String repositoryDocId="";
+    // the doc version in the repository
     private String repositoryDocVersion="";
+    // the source repository
     private String source="";
+    //
     private String doi="";
+    //The publication type.
     private String publicationType="";
+    //annexes
     private List<BinaryFile> annexes;
+    //the domains of the publication
     private List<String> domains;
+    //flag to check if the metadata formatting is done and TEICorpus is built.
     private Boolean isProcessedByPub2TEI = false;
+    //flag to check if the fultext is appended to TEICorpus.
     private Boolean isFulltextAppended = false;
+    //flag to check if the fultext is available.
     private Boolean isWithFulltext = false;
+    //flag to check if the metadata is save to the knowledge base.
     private Boolean isMined = false;
+    //flag to check if the document is indexed.
     private Boolean isIndexed = false;
 
     /**

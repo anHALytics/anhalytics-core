@@ -1,4 +1,4 @@
-package fr.inria.anhalytics.harvest.oaipmh;
+package fr.inria.anhalytics.harvest.parsers;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.harvest.Harvester;
@@ -29,7 +29,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * Extract and parse records from oai-pmh response.
+ * Extract and parse records from OAI-PMH response.
  *
  * @author Achraf
  */
@@ -50,6 +50,9 @@ public class HALOAIPMHDomParser {
         this.tb = new TeiBuilder();
     }
 
+    /*
+    ** Collectes BiblioObjects from the inputStream, and saves the metadata.
+    */
     public List<BiblioObject> getGrabbedObjects(InputStream in, List<BiblioObject> biblioobjs) {
         setDoc(parse(in));
         if (doc != null) {

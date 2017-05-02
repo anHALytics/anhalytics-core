@@ -119,7 +119,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     /**
-     * Updates object status(Processings) and resets status if new TEICorpus was created (resetStatus).
+     * Updates object status(Processings) and resets status if new TEICorpus was
+     * created (resetStatus).
+     *
      * @param biblioObject
      */
     public void updateBiblioObjectStatus(BiblioObject biblioObject, Processings processing, boolean resetStatus) {
@@ -142,8 +144,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         newDocument.put("isIndexed", biblioObject.getIsIndexed());
         if (processing != null) {
             newDocument.put(processing.getName(), true);
-        } 
-        
+        }
+
         if (resetStatus) {
             for (Processings p : Processings.values()) {
                 newDocument.put(p.getName(), false);
@@ -551,7 +553,15 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //
 //        }
 //    }
+    /*
+    
+    */
     public boolean isProcessed(Processings processing) {
-        return (boolean) temp.get(processing.getName());
+        Object isProcessed = temp.get(processing.getName());
+        if (isProcessed == null) {
+            return false;
+        } else {
+            return (boolean) isProcessed;
+        }
     }
 }

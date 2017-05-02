@@ -30,6 +30,10 @@ public class Annotator {
         this.mm = MongoFileManager.getInstance(false);
     }
 
+    /**
+     * Process annotations following the annotator_type.
+     * two options : multithread or single
+     */
     public void annotate(Processings annotator_type) {
         try {
             if (AnnotateProperties.isIsMultiThread()) {
@@ -44,7 +48,7 @@ public class Annotator {
     }
     
     /**
-     * Annotates tei collection entries with fulltext.
+     * Annotates TEICorpus collection by annotator_type.
      */
     private void annotateTeiCollection(Processings annotator_type)
             throws UnreachableAnnotateServiceException, AnnotatorNotAvailableException {
@@ -56,21 +60,12 @@ public class Annotator {
         try {
             if (AnnotateService.isAnnotateServiceReady(annotator_type)) {
                 if (mm.initObjects(null)) {
-                    //logger.info("processing teis for :" + date);
                     while (mm.hasMore()) {
                         BiblioObject biblioObject = mm.nextBiblioObject();
-                        System.out.println(mm.isProcessed(annotator_type));
                         if (!AnnotateProperties.isReset() && mm.isProcessed(annotator_type)) {
                             logger.info("\t\t Already annotated by " + annotator_type + ", Skipping...");
                             continue;
                         }
-
-                        // filter based on document size... we should actually annotate only 
-                        // a given length and then stop
-//                        if (biblioObject.getTeiCorpus().length() > 300000) {
-//                            logger.info("skipping " + biblioObject.getRepositoryDocId() + ": file too large");
-//                            continue;
-//                        }
                         Runnable worker = null;
                         if (annotator_type == Processings.NERD) {
                             if (biblioObject.getIsProcessedByPub2TEI()) {
@@ -117,7 +112,7 @@ public class Annotator {
     }
 
     /**
-     * Annotates tei collection entries with fulltext (multithread process).
+     * Annotates TEICorpus collection entries (multithread process).
      */
     private void annotateTeiCollectionMultiThreaded(Processings annotator_type)
             throws UnreachableAnnotateServiceException, AnnotatorNotAvailableException {
@@ -194,6 +189,9 @@ public class Annotator {
         }
     }
 
+    /**
+    * Returns an execution pool(blocking mode).
+    */
     private ThreadPoolExecutor getThreadsExecutor(Processings annotator_type) {
         // max queue of tasks of 50 
         BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(50);

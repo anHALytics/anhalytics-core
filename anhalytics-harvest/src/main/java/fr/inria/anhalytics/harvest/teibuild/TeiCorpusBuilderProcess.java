@@ -30,8 +30,8 @@ public class TeiCorpusBuilderProcess {
     }
 
     /**
-     * Returns an initialized TEICorpus containing the formatted metadata
-     * following the Grobid standard and pub2TEI. Pub2TEI equivalent.
+     * Formats the metadata and initializes the TEICorpus
+     * Based on the Grobid standard and pub2TEI. Pub2TEI equivalent.
      */
     public void transformMetadata() {
         if (mm.initObjects(HarvestProperties.getSource().toLowerCase())) {
@@ -60,7 +60,8 @@ public class TeiCorpusBuilderProcess {
     }
 
     /**
-     * Clean up metadatas , add grobid TEI and build a corpus tei.
+     * Appends Grobid TEI to preexisting TEICorpus.
+     * Completes the missing metadata parts, abstract, keywords, publication date, and authors affiliations.
      */
     public void addGrobidFulltextToTEICorpus() {
         try {

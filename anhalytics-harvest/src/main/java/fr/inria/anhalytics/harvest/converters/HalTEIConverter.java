@@ -20,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Function for converting metadata from Hal stored to Standard Tei format close
+ * Function for converting metadata from Hal format to Standard Tei format close
  * to the one used for Grobid. https://github.com/kermitt2/Pub2TEIPrivate we
  * base our approach on the XSD here
  * https://raw.githubusercontent.com/CCSDForge/HAL/master/schema/tei.xsd
@@ -30,12 +30,13 @@ import java.util.logging.Logger;
 public class HalTEIConverter implements MetadataConverter {
 
     /**
-     * Converts metadata to standard TEI format. Reorganizes some nodes
-     * especially authors/editors that are misplaced, puts them under biblFull
-     * node and returns the result( some data is redundant).
-     *
-     * @param docAdditionalTei
-     * @return
+     * Converts metadata to standard TEI format. 
+     * Reorganizes some nodes especially authors/editors that are misplaced, puts them under biblFull node, 
+     * parses the address using Grobid, 
+     * updates the affiliation from the back 
+     * Updates all Hal specific attribute(halTypology => typology)
+     * Checks if there is the publication date and take other alternatives, conference date, submission date..
+     * and returns the result( some data is redundant).
      */
     public Element convertMetadataToTEIHeader(Document metadata, Document newTEICorpus) {
 
@@ -68,6 +69,10 @@ public class HalTEIConverter implements MetadataConverter {
         return teiHeader;
     }
 
+    /**
+    * For generalisation purpose we use typology scheme instead of halTypology 
+    * and we concatenate the abbreviation with the full typology (must be handled from frontend..).
+    */
     private void updatePublicationType(Document newTEICorpus) {
         try {
             XPath xPath = XPathFactory.newInstance().newXPath();
@@ -82,6 +87,9 @@ public class HalTEIConverter implements MetadataConverter {
         }
     }
 
+    /**
+    * Checks the publication date and consider other ones if there is none.
+    */
     private void updatePublicationDate(Document newTEICorpus) {
         try {
             XPath xPath = XPathFactory.newInstance().newXPath();
@@ -141,6 +149,9 @@ public class HalTEIConverter implements MetadataConverter {
         }
     }
 
+    /**
+    * Puts all elements found under biblFull into a teiHeader.
+    */
     private Element createMetadataTEIHeader(NodeList stuffToTake, Document doc) {
         Element teiHeader = doc.createElement("teiHeader");
         if (stuffToTake.getLength() == 0) {
@@ -155,6 +166,9 @@ public class HalTEIConverter implements MetadataConverter {
         return teiHeader;
     }
 
+    /**
+    * parses the organisation address using Grobid.
+    */
     private void parseOrgsAddress(Document doc, NodeList orgs) {
         Node org = null;
         GrobidService gs = new GrobidService();
@@ -214,27 +228,7 @@ public class HalTEIConverter implements MetadataConverter {
     }
 
     /**
-     * Moves metadata under biblFull.
-     *
-     * @param docAdditionalTei
-     * @param entities
-     */
-    private void correctDataLocation(Document docAdditionalTei, NodeList entities) throws XPathExpressionException {
-        XPath xPath = XPathFactory.newInstance().newXPath();
-        Node person = null;
-        for (int i = entities.getLength() - 1; i >= 0; i--) {
-            person = entities.item(i);
-
-            person.getParentNode().removeChild(person);
-
-            NodeList biblStruct = (NodeList) xPath.compile("/TEI/text/body/listBibl/biblFull/sourceDesc/biblStruct").evaluate(docAdditionalTei, XPathConstants.NODESET);
-            biblStruct.item(0).insertBefore(person, biblStruct.item(0).getFirstChild());
-        }
-
-    }
-
-    /**
-     * Remove duplicated parts and update.
+     * Remove duplicated and uneeded parts and update.
      */
     private Document transformMetadata(Document metadata) throws XPathExpressionException {
         XPath xPath = XPathFactory.newInstance().newXPath();
@@ -267,8 +261,8 @@ public class HalTEIConverter implements MetadataConverter {
         return metadata;
     }
 
-    /*
-    ** Moves all relations under author element.
+    /**
+    * Moves all relations under author element.
      */
     private void moveOrgToAffiliation(Element aff, Element org, NodeList orgs) {
         NodeList relations = org.getElementsByTagName("relation");
@@ -290,8 +284,8 @@ public class HalTEIConverter implements MetadataConverter {
         }
     }
 
-    /*
-    ** Selects affiliation from back of the TEI and attach it to the author along with associated relations.
+    /**
+    * Selects affiliation from back of the TEI and attach it to the author along with associated relations.
      */
     private void updateAffiliations(NodeList persons, NodeList orgs, Document docAdditionalTei) {
         Element person = null;

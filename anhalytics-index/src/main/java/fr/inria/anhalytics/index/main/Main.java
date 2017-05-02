@@ -8,9 +8,6 @@ import fr.inria.anhalytics.index.KnowledgeBaseIndexer;
 import fr.inria.anhalytics.commons.properties.IndexProperties;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -28,7 +25,7 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands
-            = Arrays.asList("setup", "indexAll", "indexMetadata", "indexFulltext",
+            = Arrays.asList("setup", "indexAll", "indexTEI",
                     "indexAnnotations", "indexKB");
 
     public static void main(String[] args) throws UnknownHostException {
@@ -121,25 +118,15 @@ public class Main {
                     esm.setUpIndex(IndexProperties.getKbIndexName());
                 }
             } else if (process.equals("indexAll")) {
-                try {
-                    int nbDoc = esm.indexTeiFulltextCollection();
-                    logger.info("Total: " + nbDoc + " fulltext documents indexed.");
-                } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getFulltextTeisIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getFulltextTeisIndexName() + " will be created.");
-                    esm.createIndex(IndexProperties.getFulltextTeisIndexName());
-                    int nbDoc = esm.indexTeiFulltextCollection();
-                    logger.info("Total: " + nbDoc + " fulltext documents indexed.");
-                }
 
                 try {
-                    int nbDoc1 = esm.indexTeiMetadataCollection();
+                    int nbDoc1 = esm.indexTeiCorpus();
                     logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getMetadataTeisIndexName() + " not found, setup the index.");
                     logger.info("The index " + IndexProperties.getMetadataTeisIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getMetadataTeisIndexName());
-                    int nbDoc1 = esm.indexTeiMetadataCollection();
+                    int nbDoc1 = esm.indexTeiCorpus();
                     logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
                 }
 
@@ -175,28 +162,15 @@ public class Main {
                     int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
                     logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
                 }
-
-//KB indexing
-            } else if (process.equals("indexFulltext")) {
+            } else if (process.equals("indexTEI")) {
                 try {
-                    int nbDoc = esm.indexTeiFulltextCollection();
-                    logger.info("Total: " + nbDoc + " fulltext documents indexed.");
-                } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getFulltextTeisIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getFulltextTeisIndexName() + " will be created.");
-                    esm.createIndex(IndexProperties.getFulltextTeisIndexName());
-                    int nbDoc = esm.indexTeiFulltextCollection();
-                    logger.info("Total: " + nbDoc + " fulltext documents indexed.");
-                }
-            } else if (process.equals("indexMetadata")) {
-                try {
-                    int nbDoc1 = esm.indexTeiMetadataCollection();
+                    int nbDoc1 = esm.indexTeiCorpus();
                     logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
                 } catch (IndexNotCreatedException e) {
                     logger.error(IndexProperties.getMetadataTeisIndexName() + " not found, setup the index.");
                     logger.info("The index " + IndexProperties.getMetadataTeisIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getMetadataTeisIndexName());
-                    int nbDoc1 = esm.indexTeiMetadataCollection();
+                    int nbDoc1 = esm.indexTeiCorpus();
                     logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
                 }
             } else if (process.equals("indexAnnotations")) {

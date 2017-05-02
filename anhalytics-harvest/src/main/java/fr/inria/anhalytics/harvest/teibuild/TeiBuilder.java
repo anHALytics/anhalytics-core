@@ -8,8 +8,6 @@ import fr.inria.anhalytics.harvest.converters.HalTEIConverter;
 import fr.inria.anhalytics.harvest.converters.IstexTEIConverter;
 import fr.inria.anhalytics.harvest.converters.MetadataConverter;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
@@ -27,9 +25,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 /**
- * Functions that builds TEICorpus. 1. Creates Tei corpus (we use this format to
- * append other extracted metadata from annexes, annotation standoffs..) 2.
- * Appends Extracted Grobid Tei to TEI Corpus
+ * Functions that builds TEICorpus.
+ * 
+ * 1. Creates Tei corpus (we use this format to append other extracted metadata from annexes, annotation standoffs..) 
+ * 2. Appends Extracted Grobid Tei to TEI Corpus (completes missing abstract, keywords, affiliations, publication date)
  *
  * @author Achraf
  */
@@ -57,11 +56,9 @@ public class TeiBuilder {
     }
 
     /**
-     * returns new Document representing TEICorpus with harvested metadata in
-     * TEI header.
+     * Creates a working TEICorpus with harvested metadata in TEI header.
      */
     public Document createTEICorpus(String metadata) {
-
         Document metadataDoc = null;
         try {
             metadataDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(metadata.getBytes("utf-8"))));
@@ -84,6 +81,7 @@ public class TeiBuilder {
 
     /**
      * appends fulltext grobid tei to existing TEICorpus.
+     * Fills missing metadata parts , abstract, keywords, publication date and authors.
      */
     public Document addGrobidTEIToTEICorpus(String teiCorpus, String grobidTei) {
         Document resultTei = null;
@@ -181,8 +179,8 @@ public class TeiBuilder {
         }
     }
 
-    /*
-    We consider that grobid is accurate.
+    /**
+    * We consider that grobid is accurate.
      */
     public void fillPubDate(Document doc, Document teiCorpusDoc) throws XPathExpressionException {
         try {
@@ -211,8 +209,8 @@ public class TeiBuilder {
         }
     }
 
-    /*
-    ** Completes the authors affiliation using grobid.
+    /**
+    * Completes the authors affiliation using grobid.
     */
     public void fillAuthors(Document grobidDoc, Document teiCorpusDoc) throws XPathExpressionException {
         XPath xPath = XPathFactory.newInstance().newXPath();

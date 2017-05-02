@@ -3,15 +3,10 @@ package fr.inria.anhalytics.annotate;
 import fr.inria.anhalytics.annotate.services.QuantitiesService;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.Processings;
-import fr.inria.anhalytics.commons.data.TEIFile;
-import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
-import fr.inria.anhalytics.commons.utilities.Utilities;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,8 +23,12 @@ import org.xml.sax.InputSource;
 import org.apache.commons.io.IOUtils;
 
 /**
- *
- * @author azhar
+ * Annotates the quantities extracted from each text element in the TEICorpus using Grobid Quantities.
+ * 
+ * The content of every TEI elements having an attribute @xml:id randomly
+ * generated will be annotated. The annotations follow a stand-off
+ * representation that is using the @xml:id as base and offsets to identified
+ * the annotated chunk of text.
  */
 public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
 
@@ -42,7 +41,6 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
 
     @Override
     protected void processCommand() {
-
         // get all the elements having an attribute id and annotate their text content
         boolean inserted = mm.insertAnnotation(annotateDocument(), annotationsCollection);
         if (inserted) {
@@ -53,7 +51,6 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
             logger.info("\t\t " + Thread.currentThread().getName() + ": "
                     + biblioObject.getRepositoryDocId() + " error occured trying to annotate with QUANTITIES.");
         }
-
     }
 
     @Override

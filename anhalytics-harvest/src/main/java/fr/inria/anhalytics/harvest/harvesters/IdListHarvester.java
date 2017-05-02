@@ -1,8 +1,8 @@
-package fr.inria.anhalytics.harvest.auxiliaries;
+package fr.inria.anhalytics.harvest.harvesters;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.harvest.Harvester;
-import fr.inria.anhalytics.harvest.oaipmh.HALOAIPMHDomParser; // to be modified
+import fr.inria.anhalytics.harvest.parsers.HALOAIPMHDomParser; // to be modified
 import java.text.ParseException;
 
 import fr.inria.anhalytics.commons.exceptions.ServiceException;

@@ -14,14 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.io.IOUtils;
 
 /**
- * Runnable that uses the NERD REST service for annotating HAL TEI
+ * Runnable that uses the KeyTerm REST service for annotating available Grobid TEI
  * documents.Resulting JSON annotations are then stored in MongoDB as persistent
  * storage.
- *
- * The content of every TEI elements having an attribute @xml:id randomly
- * generated will be annotated. The annotations follow a stand-off
- * representation that is using the @xml:id as base and offsets to identified
- * the annotated chunk of text.
  *
  * @author Achraf, Patrice
  */
@@ -53,7 +48,7 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
     }
 
     /**
-     * Annotation of a complete document with extracted disambiguated key terms
+     * Annotation of a complete document with extracted disambiguated key terms.
      */
     @Override
     protected String annotateDocument() {
@@ -88,6 +83,7 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
                     + "\",\"isIndexed\" : \"" + false
                     + "\", \"keyterm\" : ");
             String jsonText = null;
+            //call keyterm service on the grobid TEI.
             KeyTermExtractionService keyTermService = new KeyTermExtractionService(IOUtils.toInputStream(biblioObject.getGrobidTei(), "UTF-8"));
             jsonText = keyTermService.runKeyTermExtraction();
             if (jsonText != null) {
