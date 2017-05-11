@@ -179,7 +179,7 @@ abstract class Indexer {
                 createIndexRequestBuilder.addMapping(IndexProperties.getKbOrganisationsTypeName(), loadMapping(indexName, IndexProperties.getKbOrganisationsTypeName()));
                 createIndexRequestBuilder.addMapping(IndexProperties.getKbPublicationsTypeName(), loadMapping(indexName, IndexProperties.getKbPublicationsTypeName()));
             } else {
-                createIndexRequestBuilder.addMapping(IndexProperties.getFulltextTeisTypeName(), loadMapping(indexName, IndexProperties.getFulltextTeisTypeName()));
+                createIndexRequestBuilder.addMapping(IndexProperties.getTeisIndexName(), loadMapping(indexName, IndexProperties.getTeisTypeName()));
             }
 
             final CreateIndexResponse createResponse = createIndexRequestBuilder.execute().actionGet();

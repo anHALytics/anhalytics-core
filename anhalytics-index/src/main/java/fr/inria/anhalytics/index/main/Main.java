@@ -88,10 +88,10 @@ public class Main {
         try {
             DocumentIndexer esm = new DocumentIndexer();
             if (process.equals("setup")) {
-                System.out.println("The existing index (" + IndexProperties.getFulltextTeisIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
+                System.out.println("The existing index (" + IndexProperties.getTeisIndexName()+ ") will be deleted and reseted, continue ?(Y/N)");
                 reponse = sc.nextLine().charAt(0);
                 if (reponse != 'N') {
-                    esm.setUpIndex(IndexProperties.getFulltextTeisIndexName());
+                    esm.setUpIndex(IndexProperties.getTeisIndexName());
                 }
 
                 System.out.println("The existing index (" + IndexProperties.getNerdAnnotsIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
@@ -121,13 +121,13 @@ public class Main {
 
                 try {
                     int nbDoc1 = esm.indexTeiCorpus();
-                    logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
+                    logger.info("Total: " + nbDoc1 + " tei documents indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getMetadataTeisIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getMetadataTeisIndexName() + " will be created.");
-                    esm.createIndex(IndexProperties.getMetadataTeisIndexName());
+                    logger.error(IndexProperties.getTeisIndexName()+ " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getTeisIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getTeisIndexName());
                     int nbDoc1 = esm.indexTeiCorpus();
-                    logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
+                    logger.info("Total: " + nbDoc1 + " teis documents indexed.");
                 }
 
                 try {
@@ -167,9 +167,9 @@ public class Main {
                     int nbDoc1 = esm.indexTeiCorpus();
                     logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getMetadataTeisIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getMetadataTeisIndexName() + " will be created.");
-                    esm.createIndex(IndexProperties.getMetadataTeisIndexName());
+                    logger.error(IndexProperties.getTeisIndexName()+ " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getTeisIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getTeisIndexName());
                     int nbDoc1 = esm.indexTeiCorpus();
                     logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
                 }

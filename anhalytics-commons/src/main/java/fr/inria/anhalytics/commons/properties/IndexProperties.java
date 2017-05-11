@@ -25,10 +25,9 @@ public class IndexProperties {
     private static String quantitiesAnnotsIndexName = "annotations_quantities";
     private static String quantitiesAnnotsTypeName = "quantities";
 
-    private static String fulltextTeisIndexName  = "anhalytics_fulltextteis_in";
-    private static String fulltextTeisTypeName = "npl";
-
-    private static String metadataTeisIndexName  = "anhalytics_metadatateis";
+    private static String teisIndexName  = "anhalytics_teis";
+    private static String teisTypeName = "anhalytics_teis";
+    
     private static String kbIndexName = "anhalytics_kb"; // to be rename, it's not metadata but KB
     private static String kbAuthorsTypeName = "authors"; // to be rename, it's not metadata but KB
     private static String kbPublicationsTypeName = "publications"; // to be rename, it's not metadata but KB
@@ -56,8 +55,7 @@ public class IndexProperties {
         setNerdAnnotsIndexName(props.getProperty("index.elasticSearch_nerdAnnotsIndexName"));
         setKeytermAnnotsIndexName(props.getProperty("index.elasticSearch_keytermAnnotsIndexName"));
         setQuantitiesAnnotsIndexName(props.getProperty("index.elasticSearch_quantitiesAnnotsIndexName"));
-        setFulltextTeisIndexName(props.getProperty("index.elasticSearch_fulltextTeisIndexName"));
-        setMetadataTeisIndexName(props.getProperty("index.elasticSearch_metadataTeisIndexName"));
+        setTeisIndexName(props.getProperty("index.elasticSearch_TeisIndexName"));
         setKbIndexName(props.getProperty("index.elasticSearch_kbIndexName"));
     }
 
@@ -211,31 +209,17 @@ public class IndexProperties {
     }
 
     /**
-     * @return the fulltextTeisIndexName
+     * @return the teisIndexName
      */
-    public static String getFulltextTeisIndexName() {
-        return fulltextTeisIndexName;
+    public static String getTeisIndexName() {
+        return teisIndexName;
     }
 
     /**
-     * @param aFulltextTeisIndexName the fulltextTeisIndexName to set
+     * @param aTeisIndexName the metadataTeisIndexName to set
      */
-    public static void setFulltextTeisIndexName(String aFulltextTeisIndexName) {
-        fulltextTeisIndexName = aFulltextTeisIndexName;
-    }
-
-    /**
-     * @return the metadataTeisIndexName
-     */
-    public static String getMetadataTeisIndexName() {
-        return metadataTeisIndexName;
-    }
-
-    /**
-     * @param aMetadataTeisIndexName the metadataTeisIndexName to set
-     */
-    public static void setMetadataTeisIndexName(String aMetadataTeisIndexName) {
-        metadataTeisIndexName = aMetadataTeisIndexName;
+    public static void setTeisIndexName(String aTeisIndexName) {
+        teisIndexName = aTeisIndexName;
     }
 
     /**
@@ -295,17 +279,17 @@ public class IndexProperties {
     }
 
     /**
-     * @return the fulltextTeisTypeName
+     * @return the teisTypeName
      */
-    public static String getFulltextTeisTypeName() {
-        return fulltextTeisTypeName;
+    public static String getTeisTypeName() {
+        return teisTypeName;
     }
 
     /**
-     * @param aFulltextTeisTypeName the fulltextTeisTypeName to set
+     * @param aTeisTypeName the fulltextTeisTypeName to set
      */
-    public static void setFulltextTeisTypeName(String aFulltextTeisTypeName) {
-        fulltextTeisTypeName = aFulltextTeisTypeName;
+    public static void setTeisTypeName(String aTeisTypeName) {
+        teisTypeName = aTeisTypeName;
     }
 
     /**

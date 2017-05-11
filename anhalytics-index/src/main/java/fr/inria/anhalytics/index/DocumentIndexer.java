@@ -44,7 +44,7 @@ public class DocumentIndexer extends Indexer {
      */
     public int indexTeiCorpus() {
         int nb = 0;
-        if (isIndexExists(IndexProperties.getFulltextTeisIndexName())) {
+        if (isIndexExists(IndexProperties.getTeisIndexName())) {
             int bulkSize = 100;
             BulkRequestBuilder bulkRequest = client.prepareBulk();
             //bulkRequest.setRefresh(true);
@@ -76,7 +76,7 @@ public class DocumentIndexer extends Indexer {
 
                         // index the json in ElasticSearch
                         // beware the document type bellow and corresponding mapping!
-                        bulkRequest.add(client.prepareIndex(IndexProperties.getFulltextTeisIndexName(), IndexProperties.getFulltextTeisTypeName(), biblioObject.getAnhalyticsId()).setSource(jsonStr));
+                        bulkRequest.add(client.prepareIndex(IndexProperties.getTeisIndexName(), IndexProperties.getTeisTypeName(), biblioObject.getAnhalyticsId()).setSource(jsonStr));
                         nb++;
                         if (nb % bulkSize == 0) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
@@ -260,7 +260,7 @@ public class DocumentIndexer extends Indexer {
 
     /**
      * Indexing of the grobid-quantities annotations as independent documents in
-     * ElasticSearch
+     * ElasticSearch.
      */
     public int indexQuantitiesAnnotations() {
         int nb = 0;
@@ -398,6 +398,9 @@ public class DocumentIndexer extends Indexer {
         return nb;
     }
 
+    /**
+    * Returns a list of valid xml:ids found in the document.(to check if annotation is to be considered).
+    */
     private List<String> validDocIDs(String anhalyticsId, ObjectMapper mapper) {
         List<String> results = new ArrayList<String>();
         logger.info("validDocIDs: " + anhalyticsId);
@@ -405,7 +408,7 @@ public class DocumentIndexer extends Indexer {
         //String query = "{\"query\": { \"bool\": { \"must\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
 
         BoolQueryBuilder builder = QueryBuilders.boolQuery().must(new TermQueryBuilder("_id", anhalyticsId));
-        SearchRequestBuilder srb = client.prepareSearch(IndexProperties.getFulltextTeisIndexName()).setQuery(builder);
+        SearchRequestBuilder srb = client.prepareSearch(IndexProperties.getTeisIndexName()).setQuery(builder);
         for (String field : toBeIndexed) {
             srb.addStoredField(field);
         }
