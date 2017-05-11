@@ -26,9 +26,10 @@ import org.xml.sax.InputSource;
 
 /**
  * Functions that builds TEICorpus.
- * 
- * 1. Creates Tei corpus (we use this format to append other extracted metadata from annexes, annotation standoffs..) 
- * 2. Appends Extracted Grobid Tei to TEI Corpus (completes missing abstract, keywords, affiliations, publication date)
+ *
+ * 1. Creates Tei corpus (we use this format to append other extracted metadata
+ * from annexes, annotation standoffs..) 2. Appends Extracted Grobid Tei to TEI
+ * Corpus (completes missing abstract, keywords, affiliations, publication date)
  *
  * @author Achraf
  */
@@ -36,7 +37,7 @@ public class TeiBuilder {
 
     private DocumentBuilder docBuilder;
 
-    private MetadataConverter mc; 
+    private MetadataConverter mc;
     public TeiBuilder() {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
@@ -59,29 +60,29 @@ public class TeiBuilder {
      * Creates a working TEICorpus with harvested metadata in TEI header.
      */
     public Document createTEICorpus(String metadata) {
-        Document metadataDoc = null;
+        Document newTEICorpus = null;
         try {
-            metadataDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(metadata.getBytes("utf-8"))));
+            Document metadataDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(metadata.getBytes("utf-8"))));
+
+            newTEICorpus = docBuilder.newDocument();
+
+            Element teiHeader = mc.convertMetadataToTEIHeader(metadataDoc, newTEICorpus);
+
+            Element teiCorpus = newTEICorpus.createElement("teiCorpus");
+            teiHeader.setAttribute("xml:id", HarvestProperties.getSource());
+            teiCorpus.appendChild(teiHeader);
+            teiCorpus.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
+            newTEICorpus.appendChild(teiCorpus);
+            Utilities.generateIDs(newTEICorpus);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        Document newTEICorpus = docBuilder.newDocument();
-
-        Element teiHeader = mc.convertMetadataToTEIHeader(metadataDoc, newTEICorpus);
-        
-        Element teiCorpus = newTEICorpus.createElement("teiCorpus");
-        teiHeader.setAttribute("xml:id", HarvestProperties.getSource());
-        teiCorpus.appendChild(teiHeader);
-        teiCorpus.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
-        newTEICorpus.appendChild(teiCorpus);
-        Utilities.generateIDs(newTEICorpus);
         return newTEICorpus;
     }
 
     /**
-     * appends fulltext grobid tei to existing TEICorpus.
-     * Fills missing metadata parts , abstract, keywords, publication date and authors.
+     * appends fulltext grobid tei to existing TEICorpus. Fills missing metadata
+     * parts , abstract, keywords, publication date and authors.
      */
     public Document addGrobidTEIToTEICorpus(String teiCorpus, String grobidTei) {
         Document resultTei = null;
@@ -130,7 +131,7 @@ public class TeiBuilder {
 
         return resultTei;
     }
-    
+
     public void fillAbstract(Document doc, Document teiCorpusDoc) throws XPathExpressionException {
         XPath xPath = XPathFactory.newInstance().newXPath();
         Element profileDescElt = (Element) xPath.compile("/teiCorpus/teiHeader/profileDesc").evaluate(teiCorpusDoc, XPathConstants.NODE);
@@ -180,7 +181,7 @@ public class TeiBuilder {
     }
 
     /**
-    * We consider that grobid is accurate.
+     * We consider that grobid is accurate.
      */
     public void fillPubDate(Document doc, Document teiCorpusDoc) throws XPathExpressionException {
         try {
@@ -210,8 +211,8 @@ public class TeiBuilder {
     }
 
     /**
-    * Completes the authors affiliation using grobid.
-    */
+     * Completes the authors affiliation using grobid.
+     */
     public void fillAuthors(Document grobidDoc, Document teiCorpusDoc) throws XPathExpressionException {
         XPath xPath = XPathFactory.newInstance().newXPath();
         // email & ptr to be done

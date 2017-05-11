@@ -64,7 +64,7 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
             }
             biblioObject.getPdf().getStream().close();
         } catch (Exception ex) {
-            logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: ");
+            logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the quantities extractor: ");
             ex.printStackTrace();
         }
         return json.toString();
