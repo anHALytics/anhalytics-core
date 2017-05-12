@@ -196,12 +196,14 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
         try {
             insertMetadataDocument(biblioObject.getMetadata(), objectId.toString());
-            if (biblioObject.getIsWithFulltext()) {
+            if (biblioObject.getIsWithFulltext() && biblioObject.getPdf().getStream() != null) {
                 insertPDFDocument(biblioObject.getPdf().getStream(), objectId.toString());
             }
             if (biblioObject.getAnnexes() != null) {
                 for (BinaryFile bf : biblioObject.getAnnexes()) {
-                    insertAnnexDocument(bf, objectId.toString());
+                    if (bf.getStream() != null) {
+                        insertAnnexDocument(bf, objectId.toString());
+                    }
                 }
             }
             collection.insert(document);
@@ -556,7 +558,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //    }
     /*
     
-    */
+     */
     public boolean isProcessed(Processings processing) {
         Object isProcessed = temp.get(processing.getName());
         if (isProcessed == null) {
