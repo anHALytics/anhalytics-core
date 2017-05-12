@@ -81,7 +81,6 @@ public class IndexingPreprocess {
             JsonNode standoffNode = getStandoffNerd(mapper, anhalyticsId);
             standoffNode = getStandoffKeyTerm(mapper, anhalyticsId, standoffNode);
             standoffNode = getStandoffQuantities(mapper, anhalyticsId, standoffNode);
-//            standoffNode = getStandoffPDFQuantities(mapper, anhalyticsId, standoffNode);
             if (standoffNode != null) {
                 ((ArrayNode) teiRoot).add(standoffNode);
             }
@@ -383,6 +382,7 @@ public class IndexingPreprocess {
                     }
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
+                    System.out.println(typeNode.toString());
                     ((ObjectNode) subJson).put("$date", arrayNode); // update value
                     return subJson;
                 } else if ((theTypeNode == null) && (theDateNode != null)) {
@@ -490,7 +490,7 @@ public class IndexingPreprocess {
      */
     public JsonNode getStandoffNerd(ObjectMapper mapper, String anhalyticsId) throws Exception {
         JsonNode standoffNode = null;
-        String annotation = mm.getNerdAnnotations(anhalyticsId).getJson();
+        String annotation = mm.getNerdAnnotations(anhalyticsId) != null ? mm.getNerdAnnotations(anhalyticsId).getJson():null;
         if ((annotation != null) && (annotation.trim().length() > 0)) {
             JsonNode jsonAnnotation = mapper.readTree(annotation);
             if ((jsonAnnotation != null) && (!jsonAnnotation.isMissingNode())) {
@@ -568,7 +568,7 @@ public class IndexingPreprocess {
      * Get the grobid-keyterm annotations and inject them in the document structure in a standoff node
      */
     public JsonNode getStandoffKeyTerm(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
-        String annotation = mm.getKeytermAnnotations(anhalyticsId).getJson();
+        String annotation = mm.getKeytermAnnotations(anhalyticsId) != null? mm.getKeytermAnnotations(anhalyticsId).getJson():null;
         if ((annotation != null) && (annotation.trim().length() > 0)) {
             JsonNode jsonAnnotation = mapper.readTree(annotation);
 
@@ -745,7 +745,7 @@ public class IndexingPreprocess {
      * Get the grobid quantities annotations and inject them in the document structure in a standoff node
      */
     public JsonNode getStandoffQuantities(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
-        String annotation = mm.getQuantitiesAnnotations(anhalyticsId).getJson();
+        String annotation = mm.getQuantitiesAnnotations(anhalyticsId) != null ? mm.getQuantitiesAnnotations(anhalyticsId).getJson():null;
         if ((annotation != null) && (annotation.trim().length() > 0)) {           
             JsonNode jsonAnnotation = mapper.readTree(annotation);
             if ((jsonAnnotation != null) && (!jsonAnnotation.isMissingNode())) {
@@ -758,20 +758,19 @@ public class IndexingPreprocess {
                 int n = 0;
                 int m = 0;
                 while (iter0.hasNext()
-                        && (n < MAX_QUANTITIES_INDEXED_PARAGRAPHS)
+                        //&& (n < MAX_QUANTITIES_INDEXED_PARAGRAPHS)
                         && (m < MAX_INDEXED_QUANTITIES)) {
                     JsonNode jsonLocalAnnotation = (JsonNode) iter0.next();
-
                     // we only get what should be searched together with the document metadata and content
                     // so ignoring coordinates, offsets, ...
-                    JsonNode quantities = jsonLocalAnnotation.findPath("quantities");
-                    if ((quantities == null) || (quantities.isMissingNode())) 
-                        continue;
-                    JsonNode measurements = quantities.findPath("measurements");
-                    if ((measurements == null) || (measurements.isMissingNode())) 
-                        continue;
+//                    JsonNode quantities = jsonLocalAnnotation.findPath("quantities");
+//                    if ((quantities == null) || (quantities.isMissingNode())) 
+//                        continue;
+//                    JsonNode measurements = jsonLocalAnnotation.findPath("measurements");
+//                    if ((measurements == null) || (measurements.isMissingNode())) 
+//                        continue;
                     // measurements is an array
-                    Iterator<JsonNode> iter = measurements.elements();
+                    Iterator<JsonNode> iter = jsonLocalAnnotation.elements();
                     while (iter.hasNext()) {
                         JsonNode piece = (JsonNode) iter.next();
 //logger.info(piece.toString());
@@ -786,11 +785,13 @@ public class IndexingPreprocess {
                             if ((quantity == null) || (quantity.isMissingNode())) 
                                 continue;
                             JsonNode typeMeasure = quantity.findPath("type");
+                            //if no quantity type we move on.
                             if ((typeMeasure == null) || (typeMeasure.isMissingNode()))
                                 continue;
                             String valueTypeMeasure = typeMeasure.textValue();
                             
                             JsonNode normalizedQuantity = quantity.findPath("normalizedQuantity");
+                            //if no normalized value we continue over.
                             if ((normalizedQuantity == null) || (normalizedQuantity.isMissingNode()))
                                 continue;
                             Double val = normalizedQuantity.doubleValue();
@@ -808,7 +809,7 @@ public class IndexingPreprocess {
                             JsonNode range = null;
                             Double valLeast;
                             Double valMost;
-
+//System.out.println("interval");
                             if ((quantityMost != null) && (!quantityMost.isMissingNode())) {
                                 JsonNode typeMeasure = quantityMost.findPath("type");
                                 if ((typeMeasure == null) || (typeMeasure.isMissingNode()))
@@ -845,7 +846,7 @@ public class IndexingPreprocess {
                                 ((ObjectNode) newNode).put(valueTypeMeasure.replace(" ", "_")+"_range", range);
                                 ((ArrayNode) annotNode).add(newNode);
 
-logger.info("type is " + type + " / " + annotNode.toString());
+//logger.info("type is " + type + " / " + annotNode.toString());
                             }
 
                         } else if (type.equals("listc")) {
@@ -868,8 +869,7 @@ logger.info("type is " + type + " / " + annotNode.toString());
                 //((ObjectNode) standoffNode).put("$standoff", annotationArrayNode);
                 if (m > 0) {
                     if (standoffNode == null) {
-                        standoffNode = mapper.createArrayNode();
-
+                        standoffNode = mapper.createObjectNode();
                         JsonNode annotationArrayNode = mapper.createArrayNode();
                         ((ArrayNode) annotationArrayNode).add(quantitiesStandoffNode);
 
