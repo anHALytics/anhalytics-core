@@ -22,8 +22,6 @@ public class HarvestProperties {
     private static String untilDate;
 
     private static boolean processByDate = true;
-    
-    private static String apiUrl;
 
     private static String source;
     
@@ -52,7 +50,6 @@ public class HarvestProperties {
         }
         
         setSource(props.getProperty("harvest.source"));
-        setApiUrl(props.getProperty("harvest.api_url"));
         setGrobidHost(props.getProperty("harvest.grobid_host"));
         setGrobidPort(props.getProperty("harvest.grobid_port"));
         setTmpPath(props.getProperty("harvest.tmpPath"));
@@ -118,20 +115,6 @@ public class HarvestProperties {
      */
     public static void setUntilDate(String untildate) {
         untilDate = untildate;
-    }
-
-    /**
-     * @return the apiUrl
-     */
-    public static String getApiUrl() {
-        return apiUrl;
-    }
-
-    /**
-     * @param oaiUrl the oaiUrl to set
-     */
-    public static void setApiUrl(String apiurl) {
-        apiUrl = apiurl;
     }
 
     /**

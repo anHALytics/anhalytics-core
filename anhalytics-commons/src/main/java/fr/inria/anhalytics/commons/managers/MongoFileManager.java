@@ -437,13 +437,14 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     public Annotation getQuantitiesAnnotations(String anhalyticsId) {
-        return getAnnotations(anhalyticsId, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
+        return getAnnotations(anhalyticsId, MongoCollectionsInterface.PDF_QUANTITIES_ANNOTATIONS);
     }
 
     /**
      * Returns the annotation for a given repositoryDocId.
      */
     private Annotation getAnnotations(String anhalyticsId, String annotationsCollection) {
+        Annotation annotation = null;
         DBCollection c = db.getCollection(annotationsCollection);
 
 //        c.ensureIndex(new BasicDBObject("repositoryDocId", 1));
@@ -456,6 +457,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             if (curs.hasNext()) {
                 // we get now the sub-document corresponding to the annotations
                 result = curs.next();
+                annotation = new Annotation(result.toString(), (String) result.get("repositoryDocId"), (String) result.get("anhalyticsId"), Boolean.parseBoolean((String) result.get("isIndexed")));
                 //int ind = annotationsCollection.indexOf("_"); // TBR: this is dirty !
                 //BasicDBList annot = (BasicDBList) annotations.get(annotationsCollection.substring(0, ind));
 //                if (annotations != null) {
@@ -469,7 +471,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 curs.close();
             }
         }
-        Annotation annotation = new Annotation(result.toString(), (String) result.get("repositoryDocId"), (String) result.get("anhalyticsId"), Boolean.parseBoolean((String) result.get("isIndexed")));
         return annotation;
     }
 

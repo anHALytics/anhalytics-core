@@ -20,7 +20,7 @@ public class HALOAIPMHHarvester extends Harvester {
     private static String OAI_FORMAT = "xml-tei";
 
     // the api url
-    protected String oai_url = null;
+    protected String oai_url = "http://api.archives-ouvertes.fr/oai/hal";
     
     private HALOAIPMHDomParser oaiDom;
 
