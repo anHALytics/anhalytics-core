@@ -78,31 +78,36 @@ public class Main {
     protected static boolean processArgs(final String[] args) {
         String currArg;
         boolean result = true;
-        for (int i = 0; i < args.length; i++) {
-            currArg = args[i];
-            if (currArg.equals("-h")) {
-                System.out.println(getHelp());
-                continue;
-            }else if (currArg.equals("-multiThread")) {
-                AnnotateProperties.setIsMultiThread(true);
-                continue;
-            } else if (currArg.equals("-exe")) {
-                String command = args[i + 1];
-                if (availableCommands.contains(command)) {
-                    AnnotateProperties.setProcessName(command);
+
+        if (args.length == 0) {
+            result = false;
+        } else {
+            for (int i = 0; i < args.length; i++) {
+                currArg = args[i];
+                if (currArg.equals("-h")) {
+                    result = false;
+                    break;
+                } else if (currArg.equals("-multiThread")) {
+                    AnnotateProperties.setIsMultiThread(true);
+                    continue;
+                } else if (currArg.equals("-exe")) {
+                    String command = args[i + 1];
+                    if (availableCommands.contains(command)) {
+                        AnnotateProperties.setProcessName(command);
+                        i++;
+                        continue;
+                    } else {
+                        System.err.println("-exe value should be one value from this list: " + availableCommands);
+                        result = false;
+                        break;
+                    }
+                } else if (currArg.equals("--reset")) {
+                    AnnotateProperties.setReset(true);
                     i++;
                     continue;
                 } else {
-                    System.err.println("-exe value should be one value from this list: " + availableCommands);
                     result = false;
-                    break;
                 }
-            } else if (currArg.equals("--reset")) {
-                AnnotateProperties.setReset(true);
-                i++;
-                continue;
-            } else {
-                result = false;
             }
         }
         return result;

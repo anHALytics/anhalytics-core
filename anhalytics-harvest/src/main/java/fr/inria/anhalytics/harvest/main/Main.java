@@ -5,7 +5,6 @@ import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.Harvester;
 import fr.inria.anhalytics.harvest.harvesters.IstexHarvester;
-import fr.inria.anhalytics.harvest.harvesters.IdListHarvester;
 import fr.inria.anhalytics.harvest.crossref.CrossRef;
 import fr.inria.anhalytics.harvest.crossref.OpenUrl;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
@@ -18,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -79,7 +79,6 @@ public class Main {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
-        String todayDate = dateFormat.format(cal.getTime());
         String process = HarvestProperties.getProcessName();
         GrobidProcess gp = new GrobidProcess();
         TeiCorpusBuilderProcess tcb = new TeiCorpusBuilderProcess();
@@ -96,10 +95,22 @@ public class Main {
                 harvester = new IstexHarvester();
             }
             harvester.fetchAllDocuments();
-        } else if (process.equals("harvestDaily")) {
-            harvester = new HALOAIPMHHarvester();
-            Utilities.updateDates(todayDate, todayDate);
-            harvester.fetchAllDocuments();
+        } else if (process.equals("harvestList")) {
+             if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) 
+            {
+                harvester = new HALOAIPMHHarvester();
+            } else {
+                harvester = new IstexHarvester();
+            }
+            harvester.fetchListDocuments();
+        } else if (process.equals("sample")) {
+            if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) 
+            {
+                harvester = new HALOAIPMHHarvester();
+            } else {
+                harvester = new IstexHarvester();
+            }
+            harvester.sample();
         } else if (process.equals("transformMetadata")) {
             tcb.transformMetadata();
         } else if (process.equals("processGrobid")) {
@@ -108,12 +119,6 @@ public class Main {
             tcb.addGrobidFulltextToTEICorpus();
         } else if (process.equals("harvestIstex")) {
             harvester = new IstexHarvester();
-            harvester.fetchAllDocuments();
-        }else if (process.equals("sampleIstex")) {
-            IstexHarvester ih = new IstexHarvester();
-            ih.sample();
-        } else if (process.equals("harvestHalList")) {
-            harvester = new IdListHarvester();
             harvester.fetchAllDocuments();
         }
         
@@ -127,13 +132,12 @@ public class Main {
     protected static boolean processArgs(final String[] pArgs) {
         boolean result = true;
         if (pArgs.length == 0) {
-            System.out.println(getHelp());
+            result = false;
         } else {
             String currArg;
             for (int i = 0; i < pArgs.length; i++) {
                 currArg = pArgs[i];
                 if (currArg.equals("-h")) {
-                    System.out.println(getHelp());
                     result = false;
                     break;
                 } else if (currArg.equals("-nodates")) {
@@ -193,6 +197,13 @@ public class Main {
                     HarvestProperties.setReset(true);
                     i++;
                     continue;
+                } else if (currArg.equals("-source")) {
+                    String command = pArgs[i + 1];
+
+                    //check collection exists
+                    HarvestProperties.setSource(command);
+                    i++;
+                    continue;
                 } else {
                     result = false;
                     break;
@@ -209,7 +220,8 @@ public class Main {
         help.append("-dOAI: url of the OAI-PMH service\n");
         help.append("-set: select a specific set (INRIA, CNRS..), the available sets are for instance : https://api.archives-ouvertes.fr/oai/hal/?verb=ListSets \n");
         help.append("-list: give a file with a list of HAL id to harvest, one HAL ID per line \n");
-        help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
+        help.append("-source: the sources available are : \n");
+        help.append("\t" + Arrays.toString(Harvester.Source.values()) + "\n");
         help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-dUntilDate: filter until date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-exe: gives the command to execute. The value should be one of these : \n");

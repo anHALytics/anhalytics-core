@@ -52,31 +52,35 @@ public class Main {
     protected static boolean processArgs(final String[] args) {
         String currArg;
         boolean result = true;
-        for (int i = 0; i < args.length; i++) {
-            currArg = args[i];
-            if (currArg.equals("-h")) {
-                System.out.println(getHelp());
-                continue;
-            } else if (currArg.equals("-exe")) {
-                String command = args[i + 1];
-                if (availableCommands.contains(command)) {
-                    IndexProperties.setProcessName(command);
+        if (args.length == 0) {
+            result = false;
+        } else {
+            for (int i = 0; i < args.length; i++) {
+                currArg = args[i];
+                if (currArg.equals("-h")) {
+                    result = false;
+                    continue;
+                } else if (currArg.equals("-exe")) {
+                    String command = args[i + 1];
+                    if (availableCommands.contains(command)) {
+                        IndexProperties.setProcessName(command);
+                        i++;
+                        continue;
+                    } else {
+                        System.err.println("-exe value should be one value from this list: " + availableCommands);
+                        result = false;
+                        break;
+                    }
+                } else if (currArg.equals("--reset")) {
+                    IndexProperties.setReset(true);
                     i++;
                     continue;
                 } else {
-                    System.err.println("-exe value should be one value from this list: " + availableCommands);
                     result = false;
-                    break;
                 }
-            } else if (currArg.equals("--reset")) {
-                IndexProperties.setReset(true);
                 i++;
                 continue;
-            } else {
-                result = false;
             }
-            i++;
-            continue;
         }
         return result;
     }
@@ -88,7 +92,7 @@ public class Main {
         try {
             DocumentIndexer esm = new DocumentIndexer();
             if (process.equals("setup")) {
-                System.out.println("The existing index (" + IndexProperties.getTeisIndexName()+ ") will be deleted and reseted, continue ?(Y/N)");
+                System.out.println("The existing index (" + IndexProperties.getTeisIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
                 reponse = sc.nextLine().charAt(0);
                 if (reponse != 'N') {
                     esm.setUpIndex(IndexProperties.getTeisIndexName());
@@ -123,7 +127,7 @@ public class Main {
                     int nbDoc1 = esm.indexTeiCorpus();
                     logger.info("Total: " + nbDoc1 + " tei documents indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getTeisIndexName()+ " not found, setup the index.");
+                    logger.error(IndexProperties.getTeisIndexName() + " not found, setup the index.");
                     logger.info("The index " + IndexProperties.getTeisIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getTeisIndexName());
                     int nbDoc1 = esm.indexTeiCorpus();
@@ -167,34 +171,34 @@ public class Main {
                     int nbDoc1 = esm.indexTeiCorpus();
                     logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getTeisIndexName()+ " not found, setup the index.");
+                    logger.error(IndexProperties.getTeisIndexName() + " not found, setup the index.");
                     logger.info("The index " + IndexProperties.getTeisIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getTeisIndexName());
                     int nbDoc1 = esm.indexTeiCorpus();
                     logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
                 }
             } else if (process.equals("indexAnnotations")) {
-                try {
-                    int nbNerdAnnot = esm.indexNerdAnnotations();
-                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
-                } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getNerdAnnotsIndexName() + " will be created.");
-                    esm.createIndex(IndexProperties.getNerdAnnotsIndexName());
-                    int nbNerdAnnot = esm.indexNerdAnnotations();
-                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
-                }
-
-                try {
-                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
-                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
-                } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getKeytermAnnotsIndexName() + " will be created.");
-                    esm.createIndex(IndexProperties.getKeytermAnnotsIndexName());
-                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
-                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
-                }
+//                try {
+//                    int nbNerdAnnot = esm.indexNerdAnnotations();
+//                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+//                } catch (IndexNotCreatedException e) {
+//                    logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
+//                    logger.info("The index " + IndexProperties.getNerdAnnotsIndexName() + " will be created.");
+//                    esm.createIndex(IndexProperties.getNerdAnnotsIndexName());
+//                    int nbNerdAnnot = esm.indexNerdAnnotations();
+//                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+//                }
+//
+//                try {
+//                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
+//                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+//                } catch (IndexNotCreatedException e) {
+//                    logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
+//                    logger.info("The index " + IndexProperties.getKeytermAnnotsIndexName() + " will be created.");
+//                    esm.createIndex(IndexProperties.getKeytermAnnotsIndexName());
+//                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
+//                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+//                }
 
                 try {
                     int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();

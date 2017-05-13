@@ -83,13 +83,12 @@ public class Main {
     protected static boolean processArgs(final String[] pArgs) {
         boolean result = true;
         if (pArgs.length == 0) {
-            System.out.println(getHelp());
+            result = false;
         } else {
             String currArg;
             for (int i = 0; i < pArgs.length; i++) {
                 currArg = pArgs[i];
                 if (currArg.equals("-h")) {
-                    System.out.println(getHelp());
                     result = false;
                     break;
                 } else if (currArg.equals("-nodates")) {
