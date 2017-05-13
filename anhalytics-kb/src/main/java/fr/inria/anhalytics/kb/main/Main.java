@@ -1,16 +1,11 @@
 package fr.inria.anhalytics.kb.main;
 
-import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
-import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.kb.datamine.KnowledgeBaseFeeder;
 import fr.inria.anhalytics.commons.properties.KbProperties;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
 import org.slf4j.Logger;
@@ -26,9 +21,7 @@ public class Main {
     
     private static List<String> availableCommands = new ArrayList<String>() {
         {
-            
             add("initKnowledgeBase");
-            add("initKnowledgeBaseDaily");
             add("initCitationKnowledgeBase");
             add("deduplicate");
         }
@@ -43,9 +36,6 @@ public class Main {
         }
         
         if (processArgs(args)) {
-            if (KbProperties.getFromDate() != null || KbProperties.getUntilDate() != null) {
-                Utilities.updateDates(KbProperties.getUntilDate(), KbProperties.getFromDate());
-            }
             Main main = new Main();
             main.processCommand();
         } else {
@@ -57,19 +47,11 @@ public class Main {
     private void processCommand() throws UnknownHostException, SQLException {
         Scanner sc = new Scanner(System.in);
         char reponse = ' ';
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        String todayDate = dateFormat.format(cal.getTime());
         String process = KbProperties.getProcessName();
         try {
             KnowledgeBaseFeeder kbf = new KnowledgeBaseFeeder();
             if (process.equals("initKnowledgeBase")) {
                 //Initiates HAL knowledge base and creates working corpus TEI.
-                kbf.initKnowledgeBase();
-            } else if (process.equals("initKnowledgeBaseDaily")) {
-                //Initiates HAL knowledge base and creates working corpus TEI.
-                Utilities.updateDates(todayDate, todayDate);
                 kbf.initKnowledgeBase();
             } else if (process.equals("initCitationKnowledgeBase")) {
                 kbf.processCitations();
@@ -91,34 +73,6 @@ public class Main {
                 if (currArg.equals("-h")) {
                     result = false;
                     break;
-                } else if (currArg.equals("-nodates")) {
-                    KbProperties.setProcessByDate(false);
-                    i++;
-                    continue;
-                } else if (currArg.equals("-dFromDate")) {
-                    String stringDate = pArgs[i + 1];
-                    if (!stringDate.isEmpty()) {
-                        if (Utilities.isValidDate(stringDate)) {
-                            KbProperties.setFromDate(pArgs[i + 1]);
-                        } else {
-                            System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
-                            result = false;
-                        }
-                    }
-                    i++;
-                    continue;
-                } else if (currArg.equals("-dUntilDate")) {
-                    String stringDate = pArgs[i + 1];
-                    if (!stringDate.isEmpty()) {
-                        if (Utilities.isValidDate(stringDate)) {
-                            KbProperties.setUntilDate(stringDate);
-                        } else {
-                            System.err.println("The date given is not correct, make sure it follows the pattern : yyyy-MM-dd");
-                            result = false;
-                        }
-                    }
-                    i++;
-                    continue;
                 } else if (currArg.equals("-exe")) {
                     String command = pArgs[i + 1];
                     if (availableCommands.contains(command)) {
