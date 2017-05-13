@@ -2,12 +2,18 @@ package fr.inria.anhalytics.kb.datamine;
 
 import fr.inria.anhalytics.commons.dao.*;
 import fr.inria.anhalytics.commons.dao.anhalytics.AffiliationDAO;
+import fr.inria.anhalytics.commons.dao.anhalytics.DAOFactory;
 import fr.inria.anhalytics.commons.dao.anhalytics.LocationDAO;
 import fr.inria.anhalytics.commons.dao.anhalytics.OrganisationDAO;
 import fr.inria.anhalytics.commons.dao.biblio.AbstractBiblioDAOFactory;
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.entities.*;
+import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
+import fr.inria.anhalytics.commons.properties.KbProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.kb.exceptions.NumberOfCoAuthorsExceededException;
+import java.io.ByteArrayInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -26,6 +32,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
 
 /**
  * Format and Extract HAL metadata to seed the KB.
@@ -50,103 +59,92 @@ public class KnowledgeBaseFeeder {
      * Initiates HAL knowledge base and creates working corpus TEI.
      */
     public void initKnowledgeBase() throws SQLException {
-//        XPath xPath = XPathFactory.newInstance().newXPath();
-//        DAOFactory.initConnection();
-//        PublicationDAO pd = (PublicationDAO) adf.getPublicationDAO();
-//        DocumentDAO dd = (DocumentDAO) adf.getDocumentDAO();
-//
-//        for (String date : Utilities.getDates()) {
-//
-//            if (!KbProperties.isProcessByDate()) {
-//                date = null;
-//            }
-//            if (mm.initTeis(date, MongoCollectionsInterface.METADATAS_TEIS)) {
-//                while (mm.hasMore()) {
-//                    TEIFile tei = mm.nextTeiDocument();
-//                    if (tei.getAnhalyticsId() == null || tei.getAnhalyticsId().isEmpty()) {
-//                        logger.info("skipping " + tei.getRepositoryDocId() + " No anHALytics id provided");
-//                        continue;
-//                    }
-//                    if (!dd.isMined(tei.getAnhalyticsId())) {
-//                        adf.openTransaction();
-//                        Document teiDoc = null;
-//                        try {
-//                            InputStream teiStream = new ByteArrayInputStream(tei.getTei().getBytes());
-//                            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-//                            docFactory.setValidating(false);
-//                            //docFactory.setNamespaceAware(true);
-//                            DocumentBuilder docBuilder = null;
-//                            try {
-//                                docBuilder = docFactory.newDocumentBuilder();
-//                                teiDoc = docBuilder.parse(teiStream);
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                            teiStream.close();
-//
-//                            Publication pub = new Publication();
-//
-//                            Element teiHeader = (Element) xPath.compile(TeiPaths.MetadataElement).evaluate(teiDoc, XPathConstants.NODE);
-//                            NodeList authorsFromfulltextTeiHeader = (NodeList) xPath.compile(TeiPaths.FulltextTeiHeaderAuthors).evaluate(teiDoc, XPathConstants.NODESET);
-//
-//                            Element title = null;
-//                            if (teiHeader.getElementsByTagName("title") != null) {
-//                                title = (Element) teiHeader.getElementsByTagName("title").item(0);
-//                                if (title != null) {
-//                                    pub.setDoc_title(title.getTextContent().trim());
-//                                }
-//                            }
-//                            Node language = (Node) xPath.compile(TeiPaths.LanguageElement).evaluate(teiDoc, XPathConstants.NODE);
-//                            Node type = (Node) xPath.compile(TeiPaths.TypologyElement).evaluate(teiDoc, XPathConstants.NODE);
-//                            Node submission_date = (Node) xPath.compile(TeiPaths.SubmissionDateElement).evaluate(teiDoc, XPathConstants.NODE);
-//                            Node domain = (Node) xPath.compile(TeiPaths.DomainElement).evaluate(teiDoc, XPathConstants.NODE);
-//                            //more than one domain / article
-//                            NodeList editors = teiHeader.getElementsByTagName("editor");
-//                            NodeList authors = teiHeader.getElementsByTagName("author");
-//                            Element monogr = (Element) xPath.compile(TeiPaths.MonogrElement).evaluate(teiDoc, XPathConstants.NODE);
-//                            NodeList ids = (NodeList) xPath.compile(TeiPaths.IdnoElement).evaluate(teiDoc, XPathConstants.NODESET);
-//                            logger.info("Extracting :" + tei.getRepositoryDocId());
-//                            if (authors.getLength() > 30) {
-//                                throw new NumberOfCoAuthorsExceededException("Number of authors exceed 30 co-authors for this publication.");
-//                            }
-//
-//                            fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(tei.getAnhalyticsId(), tei.getRepositoryDocVersion(), new ArrayList<Document_Identifier>());
-//
-//                            processIdentifiers(ids, doc, tei.getRepositoryDocId());
-//                            dd.create(doc);
-//
-//                            pub.setDocument(doc);
-//                            // for some pub types we just keep the submission date.
-//                            pub.setDate_eletronic(submission_date.getTextContent());
-//                            pub.setDate_printed(Utilities.parseStringDate(submission_date.getTextContent()));
-//                            pub.setType(type.getTextContent());
-//                            pub.setLanguage(language.getTextContent());
-//                            processMonogr(monogr, pub);
-//
-//                            pd.create(pub);
-//                            processPersons(authors, "author", pub, teiDoc, authorsFromfulltextTeiHeader);
-//                            processPersons(editors, "editor", pub, teiDoc, authorsFromfulltextTeiHeader);
-//
-//                            logger.info("#################################################################");
-//                        } catch (Exception xpe) {
-//                            xpe.printStackTrace();
-//                            adf.rollback();
-//                            teiDoc = null;
-//                        }
-//                        adf.endTransaction();
-//                        if (teiDoc != null) {
-//                            String generatedTeiString = Utilities.toString(teiDoc);
-//                            mm.updateTei(generatedTeiString, tei.getRepositoryDocId(), MongoCollectionsInterface.METADATAS_TEIS);
-//                        }
-//                    }
-//                }
-//            }
-//            if (!KbProperties.isProcessByDate()) {
-//                break;
-//            }
-//
-//        }
-//        DAOFactory.closeConnection();
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        DAOFactory.initConnection();
+        PublicationDAO pd = (PublicationDAO) adf.getPublicationDAO();
+        DocumentDAO dd = (DocumentDAO) adf.getDocumentDAO();
+
+            if (mm.initObjects(null)) {
+                while (mm.hasMore()) {
+                    BiblioObject biblioObject = mm.nextBiblioObject();
+                     if (!KbProperties.isReset() && biblioObject.getIsMined()) {
+                        logger.info("\t\t Already mined, Skipping...");
+                        continue;
+                    }
+                        adf.openTransaction();
+                        Document teiDoc = null;
+                        try {
+                            InputStream teiStream = new ByteArrayInputStream(mm.getTEICorpus(biblioObject).getBytes());
+                            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+                            docFactory.setValidating(false);
+                            //docFactory.setNamespaceAware(true);
+                            DocumentBuilder docBuilder = null;
+                            try {
+                                docBuilder = docFactory.newDocumentBuilder();
+                                teiDoc = docBuilder.parse(teiStream);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            teiStream.close();
+
+                            Publication pub = new Publication();
+
+                            Element teiHeader = (Element) xPath.compile(TeiPaths.MetadataElement).evaluate(teiDoc, XPathConstants.NODE);
+                            NodeList authorsFromfulltextTeiHeader = (NodeList) xPath.compile(TeiPaths.FulltextTeiHeaderAuthors).evaluate(teiDoc, XPathConstants.NODESET);
+
+                            Element title = null;
+                            if (teiHeader.getElementsByTagName("title") != null) {
+                                title = (Element) teiHeader.getElementsByTagName("title").item(0);
+                                if (title != null) {
+                                    pub.setDoc_title(title.getTextContent().trim());
+                                }
+                            }
+                            Node language = (Node) xPath.compile(TeiPaths.LanguageElement).evaluate(teiDoc, XPathConstants.NODE);
+                            Node type = (Node) xPath.compile(TeiPaths.TypologyElement).evaluate(teiDoc, XPathConstants.NODE);
+                            Node submission_date = (Node) xPath.compile(TeiPaths.SubmissionDateElement).evaluate(teiDoc, XPathConstants.NODE);
+                            Node domain = (Node) xPath.compile(TeiPaths.DomainElement).evaluate(teiDoc, XPathConstants.NODE);
+                            //more than one domain / article
+                            NodeList editors = teiHeader.getElementsByTagName("editor");
+                            NodeList authors = teiHeader.getElementsByTagName("author");
+                            Element monogr = (Element) xPath.compile(TeiPaths.MonogrElement).evaluate(teiDoc, XPathConstants.NODE);
+                            NodeList ids = (NodeList) xPath.compile(TeiPaths.IdnoElement).evaluate(teiDoc, XPathConstants.NODESET);
+                            logger.info("Extracting :" + biblioObject.getRepositoryDocId());
+                            if (authors.getLength() > 30) {
+                                throw new NumberOfCoAuthorsExceededException("Number of authors exceed 30 co-authors for this publication.");
+                            }
+
+                            fr.inria.anhalytics.commons.entities.Document doc = new fr.inria.anhalytics.commons.entities.Document(biblioObject.getAnhalyticsId(), biblioObject.getRepositoryDocVersion(), new ArrayList<Document_Identifier>());
+
+                            processIdentifiers(ids, doc, biblioObject.getRepositoryDocId());
+                            dd.create(doc);
+
+                            pub.setDocument(doc);
+                            // for some pub types we just keep the submission date.
+                            pub.setDate_eletronic(submission_date.getTextContent());
+                            pub.setDate_printed(Utilities.parseStringDate(submission_date.getTextContent()));
+                            pub.setType(type.getTextContent());
+                            pub.setLanguage(language.getTextContent());
+                            processMonogr(monogr, pub);
+
+                            pd.create(pub);
+                            processPersons(authors, "author", pub, teiDoc, authorsFromfulltextTeiHeader);
+                            processPersons(editors, "editor", pub, teiDoc, authorsFromfulltextTeiHeader);
+
+                            logger.info("#################################################################");
+                        } catch (Exception xpe) {
+                            xpe.printStackTrace();
+                            adf.rollback();
+                            teiDoc = null;
+                        }
+                        adf.endTransaction();
+                        if (teiDoc != null) {
+                            String generatedTeiString = Utilities.toString(teiDoc);
+                            mm.insertTEIcorpus(generatedTeiString, biblioObject.getAnhalyticsId());
+                        }
+                }
+            }
+
+        DAOFactory.closeConnection();
         logger.info("DONE.");
     }
 
