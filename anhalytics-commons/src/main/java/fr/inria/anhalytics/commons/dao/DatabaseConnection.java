@@ -44,7 +44,7 @@ public class DatabaseConnection {
                         + CommonsProperties.getMysql_host() +
                         mysqlPort + "/" + CommonsProperties.getMysql_bibliodb() + "?characterEncoding=utf8";
 
-                connectBiblioDB = DriverManager.getConnection(url);
+                connectBiblioDB = DriverManager.getConnection(url, CommonsProperties.getMysql_user(), CommonsProperties.getMysql_pass());
 
             }
         } catch (SQLException e) {
