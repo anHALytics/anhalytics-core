@@ -50,6 +50,15 @@ public abstract class Harvester {
         public String getName() {
             return name;
         }
+        
+        public static boolean contains(String test) {
+            for (Source c : Source.values()) {
+                if (c.name().equals(test)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     };
 
     protected Source source = null;

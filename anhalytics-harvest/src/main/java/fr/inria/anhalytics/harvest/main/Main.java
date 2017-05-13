@@ -199,7 +199,13 @@ public class Main {
                 } else if (currArg.equals("-source")) {
                     String command = pArgs[i + 1];
 
-                    //check collection exists
+                    //check source exists
+                    if(!Harvester.Source.contains(command)){
+                        System.err.println("source should be one value from this list: " + Arrays.toString(Harvester.Source.values()));
+                        System.err.println("Refer to the documentation to add new harvesters ");
+                        result = false;
+                    }
+                    
                     HarvestProperties.setSource(command);
                     i++;
                     continue;
