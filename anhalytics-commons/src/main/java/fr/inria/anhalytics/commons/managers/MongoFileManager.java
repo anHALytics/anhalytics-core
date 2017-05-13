@@ -110,8 +110,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
         cursor = collection.find(bdbo);
         indexFile = 0;
+        logger.info(cursor.size() + " objects found.");
         if (cursor.size() > 0) {
-            logger.info(cursor.size() + " objects found.");
             return true;
         } else {
             return false;

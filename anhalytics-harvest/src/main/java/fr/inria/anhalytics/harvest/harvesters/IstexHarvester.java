@@ -6,7 +6,6 @@ import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.Harvester;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;

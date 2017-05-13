@@ -1,7 +1,7 @@
 package fr.inria.anhalytics.harvest.parsers;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
-import fr.inria.anhalytics.harvest.Harvester;
+import fr.inria.anhalytics.harvest.harvesters.Harvester;
 import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.utilities.Utilities;

@@ -3,7 +3,7 @@ package fr.inria.anhalytics.harvest.main;
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.Harvester;
+import fr.inria.anhalytics.harvest.harvesters.Harvester;
 import fr.inria.anhalytics.harvest.harvesters.IstexHarvester;
 import fr.inria.anhalytics.harvest.crossref.CrossRef;
 import fr.inria.anhalytics.harvest.crossref.OpenUrl;

@@ -4,7 +4,6 @@ import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.Harvester;
 import fr.inria.anhalytics.harvest.parsers.HALOAIPMHDomParser;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

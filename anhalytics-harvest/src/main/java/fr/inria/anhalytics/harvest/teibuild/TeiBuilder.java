@@ -3,7 +3,7 @@ package fr.inria.anhalytics.harvest.teibuild;
 import fr.inria.anhalytics.commons.exceptions.SystemException;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.Harvester;
+import fr.inria.anhalytics.harvest.harvesters.Harvester;
 import fr.inria.anhalytics.harvest.converters.HalTEIConverter;
 import fr.inria.anhalytics.harvest.converters.IstexTEIConverter;
 import fr.inria.anhalytics.harvest.converters.MetadataConverter;
