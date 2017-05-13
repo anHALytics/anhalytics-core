@@ -34,7 +34,6 @@ public class Main {
     private static List<String> availableCommands = new ArrayList<String>() {
         {
             add("harvestAll");
-            add("harvestDaily");
             
             add("transformMetadata");
             add("processGrobid");
