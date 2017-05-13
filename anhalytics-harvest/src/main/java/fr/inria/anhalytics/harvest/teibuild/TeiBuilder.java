@@ -37,17 +37,11 @@ public class TeiBuilder {
 
     private DocumentBuilder docBuilder;
 
-    private MetadataConverter mc;
     public TeiBuilder() {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
         //docFactory.setNamespaceAware(true);
-
-        if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
-            mc = new HalTEIConverter();
-        } else {
-            mc = new IstexTEIConverter();
-        }
+        
         try {
             docBuilder = docFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
@@ -57,9 +51,15 @@ public class TeiBuilder {
     }
 
     /**
-     * Creates a working TEICorpus with harvested metadata in TEI header.
+     * Creates a working TEICorpus from the harvested metadata in TEI header.
      */
     public Document createTEICorpus(String metadata) {
+        MetadataConverter mc;
+        if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
+            mc = new HalTEIConverter();
+        } else {
+            mc = new IstexTEIConverter();
+        }
         Document newTEICorpus = null;
         try {
             Document metadataDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(metadata.getBytes("utf-8"))));
