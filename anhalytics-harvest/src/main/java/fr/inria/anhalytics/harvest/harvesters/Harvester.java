@@ -53,7 +53,7 @@ public abstract class Harvester {
         
         public static boolean contains(String test) {
             for (Source c : Source.values()) {
-                if (c.name().equals(test)) {
+                if (c.name().toLowerCase().equals(test)) {
                     return true;
                 }
             }
@@ -142,7 +142,7 @@ public abstract class Harvester {
     protected void requestFile(BinaryFile bf) throws ParseException, IOException {
         Date embDate = Utilities.parseStringDate(bf.getEmbargoDate());
         Date today = new Date();
-        if (embDate.before(today) || embDate.equals(today)) {
+        if (embDate == null || embDate.before(today) || embDate.equals(today)) {
             logger.info("\t\t\t Downloading: " + bf.getUrl());
             try {
                 bf.setStream(Utilities.request(bf.getUrl()));

@@ -40,11 +40,9 @@ public class Main {
             
             add("appendFulltextTei");
             
-            add("harvestIstex");
+            add("harvestList");
             
-            add("sampleIstex");
-            
-            add("harvestHalList");
+            add("sample");
             
 //            add("harvestDOI");
 //            add("openUrl");
@@ -116,9 +114,6 @@ public class Main {
             gp.processFulltexts();
         } else if (process.equals("appendFulltextTei")) {
             tcb.addGrobidFulltextToTEICorpus();
-        } else if (process.equals("harvestIstex")) {
-            harvester = new IstexHarvester();
-            harvester.fetchAllDocuments();
         }
         
 //        else if (process.equals("harvestDOI")) {
@@ -200,7 +195,8 @@ public class Main {
                     String command = pArgs[i + 1];
 
                     //check source exists
-                    if(!Harvester.Source.contains(command)){
+                    if(!Harvester.Source.contains(command.toLowerCase())){
+                        System.out.println(command);
                         System.err.println("source should be one value from this list: " + Arrays.toString(Harvester.Source.values()));
                         System.err.println("Refer to the documentation to add new harvesters ");
                         result = false;
