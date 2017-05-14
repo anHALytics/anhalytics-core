@@ -1,6 +1,6 @@
 package fr.inria.anhalytics.harvest.converters;
 
-import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.harvest.grobid.GrobidService;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,20 +25,40 @@ import org.xml.sax.SAXException;
 public class IstexTEIConverter implements MetadataConverter {
 
     @Override
-    public Element convertMetadataToTEIHeader(Document metadata, Document newTEIcorpus) {
+    public Element convertMetadataToTEIHeader(Document metadata, Document newTEIcorpus, BiblioObject biblio) {
         XPath xPath = XPathFactory.newInstance().newXPath();
         Element teiHeader = null;
         try {
             teiHeader = (Element) xPath.compile("/TEI/teiHeader").evaluate(metadata, XPathConstants.NODE);
             updatePublicationType(metadata);
             updateKeywords(metadata);
+            updatePublicationDate(metadata);
             NodeList affs = (NodeList) xPath.compile("/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/analytic/author/affiliation").evaluate(metadata, XPathConstants.NODESET);
             parseAffiliationString(metadata, affs);
+            addDomains(metadata, biblio);
             teiHeader = (Element) newTEIcorpus.importNode(teiHeader, true);
         } catch (XPathExpressionException e) {
             e.printStackTrace();
         }
         return teiHeader;
+    }
+
+    private void updatePublicationDate(Document metadata) {
+        try {
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            Element dateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"published\"]").evaluate(metadata, XPathConstants.NODE);
+
+            String dateFormatted = dateElt.getAttribute("when");
+
+            //and check again if the content is not ok (create a new function and reuse it)
+            if (!dateFormatted.isEmpty()) {
+                dateElt.setTextContent(dateFormatted);
+                dateElt.setAttribute("when", dateFormatted);
+            }
+
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updatePublicationType(Document metadata) {
@@ -146,6 +166,24 @@ public class IstexTEIConverter implements MetadataConverter {
                 }
             }
 
+        }
+    }
+
+    /**
+     * Takes the domains found from the api metadata and put them to the TEI.
+     */
+    private void addDomains(Document newTEICorpus, BiblioObject biblioObj) {
+        try {
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            Element textClass = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass").evaluate(newTEICorpus, XPathConstants.NODE);
+            for (String domain : biblioObj.getDomains()) {
+                Element classCode = newTEICorpus.createElement("classCode");
+                classCode.setAttribute("scheme", "domain");
+                classCode.setTextContent(domain);
+                textClass.appendChild(classCode);
+            }
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
         }
     }
 

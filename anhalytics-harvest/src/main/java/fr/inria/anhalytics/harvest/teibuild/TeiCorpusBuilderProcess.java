@@ -42,8 +42,8 @@ public class TeiCorpusBuilderProcess {
                     continue;
                 }
                 logger.info("\t\t transforming :" + biblioObject.getRepositoryDocId());
-                String metadata = mm.getMetadata(biblioObject);
-                Document generatedTEIcorpus = tb.createTEICorpus(metadata);
+                biblioObject.setMetadata(mm.getMetadata(biblioObject));
+                Document generatedTEIcorpus = tb.createTEICorpus(biblioObject);
                 if (generatedTEIcorpus != null) {
                     boolean inserted = mm.insertTEIcorpus(Utilities.toString(generatedTEIcorpus), biblioObject.getAnhalyticsId());
                     if (inserted) {

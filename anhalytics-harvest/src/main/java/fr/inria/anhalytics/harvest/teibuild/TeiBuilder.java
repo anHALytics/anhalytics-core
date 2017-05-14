@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.exceptions.SystemException;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
@@ -53,7 +54,7 @@ public class TeiBuilder {
     /**
      * Creates a working TEICorpus from the harvested metadata in TEI header.
      */
-    public Document createTEICorpus(String metadata) {
+    public Document createTEICorpus(BiblioObject biblioObj) {
         MetadataConverter mc;
         if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
             mc = new HalTEIConverter();
@@ -62,11 +63,11 @@ public class TeiBuilder {
         }
         Document newTEICorpus = null;
         try {
-            Document metadataDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(metadata.getBytes("utf-8"))));
+            Document metadataDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(biblioObj.getMetadata().getBytes("utf-8"))));
 
             newTEICorpus = docBuilder.newDocument();
-
-            Element teiHeader = mc.convertMetadataToTEIHeader(metadataDoc, newTEICorpus);
+            //biblioobject is used to fill the missing metadata, domains, publication type, doi...
+            Element teiHeader = mc.convertMetadataToTEIHeader(metadataDoc, newTEICorpus, biblioObj);
 
             Element teiCorpus = newTEICorpus.createElement("teiCorpus");
             teiHeader.setAttribute("xml:id", HarvestProperties.getSource());

@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.harvest.converters;
 
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.grobid.GrobidService;
 import org.w3c.dom.Document;
@@ -38,7 +39,8 @@ public class HalTEIConverter implements MetadataConverter {
      * Checks if there is the publication date and take other alternatives, conference date, submission date..
      * and returns the result( some data is redundant).
      */
-    public Element convertMetadataToTEIHeader(Document metadata, Document newTEICorpus) {
+    @Override
+    public Element convertMetadataToTEIHeader(Document metadata, Document newTEICorpus, BiblioObject biblio) {
 
         XPath xPath = XPathFactory.newInstance().newXPath();
         /////////////// Hal specific : To be done as a harvesting post process before storing tei ////////////////////
@@ -59,6 +61,7 @@ public class HalTEIConverter implements MetadataConverter {
             Utilities.trimEOL(metadata.getDocumentElement(), metadata);
             NodeList stuffToTake = (NodeList) xPath.compile("/TEI/text/body/listBibl").evaluate(metadata, XPathConstants.NODESET);
             updatePublicationType(metadata);
+            updateDomainsType(metadata);
             updatePublicationDate(metadata);
             teiHeader = createMetadataTEIHeader(stuffToTake, newTEICorpus);
 
@@ -80,6 +83,24 @@ public class HalTEIConverter implements MetadataConverter {
             Element textClass = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass").evaluate(newTEICorpus, XPathConstants.NODE);
             Element classCode = newTEICorpus.createElement("classCode");
             classCode.setAttribute("scheme", "typology");
+            classCode.setTextContent(pubType.getAttribute("n") + "_" + pubType.getTextContent());
+            textClass.appendChild(classCode);
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+    * For generalisation purpose we use typology scheme instead of halDomain 
+    * and we concatenate the abbreviation with the full typology (must be handled from frontend..).
+    */
+    private void updateDomainsType(Document newTEICorpus) {
+        try {
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            Element pubType = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass/classCode[@scheme=\"halDomain\"]").evaluate(newTEICorpus, XPathConstants.NODE);
+            Element textClass = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass").evaluate(newTEICorpus, XPathConstants.NODE);
+            Element classCode = newTEICorpus.createElement("classCode");
+            classCode.setAttribute("scheme", "domain");
             classCode.setTextContent(pubType.getAttribute("n") + "_" + pubType.getTextContent());
             textClass.appendChild(classCode);
         } catch (XPathExpressionException e) {
