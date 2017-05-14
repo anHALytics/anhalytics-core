@@ -161,6 +161,7 @@ public class IstexHarvester extends Harvester {
                 if (((JSONObject) fulltextArray.get(i)).get("extension").equals("pdf")) {
                     BinaryFile bf = new BinaryFile();
                     bf.setUrl(istexApiUrl + "/" + bo.getRepositoryDocId() + "/fulltext/pdf");
+                    bo.setPdf(bf);
                     bo.setIsWithFulltext(Boolean.TRUE);
                 }
             }
@@ -183,7 +184,7 @@ public class IstexHarvester extends Harvester {
         try {
             for (String category : categories) {
                 String[] cat = category.split("\\.");
-                logger.info("Sampling " + sampleSize + " documents from category : " + cat[1]);
+                logger.info("\t\t\t\t Sampling " + sampleSize + " documents from category : " + cat[1]);
                 count = getCategoryDocCount(cat);
                 rands = new ArrayList<>();
                 //we pick some pages randomly because we have no idea how istex is building pages..
