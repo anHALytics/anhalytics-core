@@ -265,7 +265,6 @@ public class DocumentIndexer extends Indexer {
     public int indexQuantitiesAnnotations() {
         int nb = 0;
         int bulkSize = 200;
-        ObjectMapper mapper = new ObjectMapper();
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         //bulkRequest.setRefresh(true);
         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
@@ -273,111 +272,32 @@ public class DocumentIndexer extends Indexer {
         if (mm.initObjects(null)) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
-                Annotation annotation = mm.getNerdAnnotations(biblioObject.getAnhalyticsId());
+                Annotation annotation = mm.getQuantitiesAnnotations(biblioObject.getAnhalyticsId());
+                if(annotation == null)
+                    continue;
+                
                 annotation.setJson(annotation.getJson().replaceAll("_id", "id"));
                 if (!IndexProperties.isReset() && annotation.isIsIndexed()) {
                     logger.info("\t\t Already indexed annotations for " + biblioObject.getAnhalyticsId() + ", Skipping...");
                     continue;
                 }
-
                 try {
-                    JsonNode jsonAnnotation = mapper.readTree(annotation.getJson());
-                    JsonNode jn = jsonAnnotation.findPath("annotation");
-                    Iterator<JsonNode> ite = jn.elements();
-                    while (ite.hasNext()) {
-                        JsonNode temp = ite.next();
-                        JsonNode idNode = temp.findValue("xml:id");
-                        if ((idNode == null) || (idNode.isMissingNode())) {
-                            continue;
+                    // index the json in ElasticSearch
+                    // beware the document type bellow and corresponding mapping!
+                    bulkRequest.add(client.prepareIndex(
+                            IndexProperties.getQuantitiesAnnotsIndexName(), IndexProperties.getQuantitiesAnnotsTypeName(),
+                            annotation.getAnhalyticsId()).setSource(annotation.getJson()));
+                    nb++;
+                    if (nb % bulkSize == 0) {
+                        BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+                        if (bulkResponse.hasFailures()) {
+                            // process failures by iterating through each bulk response item    
+                            logger.error(bulkResponse.buildFailureMessage());
                         }
-                        String xmlID = idNode.textValue();
-
-                        // we do not index the empty annotation results! ls
-                        // the nerd subdoc has no entites field
-                        JsonNode annotNode = temp.findPath("quantities");
-                        if ((annotNode == null) || (annotNode.isMissingNode())) {
-                            continue;
-                        }
-                        JsonNode annotNode2 = annotNode.findPath("measurements");
-                        if ((annotNode2 == null) || (annotNode2.isMissingNode())) {
-                            continue;
-                        }
-                        Iterator<JsonNode> ite2 = annotNode2.elements();
-                        int rank = 0;
-                        while (ite2.hasNext()) {
-                            JsonNode temp2 = ite2.next();
-                            ((ObjectNode) temp2).put("xml:id", xmlID);
-                            ((ObjectNode) temp2).put("anHALyticsID", annotation.getAnhalyticsId());
-                            JsonNode newNode = mapper.createObjectNode();
-
-                            // we try to enrich with a range or atomic value
-                            JsonNode typeNode = temp2.findPath("type");
-                            if ((typeNode != null) && (!typeNode.isMissingNode())) {
-                                String type = typeNode.textValue();
-
-                                if (type.equals("value")) {
-                                    //JsonNode newNode = mapper.createArrayNode();
-                                    JsonNode quantity = temp2.findPath("quantity");
-                                    if ((quantity != null) && (!quantity.isMissingNode())) {
-                                        JsonNode normalizedQuantity = quantity.findPath("normalizedQuantity");
-                                        if ((normalizedQuantity != null) && (!normalizedQuantity.isMissingNode())) {
-                                            Double val = normalizedQuantity.doubleValue();
-                                            ((ObjectNode) temp2).put("atomic", val);
-                                        }
-                                    }
-                                } else if (type.equals("interval")) {
-                                    JsonNode quantityMost = temp2.findPath("quantityMost");
-                                    JsonNode quantityLeast = temp2.findPath("quantityLeast");
-
-                                    if ((quantityMost != null) && (!quantityMost.isMissingNode())
-                                            && (quantityLeast != null) && (!quantityLeast.isMissingNode())) {
-
-                                        JsonNode normalizedQuantityLeast = quantityLeast.findPath("normalizedQuantity");
-                                        if ((normalizedQuantityLeast != null) && (!normalizedQuantityLeast.isMissingNode())) {
-                                            Double valLeast = normalizedQuantityLeast.doubleValue();
-
-                                            JsonNode normalizedQuantityMost = quantityMost.findPath("normalizedQuantity");
-                                            if ((normalizedQuantityMost != null) && (!normalizedQuantityMost.isMissingNode())) {
-                                                Double valMost = normalizedQuantityMost.doubleValue();
-                                                JsonNode range = mapper.createObjectNode();
-                                                ((ObjectNode) range).put("lte", valMost);
-                                                ((ObjectNode) range).put("gte", valLeast);
-                                                ((ObjectNode) temp2).put("range", range);
-                                            }
-                                        }
-                                    }
-                                } else if (type.equals("listc")) {
-                                    JsonNode quantitiesList = temp2.findPath("quantities");
-                                    if ((quantitiesList == null) || (quantitiesList.isMissingNode())) {
-                                        continue;
-                                    }
-                                    // quantitiesList here is a list with a list of quantity values
-                                    // to be done...
-                                }
-                            }
-
-                            ((ObjectNode) newNode).put("measurement", temp2);
-                            String annotJson = newNode.toString();
-
-                            // index the json in ElasticSearch
-                            // beware the document type bellow and corresponding mapping!
-                            bulkRequest.add(client.prepareIndex(
-                                    IndexProperties.getQuantitiesAnnotsIndexName(), IndexProperties.getQuantitiesAnnotsTypeName(),
-                                    xmlID + "_" + rank).setSource(annotJson));
-                            nb++;
-                            rank++;
-                            if (nb % bulkSize == 0) {
-                                BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                                if (bulkResponse.hasFailures()) {
-                                    // process failures by iterating through each bulk response item    
-                                    logger.error(bulkResponse.buildFailureMessage());
-                                }
-                                bulkRequest = client.prepareBulk();
-                                //bulkRequest.setRefresh(true);
-                                bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                                logger.info("\n Bulk number : " + nb / bulkSize);
-                            }
-                        }
+                        bulkRequest = client.prepareBulk();
+                        //bulkRequest.setRefresh(true);
+                        bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
+                        logger.info("\n Bulk number : " + nb / bulkSize);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -399,8 +319,9 @@ public class DocumentIndexer extends Indexer {
     }
 
     /**
-    * Returns a list of valid xml:ids found in the document.(to check if annotation is to be considered).
-    */
+     * Returns a list of valid xml:ids found in the document.(to check if
+     * annotation is to be considered).
+     */
     private List<String> validDocIDs(String anhalyticsId, ObjectMapper mapper) {
         List<String> results = new ArrayList<String>();
         logger.info("validDocIDs: " + anhalyticsId);
