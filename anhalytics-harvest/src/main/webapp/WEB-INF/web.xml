@@ -2,7 +2,7 @@
  "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 <web-app>
-    <display-name>fr.inria.hal.service</display-name>
+    <display-name>fr.inria.service</display-name>
  <servlet>
     <servlet-name>asset-service</servlet-name>
     <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
@@ -16,6 +16,10 @@
   <servlet-mapping>
     <servlet-name>asset-service</servlet-name>
     <url-pattern>/asset</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>asset-service</servlet-name>
+    <url-pattern>/pdf</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>asset-service</servlet-name>

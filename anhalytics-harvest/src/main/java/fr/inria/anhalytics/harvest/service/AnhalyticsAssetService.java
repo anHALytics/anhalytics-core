@@ -25,12 +25,12 @@ import java.util.Properties;
 @Path("/")
 public class AnhalyticsAssetService {
 
-//    private MongoFileManager mm;
-//
-//    private static String KEY = null; // :)
-//
-//    public AnhalyticsAssetService() throws IOException {
-//        this.mm = MongoFileManager.getInstance(false);
+    private MongoFileManager mm;
+
+    private static String KEY = null; // :)
+
+    public AnhalyticsAssetService() throws IOException {
+        this.mm = MongoFileManager.getInstance(false);
 //        Properties prop = new Properties();
 //        try {
 //            ClassLoader classLoader = AnhalyticsAssetService.class.getClassLoader();
@@ -39,8 +39,8 @@ public class AnhalyticsAssetService {
 //            throw new PropertyException("Cannot open file of harvest.properties", exp);
 //        }
 //        KEY = prop.getProperty("harvest.service_key");
-//    }
-//
+    }
+
 //    @Path("asset")
 //    @GET
 //    public Response getImage(@QueryParam("id") String id, @QueryParam("filename") String filename, @QueryParam("key") String key) {
@@ -49,7 +49,7 @@ public class AnhalyticsAssetService {
 //        InputStream is = null;
 //        if (StringUtils.equals(key, KEY)) {
 //            try {
-//                is = mm.findAssetFile(id, filename);
+//                is = mm.getFulltextByAnhalyticsId(id);
 //                if (is == null) {
 //                    response = Response.status(Status.NOT_FOUND).build();
 //                } else {
@@ -71,11 +71,47 @@ public class AnhalyticsAssetService {
 //        }
 //        return response;
 //    }
-//
-//    @GET
-//    @Produces(MediaType.TEXT_HTML)
-//    public String sayHtmlHello() {
-//        return "<html> " + "<title>" + "Hello Anhalytics" + "</title>"
-//                + "<body><h1>" + "Hello Anhalytics" + "</body></h1>" + "</html> ";
-//    }
+    
+    
+    @Path("pdf")
+    @GET
+    public Response getPDF(@QueryParam("id") String id, @QueryParam("key") String key) {
+
+        Response response = null;
+        InputStream is = null;
+        if (StringUtils.equals(key, KEY)) {
+            try {
+                is = mm.getFulltextByAnhalyticsId(id);
+                if (is == null) {
+                    response = Response.status(Status.NOT_FOUND).build();
+                } else {
+                    response = Response
+                            .ok()
+                            .type("application/pdf")
+                            .entity(IOUtils.toByteArray(is))
+                            .header("Content-Disposition", "attachment; filename=\"" + id + "\"")
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+                            .header("Access-Control-Allow-Headers", "Range")
+                            .header("Access-Control-Expose-Headers", "Accept-Ranges, Content-Encoding, Content-Length, Content-Range")
+                            .build();
+                }
+
+            } catch (Exception exp) {
+                response = Response.status(Status.INTERNAL_SERVER_ERROR).type("text/plain").entity(exp.getMessage()).build();
+            } finally {
+                IOUtils.closeQuietly(is);
+            }
+        } else {
+            response = Response.status(Status.UNAUTHORIZED).type("text/plain").build();
+        }
+        return response;
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public String sayHtmlHello() {
+        return "<html> " + "<title>" + "Hello Anhalytics" + "</title>"
+                + "<body><h1>" + "Hello Anhalytics" + "</body></h1>" + "</html> ";
+    }
 }

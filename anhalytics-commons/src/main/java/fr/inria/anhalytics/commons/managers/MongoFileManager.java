@@ -206,7 +206,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                     }
                 }
             }
-            collection.insert(document);
         } catch (MongoException me) {
             me.printStackTrace();
             //rollback
@@ -214,14 +213,19 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             ioe.printStackTrace();
             //rollback
         }
+        collection.insert(document);
 
     }
 
     public InputStream getFulltext(BiblioObject biblioObject) {
+        return getFulltextByAnhalyticsId(biblioObject.getAnhalyticsId());
+    }
+    
+    public InputStream getFulltextByAnhalyticsId(String anhalyticsId) {
         try {
             GridFS gfs = new GridFS(db, BINARIES);
             BasicDBObject whereQuery = new BasicDBObject();
-            whereQuery.put("anhalyticsId", biblioObject.getAnhalyticsId());
+            whereQuery.put("anhalyticsId", anhalyticsId);
             GridFSDBFile file = gfs.findOne(whereQuery);
             return file.getInputStream();
         } catch (Exception e) {
