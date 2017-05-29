@@ -106,7 +106,6 @@ public class HALOAIPMHHarvester extends Harvester {
 	 * the id type */
     @Override
     public void fetchListDocuments() {
-        List<BiblioObject> biblioObjects = new ArrayList<BiblioObject>();
         BufferedReader br = null;
         try {
             // read the file with one hal id per line
@@ -136,7 +135,7 @@ public class HALOAIPMHHarvester extends Harvester {
                 Element rootElement = teiDoc.getDocumentElement();
                 BiblioObject biblioObject = this.oaiDom.processRecord((Element) rootElement);
                 if (biblioObject != null) {
-                    biblioObjects.add(biblioObject);
+                    grabbedObjects.add(biblioObject);
                 }
             }
             saveObjects();
