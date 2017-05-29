@@ -1,5 +1,4 @@
 {
-    "npl": {
         "_all": {
             "enabled": true,
             "store": true
@@ -1607,7 +1606,7 @@
                                                         "index": "not_analyzed",
                                                         "type": "string"
                                                     },
-                                                    "$scheme_halTypology": {
+                                                    "$scheme_typology": {
                                                         "index": "not_analyzed",
                                                         "type": "string",
                                                         "store": "yes"
@@ -1828,6 +1827,5 @@
                 "type": "string"
             }
         }
-    }
 }
 

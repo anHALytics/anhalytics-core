@@ -56,6 +56,7 @@ public class IndexProperties {
         setKeytermAnnotsIndexName(props.getProperty("index.elasticSearch_keytermAnnotsIndexName"));
         setQuantitiesAnnotsIndexName(props.getProperty("index.elasticSearch_quantitiesAnnotsIndexName"));
         setTeisIndexName(props.getProperty("index.elasticSearch_TeisIndexName"));
+        setTeisTypeName(props.getProperty("index.elasticSearch_TeisTypeName"));
         setKbIndexName(props.getProperty("index.elasticSearch_kbIndexName"));
     }
 
