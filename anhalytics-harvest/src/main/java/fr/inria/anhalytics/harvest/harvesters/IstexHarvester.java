@@ -120,7 +120,9 @@ public class IstexHarvester extends Harvester {
     }
 
     /**
-     * Parses the hit entry, downloads the tei metadata and the fulltext pdf and returns a biblioObject.
+     * Parses the hit entry, downloads the tei metadata and the fulltext pdf and
+     * returns a biblioObject.
+     *
      * @param hit
      * @return
      */
@@ -185,36 +187,34 @@ public class IstexHarvester extends Harvester {
             for (String category : categories) {
                 String[] cat = category.split("\\.");
                 logger.info("\t\t\t\t Sampling " + sampleSize + " documents from category : " + cat[1]);
-                count = getCategoryDocCount(cat);
+                //count = getCategoryDocCount(cat);
+                // Use scroll
                 rands = new ArrayList<>();
                 //we pick some pages randomly because we have no idea how istex is building pages..
-                for (int i = 0; i < sampleSize; i++) {
-                    rands.add((int) (Math.random() * ((count) - 1)));
-                }
-                for (int rnd : rands) {
-                    params = "?q=genre:research%20article%20AND%20categories." + cat[0] + ":" + URLEncoder.encode(cat[1], "UTF-8") + "%20AND%20qualityIndicators.score:[8%20TO%20*]&from=" + rnd + "&size=1&output=*";
+//                for (int i = 0; i < sampleSize; i++) {
+//                    rands.add((int) (Math.random() * ((count) - 1)));
+//                }
+                params = "?q=genre:research%20article%20AND%20categories." + cat[0] + ":" + URLEncoder.encode(cat[1], "UTF-8") + "%20AND%20qualityIndicators.score:[8%20TO%20*]&scroll=1s&size=" + sampleSize + "&output=*";
 
-                    request = istexApiUrl + "/" + params;
-                    URL url = new URL(request);
-                    logger.info(request);
-                    urlConn = (HttpURLConnection) url.openConnection();
-                    if (urlConn != null) {
-                        urlConn.setDoInput(true);
-                        urlConn.setRequestMethod("GET");
+                request = istexApiUrl + "/" + params;
+                URL url = new URL(request);
+                logger.info(request);
+                urlConn = (HttpURLConnection) url.openConnection();
+                if (urlConn != null) {
+                    urlConn.setDoInput(true);
+                    urlConn.setRequestMethod("GET");
 
-                        InputStream in = urlConn.getInputStream();
-                        json = Utilities.convertStreamToString(in);
+                    InputStream in = urlConn.getInputStream();
+                    json = Utilities.convertStreamToString(in);
 
-                        JSONParser jsonParser = new JSONParser();
-                        JSONObject jsonObject = (JSONObject) jsonParser.parse(json);
-
-                        JSONArray hits = (JSONArray) jsonObject.get("hits");
-
+                    JSONParser jsonParser = new JSONParser();
+                    JSONObject jsonObject = (JSONObject) jsonParser.parse(json);
+                    JSONArray hits = (JSONArray) jsonObject.get("hits");
+                    for (int i = 0; i < sampleSize; i++) {
                         //we get only the first element.
-                        bo = getBiblioObjectFromHit((JSONObject) hits.get(0));
+                        bo = getBiblioObjectFromHit((JSONObject) hits.get(i));
                         grabbedObjects.add(bo);
                     }
-
                 }
 //                logger.info("Saving IDs for download :" + ids);
                 //Download / store docs
