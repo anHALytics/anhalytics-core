@@ -24,7 +24,7 @@ public enum Processings {
     
     public static boolean contains(String test) {
             for (Processings c : Processings.values()) {
-                if (c.name().equals(test)) {
+                if (c.getName().equals(test)) {
                     return true;
                 }
             }

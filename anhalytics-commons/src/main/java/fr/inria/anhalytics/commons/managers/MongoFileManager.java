@@ -257,7 +257,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             whereQuery.put("anhalyticsId", anhalyticsId);
             GridFSDBFile file = gfs.findOne(whereQuery);
             InputStream teiStream = file.getInputStream();
-            tei = IOUtils.toString(teiStream);
+            tei = IOUtils.toString(teiStream, "UTF-8");
             teiStream.close();
         } catch (Exception e) {
             throw new DataException(e);

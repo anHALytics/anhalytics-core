@@ -180,7 +180,10 @@ public class IstexTEIConverter implements MetadataConverter {
                 Element classCode = newTEICorpus.createElement("classCode");
                 classCode.setAttribute("scheme", "domain");
                 classCode.setTextContent(domain);
-                textClass.appendChild(classCode);
+                if(textClass != null) {
+                    textClass.appendChild(classCode);
+                }
+
             }
         } catch (XPathExpressionException e) {
             e.printStackTrace();

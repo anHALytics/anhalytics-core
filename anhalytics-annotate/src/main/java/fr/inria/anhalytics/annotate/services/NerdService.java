@@ -1,29 +1,20 @@
 package fr.inria.anhalytics.annotate.services;
 
-import fr.inria.anhalytics.annotate.Annotator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
-import fr.inria.anhalytics.annotate.exceptions.UnreachableAnnotateServiceException;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.InputStream;
-import java.io.OutputStream;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 /*import org.codehaus.jackson.node.*;
 import org.codehaus.jackson.map.ObjectMapper;*/
-
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.node.*;
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.core.io.*;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  * Call of Nerd process via its REST web services.
@@ -36,7 +27,7 @@ public class NerdService extends AnnotateService {
 
 	private String language = null;
 
-    static private String REQUEST = "processERDQuery";
+    static private String REQUEST = "disambiguate";
 
     public NerdService(InputStream input, String language) {
         super(input);
@@ -67,11 +58,11 @@ public class NerdService extends AnnotateService {
             dataTable.add("de");
             dataTable.add("en");
             node.put("resultLanguages", dataTable);
-			if (language != null) {
-	            ObjectNode dataNode = mapper.createObjectNode();
-	            dataNode.put("lang", language);
-				node.put("language", dataNode);
-			}
+            if (language != null) {
+                ObjectNode dataNode = mapper.createObjectNode();
+                dataNode.put("lang", language);
+                node.put("language", dataNode);
+            }
             byte[] postDataBytes = node.toString().getBytes("UTF-8");
 
             OutputStream os = conn.getOutputStream();
