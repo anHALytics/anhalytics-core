@@ -53,7 +53,7 @@ public class Main {
         try {
             HarvestProperties.init("anhalytics.properties");
         } catch (PropertyException exp) {
-            logger.error(exp.getMessage());
+            logger.error("Something wrong when opening anhalytics.properties", exp);
             return;
         }
 

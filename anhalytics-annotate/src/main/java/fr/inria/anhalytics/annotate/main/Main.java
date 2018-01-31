@@ -50,7 +50,7 @@ public class Main {
         }
     }
 
-    private void processCommand() throws UnknownHostException {
+    private void processCommand() {
         String process = AnnotateProperties.getProcessName();
 
         try {

@@ -54,12 +54,12 @@ public class IstexHarvester extends Harvester {
     }
 
     @Override
-    public void fetchAllDocuments() throws IOException, SAXException, ParserConfigurationException, ParseException {
+    public void fetchAllDocuments() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void fetchListDocuments() throws IOException, SAXException, ParserConfigurationException, ParseException {
+    public void fetchListDocuments() {
         BufferedReader br = null;
         HttpURLConnection urlConn = null;
         String json = null;
@@ -189,6 +189,7 @@ public class IstexHarvester extends Harvester {
                 logger.info("\t\t\t\t Sampling " + sampleSize + " documents from category : " + cat[1]);
                 //count = getCategoryDocCount(cat);
                 // Use scroll
+//                count = 10000;
                 rands = new ArrayList<>();
                 //we pick some pages randomly because we have no idea how istex is building pages..
 //                for (int i = 0; i < sampleSize; i++) {
