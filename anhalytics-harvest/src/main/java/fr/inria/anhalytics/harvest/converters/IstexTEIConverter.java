@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.harvest.converters;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
+import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.grobid.GrobidService;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -175,12 +176,14 @@ public class IstexTEIConverter implements MetadataConverter {
     private void addDomains(Document newTEICorpus, BiblioObject biblioObj) {
         try {
             XPath xPath = XPathFactory.newInstance().newXPath();
-            Element textClass = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass").evaluate(newTEICorpus, XPathConstants.NODE);
+            Element profileDesc = (Element) xPath.compile("/TEI/teiHeader/profileDesc").evaluate(newTEICorpus, XPathConstants.NODE);
             for (String domain : biblioObj.getDomains()) {
+                Element textClass = newTEICorpus.createElement("textClass");
                 Element classCode = newTEICorpus.createElement("classCode");
                 classCode.setAttribute("scheme", "domain");
                 classCode.setTextContent(domain);
                 textClass.appendChild(classCode);
+                profileDesc.appendChild(textClass);
             }
         } catch (XPathExpressionException e) {
             e.printStackTrace();

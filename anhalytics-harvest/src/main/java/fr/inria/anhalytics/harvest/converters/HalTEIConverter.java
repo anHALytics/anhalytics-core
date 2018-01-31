@@ -81,17 +81,19 @@ public class HalTEIConverter implements MetadataConverter {
             XPath xPath = XPathFactory.newInstance().newXPath();
             Element pubType = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass/classCode[@scheme=\"halTypology\"]").evaluate(newTEICorpus, XPathConstants.NODE);
             Element textClass = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass").evaluate(newTEICorpus, XPathConstants.NODE);
-            Element classCode = newTEICorpus.createElement("classCode");
-            classCode.setAttribute("scheme", "typology");
-            classCode.setTextContent(pubType.getAttribute("n") + "_" + pubType.getTextContent());
-            textClass.appendChild(classCode);
+            if (pubType != null) {
+                Element classCode = newTEICorpus.createElement("classCode");
+                classCode.setAttribute("scheme", "typology");
+                classCode.setTextContent(pubType.getAttribute("n") + "_" + pubType.getTextContent());
+                textClass.appendChild(classCode);
+            }
         } catch (XPathExpressionException e) {
             e.printStackTrace();
         }
     }
-    
+
     /**
-    * For generalisation purpose we use typology scheme instead of halDomain 
+    * For generalisation purpose we use typology scheme instead of halDomain
     * and we concatenate the abbreviation with the full typology (must be handled from frontend..).
     */
     private void updateDomainsType(Document newTEICorpus) {
@@ -99,10 +101,12 @@ public class HalTEIConverter implements MetadataConverter {
             XPath xPath = XPathFactory.newInstance().newXPath();
             Element pubType = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass/classCode[@scheme=\"halDomain\"]").evaluate(newTEICorpus, XPathConstants.NODE);
             Element textClass = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass").evaluate(newTEICorpus, XPathConstants.NODE);
-            Element classCode = newTEICorpus.createElement("classCode");
-            classCode.setAttribute("scheme", "domain");
-            classCode.setTextContent(pubType.getAttribute("n") + "_" + pubType.getTextContent());
-            textClass.appendChild(classCode);
+            if (pubType != null) {
+                Element classCode = newTEICorpus.createElement("classCode");
+                classCode.setAttribute("scheme", "domain");
+                classCode.setTextContent(pubType.getAttribute("n") + "_" + pubType.getTextContent());
+                textClass.appendChild(classCode);
+            }
         } catch (XPathExpressionException e) {
             e.printStackTrace();
         }
