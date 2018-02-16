@@ -211,7 +211,7 @@ abstract class Indexer {
                     mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kbpublications.json"));
                 }
             } else if (indexName.equals(IndexProperties.getQuantitiesAnnotsIndexName())) {
-                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_quantities.json"));
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_pdf_quantities.json"));
             } else {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl.json"));
             }
