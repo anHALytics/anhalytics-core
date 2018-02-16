@@ -246,7 +246,7 @@ public class Utilities {
      * Add xml ids on the textual nodes of the document
      */
     private static List<String> fields
-            = Arrays.asList("title", "abstract", "term", "funder", "classCode", "p", "head", "figDesc", "item");
+            = Arrays.asList("title", "term", "funder", "classCode", "p", "head", "figDesc", "item");
 
     public static void generateIDs(Document doc) {
         for (String field : fields) {

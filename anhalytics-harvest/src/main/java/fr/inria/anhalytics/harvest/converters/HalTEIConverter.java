@@ -63,6 +63,7 @@ public class HalTEIConverter implements MetadataConverter {
             updatePublicationType(metadata);
             updateDomainsType(metadata);
             updatePublicationDate(metadata);
+            updateAbstract(metadata);
             teiHeader = createMetadataTEIHeader(stuffToTake, newTEICorpus);
 
         } catch (XPathExpressionException e) {
@@ -82,10 +83,9 @@ public class HalTEIConverter implements MetadataConverter {
             Element pubType = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass/classCode[@scheme=\"halTypology\"]").evaluate(newTEICorpus, XPathConstants.NODE);
             Element textClass = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass").evaluate(newTEICorpus, XPathConstants.NODE);
             if (pubType != null) {
-                Element classCode = newTEICorpus.createElement("classCode");
-                classCode.setAttribute("scheme", "typology");
-                classCode.setTextContent(pubType.getAttribute("n") + "_" + pubType.getTextContent());
-                textClass.appendChild(classCode);
+                pubType.setAttribute("scheme", "typology");
+                pubType.setTextContent(pubType.getAttribute("n") + "_" + pubType.getTextContent());//for generality reasons, the abbreviations checked and would be parsed from the demo.
+                //classCode.removeAttribute("n");
             }
         } catch (XPathExpressionException e) {
             e.printStackTrace();
@@ -99,13 +99,16 @@ public class HalTEIConverter implements MetadataConverter {
     private void updateDomainsType(Document newTEICorpus) {
         try {
             XPath xPath = XPathFactory.newInstance().newXPath();
-            Element pubType = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass/classCode[@scheme=\"halDomain\"]").evaluate(newTEICorpus, XPathConstants.NODE);
-            Element textClass = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass").evaluate(newTEICorpus, XPathConstants.NODE);
-            if (pubType != null) {
-                Element classCode = newTEICorpus.createElement("classCode");
-                classCode.setAttribute("scheme", "domain");
-                classCode.setTextContent(pubType.getAttribute("n") + "_" + pubType.getTextContent());
-                textClass.appendChild(classCode);
+            NodeList pubDomains = (NodeList) xPath.compile("/TEI/text/body/listBibl/profileDesc/textClass/classCode[@scheme=\"halDomain\"]").evaluate(newTEICorpus, XPathConstants.NODESET);
+            if (pubDomains != null) {
+                for(int i = 0; i <= pubDomains.getLength() - 1; i++) {
+                    if(pubDomains.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                        Element classCode = (Element)pubDomains.item(i);
+                        classCode.setAttribute("scheme", "domain");
+                        classCode.setTextContent(classCode.getAttribute("n") + "_" + classCode.getTextContent());
+                        //classCode.removeAttribute("n");
+                    }
+                }
             }
         } catch (XPathExpressionException e) {
             e.printStackTrace();
@@ -340,6 +343,24 @@ public class HalTEIConverter implements MetadataConverter {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * In HAL, Abstract text is wrapped into abstract element while it should be under organised into paragraphs.
+     */
+    private void updateAbstract(Document newTEICorpus) {
+        try {
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            Element abstractElt = (Element) xPath.compile("/TEI/text/body/listBibl/profileDesc/abstract").evaluate(newTEICorpus, XPathConstants.NODE);
+            if (abstractElt != null) {
+                Element p = newTEICorpus.createElement("p");
+                p.setTextContent(abstractElt.getTextContent());
+                abstractElt.setTextContent("");
+                abstractElt.appendChild(p);
+            }
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
         }
     }
 }

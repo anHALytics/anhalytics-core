@@ -31,7 +31,7 @@ public class DocumentIndexer extends Indexer {
     // only annotations under these paths will be indexed for the moment
     static final public List<String> toBeIndexed
             = Arrays.asList("$teiCorpus.$teiHeader.$fileDesc.$titleStmt.xml:id",
-                    "$teiCorpus.$teiHeader.$profileDesc.xml:id",
+                    "$teiCorpus.$teiHeader.$profileDesc.$abstract.xml:id",
                     "$teiCorpus.$teiHeader.$profileDesc.$textClass.$keywords.$type_author.xml:id");
 
     public DocumentIndexer() {
@@ -125,7 +125,9 @@ public class DocumentIndexer extends Indexer {
         if (mm.initObjects(null)) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
-                Annotation annotation = mm.getNerdAnnotations(biblioObject.getAnhalyticsId());
+                Annotation annotation = mm.getKeytermAnnotations(biblioObject.getAnhalyticsId());
+                if(annotation == null)
+                    continue;
                 annotation.setJson(annotation.getJson().replaceAll("_id", "id"));
                 if (!IndexProperties.isReset() && annotation.isIsIndexed()) {
                     logger.info("\t\t Already indexed annotations for " + biblioObject.getAnhalyticsId() + ", Skipping...");
@@ -142,7 +144,7 @@ public class DocumentIndexer extends Indexer {
                     if (nb % bulkSize == 0) {
                         BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                         if (bulkResponse.hasFailures()) {
-                            // process failures by iterating through each bulk response item	
+                            // process failures by iterating through each bulk response item
                             logger.error(bulkResponse.buildFailureMessage());
                         }
                         bulkRequest = client.prepareBulk();
@@ -182,6 +184,9 @@ public class DocumentIndexer extends Indexer {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 Annotation annotation = mm.getNerdAnnotations(biblioObject.getAnhalyticsId());
+                if(annotation == null)
+                    continue;
+
                 annotation.setJson(annotation.getJson().replaceAll("_id", "id"));
                 if (!IndexProperties.isReset() && annotation.isIsIndexed()) {
                     logger.info("\t\t Already indexed annotations for " + biblioObject.getAnhalyticsId() + ", Skipping...");
@@ -209,7 +214,7 @@ public class DocumentIndexer extends Indexer {
                         ((ObjectNode) newNode).put("annotation", temp);
                         String annotJson = newNode.toString();
 
-                        // we do not index the empty annotation results! 
+                        // we do not index the empty annotation results!
                         // the nerd subdoc has no entites field
                         JsonNode annotNode = temp.findPath("nerd");
                         JsonNode entitiesNode = null;
@@ -231,7 +236,7 @@ public class DocumentIndexer extends Indexer {
                         if (nb % bulkSize == 0) {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                             if (bulkResponse.hasFailures()) {
-                                // process failures by iterating through each bulk response item	
+                                // process failures by iterating through each bulk response item
                                 logger.error(bulkResponse.buildFailureMessage());
                             }
                             bulkRequest = client.prepareBulk();
