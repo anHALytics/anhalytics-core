@@ -518,8 +518,17 @@ public class IndexingPreprocess {
                             JsonNode freeBaseExternalRefN = piece.findValue("freeBaseExternalRef");
 
                             String nerd_score = nerd_scoreN.textValue();
-                            String wikipediaExternalRef = wikipediaExternalRefN.textValue();
-                            String preferredTerm = preferredTermN.textValue();
+
+                            String wikipediaExternalRef = null;
+                            if ((wikipediaExternalRefN != null) && (!wikipediaExternalRefN.isMissingNode())) {
+                                wikipediaExternalRef = wikipediaExternalRefN.textValue();
+                            }
+
+                            String preferredTerm = null;
+                            if ((preferredTermN != null) && (!preferredTermN.isMissingNode())) {
+                                preferredTerm = preferredTermN.textValue();
+                            }
+
                             String freeBaseExternalRef = null;
                             if ((freeBaseExternalRefN != null) && (!freeBaseExternalRefN.isMissingNode())) {
                                 freeBaseExternalRef = freeBaseExternalRefN.textValue();
@@ -531,13 +540,17 @@ public class IndexingPreprocess {
                             ((ObjectNode) nerdScoreNode).put("nerd_score", nerd_score);
                             ((ArrayNode) newNode).add(nerdScoreNode);
 
-                            JsonNode wikiNode = mapper.createObjectNode();
-                            ((ObjectNode) wikiNode).put("wikipediaExternalRef", wikipediaExternalRef);
-                            ((ArrayNode) newNode).add(wikiNode);
+                            if (wikipediaExternalRefN != null) {
+                                JsonNode wikiNode = mapper.createObjectNode();
+                                ((ObjectNode) wikiNode).put("wikipediaExternalRef", wikipediaExternalRef);
+                                ((ArrayNode) newNode).add(wikiNode);
+                            }
 
-                            JsonNode preferredTermNode = mapper.createObjectNode();
-                            ((ObjectNode) preferredTermNode).put("preferredTerm", preferredTerm);
-                            ((ArrayNode) newNode).add(preferredTermNode);
+                            if (wikipediaExternalRef != null) {
+                                JsonNode preferredTermNode = mapper.createObjectNode();
+                                ((ObjectNode) preferredTermNode).put("preferredTerm", preferredTerm);
+                                ((ArrayNode) newNode).add(preferredTermNode);
+                            }
 
                             if (freeBaseExternalRef != null) {
                                 JsonNode freeBaseNode = mapper.createObjectNode();
