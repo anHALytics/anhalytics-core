@@ -175,30 +175,30 @@ public class Main {
                     logger.info("The index " + IndexProperties.getTeisIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getTeisIndexName());
                     int nbDoc1 = esm.indexTeiCorpus();
-                    logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
+                    logger.info("Total: " + nbDoc1 + " TEI documents indexed.");
                 }
             } else if (process.equals("indexAnnotations")) {
-//                try {
-//                    int nbNerdAnnot = esm.indexNerdAnnotations();
-//                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
-//                } catch (IndexNotCreatedException e) {
-//                    logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
-//                    logger.info("The index " + IndexProperties.getNerdAnnotsIndexName() + " will be created.");
-//                    esm.createIndex(IndexProperties.getNerdAnnotsIndexName());
-//                    int nbNerdAnnot = esm.indexNerdAnnotations();
-//                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
-//                }
-//
-//                try {
-//                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
-//                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
-//                } catch (IndexNotCreatedException e) {
-//                    logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
-//                    logger.info("The index " + IndexProperties.getKeytermAnnotsIndexName() + " will be created.");
-//                    esm.createIndex(IndexProperties.getKeytermAnnotsIndexName());
-//                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
-//                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
-//                }
+                try {
+                    int nbNerdAnnot = esm.indexNerdAnnotations();
+                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getNerdAnnotsIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getNerdAnnotsIndexName());
+                    int nbNerdAnnot = esm.indexNerdAnnotations();
+                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+                }
+
+                try {
+                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
+                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+                } catch (IndexNotCreatedException e) {
+                    logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
+                    logger.info("The index " + IndexProperties.getKeytermAnnotsIndexName() + " will be created.");
+                    esm.createIndex(IndexProperties.getKeytermAnnotsIndexName());
+                    int nbKeytermAnnot = esm.indexKeytermAnnotations();
+                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+                }
 
                 try {
                     int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
