@@ -36,6 +36,14 @@
                                                     },
                                                     "status": {
                                                         "type": "string"
+                                                    },
+                                                    "$availability": {
+                                                        "properties": {
+                                                            "licence": {
+                                                                "index": "not_analyzed",
+                                                                "type": "string"
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             },
@@ -544,6 +552,10 @@
                                                                                     "type": {
                                                                                         "index": "not_analyzed",
                                                                                         "type": "string"
+                                                                                    },
+                                                                                    "$idno": {
+                                                                                        "type" : "object",
+                                                                                        "enabled" : false
                                                                                     }
                                                                                 }
                                                                             },
@@ -1322,6 +1334,10 @@
                                                                     },
                                                                     "type": {
                                                                         "type": "string"
+                                                                    },
+                                                                    "$note":{
+                                                                        "type" : "object",
+                                                                        "enabled" : false
                                                                     }
                                                                 }
                                                             },
@@ -1549,10 +1565,21 @@
                                                 "type": "string"
                                             }
                                         }
+                                    },
+                                    "$publicationStmt": {
+                                        "properties": {
+                                            "$availability": {
+                                                "properties": {
+                                                    "$licence": {
+                                                        "type" : "object",
+                                                        "enabled" : false
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                            }
-                            ,
+                            },
                             "$profileDesc": {
                                 "properties": {
                                     "$abstract": {
@@ -1574,14 +1601,41 @@
                                                 "analyzer": "german",
                                                 "store": "yes",
                                                 "term_vector": "with_positions_offsets"
+                                            },
+                                            "$p": {
+                                                "properties": {
+                                                    "$lang_en": {
+                                                        "type": "text",
+                                                        "analyzer": "english",
+                                                        "store": "yes",
+                                                        "term_vector": "with_positions_offsets"
+                                                    },
+                                                    "$lang_fr": {
+                                                        "type": "text",
+                                                        "analyzer": "french",
+                                                        "store": "yes",
+                                                        "term_vector": "with_positions_offsets"
+                                                    },
+                                                    "$lang_de": {
+                                                        "type": "text",
+                                                        "analyzer": "german",
+                                                        "store": "yes",
+                                                        "term_vector": "with_positions_offsets"
+                                                    }
+                                                }
+                                            },
+                                            "xml:id": {
+                                                "index": "not_analyzed",
+                                                "type": "string",
+                                                "include_in_all": false,
+                                                "store": "yes"
                                             }
                                         }
                                     },
                                     "xml:id": {
                                         "index": "not_analyzed",
                                         "type": "string",
-                                        "include_in_all": false,
-                                        "store": "yes"
+                                        "include_in_all": false
                                     },
                                     "$langUsage": {
                                         "properties": {
@@ -1598,11 +1652,11 @@
                                         "properties": {
                                             "$classCode": {
                                                 "properties": {
-                                                    "$scheme_halDomain": {
+                                                    "$scheme_domain": {
                                                         "index": "not_analyzed",
                                                         "type": "string"
                                                     },
-                                                    "$scheme_halDomain_abbrev": {
+                                                    "$scheme_domain_abbrev": {
                                                         "index": "not_analyzed",
                                                         "type": "string"
                                                     },
@@ -1611,7 +1665,7 @@
                                                         "type": "string",
                                                         "store": "yes"
                                                     },
-                                                    "$scheme_halTypology_abbrev": {
+                                                    "$scheme_typology_abbrev": {
                                                         "index": "not_analyzed",
                                                         "type": "string",
                                                         "store": "yes"

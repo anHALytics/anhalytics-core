@@ -26,7 +26,8 @@
                                     "rawName": {
                                         "type": "string",
                                         "index": "not_analyzed"
-                                    },"preferredTerm": {
+                                    },
+                                    "preferredTerm": {
                                         "type": "string",
                                         "index": "not_analyzed"
                                     },
@@ -37,10 +38,12 @@
                                     "prob": {
                                         "type": "string",
                                         "index": "not_analyzed"
-                                    },"wikipediaExternalRef": {
+                                    },
+                                    "wikipediaExternalRef": {
                                         "type": "string",
                                         "index": "not_analyzed"
-                                    },"freeBaseExternalRef": {
+                                    },
+                                    "freeBaseExternalRef": {
                                         "type": "string",
                                         "index": "not_analyzed"
                                     },
@@ -85,6 +88,29 @@
                                             },
                                             "page_id": {
                                                 "type": "integer"
+                                            }
+                                        }
+                                    },
+                                    "statements": {
+                                        "properties": {
+                                            "conceptId": {
+                                                "type": "text"
+                                            },
+                                            "propertyId": {
+                                                "type": "text"
+                                            },
+                                            "propertyName": {
+                                                "type": "text"
+                                            },
+                                            "value": {
+                                                "type": "object",
+                                                "enabled" : false
+                                            },
+                                            "valueName": {
+                                                "type": "text"
+                                            },
+                                            "valueType": {
+                                                "type": "text"
                                             }
                                         }
                                     }

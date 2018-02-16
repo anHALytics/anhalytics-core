@@ -1,0 +1,625 @@
+{
+            "quantities": {
+                "_all": {
+                    "enabled": false,
+                    "store": true
+                },
+                "properties": {
+                    "anhalyticsId": {
+                        "type": "keyword"
+                    },
+                    "annotation": {
+                        "properties": {
+                            "measurements": {
+                                "properties": {
+                                    "boundingBoxes": {
+                                        "properties": {
+                                            "h": {
+                                                "type": "double"
+                                            },
+                                            "p": {
+                                                "type": "double"
+                                            },
+                                            "w": {
+                                                "type": "double"
+                                            },
+                                            "x": {
+                                                "type": "double"
+                                            },
+                                            "y": {
+                                                "type": "double"
+                                            }
+                                        }
+                                    },
+                                    "quantified": {
+                                        "properties": {
+                                            "normalizedName": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            },
+                                            "offsetEnd": {
+                                                "type": "integer"
+                                            },
+                                            "offsetStart": {
+                                                "type": "integer"
+                                            },
+                                            "rawName": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "quantities": {
+                                        "properties": {
+                                            "normalizedQuantity": {
+                                                "type": "double"
+                                            },
+                                            "normalizedUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "system": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "offsetEnd": {
+                                                "type": "integer"
+                                            },
+                                            "offsetStart": {
+                                                "type": "integer"
+                                            },
+                                            "parsedValue": {
+                                                "type": "double"
+                                            },
+                                            "rawUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "integer"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "integer"
+                                                    }
+                                                }
+                                            },
+                                            "rawValue": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            },
+                                            "type": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "quantity": {
+                                        "properties": {
+                                            "normalizedQuantity": {
+                                                "type": "double"
+                                            },
+                                            "normalizedUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "system": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "offsetEnd": {
+                                                "type": "integer"
+                                            },
+                                            "offsetStart": {
+                                                "type": "integer"
+                                            },
+                                            "parsedValue": {
+                                                "type": "double"
+                                            },
+                                            "rawUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "integer"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "integer"
+                                                    }
+                                                }
+                                            },
+                                            "rawValue": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            },
+                                            "type": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "quantityBase": {
+                                        "properties": {
+                                            "normalizedQuantity": {
+                                                "type": "double"
+                                            },
+                                            "normalizedUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "system": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "offsetEnd": {
+                                                "type": "integer"
+                                            },
+                                            "offsetStart": {
+                                                "type": "integer"
+                                            },
+                                            "parsedValue": {
+                                                "type": "double"
+                                            },
+                                            "rawUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "integer"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "integer"
+                                                    }
+                                                }
+                                            },
+                                            "rawValue": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            },
+                                            "type": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "quantityLeast": {
+                                        "properties": {
+                                            "normalizedQuantity": {
+                                                "type": "double"
+                                            },
+                                            "normalizedUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "system": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "offsetEnd": {
+                                                "type": "integer"
+                                            },
+                                            "offsetStart": {
+                                                "type": "integer"
+                                            },
+                                            "parsedValue": {
+                                                "type": "double"
+                                            },
+                                            "rawUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "long"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "long"
+                                                    }
+                                                }
+                                            },
+                                            "rawValue": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            },
+                                            "type": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "quantityMost": {
+                                        "properties": {
+                                            "normalizedQuantity": {
+                                                "type": "double"
+                                            },
+                                            "normalizedUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "system": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "offsetEnd": {
+                                                "type": "integer"
+                                            },
+                                            "offsetStart": {
+                                                "type": "integer"
+                                            },
+                                            "parsedValue": {
+                                                "type": "double"
+                                            },
+                                            "rawUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "integer"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "integer"
+                                                    }
+                                                }
+                                            },
+                                            "rawValue": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            },
+                                            "type": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "quantityRange": {
+                                        "properties": {
+                                            "normalizedQuantity": {
+                                                "type": "double"
+                                            },
+                                            "normalizedUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "system": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "offsetEnd": {
+                                                "type": "integer"
+                                            },
+                                            "offsetStart": {
+                                                "type": "integer"
+                                            },
+                                            "parsedValue": {
+                                                "type": "double"
+                                            },
+                                            "rawUnit": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "text",
+                                                        "fields": {
+                                                            "keyword": {
+                                                                "type": "keyword",
+                                                                "ignore_above": 256
+                                                            }
+                                                        }
+                                                    },
+                                                    "offsetEnd": {
+                                                        "type": "integer"
+                                                    },
+                                                    "offsetStart": {
+                                                        "type": "integer"
+                                                    }
+                                                }
+                                            },
+                                            "rawValue": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            },
+                                            "type": {
+                                                "type": "text",
+                                                "fields": {
+                                                    "keyword": {
+                                                        "type": "keyword",
+                                                        "ignore_above": 256
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": {
+                                        "type": "text",
+                                        "fields": {
+                                            "keyword": {
+                                                "type": "keyword",
+                                                "ignore_above": 256
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "pages": {
+                                "properties": {
+                                    "page_height": {
+                                        "type": "double"
+                                    },
+                                    "page_width": {
+                                        "type": "double"
+                                    }
+                                }
+                            },
+                            "runtime": {
+                                "type": "double"
+                            }
+                        }
+                    },
+                    "id": {
+                        "properties": {
+                            "$oid": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "isIndexed": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "repositoryDocId": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                }
+            }
+        }

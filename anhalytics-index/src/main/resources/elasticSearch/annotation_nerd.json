@@ -77,6 +77,9 @@
                                         "type": "string",
                                         "index": "not_analyzed"
                                     },
+                                    "nerd_selection_score": {
+                                        "type": "double"
+                                    },
                                     "nerd_conf": {
                                         "type": "string",
                                         "index": "not_analyzed"
@@ -135,6 +138,30 @@
                                             "page_id": {
                                                 "type": "integer"
                                             }
+                                        }
+                                    },
+                                    "statements" :{
+                                        "properties": {
+                                            "conceptId": {
+                                                "type": "text"
+                                            },
+                                            "propertyId": {
+                                                "type": "text"
+                                            },
+                                            "propertyName": {
+                                                "type": "text"
+                                            },
+                                            "value": {
+                                                "type": "object",
+                                                "enabled" : false
+                                            },
+                                            "valueName": {
+                                                "type": "text"
+                                            },
+                                            "valueType": {
+                                                "type": "text"
+                                            }
+
                                         }
                                     }
                                 }
