@@ -241,12 +241,16 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             return this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.TEI_CORPUS);
         } catch (DataException de) {
-            return null;
+            throw new DataException("No TEI corpus was found.",de);
         }
     }
 
     public String getGrobidTei(BiblioObject biblioObject) {
-        return this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.GROBID_TEIS);
+        try {
+            return this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.GROBID_TEIS);
+        } catch (DataException de) {
+            throw new DataException("No corresponding fulltext TEI was found.",de);
+        }
     }
 
     private String getTei(String anhalyticsId, String collection) {

@@ -43,19 +43,23 @@ public class TeiCorpusBuilderProcess {
                 }
                 logger.info("\t\t transforming :" + biblioObject.getRepositoryDocId());
                 biblioObject.setMetadata(mm.getMetadata(biblioObject));
-                Document generatedTEIcorpus = tb.createTEICorpus(biblioObject);
-                if (generatedTEIcorpus != null) {
-                    boolean inserted = mm.insertTEIcorpus(Utilities.toString(generatedTEIcorpus), biblioObject.getAnhalyticsId());
-                    if (inserted) {
-                        biblioObject.setIsProcessedByPub2TEI(Boolean.TRUE);
-                        //We re-initialize everything for this new TEI (this is considered the starting point of a new coming entry from source)
-                        biblioObject.setIsFulltextAppended(Boolean.FALSE);
-                        biblioObject.setIsMined(Boolean.FALSE);
-                        biblioObject.setIsIndexed(Boolean.FALSE);
-                        mm.updateBiblioObjectStatus(biblioObject, null, true);
-                    } else {
-                        logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
+                try{
+                    Document generatedTEIcorpus = tb.createTEICorpus(biblioObject);
+                    if (generatedTEIcorpus != null) {
+                        boolean inserted = mm.insertTEIcorpus(Utilities.toString(generatedTEIcorpus), biblioObject.getAnhalyticsId());
+                        if (inserted) {
+                            biblioObject.setIsProcessedByPub2TEI(Boolean.TRUE);
+                            //We re-initialize everything for this new TEI (this is considered the starting point of a new coming entry from source)
+                            biblioObject.setIsFulltextAppended(Boolean.FALSE);
+                            biblioObject.setIsMined(Boolean.FALSE);
+                            biblioObject.setIsIndexed(Boolean.FALSE);
+                            mm.updateBiblioObjectStatus(biblioObject, null, true);
+                        } else {
+                            logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
+                        }
                     }
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
                 }
             }
         }
@@ -89,15 +93,19 @@ public class TeiCorpusBuilderProcess {
                             String TEICorpus = mm.getTEICorpus(biblioObject);
 
                             generatedTEIcorpus = tb.addGrobidTEIToTEICorpus(TEICorpus, grobidTei);
+
+                            boolean inserted = mm.insertTEIcorpus(Utilities.toString(generatedTEIcorpus), biblioObject.getAnhalyticsId());
+                            if (inserted) {
+                                biblioObject.setIsFulltextAppended(Boolean.TRUE);
+                                mm.updateBiblioObjectStatus(biblioObject, null, true);
+                            } else {
+                                logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
+                            }
+
                         } catch (DataException de) {
                             logger.error("No corresponding fulltext TEI was found.");
-                        }
-                        boolean inserted = mm.insertTEIcorpus(Utilities.toString(generatedTEIcorpus), biblioObject.getAnhalyticsId());
-                        if (inserted) {
-                            biblioObject.setIsFulltextAppended(Boolean.TRUE);
-                            mm.updateBiblioObjectStatus(biblioObject, null, true);
-                        } else {
-                            logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(),e);
                         }
                     }
                 }

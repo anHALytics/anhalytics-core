@@ -9,6 +9,8 @@ import fr.inria.anhalytics.harvest.converters.HalTEIConverter;
 import fr.inria.anhalytics.harvest.converters.IstexTEIConverter;
 import fr.inria.anhalytics.harvest.converters.MetadataConverter;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
@@ -24,6 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Attr;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Functions that builds TEICorpus.
@@ -54,7 +57,7 @@ public class TeiBuilder {
     /**
      * Creates a working TEICorpus from the harvested metadata in TEI header.
      */
-    public Document createTEICorpus(BiblioObject biblioObj) {
+    public Document createTEICorpus(BiblioObject biblioObj) throws IOException, SAXException {
         MetadataConverter mc;
         if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
             mc = new HalTEIConverter();
@@ -62,22 +65,18 @@ public class TeiBuilder {
             mc = new IstexTEIConverter();
         }
         Document newTEICorpus = null;
-        try {
-            Document metadataDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(biblioObj.getMetadata().getBytes("utf-8"))));
+        Document metadataDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(biblioObj.getMetadata().getBytes("utf-8"))));
 
-            newTEICorpus = docBuilder.newDocument();
-            //biblioobject is used to fill the missing metadata, domains, publication type, doi...
-            Element teiHeader = mc.convertMetadataToTEIHeader(metadataDoc, newTEICorpus, biblioObj);
+        newTEICorpus = docBuilder.newDocument();
+        //biblioobject is used to fill the missing metadata, domains, publication type, doi...
+        Element teiHeader = mc.convertMetadataToTEIHeader(metadataDoc, newTEICorpus, biblioObj);
 
-            Element teiCorpus = newTEICorpus.createElement("teiCorpus");
-            teiHeader.setAttribute("xml:id", HarvestProperties.getSource());
-            teiCorpus.appendChild(teiHeader);
-            teiCorpus.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
-            newTEICorpus.appendChild(teiCorpus);
-            Utilities.generateIDs(newTEICorpus);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Element teiCorpus = newTEICorpus.createElement("teiCorpus");
+        teiHeader.setAttribute("xml:id", HarvestProperties.getSource());
+        teiCorpus.appendChild(teiHeader);
+        teiCorpus.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
+        newTEICorpus.appendChild(teiCorpus);
+        Utilities.generateIDs(newTEICorpus);
         return newTEICorpus;
     }
 
@@ -85,15 +84,11 @@ public class TeiBuilder {
      * appends fulltext grobid tei to existing TEICorpus. Fills missing metadata
      * parts , abstract, keywords, publication date and authors.
      */
-    public Document addGrobidTEIToTEICorpus(String teiCorpus, String grobidTei) {
+    public Document addGrobidTEIToTEICorpus(String teiCorpus, String grobidTei) throws IOException, SAXException {
         Document resultTei = null;
-        Document teiCorpusDoc = null;
+
         HalTEIConverter htc = new HalTEIConverter();
-        try {
-            teiCorpusDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(teiCorpus.getBytes("utf-8"))));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Document teiCorpusDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(teiCorpus.getBytes("utf-8"))));
         Document doc = null;
 
         //Remove if already existing.
@@ -110,24 +105,24 @@ public class TeiBuilder {
                 }
             }
         }
-        try {
-            Element grobidTeiElement = null;
-            if (grobidTei != null) {
-                doc = docBuilder.parse(new InputSource(new ByteArrayInputStream(grobidTei.getBytes("utf-8"))));
-                grobidTeiElement = (Element) doc.getDocumentElement();
-                Attr attr = grobidTeiElement.getAttributeNode("xmlns");
-                grobidTeiElement.removeAttributeNode(attr);
-                grobidTeiElement.setAttribute("type", "main");
-                grobidTeiElement.setAttribute("xml:id", "grobid");
+        Element grobidTeiElement = null;
+        if (grobidTei != null) {
+            doc = docBuilder.parse(new InputSource(new ByteArrayInputStream(grobidTei.getBytes("utf-8"))));
+            grobidTeiElement = (Element) doc.getDocumentElement();
+            Attr attr = grobidTeiElement.getAttributeNode("xmlns");
+            grobidTeiElement.removeAttributeNode(attr);
+            grobidTeiElement.setAttribute("type", "main");
+            grobidTeiElement.setAttribute("xml:id", "grobid");
+            try {
                 fillAbstract(doc, teiCorpusDoc);
                 fillKeywords(doc, teiCorpusDoc);
                 fillPubDate(doc, teiCorpusDoc);
                 fillAuthors(doc, teiCorpusDoc);
+            } catch (XPathExpressionException e) {
+                e.printStackTrace();
             }
-            resultTei = addNewElementToTEI(teiCorpusDoc, grobidTeiElement);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        resultTei = addNewElementToTEI(teiCorpusDoc, grobidTeiElement);
         // add random xml:id on textual elements
 
         return resultTei;
