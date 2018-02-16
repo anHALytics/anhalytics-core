@@ -63,6 +63,9 @@ public class NerdService extends AnnotateService {
                 dataNode.put("lang", language);
                 node.put("language", dataNode);
             }
+
+            node.put("full", true);
+
             byte[] postDataBytes = node.toString().getBytes("UTF-8");
 
             OutputStream os = conn.getOutputStream();
