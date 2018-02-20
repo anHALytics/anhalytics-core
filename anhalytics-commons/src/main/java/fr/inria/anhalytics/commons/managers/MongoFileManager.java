@@ -142,6 +142,14 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         newDocument.put("isProcessedPub2TEI", biblioObject.getIsProcessedByPub2TEI());
         newDocument.put("isMined", biblioObject.getIsMined());
         newDocument.put("isIndexed", biblioObject.getIsIndexed());
+        for (Processings p : Processings.values()) {
+            if(temp.get(p.getName()) != null) {
+                newDocument.put(p.getName(), temp.get(p.getName()));
+            }
+        }
+        //here should be handled the workflow (when for instance when text xml:ids change (new grobid tei is generated or tei corpus))
+
+
         if (processing != null) {
             newDocument.put(processing.getName(), true);
         }
