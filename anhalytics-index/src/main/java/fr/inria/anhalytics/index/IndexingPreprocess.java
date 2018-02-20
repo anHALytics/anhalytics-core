@@ -28,10 +28,10 @@ import java.text.SimpleDateFormat;
  * expressed in JSON. Those TEI/JSON paths can be used to query the ElasticSearch indexes 
  * so that there is no need to learn and define an additional index structure
  * for full text. 
- * 
+ *
  * Second, some part of the annotations we want to use for searching documents by combining
  * of the annotations and the TEI full text structures are injected in the standoff node.  
- * 
+ *
  */
 public class IndexingPreprocess {
 
@@ -100,12 +100,12 @@ public class IndexingPreprocess {
      * Process subJson Node and iterate through sub-nodes.
      */
     private JsonNode process(JsonNode subJson,
-            ObjectMapper mapper,
-            String currentLang,
-            boolean fromArray,
-                boolean expandLang,
-            boolean isDate,
-            String anhalyticsId) throws Exception {
+                             ObjectMapper mapper,
+                             String currentLang,
+                             boolean fromArray,
+                             boolean expandLang,
+                             boolean isDate,
+                             String anhalyticsId) throws Exception {
         if (subJson.isContainerNode()) {
             if (subJson.isObject()) {
                 Iterator<String> fields = ((ObjectNode) subJson).fieldNames();
@@ -358,7 +358,7 @@ public class IndexingPreprocess {
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
                     ((ObjectNode) subJson).put("$keywords", arrayNode); // update value
-                    
+
                     return subJson;
                 } else if ((theTypeNode != null) && (theIdnoNode != null)) {
                     JsonNode typeNode = mapper.createObjectNode();
@@ -540,13 +540,13 @@ public class IndexingPreprocess {
                             ((ObjectNode) nerdScoreNode).put("nerd_score", nerd_score);
                             ((ArrayNode) newNode).add(nerdScoreNode);
 
-                            if (wikipediaExternalRefN != null) {
+                            if (wikipediaExternalRef != null) {
                                 JsonNode wikiNode = mapper.createObjectNode();
                                 ((ObjectNode) wikiNode).put("wikipediaExternalRef", wikipediaExternalRef);
                                 ((ArrayNode) newNode).add(wikiNode);
                             }
 
-                            if (wikipediaExternalRef != null) {
+                            if (preferredTerm != null) {
                                 JsonNode preferredTermNode = mapper.createObjectNode();
                                 ((ObjectNode) preferredTermNode).put("preferredTerm", preferredTerm);
                                 ((ArrayNode) newNode).add(preferredTermNode);
@@ -639,8 +639,17 @@ public class IndexingPreprocess {
                                 JsonNode freeBaseExternalRefN = entityNode.findValue("freeBaseExternalRef");
 
                                 String nerd_score = nerd_scoreN.textValue();
-                                String wikipediaExternalRef = wikipediaExternalRefN.textValue();
-                                String preferredTerm = preferredTermN.textValue();
+
+                                String wikipediaExternalRef = null;
+                                if ((wikipediaExternalRefN != null) && (!wikipediaExternalRefN.isMissingNode())) {
+                                    wikipediaExternalRef = wikipediaExternalRefN.textValue();
+                                }
+
+                                String preferredTerm = null;
+                                if ((preferredTermN != null) && (!preferredTermN.isMissingNode())) {
+                                    preferredTerm = preferredTermN.textValue();
+                                }
+
                                 String freeBaseExternalRef = null;
                                 if ((freeBaseExternalRefN != null) && (!freeBaseExternalRefN.isMissingNode())) {
                                     freeBaseExternalRef = freeBaseExternalRefN.textValue();
@@ -650,13 +659,17 @@ public class IndexingPreprocess {
                                 ((ObjectNode) nerdScoreNode).put("nerd_score", nerd_score);
                                 ((ArrayNode) newNode).add(nerdScoreNode);
 
-                                JsonNode wikiNode = mapper.createObjectNode();
-                                ((ObjectNode) wikiNode).put("wikipediaExternalRef", wikipediaExternalRef);
-                                ((ArrayNode) newNode).add(wikiNode);
+                                if (wikipediaExternalRef != null) {
+                                    JsonNode wikiNode = mapper.createObjectNode();
+                                    ((ObjectNode) wikiNode).put("wikipediaExternalRef", wikipediaExternalRef);
+                                    ((ArrayNode) newNode).add(wikiNode);
+                                }
 
-                                JsonNode preferredTermNode = mapper.createObjectNode();
-                                ((ObjectNode) preferredTermNode).put("preferredTerm", preferredTerm);
-                                ((ArrayNode) newNode).add(preferredTermNode);
+                                if (preferredTerm != null) {
+                                    JsonNode preferredTermNode = mapper.createObjectNode();
+                                    ((ObjectNode) preferredTermNode).put("preferredTerm", preferredTerm);
+                                    ((ArrayNode) newNode).add(preferredTermNode);
+                                }
 
                                 if (freeBaseExternalRef != null) {
                                     JsonNode freeBaseNode = mapper.createObjectNode();
@@ -759,11 +772,11 @@ public class IndexingPreprocess {
      */
     public JsonNode getStandoffQuantities(ObjectMapper mapper, String anhalyticsId, JsonNode standoffNode) throws Exception {
         String annotation = mm.getQuantitiesAnnotations(anhalyticsId) != null ? mm.getQuantitiesAnnotations(anhalyticsId).getJson():null;
-        if ((annotation != null) && (annotation.trim().length() > 0)) {           
+        if ((annotation != null) && (annotation.trim().length() > 0)) {
             JsonNode jsonAnnotation = mapper.readTree(annotation);
             if ((jsonAnnotation != null) && (!jsonAnnotation.isMissingNode())) {
                 JsonNode annotationNode = jsonAnnotation.findPath("annotation");
-                if ((annotationNode == null) || (annotationNode.isMissingNode())) 
+                if ((annotationNode == null) || (annotationNode.isMissingNode()))
                     return standoffNode;
 
                 Iterator<JsonNode> iter0 = annotationNode.elements();
@@ -788,21 +801,21 @@ public class IndexingPreprocess {
                         JsonNode piece = (JsonNode) iter.next();
 //logger.info(piece.toString());
                         JsonNode typeNode = piece.findPath("type");
-                        if ((typeNode == null) || (typeNode.isMissingNode())) 
+                        if ((typeNode == null) || (typeNode.isMissingNode()))
                             continue;
                         String type = typeNode.textValue();
 //logger.info("type is " + type + " / " + piece.toString());
-                        
+
                         if (type.equals("value")) {
                             JsonNode quantity = piece.findPath("quantity");
-                            if ((quantity == null) || (quantity.isMissingNode())) 
+                            if ((quantity == null) || (quantity.isMissingNode()))
                                 continue;
                             JsonNode typeMeasure = quantity.findPath("type");
                             //if no quantity type we move on.
                             if ((typeMeasure == null) || (typeMeasure.isMissingNode()))
                                 continue;
                             String valueTypeMeasure = typeMeasure.textValue();
-                            
+
                             JsonNode normalizedQuantity = quantity.findPath("normalizedQuantity");
                             //if no normalized value we continue over.
                             if ((normalizedQuantity == null) || (normalizedQuantity.isMissingNode()))
@@ -833,12 +846,12 @@ public class IndexingPreprocess {
                                 if ((normalizedQuantityMost != null) && (!normalizedQuantityMost.isMissingNode())) {
                                     if (range == null)
                                         range = mapper.createObjectNode();
-                                    valMost = normalizedQuantityMost.doubleValue();    
+                                    valMost = normalizedQuantityMost.doubleValue();
                                     ((ObjectNode) range).put("lte", valMost);
                                 }
-                            } 
+                            }
 
-                            if ((quantityLeast != null) && (!quantityLeast.isMissingNode())) {  
+                            if ((quantityLeast != null) && (!quantityLeast.isMissingNode())) {
                                 JsonNode typeMeasure = quantityLeast.findPath("type");
                                 typeMeasure = quantityLeast.findPath("type");
                                 if ((typeMeasure == null) || (typeMeasure.isMissingNode()))
@@ -864,11 +877,11 @@ public class IndexingPreprocess {
 
                         } else if (type.equals("listc")) {
                             JsonNode quantitiesList = piece.findPath("quantities");
-                            if ((quantitiesList == null) || (quantitiesList.isMissingNode())) 
+                            if ((quantitiesList == null) || (quantitiesList.isMissingNode()))
                                 continue;
                             // quantitiesList here is a list with a list of quantity values
 
-                        }  
+                        }
                         m++;
                     }
                     //n++;
