@@ -346,6 +346,20 @@ public class Main {
             defaultprops.setProperty("index.elasticSearch_cluster", elasticSearchClusterName);
         }
 
+        String elasticSearch_TeisIndexName = defaultprops.getProperty("index.elasticSearch_TeisIndexName");
+        System.out.print(ANSI_YELLOW + "elasticSearch_TeisIndexName (" + elasticSearch_TeisIndexName + "): " + ANSI_RESET);
+        elasticSearch_TeisIndexName = scanner.nextLine();
+        if (!elasticSearch_TeisIndexName.isEmpty()) {
+            defaultprops.setProperty("index.elasticSearch_TeisIndexName", elasticSearch_TeisIndexName);
+        }
+
+        String elasticSearch_TeisTypeName = defaultprops.getProperty("index.elasticSearch_TeisTypeName");
+        System.out.print(ANSI_YELLOW + "elasticSearch_TeisTypeName (" + elasticSearch_TeisTypeName + "): " + ANSI_RESET);
+        elasticSearch_TeisTypeName = scanner.nextLine();
+        if (!elasticSearch_TeisTypeName.isEmpty()) {
+            defaultprops.setProperty("index.elasticSearch_TeisTypeName", elasticSearch_TeisTypeName);
+        }
+
         String elasticsearch_nerdAnnot_indexName = defaultprops.getProperty("index.elasticSearch_nerdAnnotsIndexName");
         System.out.print(ANSI_YELLOW + "elasticsearch_nerdAnnot_indexName (" + elasticsearch_nerdAnnot_indexName + "): " + ANSI_RESET);
         elasticsearch_nerdAnnot_indexName = scanner.nextLine();
@@ -360,18 +374,11 @@ public class Main {
             defaultprops.setProperty("index.elasticSearch_keytermAnnotsIndexName", elasticsearch_keyterm_indexName);
         }
 
-        String elasticsearch_fulltextTeis_indexName = defaultprops.getProperty("index.elasticSearch_fulltextTeisIndexName");
-        System.out.print(ANSI_YELLOW + "elasticsearch_fulltextTeis_indexName (" + elasticsearch_fulltextTeis_indexName + "): " + ANSI_RESET);
-        elasticsearch_fulltextTeis_indexName = scanner.nextLine();
-        if (!elasticsearch_fulltextTeis_indexName.isEmpty()) {
-            defaultprops.setProperty("index.elasticSearch_fulltextTeisIndexName", elasticsearch_fulltextTeis_indexName);
-        }
-
-        String elasticsearch_metadataTeis_indexName = defaultprops.getProperty("index.elasticSearch_metadataTeisIndexName");
-        System.out.print(ANSI_YELLOW + "elasticsearch_metadataTeis_indexName (" + elasticsearch_metadataTeis_indexName + "): " + ANSI_RESET);
-        elasticsearch_metadataTeis_indexName = scanner.nextLine();
-        if (!elasticsearch_metadataTeis_indexName.isEmpty()) {
-            defaultprops.setProperty("index.elasticSearch_metadataTeisIndexName", elasticsearch_metadataTeis_indexName);
+        String elasticSearch_quantitiesAnnotsIndexName = defaultprops.getProperty("index.elasticSearch_quantitiesAnnotsIndexName");
+        System.out.print(ANSI_YELLOW + "elasticSearch_quantitiesAnnotsIndexName (" + elasticSearch_quantitiesAnnotsIndexName + "): " + ANSI_RESET);
+        elasticSearch_quantitiesAnnotsIndexName = scanner.nextLine();
+        if (!elasticSearch_quantitiesAnnotsIndexName.isEmpty()) {
+            defaultprops.setProperty("index.elasticSearch_quantitiesAnnotsIndexName", elasticSearch_quantitiesAnnotsIndexName);
         }
 
         String elasticsearch_kb_indexName = defaultprops.getProperty("index.elasticSearch_kbIndexName");
