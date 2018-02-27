@@ -65,7 +65,7 @@ public class HALOAIPMHHarvester extends Harvester {
             logger.info("\t Sending: " + request);
 
             InputStream in = Utilities.request(request);
-            grabbedObjects = this.oaiDom.getGrabbedObjects(in, grabbedObjects);
+            grabbedObjects = this.oaiDom.getGrabbedObjects(in);
             saveObjects();
 
             // token if any:

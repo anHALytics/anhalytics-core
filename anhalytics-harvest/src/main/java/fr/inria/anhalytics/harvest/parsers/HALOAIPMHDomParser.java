@@ -53,7 +53,8 @@ public class HALOAIPMHDomParser {
     /*
     ** Collectes BiblioObjects from the inputStream, and saves the metadata.
     */
-    public List<BiblioObject> getGrabbedObjects(InputStream in, List<BiblioObject> biblioobjs) {
+    public List<BiblioObject> getGrabbedObjects(InputStream in) {
+        List<BiblioObject> biblioobjs = new ArrayList<BiblioObject>();
         setDoc(parse(in));
         if (doc != null) {
             Element rootElement = doc.getDocumentElement();
