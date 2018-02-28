@@ -1,0 +1,1613 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.tei-c.org/ns/1.0 /data/workspace/services/grobid/grobid-home/schemas/xsd/Grobid.xsd">
+	<teiHeader xml:lang="en">
+		<encodingDesc>
+			<appInfo>
+				<application ident="GROBID" version="0.5.1-SNAPSHOT" when="2018-02-28T09:13+0000">
+					<ref target="https://github.com/kermitt2/grobid">GROBID - A machine learning software for extracting information from scholarly documents</ref>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<fileDesc>
+			<titleStmt>
+				<title level="a" type="main" xml:id="_hcrpY4y">Discriminant analyses of peanut allergy severity scores Discriminant analyses of peanut allergy severity scores</title>
+			</titleStmt>
+			<publicationStmt>
+				<publisher/>
+				<availability status="unknown">
+<licence/>
+</availability>
+			</publicationStmt>
+			<sourceDesc>
+				<biblStruct>
+					<analytic>
+						<author>
+							<persName>
+<forename type="first">Olivier</forename>
+<surname>Collignon</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">Jean-Marie</forename>
+<surname>Monnez</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">Pierre</forename>
+<surname>Vallois</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">F</forename>
+<surname>Codreanu</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">J.-M</forename>
+<surname>Renaudin</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">Gisèle</forename>
+<surname>Kanny</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">Marie</forename>
+<surname>Brulliard</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">Bernard</forename>
+<surname>Bihain</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">Sandrine</forename>
+<surname>Jacquenet</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">Denise-Anne</forename>
+<surname>Moneret-Vautrin</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">Olivier</forename>
+<surname>Collignon</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">Jean-Marie</forename>
+<surname>Monnez</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">Pierre</forename>
+<surname>Vallois</surname>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">F</forename>
+</persName>
+						</author>
+						<author>
+							<persName>
+<forename type="first">O</forename>
+<surname>Collignon</surname>
+</persName>
+							<affiliation key="aff0">
+								<orgName type="institution">Genclis SAS</orgName>
+								<address>
+									<addrLine>15 rue du Bois de la Champelle</addrLine>
+									<postCode>54500</postCode>
+									<settlement>Vandoeuvre-l` es-Nancy</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+							<affiliation key="aff1">
+								<orgName type="department">Institut Elie Cartan</orgName>
+								<orgName type="laboratory">UMR 7502</orgName>
+								<orgName key="instit1" type="institution">Nancy Université</orgName>
+								<orgName key="instit2" type="institution">CNRS</orgName>
+								<orgName key="instit3" type="institution">INRIA</orgName>
+								<address>
+									<postCode>BP239, 54506</postCode>
+									<settlement>Vandoeuvre-l` es-Nancy</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName>
+<forename type="first">J.-M</forename>
+<surname>Monnez</surname>
+</persName>
+							<affiliation key="aff1">
+								<orgName type="department">Institut Elie Cartan</orgName>
+								<orgName type="laboratory">UMR 7502</orgName>
+								<orgName key="instit1" type="institution">Nancy Université</orgName>
+								<orgName key="instit2" type="institution">CNRS</orgName>
+								<orgName key="instit3" type="institution">INRIA</orgName>
+								<address>
+									<postCode>BP239, 54506</postCode>
+									<settlement>Vandoeuvre-l` es-Nancy</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName>
+<forename type="first">P</forename>
+<surname>Vallois</surname>
+</persName>
+							<affiliation key="aff1">
+								<orgName type="department">Institut Elie Cartan</orgName>
+								<orgName type="laboratory">UMR 7502</orgName>
+								<orgName key="instit1" type="institution">Nancy Université</orgName>
+								<orgName key="instit2" type="institution">CNRS</orgName>
+								<orgName key="instit3" type="institution">INRIA</orgName>
+								<address>
+									<postCode>BP239, 54506</postCode>
+									<settlement>Vandoeuvre-l` es-Nancy</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName>
+<forename type="first">F</forename>
+<surname>Codreanu</surname>
+</persName>
+							<affiliation key="aff2">
+								<orgName type="institution">Centre Hospitalier Universitaire</orgName>
+								<address>
+									<postCode>54000</postCode>
+									<settlement>Nancy</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName>
+<forename type="first">J.-M</forename>
+<surname>Renaudin</surname>
+</persName>
+							<affiliation key="aff0">
+								<orgName type="institution">Genclis SAS</orgName>
+								<address>
+									<addrLine>15 rue du Bois de la Champelle</addrLine>
+									<postCode>54500</postCode>
+									<settlement>Vandoeuvre-l` es-Nancy</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName>
+<forename type="first">G</forename>
+<surname>Kanny</surname>
+</persName>
+							<affiliation key="aff2">
+								<orgName type="institution">Centre Hospitalier Universitaire</orgName>
+								<address>
+									<postCode>54000</postCode>
+									<settlement>Nancy</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName>
+<forename type="first">M</forename>
+<surname>Brulliard</surname>
+</persName>
+							<affiliation key="aff0">
+								<orgName type="institution">Genclis SAS</orgName>
+								<address>
+									<addrLine>15 rue du Bois de la Champelle</addrLine>
+									<postCode>54500</postCode>
+									<settlement>Vandoeuvre-l` es-Nancy</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName>
+<forename type="first">B</forename>
+<forename type="middle">E</forename>
+<surname>Bihain</surname>
+</persName>
+							<affiliation key="aff0">
+								<orgName type="institution">Genclis SAS</orgName>
+								<address>
+									<addrLine>15 rue du Bois de la Champelle</addrLine>
+									<postCode>54500</postCode>
+									<settlement>Vandoeuvre-l` es-Nancy</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName>
+<forename type="first">S</forename>
+<surname>Jacquenet</surname>
+</persName>
+							<affiliation key="aff0">
+								<orgName type="institution">Genclis SAS</orgName>
+								<address>
+									<addrLine>15 rue du Bois de la Champelle</addrLine>
+									<postCode>54500</postCode>
+									<settlement>Vandoeuvre-l` es-Nancy</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName>
+<forename type="first">D</forename>
+<surname>Moneret-Vautrin</surname>
+</persName>
+							<affiliation key="aff2">
+								<orgName type="institution">Centre Hospitalier Universitaire</orgName>
+								<address>
+									<postCode>54000</postCode>
+									<settlement>Nancy</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<title level="a" type="main" xml:id="_PJXjmZ9">Discriminant analyses of peanut allergy severity scores Discriminant analyses of peanut allergy severity scores</title>
+					</analytic>
+					<monogr>
+						<imprint>
+							<date/>
+						</imprint>
+					</monogr>
+					<idno type="DOI">10.1080/02664763.2010.529878&gt;</idno>
+					<note type="submission">Submitted on 24 Nov 2011</note>
+					<note>HAL Id: hal-00643787 https://hal.archives-ouvertes.fr/hal-00643787 HAL is a multi-disciplinary open access archive for the deposit and dissemination of sci-entific research documents, whether they are pub-lished or not. The documents may come from teaching and research institutions in France or abroad, or from public or private research centers. L'archive ouverte pluridisciplinaire HAL, est destinée au dépôt et à la diffusion de documents scientifiques de niveau recherche, publiés ou non, émanant des établissements d'enseignement et de recherche français ou étrangers, des laboratoires publics ou privés. To cite this version: Codreanu, J.-M. Renaudin, et al.. Dis-criminant analyses of peanut allergy severity scores. Journal of Applied Statistics, Taylor &amp; Francis (Routledge), 2011, 38 (9), pp. Service d'allergologie, 29 av. Mar De Lattre de Tas-signy,</note>
+				</biblStruct>
+			</sourceDesc>
+		</fileDesc>
+		<profileDesc>
+			<textClass>
+				<keywords>
+					<term xml:id="_xGujtF8">discriminant analysis</term>
+					<term xml:id="_zSKaJzW">peanut allergy</term>
+					<term xml:id="_eaDkGVh">DBPCFC</term>
+					<term xml:id="_6jpaX7e">Multiple Factorial Analy-sis</term>
+					<term xml:id="_ThX23QC">classification</term>
+					<term xml:id="_HM7ZRYp">variable selection</term>
+				</keywords>
+			</textClass>
+			<abstract>
+				<p xml:id="_uHWG3vj">Peanut allergy is one of the most prevalent food allergies. The possibility of a lethal accidental exposure and the persistence of the disease make it a public health problem. Evaluating the intensity of symptoms is accomplished with a double blind placebo controlled food challenge (DBPCFC), which scores the severity of reactions and measures the dose of peanut that elicits the first reaction. Since DBPCFC can result in life-threatening responses, we propose an alternate procedure with the long term goal of replacing invasive allergy tests. Discriminant analyses of DBPCFC score, the eliciting dose and the first accidental exposure score were performed in 76 allergic patients using 6 immunoassays and 28 skin prick tests. A Multiple Factorial Analysis was performed to assign equal weights to both groups of variables and predictive models were built by cross-validation with LDA, k-NN, CART, penalized SVM, stepwise logistic regression and AdaBoost methods. We developed an algorithm for simultaneously clustering eliciting dose values and selecting discriminant variables. Our main conclusion is that antibody measurements offer information on the allergy severity, especially those directed against rAra-h1 and rAra-h3. Further independent validation of these results and the use of new predictors will help extend this study to clinical practices.</p>
+			</abstract>
+		</profileDesc>
+	</teiHeader>
+	<text xml:lang="en">
+		<body>
+<div>
+<head n="1" xml:id="_BRBkHdJ">Introduction</head>
+<p xml:id="_fXVxFMY">An allergy is an abnormal reaction of the immune system towards foreign substances (allergens) that are normally harmless. Peanut allergies in particular affect more than 0.5% of the entire French population, and its increasing prevalence and potentially severe clinical reactions make it a public health problem. It is also the most lethal food allergy <ref target="#b3" type="bibr">[4]</ref>. Following a strict avoidance diet is currently the only effective treatment that minimises potentially lethal accidents.</p>
+</div>
+<div>
+<head xml:id="_Hyc49JB">1</head>
+<p xml:id="_FryEdzK">Diagnosing and scoring peanut allergies is currently performed with a double blind placebo controlled food challenge (DBPCFC) <ref target="#b2" type="bibr">[3]</ref>. Patients are given increasing peanut doses until the first clinical reaction appears. Those showing specific allergy symptoms are declared allergic, and a particular avoidance treatment is then initiated. DBPCFC is also used to judge the severity of an established peanut allergy by determining the cumulative dose that triggers the first reaction, known as the eliciting dose [in milligrams (mg)]. However, these tests require patient hospitalisation in specialised centers and can potentially result in life-threatening reactions from patients with severe allergies. The DBPCFC is also a costly and time consuming test to conduct. The severity of peanut allergies is usually scored using the following scale <ref type="bibr">[1]</ref> :</p>
+<p xml:id="_VJJ8ufp">• Score 1: Mild symptoms among : abdominal pains that spontaneously resolve under 30 minutes and/or rhinocunjunctivitis and/or urticaria &lt; 10 papulas and/or a rash (eczema onset);</p>
+<p xml:id="_W5SyZV2">• Score 2: One moderate symptom among : abdominal pain requiring treatment or generalized urticaria or non-laryngeal angioedema or cough or fall of Peak Expira- tory Flow between 15 and 20%;</p>
+<p xml:id="_epezmJB">• Score 3: Two moderate symptoms in the preceding list;</p>
+<p xml:id="_hZgs6u6">• Score 4: Three moderate symptoms in the preceding list or laryngeal oedema or hypotension or asthma requiring treatment;</p>
+<p xml:id="_Fe4W66W">• Score 5: Any symptom requiring hospitalisation in intensive care.</p>
+<p xml:id="_ba7Bb9V">For an already diagnosed allergy, it would be much more advantageous to predict the severity of the reaction from accidental exposure by using a blood sample or cutaneous test. This would replace the DBPCFC test with a simple statistical tool that can still evaluate potential risk without exposing the patient to a life-threatening allergic situation. Such a diagnostic method would be a major advance in food allergies and be beneficial to both patients and clinicians. The first objective of this paper was to select a set of discriminant variables which can offer useful information about the severity of peanut allergy. These variables could pro- vide biologists and allergists a better understanding of the mechanisms inducing allergic reactions. Moreover this will allow to avoid measuring useless variables in further studies.</p>
+<p xml:id="_X8wXbdC">The second goal of this study was to predict the DBPCFC score, the eliciting dose and the first accidental exposure score, evaluated a posteriori with the patient's medical record according to the same scale as the DBPCFC score. The first accidental exposure score would then reveal the "real" severity of the allergy. Compare this to using the DBPCFC, which only offers a minimal view of the severity since the procedure is terminated once the first symptoms appear.</p>
+</div>
+<div>
+<head n="2" xml:id="_mmFPAuU">Experimental Procedure and Data</head>
+<p xml:id="_CyE2Yrm">A clinical study was performed using 76 allergic patients with ages from 3 to 18 years. <ref target="#tab_1" type="table">Tables 1 and 2</ref> describe the frequencies observed for DBPCFC score, the first accidental exposure score and the eliciting dose. Note that only 47 out of the 76 patients experienced a first accident. The remaining 29 patients were diagnosed during an allergy check-up and subsequently confirmed by DBPCFC, thus avoiding further accidents. Patients were homogeneously distributed in age and sex across severity scores. Thirty-four variables were measured to reveal the presence of Immunoglobulins of type E (IgE) antibodies. These are proteins produced by the immune system that can elicit allergic reactions <ref target="#b19" type="bibr">[20]</ref>. Each antibody is specific to an allergen, i.e., it is coded to identify a particular protein for elimination. We measured the levels of IgE for the proteins of interest with the goal of building a predictive model of allergy severity. The variables used to test for IgE were measured either by immunoassays or by Skin Prick Tests (SPTs).</p>
+</div>
+<div>
+<head n="2.1" xml:id="_pCbFxPr">Immunoassays</head>
+<p xml:id="_XttCmjx">Immunoassays are biochemical tests that quantify the level of antibodies in a blood sample (in kilo-units per liter ). We performed six immunoassays aimed at measuring the follow- ing: the total IgE, the specific IgE to peanut (f13), and the specific IgE to recombinant (r)Ara-h1, rAra-h2, rAra-h3, rAra-h8, which are IgE especially directed against peanut recombinant major allergens <ref type="bibr">[1]</ref>.</p>
+</div>
+<div>
+<head n="2.2" xml:id="_n4Ymnf2">Skin Prick Tests (SPTs)</head>
+<p xml:id="_NBEWkaU">SPTs are used to detect an immunological sensitivity to a particular substance. They show the functional aspect of cellular IgE, which are linked to mast cells releasing chemical mediators that elicit symptoms <ref target="#b19" type="bibr">[20]</ref>. A small dose of allergen is applied under the skin by pricking with a needle, and the diameter of the resulting wheal is measured in millimeters. We also measured the diameter of prick-tests to codeine as a positive control showing the basal reactivity of the skin. The ratio of the two diameters is used to measure the allergen reaction.</p>
+<p xml:id="_fGjKzUj">We performed prick-tests for 28 allergens divided into three families:</p>
+<p xml:id="_asEZrUG">1. 11 nuts: almond, Brazil nut, cashew nut, chestnut, hazelnut, peanut, pecan nut, pine nut, pistachio, Queensland nut, walnut, which are often related to peanut allergies by cross-reactivity;</p>
+<p xml:id="_53MarDg">3. 10 aeroallergens: 12 grass pollens, Alternaria, ash, birch, cat epithelia, dog ep- ithelia, Dpte (Dermatophago¨ıdesDermatophago¨ıdes pteronyssinus), mugwort, ribwort, rape seed, which are the common clinical allergens.</p>
+<p xml:id="_BDUpk4s">Immunoassays and SPTs were measured immediately before DBPCFC.</p>
+</div>
+<div>
+<head n="3" xml:id="_ZMRt2BU">Statistical approach</head>
+<p xml:id="_TUUcdrr">All computations were performed using the SAS Enterprise Guide 4.1.0.471 R or R 2.7.0 <ref target="#b20" type="bibr">[21]</ref>.</p>
+</div>
+<div>
+<head n="3.1" xml:id="_3QvDpMN">Design of the study</head>
+<p xml:id="_VMfaUVe">We first performed a Principal Component Analysis (PCA) to gain an overview of the data.</p>
+<p xml:id="_jTfnvM6">To solve our problems, discriminant analyses of DBPCFC score, first accident score and eliciting dose were performed by using several classifiers. Two studies were performed for each measure of severity by treating it as a four-class variable, and then as a two-class variable. For DBPCFC and first accidental exposure, 4 classes were built by considering the score groups {1}, {2}, {3} and {4, 5} because of the low frequency of score 5. For the two-class discrimination, groups were formed by scores of either {1, 2, 3} or {4, 5}, as recommended by clinicians. Since eliciting dose values are fixed by levels by the clinician <ref type="bibr">[1]</ref>, its measure is not a continuous variable and cannot be predicted by a regression analysis. Moreover although eliciting dose could be considered as a class variable, a discriminant analysis cannot be directly performed because of numerous categories with low frequencie <ref target="#tab_2" type="table">(Table 2)</ref>. A first solution consisted in converting eliciting dose into a four or two-class variable by searching the best discriminated classification computed with all available variables. A second solution will be proposed in Section 3.3. Careful variable selection appeared especially as a major point of the analysis. Therefore three different statistical approaches were proposed for each measure of severity :</p>
+</div>
+<div>
+<head n="3.1.1" xml:id="_Q6Awxht">Direct application of the classifiers</head>
+<p xml:id="_rgppsNh">The performances of several classification rules were first compared without preselecting variables. Linear Discriminant Analysis (LDA), k-Nearest Neighbors (k−NN), Classifi- cation And Regression Trees (CART) <ref target="#b9" type="bibr">[10]</ref> and AdaBoost with CART <ref target="#b4" type="bibr">[5]</ref> were performed using all the 34 available variables as predictors. k−NN were performed for k ∈ {1, . . . , 5} and the number of nearest neighbors giving the best results was kept.</p>
+</div>
+<div>
+<head n="3.1.2" xml:id="_M8CUNDf">Simultaneous variable selection and classification</head>
+<p xml:id="_77XVBbQ">Since in supervised learning keeping noisy predictors can increase the misclassification error, two methods that simulteanously perform variable selection and classification were also used : stepwise logistic regression <ref target="#b10" type="bibr">[11]</ref> and penalized SVM <ref target="#b1" type="bibr">[2]</ref>.</p>
+</div>
+<div>
+<head n="3.1.3" xml:id="_YfBYApA">Specific variable selection scheme prior to classification</head>
+</div>
+<div>
+<head xml:id="_9BD2WRy">DBPCFC and first accident scores</head>
+<p xml:id="_XAV9JWH">As explained earlier, the determination of a set of predictors to keep is one of the main points of the study. Thus a variable selection scheme independent from classification was also developed. Variables were retained in the model if either the corresponding p-value of the Kruskal-Wallis test <ref target="#b5" type="bibr">[6]</ref> was smaller than 0.10, or if the variable was selected by the stepwise Wilks' lambda (Λ) criterion <ref target="#b12" type="bibr">[13]</ref>. The Λ statistic was computed at each step with all variables already present in the model, whereas the F − to − enter statistic and corresponding p-value measure the discriminant power of a variable added to the preceding ones. For the latter, the maximal F − to − enter p-values used as entry and removal criteria were set by default to 0.15, as recommended by <ref target="#b6" type="bibr">[7]</ref>. The nonparametric Kruskal-Wallis test was preferred to ANOVA, because variables were not always normally distributed in the classes induced by the scores. Note that the Wilks' lambda selection is based on the hypotheses of multi-normality of the variables vector distribution and equality of the within-class covariance matrices. In 1975, Lachenbruch <ref target="#b13" type="bibr">[14]</ref> asserted that the F −test is robust to small deviations of these hypotheses. We therefore decided to use the Wilks' lambda selection even though variables were not always normally distributed in the classes induced by the measures of severity. This variable selection scheme is a compromise between the assessment of variable marginal importance and the detection of a discriminant subset of predictors. This will allow first to provide biologists and allergists a list of informative variables in regards to the mech- anisms involved in allergic reactions, and second to avoid keeping noisy variables that could degrade the performance of the learning algorithms. Biologists and allergists are particularly interested in using immunoassays as markers of the severity of peanut allergy because Specific IgE to rAra-h1, rAra-h2, rAra-h3 are yet known to be very useful in practice to detect peanut allergic patients <ref type="bibr">[1]</ref>. Moreover immunoassays are precise and reliable measures contrary to SPTs. But the number of discriminant SPTs can far exceed the number of selected immunoassays, which could possibly smear out the signal brought by immunoassays. As we wanted nevertheless to keep the information provided by SPTs, a Multiple Factorial Analysis (MFA) <ref target="#b7" type="bibr">[8]</ref> was performed to equalize the influence of both groups of selected variables, which enabled the use of factors as new predictors of severity. Thus we performed two discriminant analyses :</p>
+<p xml:id="_dCtFbXk">1. by using directly the discriminant variables as predictors for classification with the methods introduced in Section 3.1.1, 2. by computing MFA factors of the discriminant variables and selecting a limited number of discriminant factors by the same selection process as the one used with raw variables, before performing the classification rules.</p>
+<p xml:id="_ngUzGm2">The overall specific statistical approach is summarized in <ref type="figure">Figure 1</ref>. Figure 1: Specific statistical analysis for DBPCFC and first accident scores. The left path of the analysis gives a set of discriminant predictors without allowing for the weights of both groups of variables, whereas the right one uses equally-weighted groups of predictors.</p>
+</div>
+<div>
+<head xml:id="_xjqYzes">Eliciting dose</head>
+<p xml:id="_VyCJb4k">To discriminate this variable, we also devised an algorithm that simultaneously clusters the eliciting dose values and selects predictors by minimizing the Wilks' lambda (Section 3.3). This algorithm was applied by using raw variables or factors computed by MFA with the 34 available variables as predictors. Once the predictors were chosen and the clusters built, the same statistical approaches as for DBPCFC and first accident scores were used. The corresponding statistical analysis is summarized in <ref target="#fig_1" type="figure">Figure 2</ref>. </p>
+</div>
+<div>
+<head n="3.2" xml:id="_X9t8m39">Multiple Factorial Analysis (MFA)</head>
+<p xml:id="_kf6yUfy">MFA was introduced by B.Escofier and J.Pagès <ref target="#b7" type="bibr">[8,</ref>
+<ref target="#b8" type="bibr">9]</ref> for sensory analysis, and is a PCA with a particular choice of metric. The aim of this method is to give a similar part to several groups of variables when determining factors, i.e., uncorrelated linear combina- tions of the initial variables. This procedure is useful for avoiding models that are fully influenced by a single group of numerous variables which could partially cancel the effect of the other groups. Briefly, an MFA is performed as follows : Suppose p variables are measured on n subjects and divided in q groups :</p>
+<formula xml:id="formula_0">(x 1,1 , . . . , x 1,m 1 ); . . . ; (x q,1 , . . . , x q,mq )<label>(1)</label>
+</formula>
+<p xml:id="_KekTdn9">with q k=1 m k =p, where m k is the number of variables in group k. Denote X k the matrix of data of size n × p corresponding to the k th group of variables, namely :</p>
+<formula xml:id="formula_1">X k = x k,1 . . . x k,j . . . x k,m k 1 . . . . . . i . . . x k,j i . . . . . . . . . n 7</formula>
+<p xml:id="_nH5dPUD">where the generic element x k,j i denotes the measure of the variable x k,j for the sample point i. Let also X = (X 1 | . . . |X q ) be the matrix corresponding to the whole set of variables. For the k th group of variables, let M k be a metric matrix in R m k , k=1, . . . , q. Let D be the diagonal matrix of the weights assigned to the sample points. The MFA algorithm is then as follows :</p>
+<p xml:id="_KdFFrPw">• Step 1 : For any 1 ≤ k ≤ q, perform PCA(X k ,M k ,D), and denote λ k 1 the greatest eigenvalue corresponding to the first factor ;</p>
+<p xml:id="_wvRWjGN">• Step 2 : consider the metric matrix in R p :</p>
+<formula xml:id="formula_2">M=    M 1 /λ 1 1 . . . M q /λ q 1    and perform PCA(X,M,D).</formula>
+<p xml:id="_Kb62ZXk">Note that in our case, q = 2 with the immunoassays as the first group of variables and the SPTs as the second. Variables were first centered and scaled to unity, and the metric matrix M k was then set to the identity matrix I k in R m k . For the DBPCFC and first accident scores, we thought it made more sense to compute the factors using only the discriminant variables rather than using all available variables. Indeed, the predictive model needed to be built with a reasonable number of characters. Even if a limited number of factors were chosen afterwards, all variables would still have to be measured to compute the factors. Moreover, a non-discriminant variable could have a large coefficient for some retained factors even though it would not improve the overall discriminative power of the model. Nonetheless, we did compute factors using all variables as well, but the results did not improve the discrimination of the first accident score. For the eliciting dose, factors were computed using all 34 available variables, not only the discriminant ones. As described in Section 3.3, the set of discriminant variables depends on the choice of the clustering of eliciting dose values and vice versa. Thus it did not seem appropriate to replace the optimal set of variables by factors.</p>
+</div>
+<div>
+<head n="3.3" xml:id="_eSgUeBc">An algorithm for simultaneously clustering the response</head>
+<p xml:id="_DJnT48Q">variable and selecting discriminant variables</p>
+</div>
+<div>
+<head n="3.3.1" xml:id="_g6yJQP7">Principle</head>
+<p xml:id="_tzaptTf">Eliciting dose is a variable whose values are taken according to an increasing scale of fixed doses of peanut. For a given patient, only an interval including the eliciting dose 8 is actually known. We wished first to group eliciting dose values in a limited number of intervals, and second to select the most discriminant variables for these categories.</p>
+<p xml:id="_bfH74jx">Here we propose an algorithm to perform these two steps simultaneously using alternate optimization.</p>
+<p xml:id="_rSjMgTq">For a given partition in intervals, a set of discriminant variables of fixed cardinal is selected using a certain optimality criterion. A new partition in intervals is then determined to optimize this criterion with the chosen variables, and so on. In order to not repeat this algorithm for different values of the cardinal, the number of variables to include could be increased one-by-one at each step of the procedure. The optimal set of variables could then be searched into all the possible subsets of variables of fixed cardinal corresponding to this step. To avoid heavy computations, variables were included forward in the model. At each step, a new variable was chosen according to the optimality criterion and added to the preceding variables.</p>
+<p xml:id="_wuNBhUd">Since Wilks' lambda provides a non-empirical stopping rule by testing its significance, this approach was preferred over using within-class inertia computation as the optimality criterion. The p-value of F − to − enter was set to 0.15.</p>
+</div>
+<div>
+<head n="3.3.2" xml:id="_E7ACqfS">Constructing the clusters</head>
+<p xml:id="_Vw5vJ9e">Let y be an ordinal categorial variable of levels {m 1 , . . . , m l }, m 1 &lt; m 2 &lt; . . . &lt; m l . Suppose that we want to cluster the levels of y into a limited number r of intervals ]m i , m j ]. Only consecutive levels can be gathered. We build consecutive left-opened and right-closed intervals by selecting the upper bounds. Thus the number of possible clusterings is C r−1 l−1 .</p>
+</div>
+<div>
+<head n="3.3.3" xml:id="_yyJCbEG">Algorithm</head>
+<p xml:id="_JV8GEhF">The algorithm for computing intervals and selecting discriminant variables is as follows:</p>
+<p xml:id="_d5DhTeS">• Step 1 :</p>
+<p xml:id="_x6rr7W9">1. choose the clustering C 1 of eliciting dose values that minimises Λ, computed using all 34 available predictors ;</p>
+<p xml:id="_4Kbb4qW">2. select the predictor v 1 that minimises Λ with the obtained clustering C 1 ;</p>
+<p xml:id="_PQcu5Pt">• Step 2 :</p>
+<p xml:id="_FjRb6K4">1. choose the clustering C 2 of eliciting dose values that minimises Λ, computed using the previously selected predictor v 1 ;</p>
+<p xml:id="_XpGrPX9">2. select the predictor v 2 such that the paired predictors (v 1 , v 2 ) minimise Λ with the new clustering C 2 ;</p>
+<p xml:id="_2gZVFfA">• and so on . . .</p>
+<p xml:id="_GhGuCQA">• procedure stops if either no left predictor can improve the discriminant power of the model, i.e., if F − to − enter p−value is greater than 0.15 <ref target="#b12" type="bibr">[13]</ref>, or if every predictor is already entered.</p>
+<p xml:id="_ywKXaJE">Note that the F −to−enter value is only computed when a new variable is entered into the model. This algorithm was used with both the variables and the MFA factors computed using all 34 available variables. Since new discriminant variables could have been chosen at each step of the algorithm, there was no default starting set of discriminant variables. Moreover, it did not seem appropriate to perform the MFA at the end of the algorithm, since the selected variables were specifically chosen to discriminate the found clusters.</p>
+</div>
+<div>
+<head n="3.4" xml:id="_BCaa9CN">Discriminant analysis</head>
+<p xml:id="_sZbTfqp">Linear discriminant analysis, k-NN, CART <ref target="#b9" type="bibr">[10]</ref> and stepwise logistic regression <ref target="#b10" type="bibr">[11]</ref> are classic methods. For two-class discrimination we also used the AdaBoost algorithm with CART <ref target="#b4" type="bibr">[5]</ref> and penalized SVM. Since these are still recently developed algorithms, we briefly summarize their concepts below.</p>
+</div>
+<div>
+<head n="3.4.1" xml:id="_xt3exqM">AdaBoost</head>
+<p xml:id="_YrxZk8s">Let {(x i , y i ) 1≤i≤n } a dataset, where x i ∈ R p is the vector of predictors, and y i ∈ {0, 1} is a binary response variable to discriminate. The principle of the AdaBoost algorithm is to re-weight observations that were misclassified by a base classifier (CART in our case). At each step of the procedure, a new classification tree is randomly built, inducing new misclassified sample points whose weights are updated before the following step starts. The method proceeds according to the following algorithm:</p>
+<p xml:id="_bmNd2tb">• Step 1 : assign equal weigths to all sample points w <ref type="bibr">[0]</ref> i =1/n, ∀i = 1, . . . , n ; • Step 2 : for m=1, . . . , M do :</p>
+<formula xml:id="formula_3">1. build a classifierˆgclassifierˆ classifierˆg [m] trained on data weighted by w [m−1] i , ∀i = 1, . . . , n ;</formula>
+<p xml:id="_vEYgH7R">2. classify the data by resubstitution : determinê g <ref type="bibr">[m]</ref> (x i ), i = 1, . . . , n ;</p>
+<p xml:id="_AtC9jZz">3. compute the misclassification rate :</p>
+<formula xml:id="formula_4">err [m] = n i=1 w [m−1] i 1 (y i =ˆg=ˆg [m] (x i )) n i=1 w [m−1] i ,<label>(2)</label>
+</formula>
+<formula xml:id="formula_5">α [m] = log 1 − err [m] err [m] ,<label>(3)</label>
+</formula>
+<p xml:id="_NsZGGf8">where</p>
+<formula xml:id="formula_6">1 (y i =ˆg=ˆg [m] (x i )) = 1 if y i = ˆ g [m] (x i ) (i.e. if x i is misclassified), 0 otherwise;<label>(4)</label>
+</formula>
+<p xml:id="_QgTsNZ7">4. update the weights</p>
+<formula xml:id="formula_7">˜ w i = w [m−1] i exp(α [m] 1 (y i =ˆg=ˆg [m] (x i )) ),<label>(5)</label>
+</formula>
+<formula xml:id="formula_8">w [m] i = ˜ w i n j=1˜wj=1˜ j=1˜w j ;<label>(6)</label>
+</formula>
+<p xml:id="_eAZM3NM">• Step 3 : build the aggregated classifier</p>
+<formula xml:id="formula_9">ˆ f AdaBoost (x) = arg max y∈{0,1} M m=1 α [m] 1 (ˆ g [m] (x)=y) .<label>(7)</label>
+</formula>
+<p xml:id="_D6DZa6b">A novel observation x is classified by the majority votê f AdaBoost (x), where vote m is weighted by α <ref type="bibr">[m]</ref> . In this study AdaBoost was performed for M = 50, 100 and 200 on the training set and the parameter value giving the best result was kept.</p>
+</div>
+<div>
+<head n="3.4.2" xml:id="_DmDQWwd">Penalized SVM</head>
+<p xml:id="_yQ34tzQ">Let {(x i , y i ) 1≤i≤n } a training set, where x i ∈ R p is the vector of predictors, and y i ∈ {−1, 1} is the class label. The Support Vector Machine (SVM) algorithm gives the hy- perplane H that best splits both groups and that is defined by the equation</p>
+<formula xml:id="formula_10">H : f (x) =&lt; w, x &gt; +b = 0<label>(8)</label>
+</formula>
+<p xml:id="_kXX8nnq">where &lt; ., . &gt; is the usual dot product in R p , w =(w 1 ,. . .,w p ) are the coefficients of the hyperplane and b is the intercept. The coefficients are obtained by solving the convex optimization problem :</p>
+<formula xml:id="formula_11">min b,w n i=1 [1 − y i f (x i )] + + pen λ (w )<label>(9)</label>
+</formula>
+<p xml:id="_4bY5sgu">where λ is a positive tuning parameter, [.] + = max(., 0) is the positive part and pen λ (w ) = λw 2 2 = λ p j=1 (w j ) 2 . The class label of a novel observation x is then given by sign(f (x)).</p>
+<p xml:id="_wtPefWq">To select a limited number of variables, the term pen λ in (9) can be replaced by a penal- ization function being singular at the origin and having a continuous first-order derivative <ref target="#b21" type="bibr">[22]</ref>. Two functions were used in this study :</p>
+<formula xml:id="formula_12">• L 1 : pen λ (w ) = λw 1 = λ p j=1 |w j |</formula>
+<p xml:id="_hZeg4Zr">• Smoothly Clipped Absolute Deviation (SCAD) : pen λ (w ) = p j=1 p λ (w j ) where</p>
+<formula xml:id="formula_13">p λ (w j ) =      λ|w j | if |w j | ≤ λ − (|w j | 2 −2aλ|w j |+λ 2 ) 2(a−1) if λ &lt; |w j | ≤ aλ (a+1)λ 2 2 if |w j | &gt; aλ<label>(10)</label>
+</formula>
+<p xml:id="_eBJtuMM">where a &gt; 2 is a tuning parameter. As suggested in <ref target="#b1" type="bibr">[2]</ref>, a is set by default to 3.7.</p>
+<p xml:id="_U6qEWyZ">The optimal λ was chosen by the algorithm in the set {0.05, 0.10, 0.15, . . . , 0.95} for L 1 penalization and in {0.10, 0.20, . . . , 1} for SCAD penalization. For both penalizations, variables with coefficient |w j | lower than a given were considered useless and removed from the model. In the penalized SVM R package, is set to 0.001 <ref target="#b21" type="bibr">[22]</ref>.</p>
+</div>
+<div>
+<head n="4" xml:id="_VxBn3H3">Results</head>
+</div>
+<div>
+<head n="4.1" xml:id="_3WTgnQB">Principal Component Analysis</head>
+<p xml:id="_MxJ4D6C">The PCA representation of the variables was relevant. As seen on the correlation circle of <ref target="#fig_2" type="figure">Figure 3</ref>, intra-family correlations between variables were rather high but inter-family correlations were quite low (with the notable exception of nuts and aeroallergens). More- over, the total IgE and specific IgE to rAra-h8 did not seem closely related to the other immunoassays, an observation fully validated by clinicians. Indeed, as explained earlier, the level of total IgE is the global measure of this antibody subclass, whereas the specific IgE to rAra-h1, rAra-h2 and rAra-h3 are directed against peanut allergens alone. Also, rAra-h8 is a homologous protein to the birch pollen allergen Bet-v1, sharing about 66% of their amino acid sequences. Thus patients sensitive to both peanut and birch pollen could present high values of specific IgE to rAra-h8 without being allergic to peanuts. These results confirmed clinical observations. Also, the individual representation did not provide supplementary information (data not shown), and no particular interpretation was evident for the PCA axes.</p>
+</div>
+<div>
+<head n="4.2" xml:id="_CCgFavr">Discriminant analysis</head>
+<p xml:id="_Ws3dnZv">Here we show the results for the prediction of the first accidental exposure score, the DBPCFC score and the eliciting dose. <ref type="table">Tables 3, 4</ref> and 5 give the well-classification rates obtained by combining the classifiers with the 3 different statistical approaches :</p>
+<p xml:id="_Jhe6WYp">1. direct application of the classifiers, The percentage of detected patients with high severity was also computed. According to clinicians, failing to detect patients with severe allergies could indeed lead to inappropriate food intake by the patient. Results are given including the variable selection scheme and/or MFA in the cross- validation. For the first and the third variable selection schemes, only the classifier giving the best performances among LDA, k−NN, CART and AdaBoost is displayed. For penalized SVM, the best result between L 1 ans SCAD penalizations was kept.</p>
+</div>
+<div>
+<head xml:id="_3JjkW2a">13</head>
+<p xml:id="_H8nn67X">The variables obtained with the selection process offering the bests results are also given and summarized in <ref target="#fig_4" type="figure">Figure 4</ref> for each measure of severity .</p>
+</div>
+<div>
+<head n="4.2.1" xml:id="_pk5Y9Vq">First accidental exposure score</head>
+<p xml:id="_xANmcw4">Four-class study Recall that in what follows, we combined scores 4 and 5 because of the low frequency of score 5. Thus the four classes considered here are for scores of {1}, {2}, {3}, and {4, 5}. Well-classification rates obtained by fourth-fold cross-validation with each statistical ap- proach are shown in <ref type="table">Table 3</ref>. The percentage of patients of score 4 who were correctly classified in class 4 is also given. Note that direct application of the classifiers could not have been performed since the number of variables was greater than the size of the learning sets. 5−NN combined with our specific variable selection scheme was the most performant classifier with 41% of well-classified patients, since stepwise logistic regression and penalized SVM did not give better results. Nevertheless all these results remained poor. Replacing variables by factors did not give better results than direct use of the variables. On the whole dataset 7 variables had a Kruskal-Wallis p-value lower than 0.10 (peanut, walnut, chick pea, pecan nut, broad bean, green pea, cashew nut, ordered by increasing p-value, <ref target="#tab_3" type="table">Table 6</ref>) and 8 were retained in the Wilks' lambda selection (chick pea, specific IgE to rAra-h8, green pea, rape seed, peanut, ribwort, total IgE, specific IgE to rAra-h1, <ref target="#tab_4" type="table">Table 7</ref>). Thus 12 different variables were selected in total (3 immunoassays and 9 SPTs). Two-class study The methodology used was the same as for the four-class study. The method which gave the best results for two-class discrimination was 1−NN with factors computed from discriminant variables as predictors (81% of well-classified sample points) <ref type="table">(Table 3</ref>). Of the score 4 patients, 74% were correctly classified. Contrary to the four-class study, the use of factors improved the classification rates compared to the direct use of variables since using selected variables with 1−NN gave 79% of well-classification rate. The other models yielded poor results. Processing the variable selection on the whole dataset gave interesting results. Eleven different variables were selected to build discriminant factors: peanut, walnut, specific IgE to rAra-h1, specific IgE to rAra-h3, pecan nut for Kruskal-Wallis and peanut, specific IgE to rAra-h1, lupine flour, specific IgE to rAra-h2, ribwort, Dpte, birch, dog epithelia for Wilks' lambda. These immunoassays, as well as SPTs to nuts and legumes, are variables expected by clinicians. This indicates that our selection process seems to detect "useful" variables. More surprisingly, a few SPTs to aeroallergens were also selected. Indeed, these variables are not known to cross-react with peanuts. Note that the discriminant factors will have to be computed these variables to use the best model for further classification.</p>
+</div>
+<div>
+<head n="4.2.2" xml:id="_s43JFTf">DBPCFC score</head>
+<p xml:id="_HES3B78">The statistical approach used to predict the DBPCFC score was the same as for the first accident score. Four-class study Scores of 4 and 5 were again grouped together due to the low frequency of score 5. Although applying CART without preselecting variables gave the best results with a 38% successful classification rate, the overall misclassification error remained high ( <ref type="table">Table 4</ref>). Note that with the specific variable selection approach, MFA was not performed since only SPTs were entered in the model during cross-validation. Interestingly 7 variables were entered in the classification tree performed on the whole dataset : lupine flour, specific IgE to f13, lentil, total IgE, specific IgE to rAra-h3, 12 grass pollens, specific IgE to rAra-h8, in order of selection. This means that although all variables were available for building a model only a few were considered as useful by the CART algorithm. Two-class study DBPCFC scores can be gathered into two classes in the same manner as for the first accidental exposure score. Overall, using 3-NN classification with our variable selection scheme offered the best results, with 66% of successfully classified sample points and 33% of successfully classified severe patients <ref type="table">(Table 4)</ref>. Total IgE was the only immunoassay retained in the model during cross-validation. Thus, no factor was computed. Indeed, assigning the same weight to this single variable as to the other variables did not seem appropriate, because total IgE are not antibodies specifically involved in peanut allergies, but in all allergic reactions. On the whole dataset this resulted in selecting variables lupine flour for Kruskal-Wallis and almond, total IgE, lupine, broad bean, pine nut for Wilks' lambda.</p>
+</div>
+<div>
+<head n="4.2.3" xml:id="_gvrE7QF">Eliciting dose</head>
+<p xml:id="_hX4UJr3">Before applying directly all the classifiers without selecting variables and performing step- wise logistic regression and penalized SVM, eliciting dose was first converted into a class variable. During cross-validation values were gathered into the partition of minimal Wilks' lambda computed with all available variables. These results were compared to those ob- tained with our algorithm that simultaneously selects discriminant variables and groups the eliciting dose values in an optimal partition (Section 3.3). This was performed for both four-class (r = 4) and two-class (r = 2) studies. The minimal number of sample points in each class was set to 10, in order to have class frequencies large enough to perform cross-validation. Note that this process was included in cross-validation. Four-class study</p>
+<p xml:id="_a9QeCtf">The eliciting dose was correctly predicted for 39% of the patients using our algorithm and CART with variables. Moreover, only 52% of the patients from the lowest eliciting doses group were correctly classified. Other approaches did not give better results <ref type="table">(Table 5)</ref> . <ref target="#tab_5" type="table">Table 8</ref>  The algorithm stopped at step 7 because no additional improvement resulted afterwards. The selected variables were hazelnut, birch, pistachio, cashew nut, green pea, total IgE, pine nut and the bounds were 95, 215, and 500 mg. The same study was performed with factors as predictors but it did not enhance the model. Two-class study Selecting factors of all available variables with our algorithm was the most discriminant model to discriminate the eliciting dose in the two-class study (77% were successfully classified with 5−NN). It also successfully classified 72% of the highly reactive patients. The threshold of eliciting dose was 300 mg with 7 factors selected (Λ = 0.62). Neverthe- less, this model cannot easily be used in practice. Indeed, as mentioned earlier, MFA was performed on all 34 variables, not just the discriminant variables. This means that to correctly predict the eliciting dose, all variables would have to be measured to compute the factors; this does not seem feasible.</p>
+</div>
+<div>
+<head n="5" xml:id="_pQ8P6EZ">Conclusions</head>
+<p xml:id="_UDwq3MB">To the best of our knowledge, this paper presents the first discriminant analysis of DBPCFC score, first accident score, and eliciting dose measurement of peanut allergy severity. Previous studies were aimed at finding links between immunoassays or SPTs and allergy severity, but their statistical analyses were limited to either comparing dis- tributions between groups of patients (using, for instance, the Mann-Whitney test) or to computing linear correlation coefficients <ref target="#b11" type="bibr">[12,</ref>
+<ref target="#b18" type="bibr">19]</ref>. In our approach, we used several classi- fication rules to aid in comparing and choosing the optimal and most efficient method. It appeared that in general selecting discriminant variables by a process independent from classification gave better results. In addition, we found that using MFA to compute new predictors was an attractive solution when equalizing the weights of group variables, and we proposed a novel algorithm for simultaneously clustering the levels of ordinal qualita- tive variables and for selecting discriminant variables. Our work differs from earlier studies in several respects. Previous studies were performed on small sample sizes of 30 to 40 patients <ref target="#b11" type="bibr">[12,</ref>
+<ref target="#b18" type="bibr">19]</ref> using a small number of measured variables, which only permitted a limited choice of discriminating predictors. Also, specific IgE to Ara-h1,2,3 were measured by SPTs instead of immunoassays <ref target="#b18" type="bibr">[19]</ref> and although a positive response to an SPT does indeed indicate allergen sensitivity, it is still less accurate than immunoassays.  There are several scoring methods in the literature to evaluate peanut allergy severity. For example, Hourihane et al. devised a complex 25-class scoring system combining observed reactions and eliciting doses <ref target="#b11" type="bibr">[12]</ref>. A graduation of symptoms was also proposed by <ref type="bibr">Müller [18]</ref>, but this score is based on allergic reactions in response to bee or wasp venom (and not peanut allergens). Thus, developing a standardized scoring method is still necessary and would facilitate comparison studies from different centers. One possible solution would be comparing the results of Hourihane et al.'s score with the one used in this study using the same cohort of patients. Moreover, the large number of scoring levels in Hourihane et al.'s approach could be reduced by our algorithm. Nevertheless, several potential biases in our study must be noted. First, SPT diameters are relatively imprecise. There is no standard method of measuring SPT reaction since both wheal diameters and areas are popular metrics <ref target="#b18" type="bibr">[19]</ref>. Additionally, the score of the first accident can be inaccurate or imprecise since it depends on the medical history of the patient, and hence subject to inaccuracies in the patient's memory which may underestimate symptom severity. Other factors such as medication can affect the first reaction symptoms as well <ref target="#b14" type="bibr">[15,</ref>
+<ref target="#b16" type="bibr">17]</ref> yielding a severity score higher than it should be. Finally, the first exposure score is a past event predicted using variables measured during a subsequent DBPCFC. As mentioned in Section 4.2.2, Hourihane et al. also used such a reverse prediction with a community score that was evaluated a posteriori using the record file of the patient <ref target="#b11" type="bibr">[12]</ref>. The predictive models used in our study yielded correct classifications for the first ac- cidental exposure and DBPCFC of up to 81% and 66% for the two-class study. Our algorithm also allowed us to group eliciting dose values and to select discriminant predic- tors, leading to an 77% classification rate for the two-class study. This indicates that it is indeed possible to correctly predict peanut allergy severity by measuring well-chosen variables. Considering that all immunoassays of specific IgE were selected once, we also hypothesize that measuring new antibodies to peanut allergens, such as those directed against rArah-6, rArah-7 and rArah-9, will further improve the discriminative power of our models. This also argues for these antibodies playing key roles in the diagnosis of peanut allergy severity. Our variable selection process also offers a new perspective on conducting allergy check- ups. Indeed, some unexpected variables appeared several times in our models, such as SPTs to dog epithelia as shown in <ref target="#fig_4" type="figure">Figure 4</ref>. If future experiments could distinguish the medical relevance of this observation from cross-reactivity, then the importance of these SPTs in discriminating severity would be confirmed. Besides, some SPTs never appeared in our models, such as SPTs to Alternaria or Brazil nut, and thus should no longer be performed in practice when diagnosing peanut allergy severity. Furthermore, some SPTs with proven cross-reactivity to peanuts were retained in our models, such as lupine flour <ref target="#b15" type="bibr">[16]</ref>, indicating that our results were in line with other medical discoveries. The discriminating models described in this paper are a first step towards a simple, safe and efficient diagnosis of peanut allergy severity by quantifying antibodies. Before being applied in clinical practices, they must first be validated on an independent set of patients. New variables must also be added as additional predictors toward improving successful classification rates. These models could then become practical tools for clinicians. When scoring severity, the clinical test results could be reported online at the allergy vigilance network (Réseau d'allergovigilance, http://www.cicbaa.com/ ), or a simple statistical soft- ware could be programmed.   <ref type="table">Table 3</ref>: Results of the discriminant analysis of first accidental exposure score for the three kinds of variable selection schemes. The best classification method is given for the four-class and two-class studies. Results are expressed as successful classification rates and as severe patient detection rates. method 4 classes 2 classes no selection x AdaBoost (M = 50) : 63%-33% stepwise logistic regression 34%-65% 63%-22.5% penalized SVM x L 1 : 61%-44% Kruskal-Wallis / Wilks' lambda with variables 5NN : 41%-65% 1NN : 79%-72% Kruskal-Wallis / Wilks' lambda with factors 1NN : 34%-46% 1NN : 81%-74% <ref type="table">Table 4</ref>: Results of the discriminant analysis of DBPCFC score for the three kinds of variable selection schemes. The best classification method is given for the four-class and two-class studies. Results are expressed as successful classification rates and as severe patient detection rates. method 4 classes 2 classes no selection CART : 38%-44% 2NN : 64%-37% stepwise logistic regression 35%-32% 56%-10% penalized SVM x L 1 : 62%-24% Kruskal-Wallis / Wilks' lambda with variables 2NN : 36%-52% 3NN : 66%-33% Kruskal-Wallis / Wilks' lambda with factors x x <ref type="table">Table 5</ref>: Results of the discriminant analysis of eliciting dose for the three kinds of variable selection schemes. The best classification method is given for the four-class and two-class studies. Results are expressed as successful classification rates and as severe patient detection rates. method 4 classes 2 classes no selection LDA : 38%-39% 5NN : 69%-62% stepwise logistic regression 12%-5% 58%-48% penalized SVM x L 1 : 66%-45% algorithm with variables CART : 39%-52% 1NN : 66%-36% algorithm with factors LDA : 33%-34% 5NN : 77%-72%   </p>
+</div>
+<figure xml:id="fig_0">
+<head xml:id="_vdsEGet"/>
+<label/>
+<figDesc xml:id="_dJK2v6n">Multiple Factorial Analysis of discriminant variables Same weight to both groups of variables Comparison of classifiers with either variables or factors as predictors _ LDA _ k NN _ CART _ AdaBoost (two-class study) Same weight to each variable Same weight to each factor Variable selection by Kruskal-Wallis' test or stepwise selection by Wilks' lambda Variable selection by Kruskal-Wallis' test or stepwise selection by Wilks' lambda</figDesc>
+</figure>
+<figure xml:id="fig_1">
+<head xml:id="_ws9fPSH">Figure 2 :</head>
+<label>2</label>
+<figDesc xml:id="_xuD4zt2">Figure 2: Specific statistical analysis for the eliciting dose</figDesc>
+</figure>
+<figure xml:id="fig_2">
+<head xml:id="_gNdKzGU">Figure 3 :</head>
+<label>3</label>
+<figDesc xml:id="_ZzS699M">Figure 3: Circle of correlations</figDesc>
+</figure>
+<figure xml:id="fig_3">
+<head xml:id="_JHCRSpw"/>
+<label/>
+<figDesc xml:id="_XqZg7cW">shows the bounds x, y, z for clustering ]−∞, x] , ]x, y] , ]y, z] , ]z, +∞[, and the variables entered at each step of the algorithm when performed on the whole dataset.</figDesc>
+</figure>
+<figure xml:id="fig_4">
+<head xml:id="_X6tmghM">Figure 4 :</head>
+<label>4</label>
+<figDesc xml:id="_89qKKpz">Figure 4: Summary of discriminant variables. Selected variables are colored in black for each measure of severity. In two classes, all available variables were used to compute discriminant factors of eliciting dose</figDesc>
+</figure>
+<figure type="table" validated="false" xml:id="tab_1">
+<head xml:id="_PGGfZ4U">Table 1 :</head>
+<label>1</label>
+<figDesc xml:id="_55Zbwuz"/>
+<table>Frequencies of DBPCFC and first accidental exposure severity score 
+scores 
+1 2 3 4 5 sum 
+DBPCFC 
+17 25 11 22 1 76 
+first accident 9 16 4 16 2 47 
+
+</table>
+</figure>
+<figure type="table" validated="false" xml:id="tab_2">
+<head xml:id="_cgZpgqr">Table 2 :</head>
+<label>2</label>
+<figDesc xml:id="_KYHWKCM"/>
+<table>Frequencies of eliciting dose values 
+eliciting dose (mg) n eliciting dose (mg) n 
+1.4 
+1 
+300 
+1 
+4.4 
+2 
+400 
+1 
+14 
+1 
+500 
+18 
+15 
+2 
+965 
+4 
+44 
+8 
+1000 
+1 
+65 
+5 
+2000 
+3 
+95 
+1 
+2110 
+1 
+115 
+1 
+3500 
+1 
+165 
+1 
+3610 
+1 
+210 
+1 
+4110 
+1 
+215 
+17 
+7000 
+3 
+265 
+1 
+sum 
+76 
+
+</table>
+</figure>
+<figure type="table" validated="false" xml:id="tab_3">
+<head xml:id="_2zcJMdt">Table 6 :</head>
+<label>6</label>
+<figDesc xml:id="_Km9e2Z4"/>
+<table>p-values of Kruskal-Wallis tests for first accidental exposure score (four-class 
+study). Variables are ordered by increasing p-values. 
+variable 
+p-value 
+variable 
+p-value 
+peanut 
+0.023 
+total IgE 
+0.424 
+walnut 
+0.038 
+chest nut 
+0.436 
+chick pea 
+0.051 
+ribwort 
+0.442 
+pecan nut 
+0.060 
+12 grass pollens 
+0.455 
+broad bean 
+0.067 
+lentil 
+0.474 
+green pea 
+0.081 
+mugwort 
+0.488 
+cashew nut 
+0.088 
+sp.IgE to f13 
+0.498 
+sp.IgE to rAra-h3 0.146 sp.IgE to rAra-h8 0.570 
+sp.IgE to rAra-h2 0.160 
+rape seed 
+0.582 
+soybean 
+0.172 
+ash 
+0.631 
+pistachio 
+0.201 sp.IgE to rAra-h2 0.693 
+Alternaria 
+0.216 
+pine nut 
+0.698 
+dried bean 
+0.254 
+Dpte 
+0.706 
+Brazil nut 
+0.266 
+birch 
+0.723 
+dog ephitelia 
+0.291 
+almond 
+0.736 
+Queensland nut 
+0.317 
+hazelnut 
+0.766 
+lupine flour 
+0.372 
+cat ephitelia 
+0.806 
+
+</table>
+</figure>
+<figure type="table" validated="false" xml:id="tab_4">
+<head xml:id="_eywzbGM">Table 7 :</head>
+<label>7</label>
+<figDesc xml:id="_rSVc9dY"/>
+<table>Wilks' lambda stepwise selection for first accidental exposure score (four-class 
+study). 
+step 
+entered 
+Wilks' Λ F − to − enter F − to − enter p-value 
+1 
+chick pea 
+0.74 
+5.14 
+4.00E-03 
+2 
+Sp.IgE to rAra-h8 
+0.55 
+4.84 
+5.55E-03 
+3 
+green pea 
+0.39 
+5.36 
+3.31E-03 
+4 
+rape seed 
+0.31 
+3.76 
+1.81E-02 
+5 
+peanut 
+0.26 
+2.50 
+7.41E-02 
+6 
+ribwort 
+0.21 
+2.56 
+6.95E-02 
+7 
+Total IgE 
+0.18 
+2.09 
+1.18E-01 
+8 
+Sp.IgE to rAra-h1 
+0.15 
+2.24 
+9.98E-02 </table>
+</figure>
+<figure type="table" validated="false" xml:id="tab_5">
+<head xml:id="_c5rdxWj">Table 8 :</head>
+<label>8</label>
+<figDesc xml:id="_TucsGsd"/>
+<table>Clusters and variables selected to discriminate eliciting doses and corresponding 
+Λ and F − to − enter statistics (four-class study). 
+step bounds / predictors Wilks Λ F − to − enter F − to − enter p-value 
+1 
+95-215-500 
+0.08 
+1 
+hazelnut 
+0.73 
+8.51 
+6.96E-05 
+2 
+95-215-500 
+0.73 
+2 
+birch 
+0.64 
+3.15 
+0.031 
+3 
+95-215-1000 
+0.63 
+3 
+pistachio 
+0.56 
+2.85 
+0.044 
+4 
+95-215-1000 
+0.56 
+4 
+cashew nut 
+0.50 
+2.74 
+0.050 
+5 
+95-215-1000 
+0.50 
+5 
+green pea 
+0.45 
+2.24 
+0.092 
+6 
+95-215-1000 
+0.45 
+6 
+total IgE 
+0.41 
+2.20 
+0.096 
+7 
+95-215-500 
+0.41 
+7 
+pine nut 
+0.35 
+3.24 
+0.028 </table>
+</figure>
+
+			<note n="2" place="foot">. 7 legumes: broad bean, chickpea, dried bean, green pea, lentil, lupine flour, soybean, since peanuts are legume;</note>
+		</body>
+		<back>
+
+			<div type="acknowledgement">
+<div>
+<head xml:id="_9uUfeaM">Acknowledgements</head>
+<p xml:id="_XxnP7Ry">The authors would like to thank Frances T. Yen for her critical review of the manuscript. </p>
+</div>
+<div>
+<head xml:id="_6p9YdKX">References</head>
+</div>
+			</div>
+
+			<div type="references">
+
+				<listBibl>
+
+<biblStruct xml:id="b0">
+	<analytic>
+		<title level="a" type="main" xml:id="_uF4Ya8r">Predictive value of skin prick tests using recombinant allergens for diagnosis of peanut allergy</title>
+		<author>
+			<persName>
+<forename type="first">G</forename>
+<surname>Sampson</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<surname>Kanny</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_D2M2GSe">Journal of Allergy Clinical Immunology</title>
+		<imprint>
+			<biblScope unit="volume">118</biblScope>
+			<biblScope from="250" to="256" unit="page"/>
+			<date type="published" when="2006"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b1">
+	<analytic>
+		<title level="a" type="main" xml:id="_A9UJPDs">penalizedSVM: a R-package for feature selection SVM classification</title>
+		<author>
+			<persName>
+<forename type="first">N</forename>
+<surname>Becker</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">W</forename>
+<surname>Werft</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">G</forename>
+<surname>Toedt</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">P</forename>
+<surname>Lichter</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<surname>Benner</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_QHaAQuF">Bioinformatics</title>
+		<imprint>
+			<biblScope unit="volume">25</biblScope>
+			<biblScope from="1712" to="1712" unit="page"/>
+			<date type="published" when="2009"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b2">
+	<analytic>
+		<title level="a" type="main" xml:id="_Ena2yxK">Standization of food challenges in patients with immediate reactions to foods-position paper from the European Academy of Allergology Clinical Immunology</title>
+		<author>
+			<persName>
+<forename type="first">C</forename>
+<surname>Bindslev-Jensen</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">B</forename>
+<surname>Ballmer-Weber</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">U</forename>
+<surname>Bengtsson</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">C</forename>
+<surname>Blanco</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">C</forename>
+<surname>Ebner</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Hourihane</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<forename type="middle">C</forename>
+<surname>Knulst</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">D</forename>
+<surname>Moneret-Vautrin</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Nekam</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">B</forename>
+<surname>Niggemann</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<surname>Osterballe</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">C</forename>
+<surname>Ortolani</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Ring</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">C</forename>
+<surname>Schnopp</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">T</forename>
+<surname>Werfel</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_v8MCJsD">Allergy</title>
+		<imprint>
+			<biblScope unit="volume">59</biblScope>
+			<biblScope from="690" to="697" unit="page"/>
+			<date type="published" when="2004"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b3">
+	<analytic>
+		<title level="a" type="main" xml:id="_mMSNYU9">Fatalities due to anaphylactic reactions to foods</title>
+		<author>
+			<persName>
+<forename type="first">S</forename>
+<forename type="middle">A</forename>
+<surname>Bock</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<surname>Munoz-Furlong</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<forename type="middle">A</forename>
+<surname>Sampson</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_JGxtzZs">Journal of Allergy Clinical Immunology</title>
+		<imprint>
+			<biblScope unit="volume">107</biblScope>
+			<biblScope from="191" to="193" unit="page"/>
+			<date type="published" when="2001"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b4">
+	<analytic>
+		<title level="a" type="main" xml:id="_s2HPsPE">Boosting Algorithms: Regularization, Prediction Model Fitting</title>
+		<author>
+			<persName>
+<forename type="first">P</forename>
+<surname>Buhlmann</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">T</forename>
+<surname>Hothorn</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_UbjUC8W">Statistical Science</title>
+		<imprint>
+			<biblScope unit="volume">22</biblScope>
+			<biblScope from="477" to="505" unit="page"/>
+			<date type="published" when="2007"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b5">
+	<analytic>
+		<title xml:id="_tCTfwfx"/>
+		<author>
+			<persName>
+<forename type="first">W</forename>
+<forename type="middle">J</forename>
+<surname>Conover</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_5qYFrrE">Practical Nonparametric Statistics</title>
+		<imprint>
+			<date type="published" when="1980"/>
+			<publisher>John Wiley &amp; Sons</publisher>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b6">
+	<analytic>
+		<title level="a" type="main" xml:id="_y528ffw">Comparison of stopping rules in forward stepwise discriminant analysis</title>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<surname>Costanza</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<forename type="middle">A</forename>
+<surname>Afifi</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_Bj85zXN">Journal of the American Statistical Association</title>
+		<imprint>
+			<biblScope unit="volume">74</biblScope>
+			<biblScope from="777" to="785" unit="page"/>
+			<date type="published" when="1979"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b7">
+	<analytic>
+		<title level="a" type="main" xml:id="_ZWXNjRZ">Multiple factor analysis</title>
+		<author>
+			<persName>
+<forename type="first">B</forename>
+<surname>Escofier</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Pagès</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m" xml:id="_34JKfsk">Computational Statistics Data Analysis</title>
+		<imprint>
+			<date type="published" when="1994"/>
+			<biblScope unit="volume">18</biblScope>
+			<biblScope from="121" to="140" unit="page"/>
+		</imprint>
+	</monogr>
+	<note>AFMULT package</note>
+</biblStruct>
+
+<biblStruct xml:id="b8">
+	<monogr>
+		<title level="m" type="main" xml:id="_YC5ypFc">Analyses factorielles simples et multiples, 3` emé edition Dunod</title>
+		<author>
+			<persName>
+<forename type="first">B</forename>
+<surname>Escofier</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Pages</surname>
+</persName>
+		</author>
+		<imprint>
+			<date type="published" when="1998"/>
+			<pubPlace>Paris</pubPlace>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b9">
+	<monogr>
+		<title level="m" type="main" xml:id="_KF8y2dh">The elements of statistical learning: data mining, inference and prediction</title>
+		<author>
+			<persName>
+<forename type="first">T</forename>
+<surname>Hastie</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">R</forename>
+<surname>Tibshirani</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Friedman</surname>
+</persName>
+		</author>
+		<imprint>
+			<date type="published" when="2001"/>
+			<publisher>Springer-Verlag</publisher>
+			<pubPlace>New-York</pubPlace>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b10">
+	<monogr>
+		<title level="m" type="main" xml:id="_8XgAekC">Applied logistic regression</title>
+		<author>
+			<persName>
+<forename type="first">D</forename>
+<forename type="middle">W</forename>
+<surname>Hosmer</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">S</forename>
+<surname>Lemeshow</surname>
+</persName>
+		</author>
+		<imprint>
+			<date type="published" when="2000"/>
+			<publisher>John Wiley &amp; Sons</publisher>
+			<pubPlace>NewYork</pubPlace>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b11">
+	<analytic>
+		<title level="a" type="main" xml:id="_EkBKrfx">Does severity of low-dose, double-blind, placebocontrolled food challenges reflect severity of allergic reactions to peanut in the community?</title>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<forename type="middle">O B</forename>
+<surname>Hourihane</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<forename type="middle">E C</forename>
+<surname>Grimshaw</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">S</forename>
+<forename type="middle">A</forename>
+<surname>Lewis</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">R</forename>
+<forename type="middle">A</forename>
+<surname>Briggs</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<forename type="middle">B</forename>
+<surname>Trewin</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">R</forename>
+<forename type="middle">M</forename>
+<surname>King</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">S</forename>
+<forename type="middle">A</forename>
+<surname>Kilburn</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<forename type="middle">O</forename>
+<surname>Warner</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_EBxZgBh">Clinical &amp; Experimental</title>
+		<imprint>
+			<biblScope unit="volume">35</biblScope>
+			<biblScope from="1227" to="1233" unit="page"/>
+			<date type="published" when="2005"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b12">
+	<monogr>
+				<author>
+			<persName>
+<forename type="first">R</forename>
+<forename type="middle">I</forename>
+<surname>Jennrich</surname>
+</persName>
+		</author>
+		<title level="m" xml:id="_CjV7C5q">Stepwise Discriminant Analysis, in Statistical Methods for Digital</title>
+		<editor>Computers, K. Enslein, A. Ralston, and H. Wilf</editor>
+		<meeting>
+<address>
+<addrLine>New York</addrLine>
+</address>
+</meeting>
+		<imprint>
+			<publisher>John Wiley &amp; Sons</publisher>
+			<date type="published" when="1977"/>
+			<biblScope from="76" to="96" unit="page"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b13">
+	<monogr>
+		<title level="m" type="main" xml:id="_VYcWBcx">Discriminant analysis</title>
+		<author>
+			<persName>
+<forename type="first">P</forename>
+<forename type="middle">A</forename>
+<surname>Lachenbruch</surname>
+</persName>
+		</author>
+		<imprint>
+			<date type="published" when="1975"/>
+			<publisher>Collier Macmillan Publishers</publisher>
+			<pubPlace>London</pubPlace>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b14">
+	<analytic>
+		<title level="a" type="main" xml:id="_qmcQwDT">Component-resolved diagnostics in food allergy</title>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Lidholm</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">B</forename>
+<forename type="middle">K</forename>
+<surname>Ballmer-Weber</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<surname>Mari</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">S</forename>
+<surname>Vieths</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_QYZsHUS">Current Opinion in Allergy Clinical Immunology</title>
+		<imprint>
+			<biblScope unit="volume">6</biblScope>
+			<biblScope from="234" to="240" unit="page"/>
+			<date type="published" when="2004"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b15">
+	<analytic>
+		<title level="a" type="main" xml:id="_4fb4Tc2">Cross-allergenicity of peanut lupin : the risk of lupin allergy in patients allergic to peanuts</title>
+		<author>
+			<persName>
+<forename type="first">D</forename>
+<forename type="middle">A</forename>
+<surname>Moneret-Vautrin</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">L</forename>
+<surname>Guerin</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">G</forename>
+<surname>Kanny</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Flabbee</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">S</forename>
+<surname>Frémont</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<surname>Morisset</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_s6u4rbZ">Journal of Allergy Clinical Immunology</title>
+		<imprint>
+			<biblScope unit="volume">104</biblScope>
+			<biblScope from="883" to="888" unit="page"/>
+			<date type="published" when="1999"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b16">
+	<analytic>
+		<title level="a" type="main" xml:id="_EA4w3gD">Epidemiology of life-threatening lethal anaphylaxis: a review</title>
+		<author>
+			<persName>
+<forename type="first">D</forename>
+<forename type="middle">A</forename>
+<surname>Moneret-Vautrin</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<surname>Morisset</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Flabbee</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">E</forename>
+<surname>Beaudouin</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">G</forename>
+<surname>Kanny</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_rN6AubN">Allergy</title>
+		<imprint>
+			<biblScope unit="volume">60</biblScope>
+			<biblScope from="443" to="451" unit="page"/>
+			<date type="published" when="2005"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b17">
+	<analytic>
+		<title level="a" type="main" xml:id="_HTeDUcn">Diagnosis Treatment of Insect Sensitivity</title>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<forename type="middle">L</forename>
+<surname>Müller</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_jd7Z3EU">Journal of Asthma</title>
+		<imprint>
+			<biblScope unit="volume">3</biblScope>
+			<biblScope from="331" to="333" unit="page"/>
+			<date type="published" when="1966"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b18">
+	<analytic>
+		<title level="a" type="main" xml:id="_bGsdU7n">Does skin prick test reactivity to purified allergens correlate with clinical severity of peanut allergy?</title>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Peeters</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">S</forename>
+<forename type="middle">J</forename>
+<surname>Koppelman</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">E</forename>
+<surname>Van Hoffen</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">C</forename>
+<forename type="middle">W H</forename>
+<surname>Van Der Tas</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">C</forename>
+<forename type="middle">F</forename>
+<surname>Den Hartog</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<forename type="middle">H</forename>
+<surname>Jager</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">S</forename>
+<forename type="middle">L</forename>
+<surname>Penninks</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">C</forename>
+<surname>Hefle</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">E</forename>
+<surname>Bruijnzeel-Koomen</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<forename type="middle">C</forename>
+<surname>Knol</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<surname>Knulst</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_Dg64xYS">Clinical &amp; Experimental Allergy</title>
+		<imprint>
+			<biblScope unit="volume">37</biblScope>
+			<biblScope from="108" to="115" unit="page"/>
+			<date type="published" when="2007"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b19">
+	<analytic>
+		<title xml:id="_Ehax3Uw"/>
+		<author>
+			<persName>
+<forename type="first">T</forename>
+<forename type="middle">D</forename>
+<surname>Pollard</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">W</forename>
+<forename type="middle">C</forename>
+<surname>Earnshaw</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">G</forename>
+<forename type="middle">T</forename>
+<surname>Johnson</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_7NwdE2D">Cell biology</title>
+		<imprint>
+			<date type="published" when="2004"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b20">
+	<monogr>
+				<ptr target="http://www.R-project.org"/>
+		<title level="m" xml:id="_DQNKhHM">R Development Core Team, R: A Language Environment for Statistical Computing</title>
+		<imprint>
+			<date type="published" when="2007"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b21">
+	<analytic>
+		<title level="a" type="main" xml:id="_KKH6kgV">Gene selection using support vector machines with non-convex penalty</title>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<forename type="middle">H</forename>
+<surname>Zhang</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Ahn</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">X</forename>
+<surname>Lin</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">C</forename>
+<surname>Park</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_sCqmJVx">Bioinformatics</title>
+		<imprint>
+			<biblScope unit="volume">22</biblScope>
+			<biblScope from="88" to="95" unit="page"/>
+			<date type="published" when="2006"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+				</listBibl>
+			</div>
+		</back>
+	</text>
+</TEI>

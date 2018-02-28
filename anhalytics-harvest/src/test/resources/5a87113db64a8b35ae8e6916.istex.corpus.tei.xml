@@ -1,0 +1,1926 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<teiCorpus xmlns="http://www.tei-c.org/ns/1.0">
+<teiHeader xml:id="istex">
+<fileDesc>
+<titleStmt>
+<title level="a" type="main" xml:id="_PT3Yr5n" xml:lang="en">Serotonin accumulation after monoamine oxidase inhibition</title>
+<title level="a" type="sub" xml:id="_S6a2whU" xml:lang="en">Effects of decreased impulse flow and of some anti-depressants and hallucinogens</title>
+</titleStmt>
+<publicationStmt>
+<authority>ISTEX</authority>
+<publisher>ELSEVIER</publisher>
+<availability>
+<p xml:id="_SeJSNDE">ELSEVIER</p>
+</availability>
+<date>1971</date>
+</publicationStmt>
+<sourceDesc>
+<biblStruct type="inbook">
+<analytic>
+<title level="a" type="main" xml:id="_MXcKE4F" xml:lang="en">Serotonin accumulation after monoamine oxidase inhibition</title>
+<title level="a" type="sub" xml:id="_zmCRfw8" xml:lang="en">Effects of decreased impulse flow and of some anti-depressants and hallucinogens</title>
+<author xml:id="author-0000">
+<persName>
+<forename type="first">James L.</forename>
+<surname>Meek</surname>
+</persName>
+<affiliation>
+<org type="institution">
+<orgName type="institution">University of Göteborg</orgName>
+<desc>
+<address>
+<postCode>S 400 33</postCode>
+<settlement>Göteborg 33</settlement>
+<country key="SE">Sweden</country>
+</address>
+</desc>
+</org>
+<org type="department">
+<orgName type="department">Department of Pharmacology</orgName>
+<desc>
+<address>
+<postCode>S 400 33</postCode>
+<settlement>Göteborg 33</settlement>
+<country key="SE">Sweden</country>
+</address>
+</desc>
+</org>
+</affiliation>
+<affiliation>
+<org type="institution">
+<orgName type="institution">Karolinska Institutet</orgName>
+<desc>
+<address>
+<addrLine>S 104 01 Stockholm 60</addrLine>
+<country key="SE">Sweden</country>
+</address>
+</desc>
+</org>
+<org type="department">
+<orgName type="department">Department of Histology</orgName>
+<desc>
+<address>
+<addrLine>S 104 01 Stockholm 60</addrLine>
+<country key="SE">Sweden</country>
+</address>
+</desc>
+</org>
+</affiliation>
+<affiliation>
+<org type="institution">
+<orgName key="instit4" type="institution">WAW Building</orgName>
+<desc>
+<address>
+<addrLine>Washington D.C. 20032</addrLine>
+<country key="US">U.S.A</country>
+</address>
+</desc>
+</org>
+<org type="institution">
+<orgName key="instit3" type="institution">Saint Elizabeth's Hospital</orgName>
+<desc>
+<address>
+<addrLine>Washington D.C. 20032</addrLine>
+<country key="US">U.S.A</country>
+</address>
+</desc>
+</org>
+<org type="institution">
+<orgName key="instit2" type="institution">Division of Special Mental Health Research</orgName>
+<desc>
+<address>
+<addrLine>Washington D.C. 20032</addrLine>
+<country key="US">U.S.A</country>
+</address>
+</desc>
+</org>
+<org type="institution">
+<orgName key="instit1" type="institution">National Institute of Mental Health</orgName>
+<desc>
+<address>
+<addrLine>Washington D.C. 20032</addrLine>
+<country key="US">U.S.A</country>
+</address>
+</desc>
+</org>
+</affiliation>
+</author>
+<author xml:id="author-0001">
+<persName>
+<forename type="first">Kjell</forename>
+<surname>Fuxe</surname>
+</persName>
+<affiliation>
+<org type="institution">
+<orgName type="institution">University of Göteborg</orgName>
+<desc>
+<address>
+<postCode>S 400 33</postCode>
+<settlement>Göteborg 33</settlement>
+<country key="SE">Sweden</country>
+</address>
+</desc>
+</org>
+<org type="department">
+<orgName type="department">Department of Pharmacology</orgName>
+<desc>
+<address>
+<postCode>S 400 33</postCode>
+<settlement>Göteborg 33</settlement>
+<country key="SE">Sweden</country>
+</address>
+</desc>
+</org>
+</affiliation>
+<affiliation>
+<org type="institution">
+<orgName type="institution">Karolinska Institutet</orgName>
+<desc>
+<address>
+<addrLine>S 104 01 Stockholm 60</addrLine>
+<country key="SE">Sweden</country>
+</address>
+</desc>
+</org>
+<org type="department">
+<orgName type="department">Department of Histology</orgName>
+<desc>
+<address>
+<addrLine>S 104 01 Stockholm 60</addrLine>
+<country key="SE">Sweden</country>
+</address>
+</desc>
+</org>
+</affiliation>
+</author>
+<idno type="istex">5D6C3E70EB566AB45BA516C3C0038D5E4875188A</idno>
+<idno type="DOI">10.1016/0006-2952(71)90155-9</idno>
+<idno type="PII">0006-2952(71)90155-9</idno>
+<idno type="ArticleID">71901559</idno>
+</analytic>
+<monogr>
+<title level="j" xml:id="_bWBuNhJ">Biochemical Pharmacology</title>
+<title level="j" type="abbrev" xml:id="_RHKYyfH">BCP</title>
+<idno type="pISSN">0006-2952</idno>
+<idno type="PII">S0006-2952(00)X0668-5</idno>
+<imprint>
+<publisher>ELSEVIER</publisher>
+<date type="published" when="1971">1971</date>
+<biblScope unit="volume">20</biblScope>
+<biblScope unit="issue">3</biblScope>
+<biblScope from="693" unit="page">693</biblScope>
+<biblScope to="696" unit="page">696</biblScope>
+</imprint>
+</monogr>
+</biblStruct>
+</sourceDesc>
+</fileDesc>
+<profileDesc>
+<creation>
+<date>1971</date>
+</creation>
+<langUsage>
+<language ident="en">en</language>
+</langUsage>
+<abstract xml:lang="en">
+<p xml:id="_sAMCx5B">The rate of synthesis of serotonin (5-HT) in rat brain and spinal cord was determined by inhibiting monoamine oxidase and measuring the resulting accumulation of 5-HT. The location of this 5-HT was examined using fluorescence histochemistry. No alteration of accumulation was seen when the flow of impulses in serotonergic nerve fibers in the spinal cord was decreased by sectioning. The accumulation was also unaltered when the animals were treated with several drugs that reduce 5-HT turnover: LSD, psilocybin and chlorimipramine. These results support previous suggestions that normal control of synthesis of 5-HT by end-product inhibition or impulse-controlled feedback does not function in rats treated with a MAO inhibitor.The accumulation of 5-HT in brain was reduced when the animals were treated with N,N-dimethyltryptamine, α-ethyltryptamine, p-methoxy amphetamine or p-chloromethamphetamine after receiving a monoamine oxidase inhibitor. The same effect also occurred in both intact and transected spinal cords. These drugs also caused the appearance of extraneuronal 5-HT fluorescence. These effects probably mainly arose from release by these latter drugs of 5-HT which was not stored in granules. p-Chloromethamphetamine was also seen to deplete 5-HT from the granular stores of normal animals.p-Methoxyamphetamine, p-chloromethamphetamme and α-ethyltryptamine strongly potentiated the hindlimb extensor reflex in spinal rats whose endogenous 5-HT stores had been depleted. These drugs seem to directly stimulate the central 5-HT receptors involved in this reflex.</p>
+</abstract>
+<textClass>
+<classCode scheme="typology" xml:id="_XfYDPpR">research-article</classCode>
+<keywords scheme="author"/>
+</textClass>
+<textClass>
+<classCode n="science.pharmacology &amp; pharmacy" scheme="domain" xml:id="_eVhYKZh">science.pharmacology &amp; pharmacy</classCode>
+</textClass>
+</profileDesc>
+<revisionDesc>
+<change when="1971">Published</change>
+</revisionDesc>
+</teiHeader>
+<TEI xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="main" xml:id="grobid" xsi:schemaLocation="http://www.tei-c.org/ns/1.0 /data/workspace/services/grobid/grobid-home/schemas/xsd/Grobid.xsd">
+	<teiHeader xml:lang="en">
+		<encodingDesc>
+			<appInfo>
+				<application ident="GROBID" version="0.5.1-SNAPSHOT" when="2018-02-16T17:16+0000">
+					<ref target="https://github.com/kermitt2/grobid">GROBID - A machine learning software for extracting information from scholarly documents</ref>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<fileDesc>
+			<titleStmt>
+				<title level="a" type="main" xml:id="_5MfdtX6">SEROTONIN ACCUMULATION AFTER MONOAMINE OXIDASE INHIBITION EFFECTS OF DECREASED IMPULSE FLOW AND OF SOME ANTI-DEPRESSANTS AND HALLUCINOGENS</title>
+			</titleStmt>
+			<publicationStmt>
+				<publisher>Pergamon Press</publisher>
+				<availability status="unknown">
+<p xml:id="_yYKa4FA">Copyright Pergamon Press</p>
+				</availability>
+				<date type="published" when="1971">1971</date>
+			</publicationStmt>
+			<sourceDesc>
+				<biblStruct>
+					<analytic>
+						<author>
+							<persName>
+<forename type="first">Jambs</forename>
+<forename type="middle">L</forename>
+<surname>Wk</surname>
+</persName>
+							<affiliation key="aff0">
+								<orgName key="dep1" type="department">Department of Pharmaco logy</orgName>
+								<orgName key="dep2" type="department">Depart-ment of Histology</orgName>
+								<orgName type="institution">University of Gateborg</orgName>
+								<address>
+									<addrLine>S 400 33 Gateborg 33</addrLine>
+									<country key="SE">Sweden</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName>
+<forename type="first">Kjell</forename>
+<surname>Fuxe</surname>
+</persName>
+							<affiliation key="aff1">
+								<orgName type="institution">Karolinska Institutet</orgName>
+								<address>
+									<addrLine>S 104 01 Stockholm 60</addrLine>
+									<country key="SE">Sweden</country>
+								</address>
+							</affiliation>
+						</author>
+						<title level="a" type="main" xml:id="_Fgaydks">SEROTONIN ACCUMULATION AFTER MONOAMINE OXIDASE INHIBITION EFFECTS OF DECREASED IMPULSE FLOW AND OF SOME ANTI-DEPRESSANTS AND HALLUCINOGENS</title>
+					</analytic>
+					<monogr>
+						<title level="j" type="main" xml:id="_NZwmzSg">Biochemical Phamacology</title>
+						<imprint>
+							<publisher>Pergamon Press</publisher>
+							<biblScope unit="volume">20</biblScope>
+							<biblScope from="693" to="706" unit="page"/>
+							<date type="published" when="1971">1971</date>
+						</imprint>
+					</monogr>
+					<note type="submission">(Received 15 June 1970; accepted 7 August 1970)</note>
+					<note>Printed in Great Britain + Present address: National Institute of Mental Health, Division of Special Mental Health Re-search, Saint Elizabeth's Hospital, WAW Building, Washington D.C. 20032, U.S.A. 693</note>
+				</biblStruct>
+			</sourceDesc>
+		</fileDesc>
+		<profileDesc>
+			<abstract>
+				<p xml:id="_eTPv5Dn">The rate of synthesis of serotonin (S-HT) in rat brain and spinal cord was determined by inhibiting monoamine oxidase and measuring the resulting accumulation of 5-HT. The location of this 5-HT was examined using fluorescence histochemistry. No alteration of accumulation was seen when the flow of impulses in serotonergic nerve. fibers in the spinal cord was decmased by sectioning. The accumulation was also unaltered when the animals were treated with several drugs that reduce 5-HT turnover: LSD, psilocybin and chlorhnipramine. These results support previous suggestions that normal control of synthesis of 54-R by end-product inhibition or impulse-controlled feedback does not function in rats treated with a MAO inhibitor. The accumulation of 54-R in brain was reduced when the animals were treated with N,N-dimethyltryptamine, a-ethyltryptamine, p-methoxy amphetamine or pchloro-methamphetamine after receiving a monoamine oxidase inhibitor. The same effect also cccurred in both intact and transected spinal cords. These drugs also caused the appearance of extraneuronal5-HT fluorescence. These effects probably mainly arose from release by these latter drugs of 5-HT which was not stored in granules. p-Chlorometh-amphetamine was also seen to deplete 5-HT from the granular stores of normal animals. p-Methoxyamphetamine, p-chloromethamphetamine and tithyltryptamine strongly potentiated the hindlimb extensor reflex in spinal rats whose endogenous 5-HT stores had been depleted. These drugs seem to directly stimulate the central 5-HT receptors involved in this reflex. PREVIOUS studies indicate that psychotomimetic drugs of the indolealkylamine and phenylethylamine types can directly stimulate serotonin (5-HT) receptors in the central nervous system. I#2 Antidepressant drugs of the imipramine type on the other hand seem to indirectly increase 5-HT receptor activity3 by blocking reuptake mechanisms in 5-HT neurons.4*5 An effect common to all these drugs is to decrease the turnover rate of 5-HT.1*2p6-12 Most of them probably decrease the flow of impulses in serotonergic nerve fibers.13.14 In the present paper we have examined whether 5-HT synthesis is diminished after treatment with chlorimipramine or several indole and amphetamine derivatives. In addition, we determined the rate of synthesis of 5-HT after decreasing impulse flow in the 5-HT axons in the spinal cords of rats by a spinal transection. As an estimate of 5-HT synthesis, we measured the rate of 5-HT accumulation after blockade of its destruction with the monoamine oxidase (MAO) inhibitors nialamide or pargyline.</p>
+			</abstract>
+		</profileDesc>
+	</teiHeader>
+	<text xml:lang="en">
+		<body>
+<div>
+<head xml:id="_P5yCwP6">METHODS</head>
+<p xml:id="_zmCfhaH">Male Sprague-Dawley rats (150-200 g) were injected intraperitoneally with the MAO inhibitor nialamide (300 mg/kg). Some received in addition one of the following drugs: Lysergic acid diethylamide (LSD); psilocybin; N,N-dimethyltryptamine @MT); a-ethyltryptamine acetate; 3,5-dimethoxy-4-methylamphetamine HCl (STP); mescaline sulfate; pchloromethamphetamine HCI (Ro4/6861); pmethoxyamphet- amine HCl @MA) or chlorimipramine HCI. Doses in the tables refer to the form indicated here. At intervals, the rats were decapitated while under chloroform anes- thesia. Brains and spinal cords were removed and analysed for 5-HT, either histo- chemically15* l6 or biochemically. I7 Similar experiments were also performed on rats with an acute midthoracic spinal transection.</p>
+<p xml:id="_scBjMEu">Three principal types of experiments were performed. In the first, the drugs listed above were injected30 or 60 ruin after treatment with either a MAO inhibitor of the hydrazine type (nialamide) or non-hydrazine type (pargyline). The rats were killed 4 hr after the nialamide (pargyline) injection. In a control experiment with a-ethyl- tryptamine and nialamide, brain MAO was determined by the method of Wurtman and Axelrod. <ref target="#b17" type="bibr">18</ref> The second type of experiment was designed to reveal a 5-HT releasing action of these drugs. Rats were also sacrificed 4 hr after injection of nialamide, but the drugs were injected only 45 min before sacrifice when 5-HT accumulation had already occurred.</p>
+<p xml:id="_zPZPvKf">In the third model used, the drugs were given as in the second kind of experiment, but to animals pretreated with reserpine in order to prevent granular storage of the accumulating 5-HT. All drugs in all these studies were injected intraperitoneally.</p>
+<p xml:id="_9YZhZ2r">Those amphetamine and tryptamine derivatives which seemed to release 5-HT were tested for the ability to block depletion of 5-HT by the displacing amine H75/12 @-methyl, a-ethyl-metatyramine). This test can reveal whether a drug blocks the amine uptake mechanism in 5-HT neurons ("the membrane pump"). <ref target="#b3" type="bibr">4</ref> The following drugs were tested in a dose of 25 mg/kg: pMA, SIP, DMT and a-ethyltryptamine. The drugs were administered 30 min before the first of the two H75/12 injections (25 mg/kg, i.p., 2 hr apart). The rats were sacrificed 2 hr after the last H75/12 injection, and the brains were removed for histochemical analysis. Five rats were used in each group.</p>
+<p xml:id="_Kt6eJ9S">We also examined the effects of the drugs mentioned above and other aralkylamines on the strength of the hindlimb extensor reflex of spinal rats in order to evaluate their influence on 5-HT neurotransmission. This reflex, which is potentiated by most of the hallucinogens1*2 and antidepressants,3 appears to be dependent on 5-HT receptor activity. The rats (four per group) were pretreated with reserpine and an inhibitor of tryptophane hydroxylase (a-propyldopacetamide, H22/54) to prevent storage and synthesis of 5-HT. Reserpine (5 mg/kg) was given 3-5 hr before and H22/54 (300 mg/kg) 1 hr before administration of one of the above amines.</p>
+</div>
+<div>
+<head xml:id="_HwRpaqK">RESULTS</head>
+<p xml:id="_R4qwdgZ">Nialamide alone caused 5-HT concentrations to rise linearly for about 4 hr and approach a constant value after approximately 6 hr ( <ref type="figure">Figs. 1 and 2</ref>). In view of these results the 4 hr interval was used in most subsequent experiments. The rate of ac- cumulation of 5-HT was found to be essentially the same in the caudal and cranial halves of the spinal cord <ref type="figure">(Fig. 1)</ref>. The 5-HT in the caudal half continued to accumulate Q,21A.+Lu+ 1. Effect of transection on the accumulation of 5-HT in rat spinal cord. Normal rats ( f---5 ) and rats spinalized the previous night ( g----- 9 &gt; were given nialamide, 300 mg/kg, i.p., and killed under chloroform anaesthesia after several intervals. Each point represents the mean f S.E.M. of five to 12 determinations, each of which involved the pooled spinal cord halves of two rats, at the same rate. even when the spinal cord had been transected at the mid-thoracic level. It was also possible to see histochemically that the ~m~ation of 5-HT in both halves of a transected spinal cord was similar. Nialamide (300 mg/kg) was injected 6 hr after spinal cord transection. Two hr after the nialamide injection there was a moderate increase in the fluorescence intensity in the S-HT nerve terminals in both the cranial and caudal halves of the spinal cord of both intact and spinalized rats (four to seven rats per group) over that seen in untreated controls. Four hr after the nialamide injection, there was a strong increase in intensity in the 5-HT nerve terminals but again there was no certain difference between cranial and caudal halves in either intact or spinal rats.  a-Ethyltryptamine + nialamide. Treatment with a-ethyltryptamine prevented most of the increase in brain and spinal cord 5-HT levels <ref type="figure">(Fig. 2</ref>, <ref target="#tab_1" type="table">Table 1</ref>). This effect was present through the duration of the 12 hr experiment. Reductions of 5-HT were observed in doses down to 5 mg/kg. An additional dose-response experiment was performed using intact animals. When rats (six per group) were pretreated with nialamide (300 mg/kg, 4 hr) and a-ethyhryptamine (5 mg/kg, 3 hr), they had levels of 5-HT in brain that were 72 f 6% of animals treated with nialamide alone. A similar effect was seen with a dose of 10 mg/kg (78 f. 7%). Higher (20 mg/kg) or lower (2.5 mg/kg) doses did not cause effects that differed significantly (P &gt; 0.05) from controls (84 f 8 %, 94 f 6 %, respectively). With 10 and 20 mg/kg a-ethyltryptamine, body temperature rose to 39" and 40", respectively. This hyperthermia might cause the decreased effect seen with an increasing dose, since high temperature has been reported to increase 5-HT turnover.1g * The rats were spinalized on the day before the experiments. They received nialamide i.p. in a dose of 300 mg/kg 3 hr before killing and aethyltryptamine i.p. 2.5 hr before killing. The organs from two rats were pooled for each det err&amp;nation. Values are means of five experiments. Significance of dif- ferences were determined by analysis of variance. S.E.M. was 0.072 *g/g.</p>
+<p xml:id="_eHryPQM">Histochemically, a 3 hr treatment with a-ethyltryptamine in a dose of 10 mg/kg decreased intraneuronal accumulation in the 5-HT nerve terminals <ref target="#tab_2" type="table">(Table 2</ref>) in agreement with the biochemical findings. A 45 min treatment with a-ethyltryptamine decreased the intraneuronal yellow fluorescence in the 5-HT cell bodies, non-terminal axons, and nerve terminals of reserpine pretreated rats in doses down to 2.5 mg/kg (Table 2, <ref target="#fig_3" type="figure">Figs. 3 and 4)</ref>. With the higher doses signs of extraneuronal accumulation of yellow fluorescence were observed close to the 5-HT cell bodies, and nerve terminals <ref target="#fig_3" type="figure">(Figs. 3 and 4</ref>). The effects were present both cranial and caudal to a spinal cord transection.</p>
+<p xml:id="_s55XQuk">Since a-ethyltryptamine is known to be a competitive reversible MAO inhibitor, MAO activity was measured in the cerebral cortex of rats treated with both nialamide and a-ethyltryptamine. After nialamide treatment alone, the MAO activity was 3-O f 0.2% of normal (eight experiments), and not significantly different from that found after the combined treatment (3.6 f O-4%, eight experiments). It therefore seems unlikely that the decreased 5-HT accumulation observed was related to a     <ref type="formula">(2)</ref> l+ <ref type="formula">(2)</ref>  * Reserpine was given i.p. in a dose of 10 rug/kg H-24 hr before sacrifice. Nialamide was given in a dose of 300 mg/kg, i.p., 6 hr before sacri6ce. The drugs to be tested were given 45 min before sac&amp;x.</p>
+<formula xml:id="formula_0">3+(3) 4+(g) l+(2) 2+(7) 3+(3) l+(3) 2$(5) 3+(l) 2-t(3) 3+(4) 3 +(4) 4+(2) 3+(2) 4+(4) l+(2) 2+@I l+(2) 2+(6) 3+(2) 2+(2) 3+(4) 4+(l) 3+(3) 4+(4) Z$ t::; 4+(4) 4+(5) 2+(6) 3+(2) 3+(4)4-t(1) 2+(5) 3+(2) 3+(4) 4ff1) l+-(4) 2+(5) 3+(l) 2+(3) 3-t(4) 3+(4) 4+(2) 4+(5) 911;; 25 3+(5) decrease 10 3+(4) 4+(2) slight decrease 2+(l) 3+(12) g l+(2) 2+(6) 3+</formula>
+<p xml:id="_rwf25VC">t Nialamide was given i.p. in a dose of 300 mg/kg 4 hr before sacri6ce. The drugs to be tested were given i.p. 30 min after the nialamide injection. decrease in MAO inhibition such as could have occurred if the reversible inhibitor was given before the niaIamide,20 which is an irreversible inhibitor.</p>
+<p xml:id="_jTqfvVA">DMT + nialamide. DMT in two doses of 10 mg/kg or a single dose of 25 mg/kg decreased the accumulation of 5-HT in the brain <ref target="#tab_5" type="table">(Table 4)</ref>. Two doses of 5 mg/kg were without effect. Histochemically DMT caused effects on 5-HT accumulation in nialamide treated rats that were similar to those of a-ethyltryptamine: a dose of 25 mg/kg for 3 hr decreased accumulation of yellow fluorescence in the 5-HT cell bodies and the non-terminal axons <ref target="#tab_2" type="table">(Table 2</ref>). With a 45 min DMT pretreatment and especially after reserpine, there was a clearcut reduction of yellow fluorescence in all parts of the 5-HT neurons and both cranial and caudal to a spinal cord transection <ref target="#tab_2" type="table">(Tables 2, 3</ref>). Signs of extraneuronal accumulation of yellow fluorescence were observed close to the 5-HT cell bodies and terminals. 21 A hyperthermic reaction developed after treatment with both DMT and nialamide.</p>
+<p xml:id="_xnaNMQ2">Psilocybin + niahmide. No significant changes in accumulation of 5-HT occurred following treatment with nialamide and doses of psilocybin between 5 and 20 mg/kg <ref target="#tab_2" type="table">(Tables 2-4</ref> and <ref type="figure">Fig. 5</ref>). Similar results were observed when pargyhne was used as the MAO inhibitor. A hyperthermia developed as with the previous drugs. </p>
+</div>
+<div>
+<head n="35.5" xml:id="_9PCtJ74">369</head>
+<p xml:id="_Zfnzca3">Rats were injected with nialamide (300 mg/kg, i.p.) 4 hr before killing. One hr later they were injected intraperitoneally with either saline, LSD, DMT or psilocybin. In some of the rats, the dose was injected twice, the second given l-5 hr after the Grst. LSD was given either 30 min after the injection of nialamide, or (as in the last experiment) 15 min before. Rectal temperatures were measured just before the rats were mcrhked Values are given as means f S.E.M. Significance of differences were calculated by analysis of variance, (1) P &lt; @OOl ; (2) P &lt; O-01.</p>
+<p xml:id="_s4J8Zv6">LSD + nialamide. Neither histochemically nor biochemically could we observe any influence of LSD on the accumulation of 5-HT after nialamide <ref target="#tab_2" type="table">(Tables 2-4</ref> and <ref target="#fig_7" type="figure">Fig. 6</ref>). A hyperthermia developed after LSD + nialamide. piUA (or STP) + r&amp;amide. pMA at a dose of 5 mg/kg decreased the accumulation of 5-HT after nialamide <ref target="#tab_6" type="table">(Table 5</ref>). The decrease was also seen caudal to a spinal cord transection and at a low (+6") and high (+30") environmental temperature (Meek and Fuxe, unpublished). Either with or without nialamide pretreatment, pMA caused an increase in the rectal temperature to about 38-38.5". Rats which were spinahxed the previous evening were injected withp-methoxyamphetamine (5 mg/kg, i.p.). Some had received nialamide (300 mg/kg, i.p.) 0.5 hr earlier. They were sacrificed under chloro- form anaesthesia 3 hr after the injection of nialamide, or 2-J hr after the injection of pMA. Spinal cord parts from two rats were pooled for each determination. Whole brain 5-HT was determined in a group of intact rats treated similarly except that the dose of pMA was 10 mg/kg. Each value rep- resents mean f S.E.M. of eight determinations. P-values were calculated for diierences between the nialamide and the nialamide f pMA groups (Student's f-test).</p>
+<p xml:id="_azrc3E3">Histochemically, doses of 5-10 mg/kg of pMA caused results similar to those obtained in the biochemical experiments. A 3 hr pMA treatment (10 mglkg) decreased intraneuronal5-HT accumulation in the cell bodies non-terminal axons and the nerve terminals <ref target="#tab_2" type="table">(Table 2)</ref>. A 45 mm pMA treatment (5-10 mg/kg) also decreased the 5-HT accumulation in all parts of the 5-HT neurons with concomitant increase in extra- neuronal 5-HT close to the 5-HT neurons. The latter effect was most striking in reserpine treated rats <ref target="#tab_2" type="table">(Tables 2 and 3</ref>). Similar effects were seen after treatment with STP <ref target="#tab_2" type="table">(Tables 2 and 3)</ref>. p-Chloromethamphetamine + nialamide. Only histochemical experiments were per- formed and only the short time intervals was studied (45 min). Signs of extraneuronal accumulation of yellow fluorescence close to the 5-HT neurons were found in doses of 2.5-5 mg/kg and decreased intraneuronal 5-HT accumulations were seen in doses of l-5 mg/kg <ref target="#tab_2" type="table">(Tables 2 and 3</ref>). Effects were observed both cranial and caudal to a spinal cord transection.</p>
+<p xml:id="_xJc5HwD">Mescaline + nialamide. Only histochemical experiments were performed and the effects were studied after 45 mm of mescaline treatment. No effects on the accumulation of 5-HT were observed with any of the doses studied <ref target="#tab_2" type="table">(Tables 2 and 3)</ref>.</p>
+<p xml:id="_j8bsNpt">Chlorimipramine + nialamide (or pargyline). Biochemically, there were no signs of change in the degree of 5-HT accumulation seen after nialamide or pargyline treatment when studied at room temperature or at low or high temperatures. How- ever, histochemically at the 45 min interval (as noted previously4) there were clearcut signs of extraneuronal fluorescence close to the 5-HT neuron and especially after reserpine pretreatment. * ClI was given i.p. 15 min before treatment with nialamide (300 mg/kg, i.p.) or pargyline (75 mg/kg, i.p.). The rats were sacrificed at various intervals. Cll was also given in repeated doses: 15 min before and 1 and 2 hr after the nialamide injection. Average rectal temperature (determined just before killing) was 36-39" in all cases except when the animals were kept at +4". In that case (nialamide + ClI) temperatures fell to 28". Animals were placed in the constant temperature rooms <ref type="bibr">(4,16 and 30")</ref> just before the nialamide injection. Values are given as means f S.E.M. Number of experiments are given within parentheses. Little or no effects at 25 mg/kg were seen with gramine; Chydroxyamphetamine; 3-hydroxyamphetamine;</p>
+<p xml:id="_8NyG6PT">Chydroxy, N,N-dimethylphenylethylamine (hordenine); 2-methyl-3-hydroxyamphetamine;</p>
+<p xml:id="_P7DukMc">5-methoxy, a-methyltryptamine and the indene analogue of NJV-diisopropyl tryptamine. Amphetamine did not appear to stimulate the extensor reflex in rats pretreated with phenoxybenzamine (25 mg/kg) to block adrenergic effects.</p>
+<p xml:id="_tCZvshU">Mescaline (50 mg/kg) had no effect in the animals treated with reserpine and H22/54 as above, but definitely did potentiate the extensor reflex in control rats. The onset of this action occurred approximately 1 hr after the injection of mescaline.</p>
+<p xml:id="_fRk3rFD">The reflex potention of most of these drugs began within about 15 min after intraperitoneal injection. With p-methoxyphenylethylamine however, the effect began after 3-4 min, and lasted approximately 45 min. With a-methyltryptamine, the onset of action began after approximately l-l.5 hr. In view of the above, the structural specificity of the 5-HT receptor (or receptors) for aralkyl amines appears rather low. Both primary and tertiary amines are active. The aryl portion can be either an indole, phenyl or benzthiazole, but not an indene ring. The alkyl portion can be an ethylene or ,%hydroxyethylene, but not a methylene group. Hydroxylation of the benzene ring in the 3-position reduces activity (possibly because of poor uptake into the brain) and seems to abolish it when in the 4-position. Methoxy-, methyl-and chloro-sub- stituents in the 4-position are all active.</p>
+</div>
+<div>
+<head xml:id="_xRXYEfr">DISCUSSION</head>
+<p xml:id="_DeYcYFt">Our findings indicate that (1) the accumulation of 5-HT in the CNS after nialamide treatment is not altered by nerve section, LSD, psilocybin, or chlorimipramine, and (2) the accumulation is altered by only certain of the drugs acting on central 5-HT receptors (DMT, SIP, pMA, a-ethyltryptamine and p-chloromethamphetamine). It is reasonable in view of the studies on the extensor reflex that all those drugs mentioned above stimulate 5-HT receptors. Other lines of evidence (see below) suggest that most of the above drugs such as LSD and psilocybin also alter synthesis of 5-HT, possibly by altering the rate of impulses in 5-HT nerve fibers. Yet, none of these drugs seem to produce a blockade of 5-HT synthesis in rats pretreated with nialamide. DMT, for example, might have been expected to diminish accumulation only cranial to a transection where the 5-HT neurons are still intact, and receive impulses if the decrease was to be dependent on changes in impulse flow. But in fact, the decrease was equally strong cranially and caudally. In view of these results, the decrease in 5-HT accumulation found with certain drugs is not related to a change in nervous impulse flow. Furthermore, the findings indicate that 5-HT receptor stimulation per se is not essential for the reduced 5-HT accumulations seen after treatment with the tryptamine and amphetamine derivatives mentioned above, since no effects were found with LSD and psilocybin.</p>
+<p xml:id="_YMjCaxg">A decreased IHT accumulation in both halves of a transected spinal cord can result from inhibition of tryptophane hydroxylase. However, if these drugs inhibited tryptophane hydroxylase, they would also lower the concentration of 5-HT in normal animals (which is not the case). Also, hydroxylase inhibition would not be likely to have the strong effect seen after near maximum levels of 5-HT had been obtained. A more likely explanation is provided by our histochemical studies.</p>
+<p xml:id="_NRsnAnP">The effect of the drugs seems to involve a release of the intraneuronally accumulated 5-HT into the extraneuronal space, either by direct displacement of 5-HT from extra- granular binding sites or an action on the nerve cell membrane other than membrane pump blockade. Uptake of H75/12 by the membrane pump for amines was not markedly affected by these drugs since they were inactive or only weakly-moderately active (a-ethyltryptamine, DMT) in blocking depletion of 5-HT by H75/12. In view of these results blockade of the 5-HT membrane pump cannot be the major mechanism for the 5-HT release observed. Presumably the 5-HT which escaped out of the neuron had been located in the axoplasm and not stored in granules. Otherwise, if displace- ment of 5-HT from granules had been present, the same effects would have occurred in the control animals treated with a-ethyltryptamine or DMT but not with nialamide.</p>
+<p xml:id="_P6dQr5q">The fact that in the reserpine treated rats the escape of 5-HT from the neuron was even greater, further underlines the view that the 5-HT must have been released from extragranular sites. The release by DMT, pMA and a-ethyltryptamine of extra- granular 5-HT may be similar to the release by amphetamine of extragranular nor- adrenaline and dopamine.22</p>
+<p xml:id="_8MEKdrA">As reported earlie+* 5 extraneuronal accumulation of 5-HT occurs also after chlorimipramine treatment, probably because of blockade of transport of 5-HT by the "membrane pump" for amines. However, chlorimipramine, unlike e.g. DMT or a-ethyltryptamine, did not decrease the total accumulation of 5-HT. A possible explanation of this difference in behaviour, is that drugs which release extragranular 5-HT are more efficient than drugs which block 5-HT reuptake in causing leakage of 5-HT into the extraneuronal space and out of the brain. Another possibility is that there is a pump for transport of amines out of the brain, as well as into the neuron, and that chlorimipramine blocks both the escape from the brain and reuptake into the neuron.</p>
+<p xml:id="_ABPzPmn">It seems unlikely that the observed pre-synaptic actions of DMT, a-ethyltryptamine and p-methoxyamphetamine on the extragranular 5-HT accumulations are of any great importance for the pharmacological effects exerted by these drugs in normal rats in which 5-HT is presumably mostly stored in granules. In support of this view the increase in extensor hindlimb reflex activity found after treatment with a-ethyl- tryptamine was independent of endogenous 5-HT concentrations: the threshold dose for eliciting increased extensor reflex activity was similar in rats treated with reserpine and H22/54 or untreated controls. In fact, DMT (like LSD) is reported to have de- creased hallucinogenic effects23s24 when MAO is inhibited and free 5-HT increased.</p>
+<p xml:id="_Fs9RPnq">The discovery in the present paper that a-ethyltryptamine, p-chloromethamphet- amine and a-methyltryptamine could directly stimulate 5-HT receptor sites in a way similar to LSD and psilocybin opens up the possibility that this action could be of importance for the antidepressive actions exerted by a-ethyltryptamine25 and p- chloromethamphetamine, <ref target="#b26" type="bibr">26</ref> and the psychotomimetic effects exerted by a-methyl- tryptamine.27 It should be emphasized that these drugs also have other effects. a-Ethyl and methyl tryptamine are well known inhibitors of MAO. pChlorometh- amphetamine is also a MAO inhibitor,28 and can cause a long-lasting depletion of 5-HT and 5-HIAA in brain. But these drugs also have a central stimulating effect that appears unrelated to MAO inhibition. 2o Repeated high doses of a-ethyltrypt- amine can lower brain 5-HT,29 although not to the extent that p-chloromethamphet- amine can. These effects of a-ethyltryptamine can perhaps partly be explained by the 5-HT release that is observable histochemically and biochemically after these drugs.</p>
+<p xml:id="_kST5fbQ">Grieg and Gibbons 2g attributed the lowering of 5-HT levels by a-ethyltryptamine to a presumably direct inhibition of tryptophane hydroxylase. Our results do not support that hypothesis.</p>
+<p xml:id="_hbEzECA">It is possible that the drop in 5-HT caused by pchloromethamphetamine is partly due to inhibition of the tryptophane hydroxylase. Our results cannot exclude this possibility. However, a direct action on the amine granules may also be involved since 5-HT depletion is observed also caudal to a spinal cord transection in the absence of nervous impulse flow, which is not the case with amine synthesis inhibitors. If p chloromethamphetamine does in fact inhibit tryptophane hydroxylase in uivo, it might not do so in vitro, since the inhibition may partly be secondary to the 5-HT receptor stimulation observed in the present experiments.</p>
+<p xml:id="_k7h3kKz">The tiding that neither nerve section nor LSD alters the accumulation of 5-HT after treatment with nialamide is of interest. Current attempts have been unsuccessful in trying to understand how the remarkably constant levels of brain 5-HT are main- tained despite varying use. It has long been known that after treatment with a MAO inhibitor, brain levels of 5-HT (unlike catecholamines) rise tremendously. It there- fore appears that there is little or no "end product inhibition" of synthesis, i.e. that increased 5-HT levels cannot completely turn off its own synthesis and that a feedback system other than end-product inhibition must be responsible for keeping brain 5-HT levels constant.</p>
+<p xml:id="_edPwMQ3">But, 5-HT synthesis and turnover can be altered in numerous ways in normal rats without strikingly changing levels of 5-HT. Thus, a decrease in 5-HT turnover is observed after LSD,lP3' psilocybin, DMT and SIP,* imipramine11*12 and lith.ium.31 An increase in 5-HT turnover is found after stress32-35 and hyperthermia.lg A factor common to most of the agents mentioned is that they might be expected to alter the impulse flow in serotonergic nerve fibers. 1*3~13*14 Direct stimulation of the 5-HT nerve fibers in the median raphe increases 5-HT turnover;36 section of the 5-HT nerve fibers in the spinal cord decreases 5-HT turnover.37 Thus, nerve impulse activity seems to be a major factor regulating 5-HT release and synthesis. The observation that neither LSD, psilocybin nor nerve section alters the rate of 5-HT accumulation after nialamide seems inconsistent with the above findings. It therefore must be considered whether normal control of 5-HT synthesis still functions after monoamine oxidase inhibition. Such would not seem to be the case in view of our fIndings and those of Lin, Ngai and Costa30 who found that despite a large increase in content of 5-HT in brain after a MAO inhibitor, no change occurred in the rate of formation of 5-HT from labelled tryptophane.</p>
+<p xml:id="_yBBdztY">This possibility must be borne in mind when conducting short term turnover experiments using MAO inhibitors, but may not be relevant when sufficient time for new synthesis of enzyme can occur. Thus, although an increased accumulation of 5-HT occurs after long term but not short term treatment with morphine,3* there may be increases in 5-HT synthesis in both cases.</p>
+<p xml:id="_7Gz5mFy">It is interesting to note that most of the known strongly hallucinogenic drugs except mescaline seem to stimulate 5-HT receptors directly. Mescaline (or a metabolite3g) on the other hand, perhaps stimulates 5-HT receptors indirectly since mescaline has less effect in rats treated with reserpine and H22/54. Most of the tricyclic antidepres- sants can be classified as indirect 5-HT receptor stimulators which potentiate the * AND$N, CORRODI, FUXE and MEEK, in preparation.</p>
+<p xml:id="_f3jTpmM">effect of released IHT, MAO inhibitors increase 5-HT levels without greatly a%cting norepinephrine levels. Both a-ethyhryptamine and p-chloromethamphetamine stimulate S-HT receptors, and in addition seem to release 5HT and inhibit MAO. In view of the above, it is fascinating to speculate whether hallucinogenic and anti- depressive drugs might work on similar receptors in the brain. It may be that sub- hallucinogenic doses of drugs such as LSD or psilocybin might be effective as anti- depressants.</p>
+<p xml:id="_9UKT2Sh">In conclusion, our results indicate that following MAO in~bition, neuronal impulses do not influence 5-HT synthesis. Thus, normal control of 5-HT synthesis appears to be lost after MAO inhibition.</p>
+<p xml:id="_snbqUNC">We have also observed that DMT, u~thyltrypta~ne, pMA, STP and pchloro- methamphetamine can cause release of the extragranular 5-HT stores produced by MAO inhibition, whereas LSD and psilocybin lack such presynaptic actions. All the drugs mentioned above seem to directly stimulate 5-HT receptors. This effect, and not the presynaptic actions, seem to be related to the hallucinogenic properties of DMT, STF, LSD and psilocybin.</p>
+</div>
+<figure xml:id="fig_0">
+<head xml:id="_K9Mj7gB">+</head>
+<label/>
+<figDesc xml:id="_wDnkZ7X">Present address: National Institute of Mental Health, Division of Special Mental Health Re- search, Saint Elizabeth's Hospital, WAW Building, Washington D.C. 20032, U.S.A. 693 JAMES L. M~BK and Kmu Fuxe</figDesc>
+</figure>
+<figure xml:id="fig_3">
+<head xml:id="_HkzWJ5m">FIG. 3 .</head>
+<label>3</label>
+<figDesc xml:id="_Gvy4Hmm">FIG. 3. Nut. raphe dorsalis of rat. Reserpine (5 mg/kg, i.p., 18 hr before killing)-nialamide (300 mg/kg, i.p., 4 hr before killing) pretreatment. A strong yellow fluorescence is observed in the 5-HT cell bodies. x 120.</figDesc>
+</figure>
+<figure xml:id="fig_4">
+<head xml:id="_DQGG7DG">FIG. 4 .</head>
+<label>4</label>
+<figDesc xml:id="_z8h6V9p">FIG. 4. Same area and pretreatment as described in text to Fig. 3, except that a-ethyltryptamine was given in a dose of 10 mg/kg, i.p., 45 min before killing. Only a weak to moderate fluorescence is observed in the cell bodies together with appearance of extraneuronal fluorescence close to the 5-HT cell bodies. x 120.</figDesc>
+</figure>
+<figure xml:id="fig_6">
+<head xml:id="_ga52hE7"/>
+<label/>
+<figDesc xml:id="_yz6wFGm">$ A semiquantitative estimation of fluorescence intensity has been made: 4+ = very strong; 3+ = strong; 2+ = moderate; 1 + = very weak. Number of animals within parentheses. § Similar results were obtained in the cranial part of the intact spinal cord and in the cranial and caudal parts of the cut spinal cord. Without reserpine pretreatment the results obtained with the drugs tested on the spinal cord were similar although less pronounced.</figDesc>
+</figure>
+<figure xml:id="fig_7">
+<head xml:id="_GVpXf98">TALU 6 .</head>
+<label>6</label>
+<figDesc xml:id="_7bmKZR8">EFFECZ OF ~H~~~~~PRAMINB (ClI) ON TEE RLSE OF 5-HT IN BRAIN KXUWING NIALAMDB OR PARGYLlNE 'l-RRA=m*</figDesc>
+</figure>
+<figure xml:id="fig_8">
+<head xml:id="_uvcupBY">H75/ 12 .</head>
+<label>12</label>
+<figDesc xml:id="_qjm3wdv">Of the drugs tested only DMT and a-ethyltryptamine caused some reduc- tion in the fluorescence disappearance from the 5-HT nerve terminals induced by H75/12. Structural requirements for reflex potentiation. Both the d and I forms of u-ethyl- tryptamine (5 mg/kg), d,Ea-methyltryptamine (10 mg/kg), p-methoxyamphetamine (5 mg/kg) andp-chloromethamphetamine (5 mg/kg) were capable of strongly stimulat- ing hindlimb extensor reflex in spinal rats. As reported elsewhere, LSD, psilocybin, DMT, MAO inhibitors, Shydroxytryptophane and (under some conditions) chlor- imipramine can also potentiate this reflex.lm3 A number of other amines also potentiated this reflex, but were less potent. De&amp;rite effects were seen at 25 mg/kg with 4-methyl,3-hydroxyamphetamine (H75/11); 4- methyl-u-ethyl metatyramine (H75/12); 4-methyl-3-hydroxy-a-ethylphenylethylamine (H77/77); @-hydroxymethamphetamine (ephedrine); 3,4_methylenedioxyamphet- amine; p-methoxy-phenylethylamine and the sulfur analogues of a-methyltryptamine and DMT (aminopropylbenz(b)thiophene and dimethylaminoethyl benz(b)thiophene).</figDesc>
+</figure>
+<figure type="table" validated="false" xml:id="tab_1">
+<head xml:id="_XEZS3VB">TABLE 1 .</head>
+<label>1</label>
+<figDesc xml:id="_EGbFk7R"/>
+<table>&amp;'FECX OF a-ETHYLTRYPTAMINE ON THE DSGRBE OF 5-m 
+
+ACCUMULATION IN BRAIN AND CAUDAL 
+AND CBANIAL To A SPINAL CORD TRANSSCTION FOLLOWING NIALAMDE TRSATMJMT* 
+
+w&amp;T Grg/g) 
+
+Treatment 
+
+Dose a-ethyl-
+
+Brain 
+
+Spinal cord 
+Spinal cord 
+cranial to the caudal to the 
+transection 
+transection 
+
+Rectal 
+tempera-
+ture 
+
+Nialamide 
+
+Nialamide + 
+a-ethyltryptamine 
+
+Nialamide + 
+aethyltxyptamine 
+
+-
+0.72 
+0.72 
+1.09 
+363 f 0.3 
+
+5 
+064 
+0.73 
+0.95 
+37.2 f 04 
+
+20 
+0.52 
+0.57 (P&lt;O.O5) a82 (PcO.05) 38.0 f 0.4 
+
+</table>
+</figure>
+<figure type="table" validated="true" xml:id="tab_2">
+<head xml:id="_HQMs29U">TABLE 2 . THE EFFECT OF A NUMBER OF TRYPTAMKNE AND AMPHETAMINE DERIVATIVES ON THE -E- INDUCED INCREASE IN FLUORFSCENCE INTENSll'Y IN 5-m NERVE TERMLNALS R-4 THE CAUDAL PART OF lTIl3 INTACT SPINAL. CORD OF RESERPINE PRETREATED RATS* AND IN THE WPRACHIASM4TIC NUCLEUS OF NON- PREI'REATED RATS?</head>
+<label>2</label>
+<figDesc xml:id="_ejvY2Wq"/>
+<table>Treatment 
+
+Dose 
+Fluorescence 
+(mg/kg) 
+intensity$ 
+
+Effect on nialamide in-
+duced increase in fluor-
+escence intensity9 
+
+Spinal cord 
+
+Nialamide 
+
+Indole compounds 
+
+Nialamide + dl-a-ethyltryptamine 
+
+Nialamide + DMT 
+
+Nialamide + psilocybin 
+
+Nialamide + LSD 
+
+Amphetamine-like compounds 
+
+Nialamide + pMA 
+
+Nialamide -t STP 
+
+Nialamide + p-chloromettamphetamine 
+
+Nialamide + mescaline 
+
+Imipramine-like compounds 
+
+Nialamide + chlorimipramine 
+
+Suprachiasmatic nucleus 
+
+Nialamide 
+Nialamide f aethyltryotamine 
+Nialamide + dimethyhryptamine 
+Nialamide + psilocybm 
+Nialamide + LSD 
+Nialamide + pMA 
+Nialamide + STP 
+Nialamide $ mescaline 
+
+</table>
+</figure>
+<figure type="table" validated="false" xml:id="tab_4">
+<head xml:id="_4Fztene">TABLE 3 . Erracr OF TIWPTAMINB AM) A~~TAMINE</head>
+<label>3</label>
+<figDesc xml:id="_Td6hXTU"/>
+<table>DERIVATIVES ON THE NIALAMDE-INDUCED 
+INCREASE 
+
+</table>
+</figure>
+<figure type="table" validated="false" xml:id="tab_5">
+<head xml:id="_t5Pw8rJ">TABLE 4 .</head>
+<label>4</label>
+<figDesc xml:id="_WSFwcut"/>
+<table>Em~crs 
+OF D -TRYPTAMINB 
+@MT), 
+PSILOCYBIN AND LSD ON THE DEGREE OF 5-m 
+ACCUMULATION IN BRAIN FOLLGWING NIALAMIDE TREAThtBNT 
+
+Treatment 
+
+Dose of the 
+drug tested 
+(mglkg) 
+
+Nialamide 
+Nialamide + DMT 
+Nialamide + DMT 
+
+Nialamide 
+Nialamide + DMT 
+Niaiamide + psilocybin 
+
+Nialamide 
+Nialamide + DMT 
+Nialamide + psilocybin 
+
+Nialamide 
+Nialamide + DMT 
+Nialamide + psilocybin 
+
+Nialami de 
+Nialamide + psilocybin 
+
+Saline control 
+DMT 
+
+Nialamide 
+Nialamide + LSD 
+Nialamide + LSD 
+Nialamide + LSD 
+
+NiahUllhk 
+LSD + nialamide 
+
+2x5 
+2 x 10 
+
+25 
+10 
+
+50 
+
+20 
+
+10 
+5 
+
+1 
+
+2 x 10 
+
+2 
+1 
+o-5 
+
+1 
+
+5 
+0*86f0.10 
+37.6 
+5 
+0.74fO.10 
+38-7 
+4 
+O-96f@ll 
+38.7 
+
+4 
+0*92f0*09 
+4 
+0*96&amp;O-15 
+
+0.41 f0.01 
+O-36&amp;0.02 
+
+37*0~0~1 
+372zhO.l 
+
+5 
+0.92&amp;O-08 
+37*7*0*1 
+3 
+1*22*0*11 
+393 rto.1 
+4 
+l-03&amp;0*09 
+39-0*0*1 
+6 
+0*89&amp;O-08 
+38-5 f0.1 
+
+5 
+5 
+
+1*05*0*05 
+0.91 f o-06 
+@75*0*06(l) 
+
+37.7fO.l 
+38.8f0.2 
+38.8 AO.2 
+
+1 G9~0~08 
+37.9zhO.3 
+0.73 i-0.08(2) 
+39.5f0.3 
+l-OOzt+O8 
+39-7&amp;O-3 
+
+o-91 ho.05 
+37.4 
+0.85 50.09 
+38.5 
+0.94 
+38.5 
+
+</table>
+</figure>
+<figure type="table" validated="false" xml:id="tab_6">
+<head xml:id="_5mBms9B">TABLE 5 .</head>
+<label>5</label>
+<figDesc xml:id="_yGW6M5f"/>
+<table>&amp;DUCTION BY p-METHOXYAMPHETAMINB @h&amp;i) OF ACCUMUL ATION OF 5-m IN BRAIN AND 
+
+SPINAL CORD HALVES AFTER hfzio 
+INHJBITION 
+
+Drug treatment 
+
+None 
+
+PMA 
+Nialamide Nialamide + 
+P 
+PMA 
+
+Cranial half 5-HT @g/g) 
+Caudal half 5-HT (&amp;g) 
+Brain 
+Rectal temperature 
+
+044 *to*03 048 f0.04 
+0.92 f@04 
+0.77 f0.05 
+&lt; 0.05 
+0*69&amp;0*05 O-71&amp;-0.06 1+17;tOG4 0*99@05 
+&lt;0*05 
+0.38fO.03 
+0.47*0*07 
+0.71 &amp;to.06 0.47f0.04 
+&lt; 0.05 
+367*0*9 
+38*0&amp;O-7 34.6 ho-4 
+38.6hO.3 
+
+</table>
+</figure>
+
+			<note place="foot">B.P.-facingpage 696</note>
+		</body>
+		<back>
+
+			<div type="acknowledgement">
+<div>
+<head xml:id="_GEgcRsZ">Acknowledgement-This work was supported by Swedish Medical Research Council grants (B69-6OF-267&amp;O&amp; B70-14X-715_05B, B70-14X-155-06B and B70-14X-2157-84B). For generous gifts of drugs we thank Drs. H. Corrodi, Goteborg (H22/54), A. Pletscher, Basle @CM), E. Campaigne, Bloomington (IV,IV-diiethyl and a_methYl~oethylbt~~ole; sulfur anafogues of DMT and a-methyl tryptamine)~ J. C. Winter, Buffalo (diisopropylaminoethylindene), Bennington, At-lanta (StP and pMA), Geigy (chlorimipramine), Pfizer (nialamide), Abbott (pargyline), Ciba (reser-pine) and Upjohn (a-ethyl and a-methyl tryptamines). We also wish to thank for excellent technical assistance Mrs. Karin Andreasson, Mrs. Mirta Baidins, Mrs. Agneta El&amp;son and Miss Barbro</head>
+<p xml:id="_FmsZ54V">Jtirblad.</p>
+</div>
+			</div>
+
+			<div type="references">
+
+				<listBibl>
+
+<biblStruct xml:id="b0">
+	<monogr>
+		<title xml:id="_rwv8CTM"/>
+		<author>
+			<persName>
+<forename type="first">N.-E</forename>
+<surname>And&amp;amp;n</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<surname>Corrodi</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>L%xa</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">T</forename>
+<surname>H~icfezlt</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">.</forename>
+<forename type="middle">J</forename>
+<surname>Br</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<surname>Pharmac</surname>
+</persName>
+		</author>
+		<imprint>
+			<date type="published" when="1967"/>
+			<biblScope unit="volume">34</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b1">
+	<monogr>
+		<title xml:id="_SsAT2zV"/>
+		<author>
+			<persName>
+<forename type="first">N.-E</forename>
+<surname>Andi~n</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<surname>Corrodi</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Fuxs</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+</persName>
+		</author>
+		<imprint>
+			<date type="published" when="1970"/>
+		</imprint>
+	</monogr>
+	<note>Pharmac. exp. 17rer. in press</note>
+</biblStruct>
+
+<biblStruct xml:id="b2">
+	<analytic>
+		<title xml:id="_fZh4ABu"/>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<forename type="middle">L</forename>
+<surname>Maax</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Fuxs</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">N.-E</forename>
+<surname>And&amp;amp;n</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_xHUkG7G">Europ. J. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">9</biblScope>
+			<biblScope unit="page">325</biblScope>
+			<date type="published" when="1970"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b3">
+	<analytic>
+		<title xml:id="_vDuaFrc"/>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<surname>Carlsson</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<surname>C~rrodi</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Fuxs</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">T</forename>
+<surname>H&amp;amp;felt</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_DfgyZvj">Europ. J. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">5</biblScope>
+			<biblScope unit="page">357</biblScope>
+			<date type="published" when="1969"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b4">
+	<analytic>
+		<title xml:id="_nVvebYa"/>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<surname>Carwon</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Jonason</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<surname>Lindqwt</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Fuxx</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_z6NdcEM">Bra&amp;t Res</title>
+		<imprint>
+			<biblScope unit="volume">12</biblScope>
+			<biblScope unit="page">456</biblScope>
+			<date type="published" when="1969"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b5">
+	<analytic>
+		<title xml:id="_73xPrEJ"/>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<forename type="middle">L</forename>
+<surname>Meek</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">B</forename>
+<surname>Werd~u~vs</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_5t8ghsx">J. Pharm. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">22</biblScope>
+			<biblScope unit="page">141</biblScope>
+			<date type="published" when="1970"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b6">
+	<analytic>
+		<title xml:id="_Uc7d4Qf"/>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Schubert</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<surname>Nw&amp;amp;k</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">G</forename>
+<surname>Sedvall</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_cSEZyMy">J. Pharm. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">22</biblScope>
+			<biblScope unit="page">136</biblScope>
+			<date type="published" when="1970"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b7">
+	<analytic>
+		<title xml:id="_wpgyVA4"/>
+		<author>
+			<persName>
+<forename type="first">R</forename>
+<forename type="middle">C</forename>
+<surname>Lpi</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">N</forename>
+<forename type="middle">H</forename>
+<surname>Neff</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">S</forename>
+<forename type="middle">H</forename>
+<surname>Ngai</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">E</forename>
+<surname>Cosr~</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_g4RKvDn">Life Sci</title>
+		<imprint>
+			<biblScope unit="volume">8</biblScope>
+			<biblScope unit="page">1077</biblScope>
+			<date type="published" when="1969"/>
+		</imprint>
+	</monogr>
+	<note>Part l</note>
+</biblStruct>
+
+<biblStruct xml:id="b8">
+	<analytic>
+		<title xml:id="_e8rDAnk"/>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<forename type="middle">J</forename>
+<surname>Sc~ldkraut</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">S</forename>
+<surname>S~hanbero</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">G</forename>
+<forename type="middle">R</forename>
+<surname>Breesb</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">I</forename>
+<forename type="middle">J</forename>
+<surname>Kop~</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_PWwCr3e">Biochem. Pham</title>
+		<imprint>
+			<biblScope unit="page">1971</biblScope>
+			<date type="published" when="1969"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b9">
+	<analytic>
+		<title xml:id="_Z6s7VtN"/>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<forename type="middle">L</forename>
+<surname>Msxx</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<forename type="middle">R</forename>
+<surname>Krall</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<forename type="middle">A</forename>
+<surname>Lipion</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_5E228J4">J. Neurochem</title>
+		<imprint>
+			<biblScope unit="volume">17</biblScope>
+			<biblScope unit="page">1627</biblScope>
+			<date type="published" when="1970"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b10">
+	<analytic>
+		<title xml:id="_RJTsBqB"/>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<surname>Cqrrodi</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Fuxe</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_ZSsCY4G">J. Pharm. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">20</biblScope>
+			<biblScope unit="page">230</biblScope>
+			<date type="published" when="1968"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b11">
+	<analytic>
+		<title xml:id="_MUkDN6p"/>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<surname>Corrodi</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Fuxa</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_m4NTd3V">Europ. J. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">7</biblScope>
+			<biblScope unit="page">56</biblScope>
+			<date type="published" when="1969"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b12">
+	<analytic>
+		<title xml:id="_DWE5ktM"/>
+		<author>
+			<persName>
+<forename type="first">G</forename>
+<surname>Aghajanian</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">W</forename>
+<surname>Foote</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<surname>Shbard</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_2QtrjTd">Science</title>
+		<imprint>
+			<biblScope unit="volume">161</biblScope>
+			<biblScope unit="page">706</biblScope>
+			<date type="published" when="1968"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b13">
+	<analytic>
+		<title xml:id="_FAwEtjQ"/>
+		<author>
+			<persName>
+<forename type="first">G</forename>
+<forename type="middle">K</forename>
+<surname>Agha~anian</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">W</forename>
+<forename type="middle">E</forename>
+<surname>Foora</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<forename type="middle">H</forename>
+<surname>Shbard</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_7DvK4sC">J. Pharmuc. exp. Ther</title>
+		<imprint>
+			<biblScope unit="volume">171</biblScope>
+			<biblScope unit="page">178</biblScope>
+			<date type="published" when="1970"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b14">
+	<analytic>
+		<title xml:id="_MzeAABq"/>
+		<author>
+			<persName>
+<forename type="first">B. F-K</forename>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">N.-A</forename>
+<surname>Hillarp</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">G</forename>
+<surname>Tmat+rx</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<surname>Torp</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_AuzeFG4">J. Histochem. Cytochem</title>
+		<imprint>
+			<biblScope unit="volume">10</biblScope>
+			<date type="published" when="1962"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b15">
+	<monogr>
+		<title xml:id="_PXXQRez"/>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Fuxe</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">G. Jo-N</forename>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">Histochemie</forename>
+<surname>Xl</surname>
+</persName>
+		</author>
+		<imprint>
+			<date type="published" when="1967"/>
+			<biblScope unit="page">161</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b16">
+	<analytic>
+		<title xml:id="_HegfNW9"/>
+		<author>
+			<persName>
+<forename type="first">N.-E</forename>
+<surname>Anden</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">T</forename>
+<surname>Maq~n</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_XV9wX4j">Acta physiol. scat&amp;</title>
+		<imprint>
+			<biblScope unit="volume">64</biblScope>
+			<biblScope unit="page">127</biblScope>
+			<date type="published" when="1965"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b17">
+	<analytic>
+		<title xml:id="_mENRRZ3"/>
+		<author>
+			<persName>
+<forename type="first">R</forename>
+<surname>Wurtman</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Axerod</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_3GEtdCJ">Biochem. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">12</biblScope>
+			<biblScope unit="page">1439</biblScope>
+			<date type="published" when="1963"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b18">
+	<analytic>
+		<title xml:id="_4RrDcJP"/>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<surname>Corrodi</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Fuxa</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">T</forename>
+<surname>H~kfelt</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_unHBNTd">Ado. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">6</biblScope>
+			<biblScope unit="page">49</biblScope>
+			<date type="published" when="1968"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b19">
+	<analytic>
+		<title xml:id="_mkfTgbx"/>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<forename type="middle">F</forename>
+<surname>Gey</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<surname>~etscmr</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_R2E6rC5">Br. J. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">19</biblScope>
+			<biblScope unit="page">161</biblScope>
+			<date type="published" when="1962"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b20">
+	<monogr>
+		<title xml:id="_au6ZCeP"/>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Fuxa</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">T</forename>
+<surname>H&amp;amp;felt</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">U</forename>
+<surname>Ungerstzdt</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">A&amp;amp;</forename>
+<surname>Pharmac</surname>
+</persName>
+		</author>
+		<imprint>
+			<date type="published" when="1968"/>
+			<biblScope unit="volume">6</biblScope>
+			<biblScope unit="page">235</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b21">
+	<analytic>
+		<title xml:id="_tXg2TsJ"/>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<surname>Carlsson</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Fuxe</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">B</forename>
+<surname>Hmberqer</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<surname>Lindqvist</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_KxABVt2">Actaphysiol. stand</title>
+		<imprint>
+			<biblScope unit="volume">67</biblScope>
+			<biblScope unit="page">481</biblScope>
+			<date type="published" when="1966"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b22">
+	<monogr>
+		<title xml:id="_fj9thEE"/>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<surname>F&amp;amp;r-Hntasz</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">Psychopharm</forename>
+</persName>
+		</author>
+		<imprint>
+			<date type="published" when="1963"/>
+			<biblScope unit="volume">4</biblScope>
+			<biblScope unit="page">385</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b23">
+	<analytic>
+		<title xml:id="_ePwU5Dq"/>
+		<author>
+			<persName>
+<forename type="first">D</forename>
+<forename type="middle">M</forename>
+<surname>Rfsnick</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<forename type="middle">R</forename>
+<surname>Kitus</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<surname>&amp;amp;%un</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_F2ce2Gp">Life Sci</title>
+		<imprint>
+			<biblScope unit="volume">3</biblScope>
+			<biblScope unit="page">1207</biblScope>
+			<date type="published" when="1964"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b24">
+	<monogr>
+		<title xml:id="_jXd2EGd"/>
+		<author>
+			<persName>
+<forename type="first">T</forename>
+<forename type="middle">R</forename>
+<surname>Robie</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Neuropsychiat</surname>
+</persName>
+		</author>
+		<imprint>
+			<date type="published" when="1961"/>
+			<biblScope unit="volume">2</biblScope>
+			<biblScope unit="page">531</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b25">
+	<monogr>
+		<title xml:id="_EZhCPSb"/>
+		<author>
+			<persName>
+<forename type="first">B</forename>
+</persName>
+		</author>
+		<imprint>
+			<biblScope unit="volume">20</biblScope>
+			<biblScope unit="page">3</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b26">
+	<monogr>
+		<title xml:id="_62gwfkK"/>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<forename type="middle">M</forename>
+<surname>Van Praao</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Korf</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">F</forename>
+<surname>Van Woudenbero</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">T</forename>
+<forename type="middle">P</forename>
+<surname>Kits</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">Psychopharm</forename>
+</persName>
+		</author>
+		<imprint>
+			<date type="published" when="1968"/>
+			<biblScope unit="volume">13</biblScope>
+			<biblScope unit="page">145</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b27">
+	<analytic>
+		<title xml:id="_CEUcaBQ"/>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<forename type="middle">B</forename>
+<surname>Murphre</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">R</forename>
+<forename type="middle">H</forename>
+<surname>Dippy</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">E</forename>
+<surname>Jbnney</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">C</forename>
+<forename type="middle">C</forename>
+<surname>Piwffer</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_7GxGPeR">Ch. Phurm. Z-her</title>
+		<imprint>
+			<biblScope unit="volume">2</biblScope>
+			<biblScope unit="page">722</biblScope>
+			<date type="published" when="1961"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b28">
+	<analytic>
+		<title xml:id="_yBdW5MD"/>
+		<author>
+			<persName>
+<forename type="first">R</forename>
+<forename type="middle">W</forename>
+<surname>Fuller</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_9SBFXAT">Life Sci</title>
+		<imprint>
+			<biblScope unit="volume">5</biblScope>
+			<biblScope unit="page">2247</biblScope>
+			<date type="published" when="1966"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b29">
+	<analytic>
+		<title xml:id="_Hh2EccF"/>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<forename type="middle">E</forename>
+<surname>Greiq</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<surname>Gibrons</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_gQbCVpB">Archs Znt. Pharmawdyn</title>
+		<imprint>
+			<biblScope unit="volume">136</biblScope>
+			<biblScope unit="page">147</biblScope>
+			<date type="published" when="1962"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b30">
+	<analytic>
+		<title xml:id="_xvw37KG"/>
+		<author>
+			<persName>
+<forename type="first">R</forename>
+<forename type="middle">C</forename>
+<surname>Lin</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">S</forename>
+<forename type="middle">H</forename>
+<surname>Ngai</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">E</forename>
+<surname>Wta</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_2jBxYj7">Science</title>
+		<imprint>
+			<biblScope unit="volume">166</biblScope>
+			<biblScope unit="page">237</biblScope>
+			<date type="published" when="1969"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b31">
+	<analytic>
+		<title xml:id="_PjdB5Ev"/>
+		<author>
+			<persName>
+<forename type="first">H</forename>
+<surname>Corrodi</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">K</forename>
+<surname>Fuxe</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<surname>Schou</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_AQzA8rv">Life Sci</title>
+		<imprint>
+			<biblScope unit="volume">8</biblScope>
+			<biblScope unit="page">643</biblScope>
+			<date type="published" when="1969"/>
+		</imprint>
+	</monogr>
+	<note>Part l</note>
+</biblStruct>
+
+<biblStruct xml:id="b32">
+	<analytic>
+		<title xml:id="_EPE7XDz"/>
+		<author>
+			<persName>
+<forename type="first">E</forename>
+<forename type="middle">L</forename>
+<surname>Bliss</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Ailion</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Zwanziger</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_ZSNs2ut">J. Pharmac. exp. Z%er</title>
+		<imprint>
+			<biblScope unit="volume">164</biblScope>
+			<biblScope unit="page">122</biblScope>
+			<date type="published" when="1968"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b33">
+	<analytic>
+		<title xml:id="_fTaBG9S"/>
+		<author>
+			<persName>
+<forename type="first">E</forename>
+<surname>Bliss</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Ailion</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_G9n4tM6">J. Pbarmac. exp. Z%er</title>
+		<imprint>
+			<biblScope unit="volume">168</biblScope>
+			<biblScope unit="page">258</biblScope>
+			<date type="published" when="1969"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b34">
+	<analytic>
+		<title xml:id="_v6kShK2"/>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<forename type="middle">S</forename>
+<surname>Wjilch</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">B</forename>
+<forename type="middle">L</forename>
+<surname>Welch</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_E6cmRWT">Biochem. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">17</biblScope>
+			<biblScope unit="page">699</biblScope>
+			<date type="published" when="1968"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b35">
+	<analytic>
+		<title xml:id="_cTdrp7A"/>
+		<author>
+			<persName>
+<forename type="first">A</forename>
+<forename type="middle">M</forename>
+<surname>Thierry</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<surname>Fexetb</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<surname>Gld~insici</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_UUtqWPF">Euron J. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">4</biblScope>
+			<biblScope unit="page">384</biblScope>
+			<date type="published" when="1968"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b36">
+	<analytic>
+		<title xml:id="_3TBt3d7"/>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<forename type="middle">H</forename>
+<surname>Shbard-</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">G</forename>
+<forename type="middle">K</forename>
+<surname>Aohajanian</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_hgQNuhV">J. Ph&amp;na&lt; exp. Ther</title>
+		<imprint>
+			<biblScope unit="volume">163</biblScope>
+			<biblScope unit="page">425</biblScope>
+			<date type="published" when="1968"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b37">
+	<analytic>
+		<title xml:id="_m8gtnfe"/>
+		<author>
+			<persName>
+<forename type="first">N.-E</forename>
+<forename type="middle">K</forename>
+<surname>Anden</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">T</forename>
+<surname>Fuxe</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<surname>H~kfelt</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_N8KBcwe">J. Pharm. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">18</biblScope>
+			<biblScope unit="page">630</biblScope>
+			<date type="published" when="1966"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b38">
+	<analytic>
+		<title xml:id="_cWUAjrz"/>
+		<author>
+			<persName>
+<forename type="first">E</forename>
+<forename type="middle">L</forename>
+<surname>Way</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">.</forename>
+<forename type="middle">H</forename>
+<surname>L~h</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">F</forename>
+<surname>Shen</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_nkQhM8Q">S&amp;me</title>
+		<imprint>
+			<biblScope unit="volume">162</biblScope>
+			<biblScope unit="page">1292</biblScope>
+			<date type="published" when="1968"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b39">
+	<analytic>
+		<title xml:id="_4jnAHMq"/>
+		<author>
+			<persName>
+<forename type="first">J</forename>
+<forename type="middle">M</forename>
+<surname>Musacchio</surname>
+</persName>
+		</author>
+		<author>
+			<persName>
+<forename type="first">M</forename>
+<surname>Gommm</surname>
+</persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j" xml:id="_unmWjnk">Biochem. Pharmac</title>
+		<imprint>
+			<biblScope unit="volume">16</biblScope>
+			<biblScope unit="page">963</biblScope>
+			<date type="published" when="1967"/>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+				</listBibl>
+			</div>
+		</back>
+	</text>
+</TEI>
+</teiCorpus>

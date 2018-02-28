@@ -1,8 +1,10 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
+import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import org.apache.commons.io.FileUtils;
+import junit.framework.TestCase;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -12,9 +14,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
@@ -22,109 +25,134 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Achraf
  */
-public class TeiBuildIntegrationTest {
+public class TeiBuildIntegrationTest extends TestCase {
+
+
+    DocumentBuilder docBuilder;
+    XPath xPath;
+    TeiBuilder teiBuilder;
+    BiblioObject biblioObject;
+
+
+    public TeiBuildIntegrationTest() {
+        super();
+
+        try {
+            HarvestProperties.init("anhalytics.test.properties");
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            docFactory.setValidating(false);
+            //docFactory.setNamespaceAware(true);
+            docBuilder = docFactory.newDocumentBuilder();
+
+            xPath = XPathFactory.newInstance().newXPath();
+            xPath.setNamespaceContext(new MyNamespaceContext());
+
+            teiBuilder = new TeiBuilder();
+
+        } catch (Exception exp) {
+            System.err.println(exp.getMessage());
+            return;
+        }
+    }
+
+
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        biblioObject = new BiblioObject();
+    }
+
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        biblioObject = null;
+    }
 
     @Test
-    public void testMetadataAppend() throws Exception {
-//        try {
-//            HarvestProperties.init("anhalytics.test.properties");
-//        } catch (Exception exp) {
-//            System.err.println(exp.getMessage());
-//            return;
-//        }
-//
-//
-//        XPath xPath = XPathFactory.newInstance().newXPath();
-//        xPath.setNamespaceContext(new MyNamespaceContext());
-//
-//        File metadata = null, fullTextFile = null;
-//        try {
-//            metadata = new File(this.getResourceDir("src/test/resources/").getAbsoluteFile()
-//                    + "/hal-00576900.tei.xml");
-//            /*if (!metadata.exists()) {
-//            throw new Exception("Cannot start test, because test resource folder is not correctly set.");
-//        }*/
-//            fullTextFile = new File(this.getResourceDir("src/test/resources/").getAbsoluteFile()
-//                    + "/hal-00576900.fulltext.tei.xml");
-//            /*if (!fullTextFile.exists()) {
-//            throw new Exception("Cannot start test, because test resource folder is not correctly set.");
-//        }
-//             */
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        TeiBuilder teiBuilder = new TeiBuilder();
-//        Document corpusTei = teiBuilder.createTEICorpus(new FileInputStream(metadata));
-//        String corpusTeiString = Utilities.toString(corpusTei);
-//
-//        String result = Utilities.toString(teiBuilder.addGrobidTEIToTEICorpus(corpusTeiString, FileUtils.readFileToString(fullTextFile)));
-//        // some test here...
-//
-//        try {
-//            String expected = FileUtils.readFileToString(new File(this.getResourceDir("src/test/resources/").getAbsoluteFile()
-//                    + "/hal-00576900.corpus.tei.xml"), "UTF-8");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-//        docFactory.setValidating(false);
-//        //docFactory.setNamespaceAware(true);
-//        Document metadataDoc = null;
-//        DocumentBuilder docBuilder = null;
-//        try {
-//            docBuilder = docFactory.newDocumentBuilder();
-//            metadataDoc = docBuilder.parse(new FileInputStream(metadata));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        Document corpusDoc = null;
-//        try {
-//            docBuilder = docFactory.newDocumentBuilder();
-//            corpusDoc = docBuilder.parse(new ByteArrayInputStream(result.getBytes()));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        String titleHalTei = (String) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/title").evaluate(metadataDoc, XPathConstants.STRING);
-//        String titleResult = (String) xPath.compile("/teiCorpus/teiHeader/fileDesc/titleStmt/title").evaluate(corpusDoc, XPathConstants.STRING);
-//        assertEquals(titleResult.trim(), titleHalTei.trim());
-//
-//        try {
-//            metadata = new File(this.getResourceDir("src/test/resources/").getAbsoluteFile()
-//                    + "/inria-00510267.tei.xml");
-//            fullTextFile = new File(this.getResourceDir("src/test/resources/").getAbsoluteFile()
-//                    + "/inria-00510267.fulltext.tei.xml");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        corpusTei = teiBuilder.createTEICorpus(new FileInputStream(metadata));
-//        String corpusTeiStream1 = (Utilities.toString(corpusTei));
-//        result = Utilities.toString(teiBuilder.addGrobidTEIToTEICorpus(corpusTeiStream1, FileUtils.readFileToString(fullTextFile)));
-//
-//        try {
-//            docBuilder = docFactory.newDocumentBuilder();
-//            metadataDoc = docBuilder.parse(new FileInputStream(metadata));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            docBuilder = docFactory.newDocumentBuilder();
-//            corpusDoc = docBuilder.parse(new ByteArrayInputStream(result.getBytes()));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        String expected;
-//        try {
-//            expected = FileUtils.readFileToString(new File(this.getResourceDir("src/test/resources/").getAbsoluteFile()
-//                    + "/inria-00510267.corpus.tei.xml"), "UTF-8");
-//            //assertXpathExists("/TEI[1]/teiHeader[1]", expected);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        titleResult = (String) xPath.compile("/TEI/text/body/listBibl/biblFull/titleStmt/title").evaluate(metadataDoc, XPathConstants.STRING);
-//        titleHalTei = (String) xPath.compile("/teiCorpus/teiHeader/fileDesc/titleStmt/title").evaluate(corpusDoc, XPathConstants.STRING);
-//        assertEquals(titleResult.trim(), titleHalTei.trim());
+    public void testTransformBuildCorpusTeiHal() throws Exception {
+
+        InputStream metadataTeiStream = null, baseCorpusTeiStream = null, grobidTeiStream = null;
+        String metadataTeiStr, grobidTeiStr;
+
+        Document corpusTeiDoc, expectedCorpusTeiDoc = null;
+
+        //HAL example
+        HarvestProperties.setSource("hal");
+        metadataTeiStream = new FileInputStream(this.getResourceDir("src/test/resources/").getAbsoluteFile()
+                + "/5a7c4c00b64afc92264bd313.hal.tei.xml");
+        metadataTeiStr = IOUtils.toString(metadataTeiStream, "UTF-8");
+        metadataTeiStream.close();
+
+        baseCorpusTeiStream = new FileInputStream(this.getResourceDir("src/test/resources/").getAbsoluteFile()
+                + "/5a7c4c00b64afc92264bd313.hal.corpus.tei.xml");
+        expectedCorpusTeiDoc = docBuilder.parse(baseCorpusTeiStream);
+        baseCorpusTeiStream.close();
+
+        biblioObject.setMetadata(metadataTeiStr);
+
+        corpusTeiDoc = teiBuilder.createTEICorpus(biblioObject);
+
+        String titleHalTei = (String) xPath.compile("/teiCorpus/teiHeader[@id=\"hal\"]/fileDesc/titleStmt/title").evaluate(corpusTeiDoc, XPathConstants.STRING);
+        String titleResult = (String) xPath.compile("/teiCorpus/teiHeader[@id=\"hal\"]/fileDesc/titleStmt/title").evaluate(expectedCorpusTeiDoc, XPathConstants.STRING);
+        assertEquals(titleResult.trim(), titleHalTei.trim());
+
+        //other asserts..
+
+        grobidTeiStream = new FileInputStream(this.getResourceDir("src/test/resources/").getAbsoluteFile()
+                + "/5a7c4c00b64afc92264bd313.hal.grobid.tei.xml");
+        grobidTeiStr = IOUtils.toString(grobidTeiStream, "UTF-8");
+        grobidTeiStream.close();
+
+        corpusTeiDoc = teiBuilder.addGrobidTEIToTEICorpus(Utilities.toString(corpusTeiDoc),grobidTeiStr);
+        String titleGrobidCorpusTei = (String) xPath.compile("/TEI[@id=\"grobid\"]/teiHeader/fileDesc/titleStmt/title").evaluate(corpusTeiDoc, XPathConstants.STRING);
+        String expectedGrobidTitleResult = (String) xPath.compile("/TEI[@id=\"grobid\"]/teiHeader/fileDesc/titleStmt/title").evaluate(expectedCorpusTeiDoc, XPathConstants.STRING);
+        assertEquals(titleGrobidCorpusTei.trim(), expectedGrobidTitleResult.trim());
+
+
+    }
+
+    @Test
+    public void testTransformBuildCorpusTeiIstex() throws Exception {
+
+        InputStream metadataTeiStream = null, baseCorpusTeiStream = null, grobidTeiStream = null;
+        String metadataTeiStr , grobidTeiStr;
+
+        Document corpusTeiDoc, expectedCorpusTeiDoc = null;
+
+        //ISTEX example
+        HarvestProperties.setSource("istex");
+        metadataTeiStream = new FileInputStream(this.getResourceDir("src/test/resources/").getAbsoluteFile()
+                + "/5a87113db64a8b35ae8e6916.istex.tei.xml");
+        metadataTeiStr = IOUtils.toString(metadataTeiStream, "UTF-8");
+        metadataTeiStream.close();
+
+        baseCorpusTeiStream = new FileInputStream(this.getResourceDir("src/test/resources/").getAbsoluteFile()
+                + "/5a87113db64a8b35ae8e6916.istex.corpus.tei.xml");
+        expectedCorpusTeiDoc = docBuilder.parse(baseCorpusTeiStream);
+        baseCorpusTeiStream.close();
+
+        biblioObject.setDomains(Arrays.asList("1 - science", "2 - pharmacology & pharmacy"));
+        biblioObject.setMetadata(metadataTeiStr);
+
+        corpusTeiDoc = teiBuilder.createTEICorpus(biblioObject);
+
+        String titleCorpusTei = (String) xPath.compile("/teiCorpus/teiHeader[@id=\"istex\"]/fileDesc/titleStmt/title").evaluate(corpusTeiDoc, XPathConstants.STRING);
+        String expectedTitleResult = (String) xPath.compile("/teiCorpus/teiHeader[@id=\"istex\"]/fileDesc/titleStmt/title").evaluate(expectedCorpusTeiDoc, XPathConstants.STRING);
+        assertEquals(titleCorpusTei.trim(), expectedTitleResult.trim());
+
+        String expectedSubjectDomains = (String) xPath.compile("/teiCorpus/teiHeader[@id=\"istex\"]/profileDesc/textClass/classCode[@scheme=\"domain\"]").evaluate(expectedCorpusTeiDoc, XPathConstants.STRING);
+        assertEquals("science.pharmacology & pharmacy", expectedSubjectDomains);//this should improved
+
+
+        grobidTeiStream = new FileInputStream(this.getResourceDir("src/test/resources/").getAbsoluteFile()
+                + "/5a87113db64a8b35ae8e6916.istex.grobid.tei.xml");
+        grobidTeiStr = IOUtils.toString(grobidTeiStream, "UTF-8");
+        grobidTeiStream.close();
+
+        corpusTeiDoc = teiBuilder.addGrobidTEIToTEICorpus(Utilities.toString(corpusTeiDoc),grobidTeiStr);
+        String titleGrobidCorpusTei = (String) xPath.compile("/TEI[@id=\"grobid\"]/teiHeader/fileDesc/titleStmt/title").evaluate(corpusTeiDoc, XPathConstants.STRING);
+        String expectedGrobidTitleResult = (String) xPath.compile("/TEI[@id=\"grobid\"]/teiHeader/fileDesc/titleStmt/title").evaluate(expectedCorpusTeiDoc, XPathConstants.STRING);
+        assertEquals(titleGrobidCorpusTei.trim(), expectedGrobidTitleResult.trim());
+        // some test here...
     }
 
     /*

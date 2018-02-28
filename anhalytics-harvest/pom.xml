@@ -90,9 +90,9 @@
                     <argLine>-Xms256m -Xmx1024m</argLine>
                     <testFailureIgnore>false</testFailureIgnore>
                     <skip>false</skip>
-                    <excludes>
-                        <exclude>**/*IntegrationTest.java</exclude>
-                    </excludes>
+                    <!--<excludes>-->
+                        <!--<exclude>**/*IntegrationTest.java</exclude>-->
+                    <!--</excludes>-->
                 </configuration>
             </plugin>
             

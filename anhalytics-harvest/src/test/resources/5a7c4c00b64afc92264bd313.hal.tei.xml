@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:hal="http://hal.archives-ouvertes.fr/">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>HAL TEI export of hal-00643787</title>
+      </titleStmt>
+      <publicationStmt>
+        <distributor>CCSD</distributor>
+        <availability status="restricted">
+          <licence target="http://creativecommons.org/licenses/by/4.0/">Distributed under a Creative Commons Attribution 4.0 International License</licence>
+        </availability>
+        <date when="2018-02-04T18:35:48+01:00"/>
+      </publicationStmt>
+      <sourceDesc>
+        <p part="N">HAL API platform</p>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text>
+    <body>
+      <listBibl>
+        <biblFull>
+          <titleStmt>
+            <title xml:lang="en">Discriminant analyses of peanut allergy severity scores</title>
+            <author role="aut">
+              <persName>
+                <forename type="first">Olivier</forename>
+                <surname>Collignon</surname>
+              </persName>
+              <idno type="halauthorid">229939</idno>
+              <affiliation ref="#struct-23"/>
+              <affiliation ref="#struct-92816"/>
+              <affiliation ref="#struct-388679"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">Jean-Marie</forename>
+                <surname>Monnez</surname>
+              </persName>
+              <idno type="halauthorid">229944</idno>
+              <affiliation ref="#struct-23"/>
+              <affiliation ref="#struct-107891"/>
+              <affiliation ref="#struct-388679"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">Pierre</forename>
+                <surname>Vallois</surname>
+              </persName>
+              <idno type="halauthorid">85961</idno>
+              <affiliation ref="#struct-23"/>
+              <affiliation ref="#struct-107891"/>
+              <affiliation ref="#struct-388679"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">F.</forename>
+                <surname>Codreanu</surname>
+              </persName>
+              <idno type="halauthorid">662631</idno>
+              <affiliation ref="#struct-195704"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">J.-M.</forename>
+                <surname>Renaudin</surname>
+              </persName>
+              <idno type="halauthorid">662632</idno>
+              <affiliation ref="#struct-92816"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">Gisèle</forename>
+                <surname>Kanny</surname>
+              </persName>
+              <idno type="halauthorid">307649</idno>
+              <affiliation ref="#struct-195704"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">Marie</forename>
+                <surname>Brulliard</surname>
+              </persName>
+              <idno type="halauthorid">229937</idno>
+              <affiliation ref="#struct-92816"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">Bernard</forename>
+                <surname>Bihain</surname>
+              </persName>
+              <idno type="halauthorid">211349</idno>
+              <affiliation ref="#struct-92816"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">Sandrine</forename>
+                <surname>Jacquenet</surname>
+              </persName>
+              <idno type="halauthorid">119491</idno>
+              <affiliation ref="#struct-92816"/>
+            </author>
+            <author role="aut">
+              <persName>
+                <forename type="first">Denise-Anne</forename>
+                <surname>Moneret-Vautrin</surname>
+              </persName>
+              <idno type="halauthorid">307650</idno>
+              <affiliation ref="#struct-195704"/>
+            </author>
+            <editor role="depositor">
+              <persName>
+                <forename>Jean-Marie</forename>
+                <surname>Monnez</surname>
+              </persName>
+              <email type="md5">f27220241ddabf09fbabc6b3ddce1a30</email>
+              <email type="domain">univ-lorraine.fr</email>
+            </editor>
+          </titleStmt>
+          <editionStmt>
+            <edition n="v1" type="current">
+              <date type="whenSubmitted">2011-11-24 20:12:29</date>
+              <date type="whenWritten">2010</date>
+              <date type="whenModified">2018-01-11 06:26:22</date>
+              <date type="whenReleased">2011-11-24 22:15:11</date>
+              <date type="whenProduced">2011</date>
+              <date type="whenEndEmbargoed">2011-11-24</date>
+              <ref target="https://hal.archives-ouvertes.fr/hal-00643787/document" type="file">
+                <date notBefore="2011-11-24"/>
+              </ref>
+              <ref n="1" subtype="author" target="https://hal.archives-ouvertes.fr/hal-00643787/file/ARTICLE.ARACHIDE.prA_publi_IECN.10.pdf" type="file">
+                <date notBefore="2011-11-24"/>
+              </ref>
+            </edition>
+            <respStmt>
+              <resp>contributor</resp>
+              <name key="112963">
+                <persName>
+                  <forename>Jean-Marie</forename>
+                  <surname>Monnez</surname>
+                </persName>
+                <email type="md5">f27220241ddabf09fbabc6b3ddce1a30</email>
+                <email type="domain">univ-lorraine.fr</email>
+              </name>
+            </respStmt>
+          </editionStmt>
+          <publicationStmt>
+            <distributor>CCSD</distributor>
+            <idno type="halId">hal-00643787</idno>
+            <idno type="halUri">https://hal.archives-ouvertes.fr/hal-00643787</idno>
+            <idno type="halBibtex">collignon:hal-00643787</idno>
+            <idno type="halRefHtml">&lt;i&gt;Journal of Applied Statistics&lt;/i&gt;, Taylor &amp; Francis (Routledge), 2011, 38 (9), pp.1783-1799. &lt;a target="_blank" href="http://dx.doi.org/10.1080/02664763.2010.529878"&gt;&amp;#x3008;10.1080/02664763.2010.529878&amp;#x3009;&lt;/a&gt;</idno>
+            <idno type="halRef">Journal of Applied Statistics, Taylor &amp; Francis (Routledge), 2011, 38 (9), pp.1783-1799. &amp;#x3008;10.1080/02664763.2010.529878&amp;#x3009;</idno>
+          </publicationStmt>
+          <seriesStmt>
+            <idno n="CNRS" type="stamp">CNRS - Centre national de la recherche scientifique</idno>
+            <idno n="INRIA" type="stamp">INRIA - Institut National de Recherche en Informatique et en Automatique</idno>
+            <idno n="IECN" type="stamp">IECL - Institut Elie Cartan de Lorraine</idno>
+            <idno n="INSMI" type="stamp">CNRS-INSMI - INstitut des Sciences Mathématiques et de leurs Interactions</idno>
+            <idno n="INRIA-NANCY-GRAND-EST" type="stamp">INRIA Nancy - Grand Est</idno>
+            <idno n="INRIA-LORRAINE" type="stamp">INRIA Nancy - Grand Est</idno>
+            <idno n="INPL" type="stamp">Institut National Polytechnique de Lorraine</idno>
+            <idno n="INRIA2" type="stamp">INRIA 2</idno>
+            <idno n="UNIV-LORRAINE" type="stamp">Université de Lorraine</idno>
+          </seriesStmt>
+          <notesStmt>
+            <note n="2" type="audience">International</note>
+            <note n="0" type="popular">No</note>
+            <note n="1" type="peer">Yes</note>
+          </notesStmt>
+          <sourceDesc>
+            <biblStruct>
+              <analytic>
+                <title xml:lang="en">Discriminant analyses of peanut allergy severity scores</title>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">Olivier</forename>
+                    <surname>Collignon</surname>
+                  </persName>
+                  <idno type="halauthorid">229939</idno>
+                  <affiliation ref="#struct-23"/>
+                  <affiliation ref="#struct-92816"/>
+                  <affiliation ref="#struct-388679"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">Jean-Marie</forename>
+                    <surname>Monnez</surname>
+                  </persName>
+                  <idno type="halauthorid">229944</idno>
+                  <affiliation ref="#struct-23"/>
+                  <affiliation ref="#struct-107891"/>
+                  <affiliation ref="#struct-388679"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">Pierre</forename>
+                    <surname>Vallois</surname>
+                  </persName>
+                  <idno type="halauthorid">85961</idno>
+                  <affiliation ref="#struct-23"/>
+                  <affiliation ref="#struct-107891"/>
+                  <affiliation ref="#struct-388679"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">F.</forename>
+                    <surname>Codreanu</surname>
+                  </persName>
+                  <idno type="halauthorid">662631</idno>
+                  <affiliation ref="#struct-195704"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">J.-M.</forename>
+                    <surname>Renaudin</surname>
+                  </persName>
+                  <idno type="halauthorid">662632</idno>
+                  <affiliation ref="#struct-92816"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">Gisèle</forename>
+                    <surname>Kanny</surname>
+                  </persName>
+                  <idno type="halauthorid">307649</idno>
+                  <affiliation ref="#struct-195704"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">Marie</forename>
+                    <surname>Brulliard</surname>
+                  </persName>
+                  <idno type="halauthorid">229937</idno>
+                  <affiliation ref="#struct-92816"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">Bernard</forename>
+                    <surname>Bihain</surname>
+                  </persName>
+                  <idno type="halauthorid">211349</idno>
+                  <affiliation ref="#struct-92816"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">Sandrine</forename>
+                    <surname>Jacquenet</surname>
+                  </persName>
+                  <idno type="halauthorid">119491</idno>
+                  <affiliation ref="#struct-92816"/>
+                </author>
+                <author role="aut">
+                  <persName>
+                    <forename type="first">Denise-Anne</forename>
+                    <surname>Moneret-Vautrin</surname>
+                  </persName>
+                  <idno type="halauthorid">307650</idno>
+                  <affiliation ref="#struct-195704"/>
+                </author>
+              </analytic>
+              <monogr>
+                <idno status="VALID" type="halJournalId">10987</idno>
+                <idno type="issn">0266-4763</idno>
+                <idno type="eissn">1360-0532</idno>
+                <title level="j">Journal of Applied Statistics</title>
+                <imprint>
+                  <publisher>Taylor &amp; Francis (Routledge)</publisher>
+                  <biblScope unit="volume">38</biblScope>
+                  <biblScope unit="issue">9</biblScope>
+                  <biblScope unit="pp">1783-1799</biblScope>
+                  <date type="datePub">2011</date>
+                </imprint>
+              </monogr>
+              <idno type="doi">10.1080/02664763.2010.529878</idno>
+            </biblStruct>
+          </sourceDesc>
+          <profileDesc>
+            <langUsage>
+              <language ident="en">English</language>
+            </langUsage>
+            <textClass>
+              <keywords scheme="author">
+                <term xml:lang="en">variable selection</term>
+                <term xml:lang="en">classification</term>
+                <term xml:lang="en">DBPCFC</term>
+                <term xml:lang="en">multiple factorial analysis</term>
+                <term xml:lang="en">discriminant analysis</term>
+                <term xml:lang="en">peanut allergy</term>
+              </keywords>
+              <classCode n="math.math-st" scheme="halDomain">Mathematics [math]/Statistics [math.ST]</classCode>
+              <classCode n="stat.th" scheme="halDomain">Statistics [stat]/Statistics Theory [stat.TH]</classCode>
+              <classCode n="ART" scheme="halTypology">Journal articles</classCode>
+            </textClass>
+            <abstract xml:lang="en">Peanut allergy is one of the most prevalent food allergies. The possibility of a lethal accidental exposure and the persistence of the disease make it a public health problem. Evaluating the intensity of symptoms is accomplished with a double blind placebo controlled food challenge (DBPCFC), which scores the severity of reactions and measures the dose of peanut that elicits the rst reaction. Since DBPCFC can result in life-threatening responses, we propose an alternate procedure with the long term goal of replacing invasive allergy tests. Discriminant analyses of DBPCFC score, the eliciting dose and the rst accidental exposure score were performed in 76 allergic patients using 6 immunoassays and 28 skin prick tests. A Multiple Factorial Analysis was performed to assign equal weights to both groups of variables and predictive models were built by cross-validation with LDA, k-NN, CART, penalized SVM, stepwise logistic regression and AdaBoost methods. We developed an algorithm for simultaneously clustering eliciting dose values and selecting discriminant variables. Our main conclusion is that antibody measurements o er information on the allergy severity, especially those directed against rAra-h1 and rAra-h3. Further independent validation of these results and the use of new predictors will help extend this study to clinical practices.</abstract>
+            <particDesc>
+              <org type="consortium">BIGS</org>
+            </particDesc>
+          </profileDesc>
+        </biblFull>
+      </listBibl>
+    </body>
+    <back>
+      <listOrg type="structures">
+        <org status="OLD" type="laboratory" xml:id="struct-23">
+          <orgName>Institut Élie Cartan de Nancy</orgName>
+          <orgName type="acronym">IECN</orgName>
+          <date type="end">2012-12-31</date>
+          <desc>
+            <address>
+              <addrLine>Université Henri Poincaré, Campus Scientifique, boulevard des Aiguillettes, 54000 Vandoeuvre-les-Nancy</addrLine>
+              <country key="FR"/>
+            </address>
+            <ref type="url">http://www.iecn.u-nancy.fr/</ref>
+          </desc>
+          <listRelation>
+            <relation active="#struct-300009" type="direct"/>
+            <relation active="#struct-300291" type="direct"/>
+            <relation active="#struct-300292" type="direct"/>
+            <relation active="#struct-300293" type="direct"/>
+            <relation active="#struct-441569" name="UMR7502" type="direct"/>
+          </listRelation>
+        </org>
+        <org status="VALID" type="laboratory" xml:id="struct-92816">
+          <orgName>Genclis SAS</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+          <listRelation>
+            <relation active="#struct-301382" type="direct"/>
+          </listRelation>
+        </org>
+        <org status="VALID" type="researchteam" xml:id="struct-388679">
+          <orgName>Probabilités et statistiques</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+            <ref type="url">http://iecl.univ-lorraine.fr/equipesIECL_probstat.html</ref>
+          </desc>
+          <listRelation>
+            <relation active="#struct-211251" type="direct"/>
+            <relation active="#struct-413289" type="indirect"/>
+            <relation active="#struct-441569" name="UMR7502" type="indirect"/>
+          </listRelation>
+        </org>
+        <org status="OLD" type="researchteam" xml:id="struct-107891">
+          <idno type="RNSR">200920955T</idno>
+          <orgName>Biology, genetics and statistics</orgName>
+          <orgName type="acronym">BIGS</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+            <ref type="url">http://www.inria.fr/equipes/bigs</ref>
+          </desc>
+          <listRelation>
+            <relation active="#struct-23" type="direct"/>
+            <relation active="#struct-300009" type="indirect"/>
+            <relation active="#struct-300291" type="indirect"/>
+            <relation active="#struct-300292" type="indirect"/>
+            <relation active="#struct-300293" type="indirect"/>
+            <relation active="#struct-441569" name="UMR7502" type="indirect"/>
+            <relation active="#struct-2496" type="direct"/>
+          </listRelation>
+        </org>
+        <org status="INCOMING" type="laboratory" xml:id="struct-195704">
+          <orgName>Service d'Allergologie [Nancy]</orgName>
+          <desc>
+            <address>
+              <addrLine>29, av Maréchal de Lattre de Tassigny, 54000 Nancy</addrLine>
+              <country key="FR"/>
+            </address>
+          </desc>
+          <listRelation>
+            <relation active="#struct-306005" type="direct"/>
+          </listRelation>
+        </org>
+        <org status="VALID" type="institution" xml:id="struct-300009">
+          <orgName>Institut National de Recherche en Informatique et en Automatique</orgName>
+          <orgName type="acronym">Inria</orgName>
+          <desc>
+            <address>
+              <addrLine>Domaine de VoluceauRocquencourt - BP 10578153 Le Chesnay Cedex</addrLine>
+              <country key="FR"/>
+            </address>
+            <ref type="url">http://www.inria.fr/en/</ref>
+          </desc>
+        </org>
+        <org status="OLD" type="institution" xml:id="struct-300291">
+          <orgName>Université Henri Poincaré - Nancy 1</orgName>
+          <orgName type="acronym">UHP</orgName>
+          <date type="end">2011-12-31</date>
+          <desc>
+            <address>
+              <addrLine>24-30 rue Lionnois, BP 60120, 54 003 NANCY cedex, France</addrLine>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org status="OLD" type="institution" xml:id="struct-300292">
+          <orgName>Université Nancy 2</orgName>
+          <date type="end">2011-12-31</date>
+          <desc>
+            <address>
+              <addrLine>91 avenue de la Libération, BP 454, 54001 Nancy cedex</addrLine>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org status="OLD" type="institution" xml:id="struct-300293">
+          <orgName>Institut National Polytechnique de Lorraine</orgName>
+          <orgName type="acronym">INPL</orgName>
+          <date type="end">2011-12-31</date>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org status="VALID" type="institution" xml:id="struct-441569">
+          <idno type="IdRef">02636817X</idno>
+          <idno type="ISNI">0000000122597504</idno>
+          <orgName>Centre National de la Recherche Scientifique</orgName>
+          <orgName type="acronym">CNRS</orgName>
+          <date type="start">1939-10-19</date>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+            <ref type="url">http://www.cnrs.fr/</ref>
+          </desc>
+        </org>
+        <org status="VALID" type="institution" xml:id="struct-301382">
+          <orgName>Genclis SAS</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+        <org status="VALID" type="laboratory" xml:id="struct-211251">
+          <idno type="IdRef">180064606</idno>
+          <idno type="RNSR">199712570F</idno>
+          <idno type="IdUnivLorraine">[UL]RSB--</idno>
+          <orgName>Institut Élie Cartan de Lorraine</orgName>
+          <orgName type="acronym">IECL</orgName>
+          <date type="start">2012-01-01</date>
+          <desc>
+            <address>
+              <addrLine>Université de Lorraine, Boulevard des Aiguillettes BP 70239 54506 Vandoeuvre-les-Nancy CedexIle du Saulcy - 57 045 Metz Cedex 01</addrLine>
+              <country key="FR"/>
+            </address>
+            <ref type="url">http://iecl.univ-lorraine.fr/</ref>
+          </desc>
+          <listRelation>
+            <relation active="#struct-413289" type="direct"/>
+            <relation active="#struct-441569" name="UMR7502" type="direct"/>
+          </listRelation>
+        </org>
+        <org status="VALID" type="institution" xml:id="struct-413289">
+          <idno type="IdRef">157040569</idno>
+          <idno type="IdUnivLorraine">[UL]100--</idno>
+          <orgName>Université de Lorraine</orgName>
+          <orgName type="acronym">UL</orgName>
+          <date type="start">2012-01-01</date>
+          <desc>
+            <address>
+              <addrLine>34 cours Léopold - CS 25233 - 54052 Nancy cedex</addrLine>
+              <country key="FR"/>
+            </address>
+            <ref type="url">http://www.univ-lorraine.fr/</ref>
+          </desc>
+        </org>
+        <org status="OLD" type="laboratory" xml:id="struct-2496">
+          <orgName>INRIA Lorraine</orgName>
+          <desc>
+            <address>
+              <addrLine>615 rue du Jardin Botanique 54600 Villers-lès-Nancy</addrLine>
+              <country key="FR"/>
+            </address>
+            <ref type="url">http://www.inria.fr/centre-de-recherche-inria/nancy-grand-est</ref>
+          </desc>
+          <listRelation>
+            <relation active="#struct-300009" type="direct"/>
+          </listRelation>
+        </org>
+        <org status="INCOMING" type="institution" xml:id="struct-306005">
+          <orgName>Centre hospitalier Universitaire</orgName>
+          <desc>
+            <address>
+              <country key="FR"/>
+            </address>
+          </desc>
+        </org>
+      </listOrg>
+    </back>
+  </text>
+</TEI>
