@@ -36,6 +36,7 @@ public class IstexTEIConverter implements MetadataConverter {
             updatePublicationDate(metadata);
             NodeList affs = (NodeList) xPath.compile("/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/analytic/author/affiliation").evaluate(metadata, XPathConstants.NODESET);
             parseAffiliationString(metadata, affs);
+
             addDomains(metadata, biblio);
             teiHeader = (Element) newTEIcorpus.importNode(teiHeader, true);
         } catch (XPathExpressionException e) {
@@ -178,58 +179,62 @@ public class IstexTEIConverter implements MetadataConverter {
             XPath xPath = XPathFactory.newInstance().newXPath();
             List<TreeMap<Integer, String>> domains_hierarchies = new ArrayList<TreeMap<Integer, String>>();
             TreeMap<Integer, String> domains_hierarchy = new TreeMap<Integer, String>();
-            Element profileDesc = (Element) xPath.compile("/TEI/teiHeader/profileDesc").evaluate(newTEICorpus, XPathConstants.NODE);
-            for (int i = 0; i <= biblioObj.getDomains().size() - 1;i++) {
-                String domain = biblioObj.getDomains().get(i);
+            if(biblioObj.getDomains() != null) {
+                for (int i = 0; i <= biblioObj.getDomains().size() - 1; i++) {
+                    String domain = biblioObj.getDomains().get(i);
 
-                String[] domain_parts = domain.split(" - ");
-                int key = Integer.parseInt(domain_parts[0]);
-                String domainStr = domain_parts[1];
+                    String[] domain_parts = domain.split(" - ");
+                    int key = Integer.parseInt(domain_parts[0]);
+                    String domainStr = domain_parts[1];
 
-                if(domains_hierarchy.containsKey(key)){
-                    //here we suppose beginning first key would be 1
-                    if( key > 1 ){
-                        domains_hierarchies.add(domains_hierarchy);
-                        domains_hierarchy = (TreeMap)domains_hierarchy.clone();
-                        int j = domains_hierarchy.lastKey();
-                        while(j >= key) {
-                            domains_hierarchy.remove(j);
-                            j--;
+                    if (domains_hierarchy.containsKey(key)) {
+                        //here we suppose beginning first key would be 1
+                        if (key > 1) {
+                            domains_hierarchies.add(domains_hierarchy);
+                            domains_hierarchy = (TreeMap) domains_hierarchy.clone();
+                            int j = domains_hierarchy.lastKey();
+                            while (j >= key) {
+                                domains_hierarchy.remove(j);
+                                j--;
+                            }
+                            domains_hierarchy.put(key, domainStr);
+                        } else if (key == 1) {
+                            domains_hierarchies.add(domains_hierarchy);
+                            domains_hierarchy = new TreeMap<Integer, String>();
+                            domains_hierarchy.put(key, domainStr);
                         }
+                    } else
                         domains_hierarchy.put(key, domainStr);
-                    } else if( key == 1 ){
+
+                    if (i == biblioObj.getDomains().size() - 1)
                         domains_hierarchies.add(domains_hierarchy);
-                        domains_hierarchy = new TreeMap<Integer, String>();
-                        domains_hierarchy.put(key, domainStr);
-                    }
-                } else
-                    domains_hierarchy.put(key, domainStr);
-
-                if(i == biblioObj.getDomains().size() - 1)
-                    domains_hierarchies.add(domains_hierarchy);
 
 
-            }
-
-            if(domains_hierarchies.size() >= 1) {
-                Element textClass = newTEICorpus.createElement("textClass");
-                for(TreeMap<Integer, String> domain : domains_hierarchies) {
-                    String taxonomy = "";
-                    Element classCode = newTEICorpus.createElement("classCode");
-                    classCode.setAttribute("scheme", "domain");
-                    for(int o = 1; o <= domain.size();o++) {
-                        if(o == 1)
-                            taxonomy += domain.get(o);
-                        else
-                            taxonomy += "." + domain.get(o);
-                    }
-                    classCode.setAttribute("n", taxonomy);
-                    classCode.setTextContent(taxonomy);
-                    textClass.appendChild(classCode);
                 }
-                profileDesc.appendChild(textClass);
-            }
 
+                if (domains_hierarchies.size() >= 1) {
+
+                    Element profileDesc = (Element) xPath.compile("/TEI/teiHeader/profileDesc").evaluate(newTEICorpus, XPathConstants.NODE);
+                    Element textClass = profileDesc.getElementsByTagName("textClass").item(0).getNodeType() == Node.ELEMENT_NODE ? (Element)profileDesc.getElementsByTagName("textClass").item(0):null;
+                    if(textClass == null)
+                        textClass = newTEICorpus.createElement("textClass");
+                    for (TreeMap<Integer, String> domain : domains_hierarchies) {
+                        String taxonomy = "";
+                        Element classCode = newTEICorpus.createElement("classCode");
+                        classCode.setAttribute("scheme", "domain");
+                        for (int o = 1; o <= domain.size(); o++) {
+                            if (o == 1)
+                                taxonomy += domain.get(o);
+                            else
+                                taxonomy += "." + domain.get(o);
+                        }
+                        classCode.setAttribute("n", taxonomy);
+                        classCode.setTextContent(taxonomy);
+                        textClass.appendChild(classCode);
+                    }
+                    profileDesc.appendChild(textClass);
+                }
+            }
         } catch (XPathExpressionException e) {
             e.printStackTrace();
         }

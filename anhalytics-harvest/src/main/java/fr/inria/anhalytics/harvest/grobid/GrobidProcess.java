@@ -3,6 +3,7 @@ package fr.inria.anhalytics.harvest.grobid;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.commons.data.Processings;
+import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.harvest.exceptions.UnreachableGrobidServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
@@ -69,6 +70,9 @@ public class GrobidProcess {
                             } catch (ParserConfigurationException exp) {
                                 logger.error("An error occured while processing the file " + bf.getRepositoryDocId()
                                         + ". Continuing the process for the other files" + exp.getMessage());
+                            } catch (DataException dataexp) {
+                                logger.error("Can't get the fulltext PDF for " + bf.getRepositoryDocId()
+                                        + ". error : " + dataexp.getMessage());
                             }
 //                        }
                     }

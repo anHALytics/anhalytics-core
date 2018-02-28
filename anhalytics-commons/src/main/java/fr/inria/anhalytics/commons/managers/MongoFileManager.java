@@ -225,11 +225,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     }
 
-    public InputStream getFulltext(BiblioObject biblioObject) {
+    public InputStream getFulltext(BiblioObject biblioObject) throws DataException {
         return getFulltextByAnhalyticsId(biblioObject.getAnhalyticsId());
     }
     
-    public InputStream getFulltextByAnhalyticsId(String anhalyticsId) {
+    public InputStream getFulltextByAnhalyticsId(String anhalyticsId) throws DataException {
         try {
             GridFS gfs = new GridFS(db, BINARIES);
             BasicDBObject whereQuery = new BasicDBObject();
