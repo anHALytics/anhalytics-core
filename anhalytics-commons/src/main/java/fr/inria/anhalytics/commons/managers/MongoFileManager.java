@@ -109,6 +109,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             bdbo.append("source", source);
         }
         cursor = collection.find(bdbo);
+        cursor.addOption(com.mongodb.Bytes.QUERYOPTION_NOTIMEOUT);
         indexFile = 0;
         logger.info(cursor.size() + " objects found.");
         if (cursor.size() > 0) {
