@@ -382,7 +382,7 @@ public class IndexingPreprocess {
                     }
                     JsonNode arrayNode = mapper.createArrayNode();
                     ((ArrayNode) arrayNode).add(typeNode);
-                    System.out.println(typeNode.toString());
+                    //System.out.println(typeNode.toString());
                     ((ObjectNode) subJson).put("$date", arrayNode); // update value
                     return subJson;
                 } else if ((theTypeNode == null) && (theDateNode != null)) {
