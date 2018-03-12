@@ -1380,19 +1380,23 @@
                                                                         "properties": {
                                                                             "$unit_serie": {
                                                                                 "index": "not_analyzed",
-                                                                                "type": "string"
+                                                                                "type": "string",
+                                                                                "store": "yes"
                                                                             },
                                                                             "$unit_volume": {
                                                                                 "index": "not_analyzed",
-                                                                                "type": "string"
+                                                                                "type": "string",
+                                                                                "store": "yes"
                                                                             },
                                                                             "$unit_issue": {
                                                                                 "index": "not_analyzed",
-                                                                                "type": "string"
+                                                                                "type": "string",
+                                                                                "store": "yes"
                                                                             },
                                                                             "$unit_pp": {
                                                                                 "index": "not_analyzed",
-                                                                                "type": "string"
+                                                                                "type": "string",
+                                                                                "store": "yes"
                                                                             }
                                                                         }
                                                                     },
@@ -1415,7 +1419,8 @@
                                                                     },
                                                                     "$publisher": {
                                                                         "index": "not_analyzed",
-                                                                        "type": "string"
+                                                                        "type": "string",
+                                                                        "store": "yes"
                                                                     },
                                                                     "type": {
                                                                         "index": "not_analyzed",
@@ -1619,6 +1624,12 @@
                                                     "$lang_de": {
                                                         "type": "text",
                                                         "analyzer": "german",
+                                                        "store": "yes",
+                                                        "term_vector": "with_positions_offsets"
+                                                    }
+                                                ,"$lang_unknown": {
+                                                        "type": "text",
+                                                        "analyzer": "english",
                                                         "store": "yes",
                                                         "term_vector": "with_positions_offsets"
                                                     }
