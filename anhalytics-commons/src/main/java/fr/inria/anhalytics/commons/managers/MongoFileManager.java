@@ -143,23 +143,19 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         newDocument.put("isProcessedPub2TEI", biblioObject.getIsProcessedByPub2TEI());
         newDocument.put("isMined", biblioObject.getIsMined());
         newDocument.put("isIndexed", biblioObject.getIsIndexed());
+
         for (Processings p : Processings.values()) {
-            if(temp.get(p.getName()) != null) {
-                newDocument.put(p.getName(), temp.get(p.getName()));
+            if(processing != null && p.equals(processing)){
+                newDocument.put(processing.getName(), true);
+            } else if(temp.get(p.getName()) != null) {
+                //here should be handled the workflow (when for instance when text xml:ids change (new grobid tei is generated or tei corpus))
+//                if(resetStatus)
+//                    newDocument.put(p.getName(), false);
+//                else
+                    newDocument.put(p.getName(), temp.get(p.getName()));
             }
         }
-        //here should be handled the workflow (when for instance when text xml:ids change (new grobid tei is generated or tei corpus))
 
-
-        if (processing != null) {
-            newDocument.put(processing.getName(), true);
-        }
-
-        if (resetStatus) {
-            for (Processings p : Processings.values()) {
-                newDocument.put(p.getName(), false);
-            }
-        }
 
         BasicDBObject searchQuery = new BasicDBObject().append("anhalyticsId", biblioObject.getAnhalyticsId());
 
