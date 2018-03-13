@@ -305,17 +305,16 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             return false;
         }
         try {
+            DBObject dbObject = (DBObject) JSON.parse(json);
             DBCollection c = null;
             c = db.getCollection(annotationsCollection);
             BasicDBObject index = new BasicDBObject();
             index.put("anhalyticsId", 1);
 //        index.put("xml:id", 1);
             c.ensureIndex(index, "index", true);
-            DBObject dbObject = (DBObject) JSON.parse(json);
 
             BasicDBObject document = new BasicDBObject();
             document.put("anhalyticsId", dbObject.get("anhalyticsId"));
-            System.out.println(dbObject.get("anhalyticsId"));
             c.findAndRemove(document);
 
             WriteResult result = c.insert(dbObject);
@@ -326,7 +325,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 done = false;
             }
         } catch (Exception e) {
-            System.out.println(json);
             logger.error(e.getMessage(), e.getCause());
         }
         return done;
