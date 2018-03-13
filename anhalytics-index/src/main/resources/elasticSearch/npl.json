@@ -1393,7 +1393,7 @@
                                                                                 "type": "string",
                                                                                 "store": "yes"
                                                                             },
-                                                                            "$unit_pp": {
+                                                                            "$unit_page": {
                                                                                 "index": "not_analyzed",
                                                                                 "type": "string",
                                                                                 "store": "yes"
