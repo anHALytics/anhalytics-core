@@ -302,7 +302,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         if ((json == null) || (json.length() == 0)) {
             // there is nothing to insert, so we can assume that we are effectively doing
             // nothing
-            return true;
+            return false;
         }
         try {
             DBCollection c = null;
