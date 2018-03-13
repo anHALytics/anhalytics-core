@@ -48,7 +48,7 @@ public class IstexTEIConverter implements MetadataConverter {
     private void updatePublicationDate(Document metadata) {
         try {
             XPath xPath = XPathFactory.newInstance().newXPath();
-            Element dateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"published\"]").evaluate(metadata, XPathConstants.NODE);
+            Element dateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/monogr/imprint/date[@type=\"published\" or @type=\"Published\"]").evaluate(metadata, XPathConstants.NODE);
 
             String dateFormatted = dateElt.getAttribute("when");
 
