@@ -222,8 +222,14 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     }
 
-    public InputStream getFulltext(BiblioObject biblioObject) throws DataException {
-        return getFulltextByAnhalyticsId(biblioObject.getAnhalyticsId());
+    public InputStream getFulltext(BiblioObject biblioObject) {
+        InputStream fulltext = null;
+        try {
+            fulltext = getFulltextByAnhalyticsId(biblioObject.getAnhalyticsId());
+        } catch (DataException de) {
+            logger.error("No PDF document was found.",de);
+        }
+        return fulltext;
     }
     
     public InputStream getFulltextByAnhalyticsId(String anhalyticsId) throws DataException {
@@ -239,26 +245,36 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     public String getMetadata(BiblioObject biblioObject) {
-        return this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.METADATAS_TEIS);
+        String metadata = null;
+        try {
+            metadata = this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.METADATAS_TEIS);
+        } catch (DataException de) {
+            logger.error("No metadata was found.",de);
+        }
+        return metadata;
     }
 
     public String getTEICorpus(BiblioObject biblioObject) {
+        String teiCorpus = null;
         try {
-            return this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.TEI_CORPUS);
+            teiCorpus = this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.TEI_CORPUS);
         } catch (DataException de) {
-            throw new DataException("No TEI corpus was found.",de);
+            logger.error("No TEI corpus was found.",de);
         }
+        return teiCorpus;
     }
 
     public String getGrobidTei(BiblioObject biblioObject) {
+        String grobidTei = null;
         try {
-            return this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.GROBID_TEIS);
+            grobidTei = this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.GROBID_TEIS);
         } catch (DataException de) {
-            throw new DataException("No corresponding fulltext TEI was found.",de);
+            logger.error("No corresponding fulltext TEI was found.", de);
         }
+        return grobidTei;
     }
 
-    private String getTei(String anhalyticsId, String collection) {
+    private String getTei(String anhalyticsId, String collection) throws DataException {
         String tei = null;
         try {
             GridFS gfs = new GridFS(db, collection);

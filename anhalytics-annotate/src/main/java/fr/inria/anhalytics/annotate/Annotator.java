@@ -185,8 +185,6 @@ public class Annotator {
                 logger.info("Finished all threads");
                 logger.info("Total: " + nb + " documents annotated.");
             }
-        } catch(DataException de) {
-            logger.error(de.getMessage(), de);
         } finally {
             mm.close();
         }
