@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.annotate;
 
+import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.annotate.exceptions.UnreachableAnnotateServiceException;
 import fr.inria.anhalytics.annotate.exceptions.AnnotatorNotAvailableException;
@@ -184,6 +185,8 @@ public class Annotator {
                 logger.info("Finished all threads");
                 logger.info("Total: " + nb + " documents annotated.");
             }
+        } catch(DataException de) {
+            logger.error(de.getMessage(), de);
         } finally {
             mm.close();
         }
