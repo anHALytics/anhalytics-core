@@ -89,7 +89,7 @@ public class AnhalyticsAssetService {
                             .ok()
                             .type("application/pdf")
                             .entity(IOUtils.toByteArray(is))
-                            .header("Content-Disposition", "attachment; filename=\"" + id + "\"")
+                            .header("Content-Disposition", "filename=\"" + id + ".pdf\"")
                             .header("Access-Control-Allow-Origin", "*")
                             .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
                             .header("Access-Control-Allow-Headers", "Range")
