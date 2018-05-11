@@ -57,7 +57,7 @@ public class Main {
                 kbf.processCitations();
             }
         } catch (ServiceException se) {
-            logger.error(se.getMessage());
+            logger.error("Error: ", se);
         }
         return;
     }
