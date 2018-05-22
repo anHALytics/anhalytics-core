@@ -219,11 +219,14 @@ public class HalTEIConverter implements MetadataConverter {
                             NodeList line1 = node.getElementsByTagName("orgName");
                             String addrLineString = "";
                             for (int z = line1.getLength() - 1; z >= 0; z--) {
-                                addrLineString += line1.item(z).getTextContent();
+                                if (line1.item(z).getNodeType() == Node.ELEMENT_NODE) {
+                                    Node localNode = (doc.importNode(line1.item(z), true));
+                                    orgElt.appendChild(localNode);
+                                }
                             }
                             NodeList line2 = node.getElementsByTagName("addrLine");
                             for (int y = line2.getLength() - 1; y >= 0; y--) {
-                                addrLineString += line2.item(y).getTextContent();
+                                addrLineString += !addrLineString.isEmpty() ? " "+line2.item(y).getTextContent():line2.item(y).getTextContent();
                             }
                             addrLine.setTextContent(addrLineString);
 
