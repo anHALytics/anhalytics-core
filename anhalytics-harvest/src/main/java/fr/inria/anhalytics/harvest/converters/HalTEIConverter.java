@@ -205,25 +205,38 @@ public class HalTEIConverter implements MetadataConverter {
             if (org.getNodeType() == Node.ELEMENT_NODE) {
                 Element orgElt = (Element) orgs.item(i);
                 NodeList addressNodes = orgElt.getElementsByTagName("addrLine");
+
+                NodeList orgNameNodes = orgElt.getElementsByTagName("orgName");
+                String orgNameStr = "";
+                Node orgNameNode = null;
+                for (int y = orgNameNodes.getLength() - 1; y >= 0; y--) {
+                    orgNameNode = orgNameNodes.item(y);
+                    if (orgNameNode.getNodeType() == Node.ELEMENT_NODE) {
+                        orgNameStr += !orgNameStr.isEmpty() ? " "+orgNameNode.getTextContent():orgNameNode.getTextContent();
+                    }
+                }
+
                 String grobidResponse = null;
                 if (addressNodes != null) {
                     Node addrLine = addressNodes.item(0);
                     if (addrLine != null && addrLine.getTextContent().trim().length() > 0) {
-                        grobidResponse = gs.processAffiliation(addrLine.getTextContent());
+                        grobidResponse = gs.processAffiliation(orgNameStr+" "+addrLine.getTextContent());
                         try {
                             Element node = DocumentBuilderFactory
                                     .newInstance()
                                     .newDocumentBuilder()
                                     .parse(new ByteArrayInputStream(grobidResponse.getBytes()))
                                     .getDocumentElement();
-                            NodeList line1 = node.getElementsByTagName("orgName");
+
                             String addrLineString = "";
-                            for (int z = line1.getLength() - 1; z >= 0; z--) {
-                                if (line1.item(z).getNodeType() == Node.ELEMENT_NODE) {
-                                    Node localNode = (doc.importNode(line1.item(z), true));
-                                    orgElt.appendChild(localNode);
-                                }
-                            }
+                            // not needed since HAL provides already fine orgNames
+//                            NodeList line1 = node.getElementsByTagName("orgName");
+//                            for (int z = line1.getLength() - 1; z >= 0; z--) {
+//                                if (line1.item(z).getNodeType() == Node.ELEMENT_NODE) {
+//                                    Node localNode = (doc.importNode(line1.item(z), true));
+//                                    orgElt.appendChild(localNode);
+//                                }
+//                            }
                             NodeList line2 = node.getElementsByTagName("addrLine");
                             for (int y = line2.getLength() - 1; y >= 0; y--) {
                                 addrLineString += !addrLineString.isEmpty() ? " "+line2.item(y).getTextContent():line2.item(y).getTextContent();
