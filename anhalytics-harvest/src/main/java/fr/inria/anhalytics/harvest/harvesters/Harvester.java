@@ -102,7 +102,7 @@ public abstract class Harvester {
             String repositoryDocId = object.getRepositoryDocId();
             logger.info("\t\t Processing metadata from " + object.getSource() + " document :" + repositoryDocId);
             if (metadataString.length() > 0) {
-                if (!HarvestProperties.isReset() && mm.isSavedObject(repositoryDocId)) {
+                if (!HarvestProperties.isReset() && mm.isSavedObject(repositoryDocId, object.getRepositoryDocVersion())) {
                     logger.info("\t\t Already grabbed, Skipping...");
                     continue;
                 }

@@ -78,11 +78,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
     }
 
-    public boolean isSavedObject(String repositoryDocId) {
-        return findObject(repositoryDocId) != null;
+    public boolean isSavedObject(String repositoryDocId, String repositoryDocVersion) {
+        return findObject(repositoryDocId, repositoryDocVersion) != null;
     }
 
-    private BasicDBObject findObject(String repositoryDocId) {
+    private BasicDBObject findObject(String repositoryDocId, String repositoryDocVersion) {
         DBCollection collection = db.getCollection(MongoCollectionsInterface.BIBLIO_OBJECTS);
         BasicDBObject document = new BasicDBObject();
         /*BasicDBObject index = new BasicDBObject();
@@ -90,6 +90,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             collection.ensureIndex(index, "index", true);
          */
         document.put("repositoryDocId", repositoryDocId);
+        if(repositoryDocVersion != null)
+            document.put("repositoryDocVersion", repositoryDocVersion);
         BasicDBObject temp = (BasicDBObject) collection.findOne(document);
         return temp;
     }

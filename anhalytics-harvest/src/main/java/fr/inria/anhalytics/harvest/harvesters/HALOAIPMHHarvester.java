@@ -115,7 +115,7 @@ public class HALOAIPMHHarvester extends Harvester {
                 if (docID.trim().length() == 0) {
                     continue;
                 }
-                if (!HarvestProperties.isReset() && mm.isSavedObject(docID)) {
+                if (!HarvestProperties.isReset() && mm.isSavedObject(docID, null)) {
                     logger.info("\t\t Already grabbed, Skipping...");
                     continue;
                 }

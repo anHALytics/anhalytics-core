@@ -43,7 +43,7 @@ public class IstexHarvester extends Harvester {
     private MongoFileManager mm = null;
 
     //20 docs from each category
-    private static final int sampleSize = 20;
+    private static final int sampleSize = 50;
 
     static final public List<String> categories
             = Arrays.asList("scienceMetrix.pharmacology & pharmacy", "scienceMetrix.chemistry", "scienceMetrix.analytical chemistry",
@@ -73,7 +73,7 @@ public class IstexHarvester extends Harvester {
                 if (docID.trim().length() == 0) {
                     continue;
                 }
-                if (!HarvestProperties.isReset() && mm.isSavedObject(docID)) {
+                if (!HarvestProperties.isReset() && mm.isSavedObject(docID, null)) {
                     logger.info("\t\t Already grabbed, Skipping...");
                     continue;
                 }
