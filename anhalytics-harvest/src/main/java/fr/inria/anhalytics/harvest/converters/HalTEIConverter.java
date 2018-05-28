@@ -216,11 +216,16 @@ public class HalTEIConverter implements MetadataConverter {
                     }
                 }
 
+                String countryCode = "";
+                Element countryNode = (Element)orgElt.getElementsByTagName("country").item(0);
+                if (countryNode != null && countryNode.getAttribute("key").trim().length() > 0) {
+                    countryCode = countryNode.getAttribute("key");
+                }
                 String grobidResponse = null;
                 if (addressNodes != null) {
                     Node addrLine = addressNodes.item(0);
                     if (addrLine != null && addrLine.getTextContent().trim().length() > 0) {
-                        grobidResponse = gs.processAffiliation(orgNameStr+" "+addrLine.getTextContent());
+                        grobidResponse = gs.processAffiliation(orgNameStr + " " + addrLine.getTextContent() + " " + countryCode);
                         try {
                             Element node = DocumentBuilderFactory
                                     .newInstance()
