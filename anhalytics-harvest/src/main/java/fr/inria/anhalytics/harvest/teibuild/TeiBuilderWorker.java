@@ -1,7 +1,9 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
+import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.exceptions.SystemException;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.harvesters.Harvester;
@@ -20,6 +22,9 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
@@ -37,15 +42,27 @@ import org.xml.sax.SAXException;
  *
  * @author Achraf
  */
-public class TeiBuilder {
+public class TeiBuilderWorker implements Runnable {
+
+    private static final Logger logger = LoggerFactory.getLogger(TeiBuilderWorker.class);
 
     private DocumentBuilder docBuilder;
 
-    public TeiBuilder() {
+    private Steps step;
+
+    protected MongoFileManager mm;
+
+    protected BiblioObject biblioObject;
+
+    public TeiBuilderWorker(BiblioObject biblioObject, Steps step) {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
         //docFactory.setNamespaceAware(true);
-        
+
+        this.mm = MongoFileManager.getInstance(false);
+        this.step = step;
+        this.biblioObject = biblioObject;
+
         try {
             docBuilder = docFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
@@ -54,10 +71,64 @@ public class TeiBuilder {
 
     }
 
+    @Override
+    public void run() {
+        long startTime = System.nanoTime();
+        logger.info(Thread.currentThread().getName() + " Start. Processing = " + biblioObject.getRepositoryDocId());
+
+        if(step == Steps.TRANSFORM) {
+            try {
+                logger.info("\t\t transforming :" + biblioObject.getRepositoryDocId());
+                Document generatedTEIcorpus = createTEICorpus();
+                if (generatedTEIcorpus != null) {
+                    boolean inserted = mm.insertTEIcorpus(Utilities.toString(generatedTEIcorpus), biblioObject.getAnhalyticsId());
+                    if (inserted) {
+                        biblioObject.setIsProcessedByPub2TEI(Boolean.TRUE);
+                        //We re-initialize everything for this new TEI (this is considered the starting point of a new coming entry from source)
+                        biblioObject.setIsFulltextAppended(Boolean.FALSE);
+                        biblioObject.setIsMined(Boolean.FALSE);
+                        biblioObject.setIsIndexed(Boolean.FALSE);
+                        mm.updateBiblioObjectStatus(biblioObject, null, true);
+                    } else {
+                        logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
+                    }
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        } else if(step == Steps.APPEND_FULLTEXT) {
+
+            Document generatedTEIcorpus = null;
+            logger.info("\t Building TEI for: " + biblioObject.getRepositoryDocId());
+            //tei.setTei(Utilities.trimEncodedCharaters(tei.getTei()));
+            try {
+                String grobidTei = mm.getGrobidTei(biblioObject);
+                String TEICorpus = mm.getTEICorpus(biblioObject);
+
+                generatedTEIcorpus = addGrobidTEIToTEICorpus(TEICorpus, grobidTei);
+
+                boolean inserted = mm.insertTEIcorpus(Utilities.toString(generatedTEIcorpus), biblioObject.getAnhalyticsId());
+                if (inserted) {
+                    biblioObject.setIsFulltextAppended(Boolean.TRUE);
+                    mm.updateBiblioObjectStatus(biblioObject, null, true);
+                } else {
+                    logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
+                }
+
+            } catch (DataException de) {
+                logger.error("No corresponding fulltext TEI was found.");
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+        long endTime = System.nanoTime();
+        logger.info(Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
+    }
+
     /**
      * Creates a working TEICorpus from the harvested metadata in TEI header.
      */
-    public Document createTEICorpus(BiblioObject biblioObj) throws IOException, SAXException {
+    public Document createTEICorpus() throws IOException, SAXException {
         MetadataConverter mc;
         if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
             mc = new HalTEIConverter();
@@ -65,11 +136,11 @@ public class TeiBuilder {
             mc = new IstexTEIConverter();
         }
         Document newTEICorpus = null;
-        Document metadataDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(biblioObj.getMetadata().getBytes("utf-8"))));
+        Document metadataDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(biblioObject.getMetadata().getBytes("utf-8"))));
 
         newTEICorpus = docBuilder.newDocument();
         //biblioobject is used to fill the missing metadata, domains, publication type, doi...
-        Element teiHeader = mc.convertMetadataToTEIHeader(metadataDoc, newTEICorpus, biblioObj);
+        Element teiHeader = mc.convertMetadataToTEIHeader(metadataDoc, newTEICorpus, biblioObject);
 
         Element teiCorpus = newTEICorpus.createElement("teiCorpus");
         teiHeader.setAttribute("xml:id", HarvestProperties.getSource());

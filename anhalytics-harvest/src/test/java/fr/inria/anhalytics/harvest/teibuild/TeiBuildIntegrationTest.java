@@ -30,7 +30,7 @@ public class TeiBuildIntegrationTest extends TestCase {
 
     DocumentBuilder docBuilder;
     XPath xPath;
-    TeiBuilder teiBuilder;
+    TeiBuilderWorker teiBuilder;
     BiblioObject biblioObject;
 
 
@@ -46,8 +46,6 @@ public class TeiBuildIntegrationTest extends TestCase {
 
             xPath = XPathFactory.newInstance().newXPath();
             xPath.setNamespaceContext(new MyNamespaceContext());
-
-            teiBuilder = new TeiBuilder();
 
         } catch (Exception exp) {
             System.err.println(exp.getMessage());
@@ -89,7 +87,10 @@ public class TeiBuildIntegrationTest extends TestCase {
 
         biblioObject.setMetadata(metadataTeiStr);
 
-        corpusTeiDoc = teiBuilder.createTEICorpus(biblioObject);
+
+
+        teiBuilder = new TeiBuilderWorker(biblioObject, Steps.APPEND_FULLTEXT);
+        corpusTeiDoc = teiBuilder.createTEICorpus();
 
         String titleHalTei = (String) xPath.compile("/teiCorpus/teiHeader[@id=\"hal\"]/fileDesc/titleStmt/title").evaluate(corpusTeiDoc, XPathConstants.STRING);
         String titleResult = (String) xPath.compile("/teiCorpus/teiHeader[@id=\"hal\"]/fileDesc/titleStmt/title").evaluate(expectedCorpusTeiDoc, XPathConstants.STRING);
@@ -133,7 +134,8 @@ public class TeiBuildIntegrationTest extends TestCase {
         biblioObject.setDomains(Arrays.asList("1 - science", "2 - pharmacology & pharmacy"));
         biblioObject.setMetadata(metadataTeiStr);
 
-        corpusTeiDoc = teiBuilder.createTEICorpus(biblioObject);
+        teiBuilder = new TeiBuilderWorker(biblioObject, Steps.APPEND_FULLTEXT);
+        corpusTeiDoc = teiBuilder.createTEICorpus();
 
         String titleCorpusTei = (String) xPath.compile("/teiCorpus/teiHeader[@id=\"istex\"]/fileDesc/titleStmt/title").evaluate(corpusTeiDoc, XPathConstants.STRING);
         String expectedTitleResult = (String) xPath.compile("/teiCorpus/teiHeader[@id=\"istex\"]/fileDesc/titleStmt/title").evaluate(expectedCorpusTeiDoc, XPathConstants.STRING);

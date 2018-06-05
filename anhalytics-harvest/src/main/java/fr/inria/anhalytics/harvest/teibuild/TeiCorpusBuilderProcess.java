@@ -11,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Appends available harvested/extracted data to the teiCorpus.
  *
@@ -22,11 +25,8 @@ public class TeiCorpusBuilderProcess {
 
     private MongoFileManager mm;
 
-    private TeiBuilder tb;
-
     public TeiCorpusBuilderProcess() {
         this.mm = MongoFileManager.getInstance(false);
-        this.tb = new TeiBuilder();
     }
 
     /**
@@ -34,35 +34,26 @@ public class TeiCorpusBuilderProcess {
      * standard and pub2TEI. Pub2TEI equivalent.
      */
     public void transformMetadata() {
+
+        ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
+
         if (mm.initObjects(HarvestProperties.getSource().toLowerCase())) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 if (!HarvestProperties.isReset() && biblioObject.getIsProcessedByPub2TEI()) {
-                    logger.info("\t\t Already transformed, Skipping...");
+                    logger.info("\t\t Already transformed, Skipping...  "  + biblioObject.getRepositoryDocId());
                     continue;
                 }
-                logger.info("\t\t transforming :" + biblioObject.getRepositoryDocId());
                 biblioObject.setMetadata(mm.getMetadata(biblioObject));
-                try{
-                    Document generatedTEIcorpus = tb.createTEICorpus(biblioObject);
-                    if (generatedTEIcorpus != null) {
-                        boolean inserted = mm.insertTEIcorpus(Utilities.toString(generatedTEIcorpus), biblioObject.getAnhalyticsId());
-                        if (inserted) {
-                            biblioObject.setIsProcessedByPub2TEI(Boolean.TRUE);
-                            //We re-initialize everything for this new TEI (this is considered the starting point of a new coming entry from source)
-                            biblioObject.setIsFulltextAppended(Boolean.FALSE);
-                            biblioObject.setIsMined(Boolean.FALSE);
-                            biblioObject.setIsIndexed(Boolean.FALSE);
-                            mm.updateBiblioObjectStatus(biblioObject, null, true);
-                        } else {
-                            logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
+                Runnable worker = new TeiBuilderWorker(biblioObject, Steps.TRANSFORM);
+                executor.execute(worker);
             }
         }
+
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+        }
+        logger.info("Finished all threads");
     }
 
     /**
@@ -71,42 +62,23 @@ public class TeiCorpusBuilderProcess {
      * affiliations.
      */
     public void addGrobidFulltextToTEICorpus() {
+        ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
         try {
             if (GrobidService.isGrobidOk()) {
                 if (mm.initObjects(null)) {
                     while (mm.hasMore()) {
                         BiblioObject biblioObject = mm.nextBiblioObject();
-                        Document generatedTEIcorpus = null;
                         if (!HarvestProperties.isReset() && biblioObject.getIsFulltextAppended()) {
-                            logger.info("\t\t Fulltext already appended, Skipping...");
+                            logger.info("\t\t Fulltext already appended, Skipping... " + biblioObject.getRepositoryDocId());
                             continue;
                         }
                         //grobid tei and teicorpus with metadata initialisation should be available.
                         if (!biblioObject.getIsProcessedByPub2TEI()) {
-                            logger.info("\t\t Metadata TEI not found, first consider creating TEI from metadata, Skipping...");
+                            logger.info("\t\t Metadata TEI not found, first consider creating TEI from metadata, Skipping... " + biblioObject.getRepositoryDocId());
                             continue;
                         }
-                        logger.info("\t Building TEI for: " + biblioObject.getRepositoryDocId());
-                        //tei.setTei(Utilities.trimEncodedCharaters(tei.getTei()));
-                        try {
-                            String grobidTei = mm.getGrobidTei(biblioObject);
-                            String TEICorpus = mm.getTEICorpus(biblioObject);
-
-                            generatedTEIcorpus = tb.addGrobidTEIToTEICorpus(TEICorpus, grobidTei);
-
-                            boolean inserted = mm.insertTEIcorpus(Utilities.toString(generatedTEIcorpus), biblioObject.getAnhalyticsId());
-                            if (inserted) {
-                                biblioObject.setIsFulltextAppended(Boolean.TRUE);
-                                mm.updateBiblioObjectStatus(biblioObject, null, true);
-                            } else {
-                                logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
-                            }
-
-                        } catch (DataException de) {
-                            logger.error("No corresponding fulltext TEI was found.");
-                        } catch (Exception e) {
-                            logger.error(e.getMessage(),e);
-                        }
+                        Runnable worker = new TeiBuilderWorker(biblioObject, Steps.APPEND_FULLTEXT);
+                        executor.execute(worker);
                     }
                 }
 

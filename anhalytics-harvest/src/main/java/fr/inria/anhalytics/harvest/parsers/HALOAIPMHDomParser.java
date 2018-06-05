@@ -5,7 +5,6 @@ import fr.inria.anhalytics.harvest.harvesters.Harvester;
 import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.teibuild.TeiBuilder;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -43,11 +42,8 @@ public class HALOAIPMHDomParser {
     private String token;
     private XPath xPath;
 
-    private TeiBuilder tb;
-
     public HALOAIPMHDomParser() {
         xPath = XPathFactory.newInstance().newXPath();
-        this.tb = new TeiBuilder();
     }
 
     /*
