@@ -59,7 +59,6 @@ public class TeiBuilderWorker implements Runnable {
         docFactory.setValidating(false);
         //docFactory.setNamespaceAware(true);
 
-        this.mm = MongoFileManager.getInstance(false);
         this.step = step;
         this.biblioObject = biblioObject;
 
@@ -73,6 +72,7 @@ public class TeiBuilderWorker implements Runnable {
 
     @Override
     public void run() {
+        this.mm = MongoFileManager.getInstance(false);
         long startTime = System.nanoTime();
         logger.info(Thread.currentThread().getName() + " Start. Processing = " + biblioObject.getRepositoryDocId());
 
