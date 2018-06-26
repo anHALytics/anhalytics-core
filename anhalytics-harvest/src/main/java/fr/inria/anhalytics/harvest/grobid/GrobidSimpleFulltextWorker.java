@@ -25,6 +25,8 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
 
     @Override
     protected void processCommand() {
+        boolean success = false;
+        File file = null;
         try {
             GrobidService grobidService = new GrobidService(this.start, this.end, true);
             // configured for HAL, first page is added to the document
@@ -36,7 +38,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
             } catch (IOException ex) {
                 throw new DataException("File stream can't be closed.", ex);
             }
-            File file = new File(filepath);
+            file = new File(filepath);
             double mb = file.length() / (1024 * 1024);
 
             // for now we extract just files with less size (avoid thesis..which may take long time)
@@ -55,7 +57,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
             } else {
                 logger.info("\t\t can't extract TEI for : " + biblioObject.getRepositoryDocId() + "size too large : " + mb + "mb");
             }
-            file.delete();
+
         } catch (GrobidTimeoutException e) {
             mm.save(biblioObject.getRepositoryDocId(), "processGrobid", "timed out");
             logger.warn("Processing of " + biblioObject.getRepositoryDocId() + " timed out");
@@ -66,6 +68,13 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
             logger.error(e.getMessage(), e.getCause());
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex.getCause());
+        }
+        if(file.exists()) {
+            success = file.delete();
+            if (!success) {
+                logger.error(
+                        "Deletion of temporary image files failed for file '" + file.getAbsolutePath() + "'");
+            }
         }
     }
 }
