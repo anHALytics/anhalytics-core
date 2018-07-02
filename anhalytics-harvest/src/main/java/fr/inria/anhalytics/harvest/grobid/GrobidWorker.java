@@ -32,6 +32,7 @@ abstract class GrobidWorker implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(GrobidWorker.class);
     protected MongoFileManager mm;
     protected BiblioObject biblioObject;
+    File file = null;
     protected int start = 2;
     protected int end = -1;
 
@@ -134,6 +135,19 @@ abstract class GrobidWorker implements Runnable {
             } catch (IOException ex) {
                 logger.error(ex.getMessage(), ex.getCause());
             }
+        }
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        boolean success = false;
+        if(file.exists()) {
+            success = file.delete();
+            if (!success) {
+                logger.error(
+                        "Deletion of temporary image files failed for file '" + file.getAbsolutePath() + "'");
+            }else
+                logger.info("\t\t "+Thread.currentThread().getName() +" :"+ file.getAbsolutePath()  +" deleted.");
         }
     }
 

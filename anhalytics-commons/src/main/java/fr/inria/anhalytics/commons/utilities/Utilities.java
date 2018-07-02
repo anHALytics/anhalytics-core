@@ -300,13 +300,13 @@ public class Utilities {
     }
 
     public static String storeTmpFile(InputStream inBinary) throws IOException {
+        if (inBinary == null) {
+            throw new DataException("File stream is null.");
+        }
         File f = File.createTempFile("tmp", ".pdf", new File(tmpPath));
         // deletes file when the virtual machine terminate
         f.deleteOnExit();
         String filePath = f.getAbsolutePath();
-        if (inBinary == null) {
-            System.out.println("null");
-        }
         getBinaryURLContent(f, inBinary);
         return filePath;
     }
