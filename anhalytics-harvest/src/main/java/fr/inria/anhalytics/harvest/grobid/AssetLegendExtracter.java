@@ -1,16 +1,14 @@
 package fr.inria.anhalytics.harvest.grobid;
 
-import fr.inria.anhalytics.commons.utilities.Utilities;
-import java.io.InputStream;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.InputStream;
+
 /**
- *
  * @author achraf
  */
 public class AssetLegendExtracter {
@@ -29,7 +27,7 @@ public class AssetLegendExtracter {
 
             NodeList nodeList = tei.getElementsByTagName("graphic");
             if (nodeList != null && nodeList.getLength() > 0) {
-                System.out.println("nodeList.getLength() "+nodeList.getLength());
+                System.out.println("nodeList.getLength() " + nodeList.getLength());
                 for (int j = 0; j < nodeList.getLength(); j++) {
                     Element el = (Element) nodeList.item(j);
                     System.out.println(el.getAttribute("url"));
@@ -39,7 +37,7 @@ public class AssetLegendExtracter {
                         if (figDescChild != null && figDescChild.getLength() > 0) {
                             Element figDesc = (Element) figDescChild.item(0);
                             legend = figDesc.getTextContent();
-                            
+
                         }
                     }
                 }

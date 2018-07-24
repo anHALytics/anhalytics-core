@@ -1,18 +1,16 @@
 package fr.inria.anhalytics.harvest.teibuild;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
-import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
-import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.harvest.exceptions.UnreachableGrobidServiceException;
 import fr.inria.anhalytics.harvest.grobid.GrobidService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
+
+import static org.apache.commons.lang3.StringUtils.lowerCase;
 
 /**
  * Appends available harvested/extracted data to the teiCorpus.
@@ -37,11 +35,11 @@ public class TeiCorpusBuilderProcess {
 
         ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
 
-        if (mm.initObjects(HarvestProperties.getSource().toLowerCase())) {
+        if (mm.initObjects(lowerCase(HarvestProperties.getSource()))) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 if (!HarvestProperties.isReset() && biblioObject.getIsProcessedByPub2TEI()) {
-                    logger.info("\t\t Already transformed, Skipping...  "  + biblioObject.getRepositoryDocId());
+                    logger.info("\t\t Already transformed, Skipping...  " + biblioObject.getRepositoryDocId());
                     continue;
                 }
                 biblioObject.setMetadata(mm.getMetadata(biblioObject));
@@ -51,7 +49,13 @@ public class TeiCorpusBuilderProcess {
         }
 
         executor.shutdown();
-        while (!executor.isTerminated()) {
+        logger.info("Jobs done, shutting down thread pool. The executor will wait 1 minutes before forcing off.  ");
+        try {
+            if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
         }
         logger.info("Finished all threads");
     }
@@ -83,7 +87,17 @@ public class TeiCorpusBuilderProcess {
                 }
 
             }
-            logger.info("Done");
+
+            executor.shutdown();
+            logger.info("Jobs done, shutting down thread pool. ");
+            try {
+                if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executor.shutdownNow();
+            }
+            logger.info("Finished all threads");
         } catch (UnreachableGrobidServiceException ugse) {
             logger.error(ugse.getMessage());
         }
