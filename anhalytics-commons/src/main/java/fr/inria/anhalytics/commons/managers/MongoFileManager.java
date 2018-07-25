@@ -39,7 +39,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     private static final Logger logger = LoggerFactory.getLogger(MongoFileManager.class);
 
     public static final DBObject ONLY_NOT_PROCESSED_FULLTEXT_APPEND_PROCESS = new BasicDBObjectBuilder()
-            .add("isFulltextAppended", false).get();
+            .add("isFulltextAppended", false)
+            .add("isWithFulltext", true)
+            .get();
 
     public static final DBObject ONLY_NOT_PROCESSED_GROBID_PROCESS = new BasicDBObjectBuilder()
             .add("isWithFulltext", true).get();
