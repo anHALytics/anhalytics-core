@@ -1,28 +1,20 @@
 package fr.inria.anhalytics.harvest.grobid;
 
-import fr.inria.anhalytics.harvest.exceptions.GrobidTimeoutException;
-import fr.inria.anhalytics.harvest.exceptions.UnreachableGrobidServiceException;
+import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.KeyGen;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.commons.properties.HarvestProperties;
-import java.io.*;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpRetryException;
-import java.net.ConnectException;
-
+import fr.inria.anhalytics.harvest.exceptions.GrobidTimeoutException;
+import fr.inria.anhalytics.harvest.exceptions.UnreachableGrobidServiceException;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLEncoder;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.*;
 
 /**
  * Call of Grobid process via its REST web services.
@@ -51,7 +43,7 @@ public class GrobidService {
     /**
      * Call the Grobid full text extraction service on server.
      *
-     * @param pdfBinary InputStream of the PDF file to be processed
+     * @param filepath InputStream of the PDF file to be processed
      * @return the resulting TEI document as a String or null if the service
      * failed
      */
@@ -107,15 +99,7 @@ public class GrobidService {
 
             conn.disconnect();
 
-        } catch (ConnectException e) {
-            logger.error(e.getMessage(), e.getCause());
-            try {
-                Thread.sleep(20000);
-                runFullTextGrobid(filepath);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
-        } catch (HttpRetryException e) {
+        } catch (ConnectException | HttpRetryException e) {
             logger.error(e.getMessage(), e.getCause());
             try {
                 Thread.sleep(20000);
@@ -125,8 +109,6 @@ public class GrobidService {
             }
         } catch (SocketTimeoutException e) {
             throw new GrobidTimeoutException("Grobid processing timed out.");
-        } catch (MalformedURLException e) {
-            logger.error(e.getMessage(), e.getCause());
         } catch (IOException e) {
             logger.error(e.getMessage(), e.getCause());
         }
@@ -196,15 +178,7 @@ public class GrobidService {
 
             conn.disconnect();
 
-        } catch (ConnectException e) {
-            logger.error(e.getMessage(), e.getCause());
-            try {
-                Thread.sleep(20000);
-                runFullTextGrobid(filepath);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
-        } catch (HttpRetryException e) {
+        } catch (ConnectException | HttpRetryException e) {
             logger.error(e.getMessage(), e.getCause());
             try {
                 Thread.sleep(20000);
@@ -214,8 +188,6 @@ public class GrobidService {
             }
         } catch (SocketTimeoutException e) {
             throw new GrobidTimeoutException("Grobid processing timed out.");
-        } catch (MalformedURLException e) {
-            logger.error(e.getMessage(), e.getCause());
         } catch (IOException e) {
             logger.error(e.getMessage(), e.getCause());
         }
@@ -286,10 +258,8 @@ public class GrobidService {
             }
         } catch (SocketTimeoutException e) {
             throw new GrobidTimeoutException("Grobid processing timed out.");
-        } catch (MalformedURLException e) {
-            logger.error(e.getMessage(), e.getCause());
         } catch (IOException e) {
-            logger.error(e.getMessage(), e.getCause());
+            logger.error(e.getMessage(), e);
         }
 
         return retVal;

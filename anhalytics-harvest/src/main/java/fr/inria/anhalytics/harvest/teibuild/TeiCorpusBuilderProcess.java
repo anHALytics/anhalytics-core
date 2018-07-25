@@ -35,7 +35,14 @@ public class TeiCorpusBuilderProcess {
 
         ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
 
-        if (mm.initObjects(lowerCase(HarvestProperties.getSource()))) {
+        boolean initResult = false;
+        if (HarvestProperties.isReset()) {
+            initResult = mm.initObjects(lowerCase(HarvestProperties.getSource()));
+        } else {
+            initResult = mm.initObjects(lowerCase(HarvestProperties.getSource()), MongoFileManager.ONLY_NOT_PROCESSED_TRANSFORM_METADATA_PROCESS);
+        }
+
+        if (initResult) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 if (!HarvestProperties.isReset() && biblioObject.getIsProcessedByPub2TEI()) {
@@ -68,25 +75,34 @@ public class TeiCorpusBuilderProcess {
     public void addGrobidFulltextToTEICorpus() {
         ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
         try {
-            if (GrobidService.isGrobidOk()) {
-                if (mm.initObjects(null)) {
-                    while (mm.hasMore()) {
-                        BiblioObject biblioObject = mm.nextBiblioObject();
-                        if (!HarvestProperties.isReset() && biblioObject.getIsFulltextAppended()) {
-                            logger.info("\t\t Fulltext already appended, Skipping... " + biblioObject.getRepositoryDocId());
-                            continue;
-                        }
-                        //grobid tei and teicorpus with metadata initialisation should be available.
-                        if (!biblioObject.getIsProcessedByPub2TEI()) {
-                            logger.info("\t\t Metadata TEI not found, first consider creating TEI from metadata, Skipping... " + biblioObject.getRepositoryDocId());
-                            continue;
-                        }
-                        Runnable worker = new TeiBuilderWorker(biblioObject, Steps.APPEND_FULLTEXT);
-                        executor.execute(worker);
-                    }
-                }
-
+            if (!GrobidService.isGrobidOk()) {
+                return;
             }
+            boolean initResult = false;
+
+            if (HarvestProperties.isReset()) {
+                initResult = mm.initObjects(null);
+            } else {
+                initResult = mm.initObjects(null, MongoFileManager.ONLY_NOT_PROCESSED_FULLTEXT_APPEND_PROCESS);
+            }
+
+            if (initResult) {
+                while (mm.hasMore()) {
+                    BiblioObject biblioObject = mm.nextBiblioObject();
+                    if (!HarvestProperties.isReset() && biblioObject.getIsFulltextAppended()) {
+                        logger.info("\t\t Fulltext already appended, Skipping... " + biblioObject.getRepositoryDocId());
+                        continue;
+                    }
+                    //grobid tei and tei corpus with metadata initialisation should be available.
+                    if (!biblioObject.getIsProcessedByPub2TEI()) {
+                        logger.info("\t\t Metadata TEI not found, first consider creating TEI from metadata, Skipping... " + biblioObject.getRepositoryDocId());
+                        continue;
+                    }
+                    Runnable worker = new TeiBuilderWorker(biblioObject, Steps.APPEND_FULLTEXT);
+                    executor.execute(worker);
+                }
+            }
+
 
             executor.shutdown();
             logger.info("Jobs done, shutting down thread pool. ");

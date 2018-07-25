@@ -15,6 +15,7 @@ import fr.inria.anhalytics.commons.utilities.Utilities;
 
 import org.apache.commons.io.IOUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,15 @@ import java.util.List;
 public class MongoFileManager extends MongoManager implements MongoCollectionsInterface {
 
     private static final Logger logger = LoggerFactory.getLogger(MongoFileManager.class);
+
+    public static final DBObject ONLY_NOT_PROCESSED_FULLTEXT_APPEND_PROCESS = new BasicDBObjectBuilder()
+            .add("isFulltextAppended", false).get();
+
+    public static final DBObject ONLY_NOT_PROCESSED_GROBID_PROCESS = new BasicDBObjectBuilder()
+            .add("isWithFulltext", false).get();
+
+    public static final DBObject ONLY_NOT_PROCESSED_TRANSFORM_METADATA_PROCESS = new BasicDBObjectBuilder()
+            .add("isProcessedPub2TEI", false).get();
 
     /**
      * A static {@link MongoFileManager} object containing MongoFileManager
@@ -94,6 +104,33 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             document.put("repositoryDocVersion", repositoryDocVersion);
         BasicDBObject temp = (BasicDBObject) collection.findOne(document);
         return temp;
+    }
+
+    /**
+     * This initializes cursor for existing objects by specifying a query.
+     */
+    public boolean initObjects(String source, DBObject query) throws MongoException {
+
+        collection = getCollection(MongoCollectionsInterface.BIBLIO_OBJECTS);
+        BasicDBObject index = new BasicDBObject();
+        index.put("repositoryDocId", 1);
+        index.put("anhalyticsId", 1);
+        collection.ensureIndex(index, "index", true);
+
+        BasicDBObject ensureIndexQuery = new BasicDBObject();
+
+        query.toMap().keySet().stream().forEach( k -> ensureIndexQuery.append((String) k, 1));
+
+        collection.ensureIndex(ensureIndexQuery, "index_" + StringUtils.join(query.toMap().keySet(), "_"));
+        cursor = collection.find(query);
+        cursor.addOption(com.mongodb.Bytes.QUERYOPTION_NOTIMEOUT);
+        indexFile = 0;
+        logger.info(cursor.size() + " objects found.");
+        if (cursor.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

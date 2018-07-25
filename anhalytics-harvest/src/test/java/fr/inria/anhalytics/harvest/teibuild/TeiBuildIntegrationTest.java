@@ -5,6 +5,8 @@ import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import junit.framework.TestCase;
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -25,44 +27,24 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Achraf
  */
-public class TeiBuildIntegrationTest extends TestCase {
-
-
+public class TeiBuildIntegrationTest {
     DocumentBuilder docBuilder;
     XPath xPath;
     TeiBuilderWorker teiBuilder;
     BiblioObject biblioObject;
 
+    @Before
+    public void setUp() throws Exception {
+        HarvestProperties.init("anhalytics.test.properties");
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setValidating(false);
+        //docFactory.setNamespaceAware(true);
+        docBuilder = docFactory.newDocumentBuilder();
 
-    public TeiBuildIntegrationTest() {
-        super();
-
-        try {
-            HarvestProperties.init("anhalytics.test.properties");
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            docFactory.setValidating(false);
-            //docFactory.setNamespaceAware(true);
-            docBuilder = docFactory.newDocumentBuilder();
-
-            xPath = XPathFactory.newInstance().newXPath();
-            xPath.setNamespaceContext(new MyNamespaceContext());
-
-        } catch (Exception exp) {
-            System.err.println(exp.getMessage());
-            return;
-        }
-    }
-
-
-    protected void setUp() throws Exception {
-        super.setUp();
+        xPath = XPathFactory.newInstance().newXPath();
+        xPath.setNamespaceContext(new MyNamespaceContext());
 
         biblioObject = new BiblioObject();
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        biblioObject = null;
     }
 
     @Test
@@ -88,7 +70,6 @@ public class TeiBuildIntegrationTest extends TestCase {
         biblioObject.setMetadata(metadataTeiStr);
 
 
-
         teiBuilder = new TeiBuilderWorker(biblioObject, Steps.APPEND_FULLTEXT);
         corpusTeiDoc = teiBuilder.createTEICorpus();
 
@@ -103,7 +84,7 @@ public class TeiBuildIntegrationTest extends TestCase {
         grobidTeiStr = IOUtils.toString(grobidTeiStream, "UTF-8");
         grobidTeiStream.close();
 
-        corpusTeiDoc = teiBuilder.addGrobidTEIToTEICorpus(Utilities.toString(corpusTeiDoc),grobidTeiStr);
+        corpusTeiDoc = teiBuilder.addGrobidTEIToTEICorpus(Utilities.toString(corpusTeiDoc), grobidTeiStr);
         String titleGrobidCorpusTei = (String) xPath.compile("/TEI[@id=\"grobid\"]/teiHeader/fileDesc/titleStmt/title").evaluate(corpusTeiDoc, XPathConstants.STRING);
         String expectedGrobidTitleResult = (String) xPath.compile("/TEI[@id=\"grobid\"]/teiHeader/fileDesc/titleStmt/title").evaluate(expectedCorpusTeiDoc, XPathConstants.STRING);
         assertEquals(titleGrobidCorpusTei.trim(), expectedGrobidTitleResult.trim());
@@ -115,7 +96,7 @@ public class TeiBuildIntegrationTest extends TestCase {
     public void testTransformBuildCorpusTeiIstex() throws Exception {
 
         InputStream metadataTeiStream = null, baseCorpusTeiStream = null, grobidTeiStream = null;
-        String metadataTeiStr , grobidTeiStr;
+        String metadataTeiStr, grobidTeiStr;
 
         Document corpusTeiDoc, expectedCorpusTeiDoc = null;
 
@@ -150,7 +131,7 @@ public class TeiBuildIntegrationTest extends TestCase {
         grobidTeiStr = IOUtils.toString(grobidTeiStream, "UTF-8");
         grobidTeiStream.close();
 
-        corpusTeiDoc = teiBuilder.addGrobidTEIToTEICorpus(Utilities.toString(corpusTeiDoc),grobidTeiStr);
+        corpusTeiDoc = teiBuilder.addGrobidTEIToTEICorpus(Utilities.toString(corpusTeiDoc), grobidTeiStr);
         String titleGrobidCorpusTei = (String) xPath.compile("/TEI[@id=\"grobid\"]/teiHeader/fileDesc/titleStmt/title").evaluate(corpusTeiDoc, XPathConstants.STRING);
         String expectedGrobidTitleResult = (String) xPath.compile("/TEI[@id=\"grobid\"]/teiHeader/fileDesc/titleStmt/title").evaluate(expectedCorpusTeiDoc, XPathConstants.STRING);
         assertEquals(titleGrobidCorpusTei.trim(), expectedGrobidTitleResult.trim());

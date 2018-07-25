@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.harvest.grobid;
 
+import com.mongodb.Mongo;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.commons.data.Processings;
@@ -43,7 +44,15 @@ public class GrobidProcess {
                 ExecutorService executor = Executors.newFixedThreadPool(HarvestProperties.getNbThreads());
                 int start = -1;
                 int end = -1;
-                if (mm.initObjects(null)) {
+
+                boolean initResult;
+                if (HarvestProperties.isReset()) {
+                    initResult = mm.initObjects(null);
+                } else {
+                    initResult = mm.initObjects(null, MongoFileManager.ONLY_NOT_PROCESSED_FULLTEXT_APPEND_PROCESS);
+                }
+
+                if (initResult) {
                     while (mm.hasMore()) {
                         BiblioObject biblioObject = mm.nextBiblioObject();
 //                        if (toBeGrobidified.contains(biblioObject.getPublicationType().split("_")[0])) {
@@ -82,7 +91,7 @@ public class GrobidProcess {
                 executor.shutdown();
                 logger.info("Jobs done, shutting down thread pool. The executor will wait 2 minutes before forcing the shutdown.");
                 try {
-                    if (!executor.awaitTermination(2, TimeUnit.MINUTES)) {
+                    if (!executor.awaitTermination(5, TimeUnit.MINUTES)) {
                         executor.shutdownNow();
                     }
                 } catch (InterruptedException e) {
