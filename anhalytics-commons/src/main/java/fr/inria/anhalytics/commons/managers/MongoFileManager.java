@@ -290,7 +290,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             metadata = this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.METADATAS_TEIS);
         } catch (DataException de) {
-            logger.error("No metadata was found.",de);
+            logger.error("No metadata was found for " + biblioObject,de);
         }
         return metadata;
     }
@@ -300,7 +300,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             teiCorpus = this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.TEI_CORPUS);
         } catch (DataException de) {
-            logger.error("No TEI corpus was found.",de);
+            logger.error("No TEI corpus was found for " + biblioObject,de);
         }
         return teiCorpus;
     }
@@ -310,7 +310,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             grobidTei = this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.GROBID_TEIS);
         } catch (DataException de) {
-            logger.error("No corresponding fulltext TEI was found.", de);
+            logger.error("No corresponding fulltext TEI was found for " + biblioObject, de);
         }
         return grobidTei;
     }
