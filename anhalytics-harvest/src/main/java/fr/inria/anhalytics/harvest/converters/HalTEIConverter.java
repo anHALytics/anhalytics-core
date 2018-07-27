@@ -20,6 +20,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.trim;
+
 /**
  * Function for converting metadata from Hal format to Standard Tei format close
  * to the one used for Grobid. https://github.com/kermitt2/Pub2TEIPrivate we
@@ -224,7 +228,7 @@ public class HalTEIConverter implements MetadataConverter {
                 String grobidResponse = null;
                 if (addressNodes != null) {
                     Node addrLine = addressNodes.item(0);
-                    if (addrLine != null && addrLine.getTextContent().trim().length() > 0) {
+                    if (addrLine != null && isNotBlank(addrLine.getTextContent())) {
                         grobidResponse = gs.processAffiliation(orgNameStr + " " + addrLine.getTextContent() + " " + countryCode);
                         try {
                             Element node = DocumentBuilderFactory
@@ -262,12 +266,8 @@ public class HalTEIConverter implements MetadataConverter {
                                     }
                                 }
                             }
-                        } catch (ParserConfigurationException ex) {
-                            Logger.getLogger(HalTEIConverter.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (SAXException ex) {
-                            Logger.getLogger(HalTEIConverter.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (IOException ex) {
-                            Logger.getLogger(HalTEIConverter.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ParserConfigurationException | SAXException | IOException ex) {
+                            Logger.getLogger(HalTEIConverter.class.getName()).log(Level.WARNING, "Could not process the affiliation with GROBID. ", ex);
                         }
                     }
                 }

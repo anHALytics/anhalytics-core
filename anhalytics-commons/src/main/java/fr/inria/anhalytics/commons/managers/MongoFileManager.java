@@ -57,9 +57,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     private GridFS gfs = null;
 
-    // index to iterate through files.
-    private int indexFile = 0;
-
     private DBObject temp = null;
     private DBCursor cursor = null;
     private DBCollection collection = null;
@@ -83,11 +80,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     public boolean hasMore() {
-        if (indexFile < cursor.size()) {
-            return true;
-        } else {
-            return false;
-        }
+        return cursor.hasNext();
     }
 
     public boolean isSavedObject(String repositoryDocId, String repositoryDocVersion) {
@@ -126,9 +119,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         collection.ensureIndex(ensureIndexQuery, "index_" + StringUtils.join(query.toMap().keySet(), "_"));
         cursor = collection.find(query);
         cursor.addOption(com.mongodb.Bytes.QUERYOPTION_NOTIMEOUT);
-        indexFile = 0;
         logger.info(cursor.size() + " objects found.");
-        if (cursor.size() > 0) {
+        if (cursor.hasNext()) {
             return true;
         } else {
             return false;
@@ -151,9 +143,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
         cursor = collection.find(bdbo);
         cursor.addOption(com.mongodb.Bytes.QUERYOPTION_NOTIMEOUT);
-        indexFile = 0;
         logger.info(cursor.size() + " objects found.");
-        if (cursor.size() > 0) {
+        if (cursor.hasNext()) {
             return true;
         } else {
             return false;
@@ -347,7 +338,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         biblioObject.setSource((String) temp.get("source"));
         biblioObject.setRepositoryDocVersion((String) temp.get("repositoryDocVersion"));
         biblioObject.setMetadataURL((String) temp.get("metadataURL"));
-        indexFile++;
         return biblioObject;
     }
 
