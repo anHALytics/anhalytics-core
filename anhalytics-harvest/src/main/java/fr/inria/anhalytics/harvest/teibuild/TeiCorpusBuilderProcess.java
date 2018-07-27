@@ -107,7 +107,7 @@ public class TeiCorpusBuilderProcess {
             executor.shutdown();
             logger.info("Jobs done, shutting down thread pool. ");
             try {
-                if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
+                if (!executor.awaitTermination(2, TimeUnit.MINUTES)) {
                     executor.shutdownNow();
                 }
             } catch (InterruptedException e) {
