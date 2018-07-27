@@ -116,7 +116,7 @@ public class TeiBuilderWorker implements Runnable {
                 }
 
             } catch (DataException de) {
-                logger.error("No corresponding fulltext TEI was found.");
+                logger.error("No corresponding fulltext TEI was found for " + biblioObject.getRepositoryDocId() + ".");
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
