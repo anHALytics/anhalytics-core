@@ -44,7 +44,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             .get();
 
     public static final DBObject ONLY_NOT_PROCESSED_GROBID_PROCESS = new BasicDBObjectBuilder()
-            .add("isWithFulltext", true).get();
+            .add("isWithFulltext", true)
+            .add(Processings.GROBID.getName(), false)
+            .get();
 
     public static final DBObject ONLY_NOT_PROCESSED_TRANSFORM_METADATA_PROCESS = new BasicDBObjectBuilder()
             .add("isProcessedPub2TEI", false).get();
