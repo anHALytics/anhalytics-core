@@ -51,6 +51,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public static final DBObject ONLY_NOT_PROCESSED_TRANSFORM_METADATA_PROCESS = new BasicDBObjectBuilder()
             .add("isProcessedPub2TEI", false).get();
 
+    public static final DBObject ONLY_NOT_MINED_INIT_KB_PROCESS = new BasicDBObjectBuilder()
+            .add("isMined", false).get();
+
     /**
      * A static {@link MongoFileManager} object containing MongoFileManager
      * instance that can be used from different locations..

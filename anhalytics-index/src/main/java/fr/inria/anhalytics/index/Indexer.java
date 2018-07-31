@@ -6,6 +6,8 @@ import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.IndexProperties;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -161,7 +163,7 @@ abstract class Indexer {
             String analyserStr = null;
             try {
                 ClassLoader classLoader = DocumentIndexer.class.getClassLoader();
-                analyserStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/analyzer.json"));
+                analyserStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/analyzer.json"), StandardCharsets.UTF_8);
             } catch (Exception e) {
                 throw new ElasticSearchConfigurationException("Cannot read analyzer for " + indexName);
             }
@@ -199,21 +201,21 @@ abstract class Indexer {
         try {
             ClassLoader classLoader = DocumentIndexer.class.getClassLoader();
             if (indexName.contains(IndexProperties.getNerdAnnotsIndexName())) {
-                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_nerd.json"));
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_nerd.json"), StandardCharsets.UTF_8);
             } else if (indexName.contains(IndexProperties.getKeytermAnnotsIndexName())) {
-                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_keyterm.json"));
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_keyterm.json"),StandardCharsets.UTF_8);
             } else if (indexName.equals(IndexProperties.getKbIndexName())) {
                 if (type.equals(IndexProperties.getKbAuthorsTypeName())) {
-                    mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kbauthors.json"));
+                    mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kbauthors.json"), StandardCharsets.UTF_8);
                 } else if (type.equals(IndexProperties.getKbOrganisationsTypeName())) {
-                    mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kborganisations.json"));
+                    mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kborganisations.json"), StandardCharsets.UTF_8);
                 } else {
-                    mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kbpublications.json"));
+                    mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kbpublications.json"), StandardCharsets.UTF_8);
                 }
             } else if (indexName.equals(IndexProperties.getQuantitiesAnnotsIndexName())) {
-                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_pdf_quantities.json"));
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_pdf_quantities.json"), StandardCharsets.UTF_8);
             } else {
-                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl.json"));
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/npl.json"), StandardCharsets.UTF_8);
             }
         } catch (Exception e) {
             throw new ElasticSearchConfigurationException("Cannot read mapping for " + indexName);
