@@ -71,7 +71,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ORGANISATION` (
   `organisationID` INT(11) NOT NULL AUTO_INCREMENT,
-  `type` ENUM('institution', 'department', 'laboratory', 'researchteam') NULL DEFAULT NULL,
+  `type` ENUM('institution', 'department', 'laboratory', 'researchteam', 'regroupinstitution', 'regrouplaboratory') NULL DEFAULT NULL,
   `url` VARCHAR(255) NULL DEFAULT NULL,
   `status` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`organisationID`))
