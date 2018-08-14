@@ -267,7 +267,7 @@ public class HalTEIConverter implements MetadataConverter {
                                 }
                             }
                         } catch (ParserConfigurationException | SAXException | IOException ex) {
-                            Logger.getLogger(HalTEIConverter.class.getName()).log(Level.WARNING, "Could not process the affiliation with GROBID. ", ex);
+                            Logger.getLogger(HalTEIConverter.class.getName()).log(Level.WARNING, "Could not process the affiliation with GROBID. Ignoring it. ", ex);
                         }
                     }
                 }

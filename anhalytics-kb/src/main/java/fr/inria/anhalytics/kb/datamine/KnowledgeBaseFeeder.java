@@ -138,8 +138,12 @@ public class KnowledgeBaseFeeder {
                     processPersons(editors, "editor", pub, teiDoc, authorsFromfulltextTeiHeader);
 
                     logger.info("#################################################################");
+                } catch(NumberOfCoAuthorsExceededException e) {
+                    logger.warn("Skipping publication, number of coauthors are exceeding 30", e);
+                    adf.rollback();
+                    teiDoc = null;
                 } catch (Exception xpe) {
-                    xpe.printStackTrace();
+                    logger.error("Error during transaction. Rollback records", xpe);
                     adf.rollback();
                     teiDoc = null;
                 }
