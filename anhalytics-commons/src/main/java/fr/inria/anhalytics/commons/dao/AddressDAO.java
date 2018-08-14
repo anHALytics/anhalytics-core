@@ -217,6 +217,7 @@ public class AddressDAO extends DAO<Address, Long> {
                     if (obj.getCountry().getIso() == null) {
                         statement1.setNull(1, java.sql.Types.VARCHAR);
                     } else {
+                        logger.debug("Creating new country: with ISO: ", obj.getCountry().toString())
                         statement1.setString(1, obj.getCountry().getIso());
                     }
                     int code1 = statement1.executeUpdate();
