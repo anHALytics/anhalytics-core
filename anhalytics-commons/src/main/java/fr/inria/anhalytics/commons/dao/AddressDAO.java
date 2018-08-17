@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 /**
  * @author azhar
  */

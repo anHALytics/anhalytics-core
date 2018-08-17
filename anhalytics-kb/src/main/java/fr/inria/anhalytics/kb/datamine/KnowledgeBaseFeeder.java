@@ -13,7 +13,6 @@ import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.KbProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.kb.exceptions.NumberOfCoAuthorsExceededException;
-import java.io.ByteArrayInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -25,6 +24,10 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -32,9 +35,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 
 /**
  * Format and Extract HAL metadata to seed the KB.
@@ -58,13 +58,20 @@ public class KnowledgeBaseFeeder {
     /**
      * Initiates HAL knowledge base and creates working corpus TEI.
      */
-    public void initKnowledgeBase() throws SQLException {
+    public void initKnowledgeBase() {
         XPath xPath = XPathFactory.newInstance().newXPath();
         DAOFactory.initConnection();
         PublicationDAO pd = (PublicationDAO) adf.getPublicationDAO();
         DocumentDAO dd = (DocumentDAO) adf.getDocumentDAO();
 
-        if (mm.initObjects(null)) {
+        boolean initResult;
+        if (KbProperties.isReset()) {
+            initResult = mm.initObjects(null);
+        } else {
+            initResult = mm.initObjects(null, MongoFileManager.ONLY_NOT_MINED_INIT_KB_PROCESS);
+        }
+
+        if (initResult) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 if (!KbProperties.isReset() && biblioObject.getIsMined()) {
@@ -131,8 +138,12 @@ public class KnowledgeBaseFeeder {
                     processPersons(editors, "editor", pub, teiDoc, authorsFromfulltextTeiHeader);
 
                     logger.info("#################################################################");
+                } catch(NumberOfCoAuthorsExceededException e) {
+                    logger.warn("Skipping publication, number of coauthors are exceeding 30", e);
+                    adf.rollback();
+                    teiDoc = null;
                 } catch (Exception xpe) {
-                    xpe.printStackTrace();
+                    logger.error("Error during transaction. Rollback records", xpe);
                     adf.rollback();
                     teiDoc = null;
                 }

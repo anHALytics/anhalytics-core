@@ -44,10 +44,15 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             .get();
 
     public static final DBObject ONLY_NOT_PROCESSED_GROBID_PROCESS = new BasicDBObjectBuilder()
-            .add("isWithFulltext", true).get();
+            .add("isWithFulltext", true)
+            .add(Processings.GROBID.getName(), false)
+            .get();
 
     public static final DBObject ONLY_NOT_PROCESSED_TRANSFORM_METADATA_PROCESS = new BasicDBObjectBuilder()
             .add("isProcessedPub2TEI", false).get();
+
+    public static final DBObject ONLY_NOT_MINED_INIT_KB_PROCESS = new BasicDBObjectBuilder()
+            .add("isMined", false).get();
 
     /**
      * A static {@link MongoFileManager} object containing MongoFileManager
@@ -56,9 +61,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     private static MongoFileManager mongoManager = null;
 
     private GridFS gfs = null;
-
-    // index to iterate through files.
-    private int indexFile = 0;
 
     private DBObject temp = null;
     private DBCursor cursor = null;
@@ -83,11 +85,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     }
 
     public boolean hasMore() {
-        if (indexFile < cursor.size()) {
-            return true;
-        } else {
-            return false;
-        }
+        return cursor.hasNext();
     }
 
     public boolean isSavedObject(String repositoryDocId, String repositoryDocVersion) {
@@ -126,9 +124,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         collection.ensureIndex(ensureIndexQuery, "index_" + StringUtils.join(query.toMap().keySet(), "_"));
         cursor = collection.find(query);
         cursor.addOption(com.mongodb.Bytes.QUERYOPTION_NOTIMEOUT);
-        indexFile = 0;
         logger.info(cursor.size() + " objects found.");
-        if (cursor.size() > 0) {
+        if (cursor.hasNext()) {
             return true;
         } else {
             return false;
@@ -151,9 +148,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
         cursor = collection.find(bdbo);
         cursor.addOption(com.mongodb.Bytes.QUERYOPTION_NOTIMEOUT);
-        indexFile = 0;
         logger.info(cursor.size() + " objects found.");
-        if (cursor.size() > 0) {
+        if (cursor.hasNext()) {
             return true;
         } else {
             return false;
@@ -347,7 +343,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         biblioObject.setSource((String) temp.get("source"));
         biblioObject.setRepositoryDocVersion((String) temp.get("repositoryDocVersion"));
         biblioObject.setMetadataURL((String) temp.get("metadataURL"));
-        indexFile++;
         return biblioObject;
     }
 
