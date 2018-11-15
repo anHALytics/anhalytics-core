@@ -53,7 +53,7 @@ public class QuantitiesService extends AnnotateService {
     public String processTextQuantities() {
         StringBuffer output = new StringBuffer();
         try {
-            URL url = new URL("http://" + AnnotateProperties.getQuantitiesHost()
+            URL url = new URL(AnnotateProperties.getQuantitiesHost()
                     + (AnnotateProperties.getQuantitiesPort().isEmpty() ? "" : ":" + AnnotateProperties.getQuantitiesPort()) + "/" + REQUEST_TEXT_QUANTITIES);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);

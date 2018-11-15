@@ -56,7 +56,7 @@ public class PDFQuantitiesService extends AnnotateService {
     public String processPDFQuantities() {
         StringBuffer output = new StringBuffer();
         try {
-            URL url = new URL("http://" + AnnotateProperties.getQuantitiesHost()
+            URL url = new URL(AnnotateProperties.getQuantitiesHost()
                     + (AnnotateProperties.getQuantitiesPort().isEmpty() ? "" : ":" + AnnotateProperties.getQuantitiesPort()) + "/" + REQUEST_PDF_QUANTITIES);
             logger.info("http://" + AnnotateProperties.getQuantitiesHost()
                     + (AnnotateProperties.getQuantitiesPort().isEmpty() ? "" : ":" + AnnotateProperties.getQuantitiesPort()) + "/" + REQUEST_PDF_QUANTITIES);

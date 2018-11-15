@@ -50,7 +50,7 @@ public class GrobidService {
     public String runFullTextGrobid(String filepath) {
         String tei = null;
         try {
-            URL url = new URL("http://" + HarvestProperties.getGrobidHost()
+            URL url = new URL(HarvestProperties.getGrobidHost()
                     + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/processFulltextDocument");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             //conn.setConnectTimeout(TIMEOUT_VALUE);
@@ -120,7 +120,7 @@ public class GrobidService {
         String tei = null;
         File zipFolder = null;
         try {
-            URL url = new URL("http://" + HarvestProperties.getGrobidHost()
+            URL url = new URL(HarvestProperties.getGrobidHost()
                     + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/processFulltextAssetDocument");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             //conn.setConnectTimeout(TIMEOUT_VALUE);
@@ -198,7 +198,7 @@ public class GrobidService {
 
         String retVal = null;
         try {
-            URL url = new URL("http://" + HarvestProperties.getGrobidHost()
+            URL url = new URL(HarvestProperties.getGrobidHost()
                     + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/processAffiliations");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             //conn.setConnectTimeout(TIMEOUT_VALUE);
@@ -277,7 +277,7 @@ public class GrobidService {
 
         int responseCode = 0;
         try {
-            URL url = new URL("http://" + HarvestProperties.getGrobidHost()
+            URL url = new URL(HarvestProperties.getGrobidHost()
                     + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/isalive");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
