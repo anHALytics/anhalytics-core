@@ -1,10 +1,6 @@
 package fr.inria.anhalytics.commons.managers;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
+import com.mongodb.*;
 
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.CommonsProperties;
@@ -30,6 +26,9 @@ abstract class MongoManager {
 
     protected DB db = null;
 
+
+    public MongoClientOptions.Builder builder = new MongoClientOptions.Builder();
+
     public MongoManager(boolean isTest) {
         try {
             CommonsProperties.init("anhalytics.properties", isTest);
@@ -38,7 +37,9 @@ abstract class MongoManager {
         }
 
         try {
-            mongo = new MongoClient(CommonsProperties.getMongodbServer(), CommonsProperties.getMongodbPort());
+            builder.socketKeepAlive(true);
+            MongoClientOptions options = builder.build();
+            mongo = new MongoClient(new ServerAddress(CommonsProperties.getMongodbServer(), CommonsProperties.getMongodbPort()), options);
             LOGGER.info("Mongodb is running on server : "+CommonsProperties.getMongodbServer()+ " port : "+CommonsProperties.getMongodbPort());
         if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
             LOGGER.info("MongoDB database " + CommonsProperties.getMongodbDb() + " does not exist and will be created");
