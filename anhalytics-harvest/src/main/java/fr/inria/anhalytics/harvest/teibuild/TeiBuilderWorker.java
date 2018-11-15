@@ -89,6 +89,7 @@ public class TeiBuilderWorker implements Runnable {
                         biblioObject.setIsMined(Boolean.FALSE);
                         biblioObject.setIsIndexed(Boolean.FALSE);
                         mm.updateBiblioObjectStatus(biblioObject, null, true);
+                        logger.info("\t\t " + biblioObject.getRepositoryDocId()+ " transformed.");
                     } else {
                         logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
                     }
@@ -111,6 +112,7 @@ public class TeiBuilderWorker implements Runnable {
                 if (inserted) {
                     biblioObject.setIsFulltextAppended(Boolean.TRUE);
                     mm.updateBiblioObjectStatus(biblioObject, null, true);
+                    logger.info("\t\t " + biblioObject.getRepositoryDocId()+ " built.");
                 } else {
                     logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
                 }

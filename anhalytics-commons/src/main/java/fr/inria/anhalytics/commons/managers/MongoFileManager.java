@@ -264,7 +264,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             fulltext = getFulltextByAnhalyticsId(biblioObject.getAnhalyticsId());
         } catch (DataException de) {
-            logger.error("No PDF document was found.",de);
+            logger.error("No PDF document was found for : "+biblioObject.getAnhalyticsId(),de);
         }
         return fulltext;
     }
