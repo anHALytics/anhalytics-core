@@ -58,7 +58,7 @@ public class TeiCorpusBuilderProcess {
         executor.shutdown();
         logger.info("Jobs done, shutting down thread pool. The executor will wait 1 minutes before forcing off.  ");
         try {
-            if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
+            if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES)) {
                 executor.shutdownNow();
             }
         } catch (InterruptedException e) {
@@ -107,7 +107,7 @@ public class TeiCorpusBuilderProcess {
             executor.shutdown();
             logger.info("Jobs done, shutting down thread pool. ");
             try {
-                if (!executor.awaitTermination(2, TimeUnit.MINUTES)) {
+                if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES)) {
                     executor.shutdownNow();
                 }
             } catch (InterruptedException e) {
