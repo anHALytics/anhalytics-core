@@ -39,24 +39,25 @@ abstract class MongoManager {
         try {
             builder.socketKeepAlive(true);
             MongoClientOptions options = builder.build();
-            mongo = new MongoClient(new ServerAddress(CommonsProperties.getMongodbServer(), CommonsProperties.getMongodbPort()), options);
+
+            mongo = new MongoClient(new ServerAddress(CommonsProperties.getMongodbServer(), CommonsProperties.getMongodbPort()),
+                    MongoCredential.createCredential(CommonsProperties.getMongodbUser(), CommonsProperties.getMongodbDb(), CommonsProperties.getMongodbPass().toCharArray()),
+                    options);
             LOGGER.info("Mongodb is running on server : "+CommonsProperties.getMongodbServer()+ " port : "+CommonsProperties.getMongodbPort());
         if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
             LOGGER.info("MongoDB database " + CommonsProperties.getMongodbDb() + " does not exist and will be created");
         }
-        } catch (MongoException|IOException ex) {
+        } catch (MongoException ex) {
             throw new ServiceException("MongoDB is not UP, the process will be halted.");
         }
     }
 
     /**
      * Initializes database if it exists and create it otherwise.
-     *
-     * @param dbName
      */
     protected void initDatabase() {
         db = mongo.getDB(CommonsProperties.getMongodbDb());
-        LOGGER.info("Database : "+CommonsProperties.getMongodbDb());
+        LOGGER.info("Mongodb is connecting to : "+CommonsProperties.getMongodbDb()+ ".");
         if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
             BasicDBObject commandArguments = new BasicDBObject();
             commandArguments.put("user", CommonsProperties.getMongodbUser());
@@ -67,7 +68,6 @@ abstract class MongoManager {
                     commandArguments);
             db.command(command);
         }
-        boolean auth = db.authenticate(CommonsProperties.getMongodbUser(), CommonsProperties.getMongodbPass().toCharArray());
     }
 
     public DBCollection getCollection(String collectionName) {
