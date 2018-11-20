@@ -57,12 +57,12 @@ public class TeiBuildIntegrationTest {
 
         //HAL example
         HarvestProperties.setSource("hal");
-        metadataTeiStream = new FileInputStream(this.getResourceDir("src/test/resources/").getAbsoluteFile()
+        metadataTeiStream = new FileInputStream(this.getResourceDir("anhalytics-harvest/src/test/resources/").getAbsoluteFile()
                 + "/5a7c4c00b64afc92264bd313.hal.tei.xml");
         metadataTeiStr = IOUtils.toString(metadataTeiStream, "UTF-8");
         metadataTeiStream.close();
 
-        baseCorpusTeiStream = new FileInputStream(this.getResourceDir("src/test/resources/").getAbsoluteFile()
+        baseCorpusTeiStream = new FileInputStream(this.getResourceDir("anhalytics-harvest/src/test/resources/").getAbsoluteFile()
                 + "/5a7c4c00b64afc92264bd313.hal.corpus.tei.xml");
         expectedCorpusTeiDoc = docBuilder.parse(baseCorpusTeiStream);
         baseCorpusTeiStream.close();
@@ -79,7 +79,7 @@ public class TeiBuildIntegrationTest {
 
         //other asserts..
 
-        grobidTeiStream = new FileInputStream(this.getResourceDir("src/test/resources/").getAbsoluteFile()
+        grobidTeiStream = new FileInputStream(this.getResourceDir("anhalytics-harvest/src/test/resources/").getAbsoluteFile()
                 + "/5a7c4c00b64afc92264bd313.hal.grobid.tei.xml");
         grobidTeiStr = IOUtils.toString(grobidTeiStream, "UTF-8");
         grobidTeiStream.close();
@@ -102,12 +102,12 @@ public class TeiBuildIntegrationTest {
 
         //ISTEX example
         HarvestProperties.setSource("istex");
-        metadataTeiStream = new FileInputStream(this.getResourceDir("src/test/resources/").getAbsoluteFile()
+        metadataTeiStream = new FileInputStream(this.getResourceDir("anhalytics-harvest/src/test/resources/").getAbsoluteFile()
                 + "/5a87113db64a8b35ae8e6916.istex.tei.xml");
         metadataTeiStr = IOUtils.toString(metadataTeiStream, "UTF-8");
         metadataTeiStream.close();
 
-        baseCorpusTeiStream = new FileInputStream(this.getResourceDir("src/test/resources/").getAbsoluteFile()
+        baseCorpusTeiStream = new FileInputStream(this.getResourceDir("anhalytics-harvest/src/test/resources/").getAbsoluteFile()
                 + "/5a87113db64a8b35ae8e6916.istex.corpus.tei.xml");
         expectedCorpusTeiDoc = docBuilder.parse(baseCorpusTeiStream);
         baseCorpusTeiStream.close();
@@ -126,7 +126,7 @@ public class TeiBuildIntegrationTest {
         assertEquals("science.pharmacology & pharmacy", expectedSubjectDomains);//this should improved
 
 
-        grobidTeiStream = new FileInputStream(this.getResourceDir("src/test/resources/").getAbsoluteFile()
+        grobidTeiStream = new FileInputStream(this.getResourceDir("anhalytics-harvest/src/test/resources/").getAbsoluteFile()
                 + "/5a87113db64a8b35ae8e6916.istex.grobid.tei.xml");
         grobidTeiStr = IOUtils.toString(grobidTeiStream, "UTF-8");
         grobidTeiStream.close();

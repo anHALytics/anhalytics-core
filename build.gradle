@@ -1,0 +1,392 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath group: 'net.researchgate', name: 'gradle-release', version: '2.6.0'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.4.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.2'
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE")
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+
+apply plugin: 'net.researchgate.release'
+
+allprojects {
+    apply plugin: 'jacoco'
+    apply plugin: 'base'
+    apply plugin: 'com.github.kt3k.coveralls'
+
+    group = "fr.inria.anhalytics"
+
+    jacoco {
+        toolVersion = '0.7.1.201405082137'
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'com.jfrog.bintray'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+        jcenter()
+//        repositories {
+//            maven {
+//                url new File(rootProject.rootDir, "grobid-core/lib")
+//            }
+//        }
+    }
+
+    configurations {
+        all*.exclude group: 'org.slf4j', module: "slf4j-log4j12"
+        all*.exclude group: 'log4j', module: "log4j"
+    }
+
+    dependencies {
+
+        testCompile "junit:junit:4.12"
+        testCompile "org.easymock:easymock:3.4"
+        testCompile "org.powermock:powermock-api-easymock:1.6.6"
+        testCompile "org.powermock:powermock-module-junit4:1.6.6"
+        testCompile "xmlunit:xmlunit:1.6"
+        testCompile "org.hamcrest:hamcrest-all:1.3"
+    }
+
+    task sourceJar(type: Jar) {
+        description = 'A jar that contains source code'
+        classifier = 'sources'
+        from project.sourceSets.main.java
+    }
+
+    artifacts {
+        archives sourceJar
+    }
+
+    jacocoTestReport {
+        additionalSourceDirs = files(sourceSets.main.allSource.srcDirs)
+        sourceDirectories = files(sourceSets.main.allSource.srcDirs)
+        classDirectories = files(sourceSets.main.output)
+        reports {
+            html.enabled = true
+            xml.enabled = true
+            csv.enabled = false
+        }
+    }
+
+    test {
+        testLogging.showStandardStreams = true
+        // enable for having separate test executor for different tests
+        //  forkEvery = 1
+        maxHeapSize = "1024m"
+    }
+}
+
+project("anhalytics-commons") {
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    dependencies {
+        compile(group: 'xml-apis', name: 'xml-apis', version: '1.4.01') {
+            // otherwise xml-apis 2.0.1 will come from XOM and will result in
+            // java.lang.ClassNotFoundException: org.w3c.dom.ElementTraversal
+            //TODO: sort out this problem better
+            force = true
+        }
+
+        compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+
+        compile "org.mongodb:mongo-java-driver:3.9.0"
+
+        compile "mysql:mysql-connector-java:5.1.40"
+
+        compile "commons-io:commons-io:2.5"
+
+        compile "org.apache.commons:commons-lang3:3.6"
+
+        compile "com.fasterxml.jackson.core:jackson-core:2.7.2"
+
+        compile "com.fasterxml.jackson.core:jackson-databind:2.7.2"
+
+        compile "com.fasterxml.jackson.core:jackson-annotations:2.7.2"
+
+        compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+        compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.7'
+        compile 'org.slf4j:slf4j-simple:1.7.7'
+    }
+}
+
+project("anhalytics-harvest") {
+    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    //mainClassName = 'org.grobid.service.main.GrobidServiceApplication'
+
+    bootJar {
+        baseName = 'fileprovider-rest-service'
+        version =  '0.1.0'
+    }
+
+    tasks.test.workingDir = rootProject.rootDir
+
+
+    configurations {
+        all*.exclude group: 'org.slf4j', module: "slf4j-log4j12"
+        all*.exclude group: 'org.slf4j', module: "slf4j-simple"
+    }
+
+    dependencies {
+
+        compile project(':anhalytics-commons')
+
+        compile "org.apache.httpcomponents:httpmime:4.2.4"
+
+        compile "com.googlecode.json-simple:json-simple:1.1"
+
+        compile "com.sun.jersey:jersey-core:1.9"
+
+        compile "com.sun.jersey:jersey-server:1.9"
+
+        compile "directory-naming:naming-java:0.8"
+
+        compile "com.google.guava:guava:16.0.1"
+
+        compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+
+        compile("org.springframework.boot:spring-boot-starter-web")
+        testCompile('org.springframework.boot:spring-boot-starter-test')
+        testCompile('com.jayway.jsonpath:json-path')
+    }
+
+    shadowJar {
+        classifier = 'onejar'
+        mergeServiceFiles()
+        zip64 true
+        manifest {
+            attributes 'Main-Class': 'fr.inria.anhalytics.harvest.main.Main'
+        }
+
+    }
+
+    task mainJar(type: ShadowJar) {
+        zip64 true
+        mergeServiceFiles()
+        from sourceSets.main.output
+    }
+
+    jar {
+        dependsOn mainJar
+        enabled false
+    }
+
+    artifacts {
+        archives shadowJar
+        archives mainJar
+    }
+}
+
+project("anhalytics-annotate") {
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    dependencies {
+
+        compile project(':anhalytics-commons')
+        compile group: 'commons-io', name: 'commons-io', version: '2.5'
+
+        compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.6'
+
+
+        runtime group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+        runtime group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.7'
+    }
+
+    shadowJar {
+        classifier = 'onejar'
+        mergeServiceFiles()
+        zip64 true
+        manifest {
+            attributes 'Main-Class': 'fr.inria.anhalytics.annotate.main.Main'
+        }
+
+    }
+
+    task mainJar(type: ShadowJar) {
+        zip64 true
+        mergeServiceFiles()
+        from sourceSets.main.output
+    }
+
+    jar {
+        dependsOn mainJar
+        enabled false
+    }
+
+    artifacts {
+        archives shadowJar
+        archives mainJar
+    }
+}
+
+project("anhalytics-kb") {
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    dependencies {
+
+        compile project(':anhalytics-commons')
+        compile group: 'org.codehaus.woodstox', name: 'stax2-api', version: '3.1.4'
+
+        compile group: 'org.codehaus.woodstox', name: 'woodstox-core-asl', version: '4.4.0'
+
+        compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
+
+        runtime group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+        runtime group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.7'
+    }
+
+    shadowJar {
+        classifier = 'onejar'
+        mergeServiceFiles()
+        zip64 true
+        manifest {
+            attributes 'Main-Class': 'fr.inria.anhalytics.kb.main.Main'
+        }
+
+    }
+
+    task mainJar(type: ShadowJar) {
+        zip64 true
+        mergeServiceFiles()
+        from sourceSets.main.output
+    }
+
+    jar {
+        dependsOn mainJar
+        enabled false
+    }
+
+    artifacts {
+        archives shadowJar
+        archives mainJar
+    }
+}
+
+project("anhalytics-index") {
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    dependencies {
+
+        compile project(':anhalytics-commons')
+        compile group: 'org.mongodb', name: 'mongo-java-driver', version: '2.10.1'
+
+        compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.40'
+
+        compile group: 'commons-io', name: 'commons-io', version: '2.5'
+
+        compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
+
+        runtime group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+        runtime group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.7'
+
+        compile "com.fasterxml.jackson.core:jackson-core:2.7.2"
+
+        compile "com.fasterxml.jackson.core:jackson-databind:2.7.2"
+
+        compile "com.fasterxml.jackson.core:jackson-annotations:2.7.2"
+
+        compile "org.apache.logging.log4j:log4j-api:2.7"
+
+        compile "org.apache.logging.log4j:log4j-core:2.7"
+
+        compile "org.json:json:20080701"
+
+        compile "org.elasticsearch:elasticsearch:5.2.2"
+
+        compile "org.elasticsearch.client:transport:5.2.2"
+    }
+
+    shadowJar {
+        classifier = 'onejar'
+        mergeServiceFiles()
+        zip64 true
+        manifest {
+            attributes 'Main-Class': 'fr.inria.anhalytics.index.main.Main'
+        }
+
+    }
+
+    task mainJar(type: ShadowJar) {
+        zip64 true
+        mergeServiceFiles()
+        from sourceSets.main.output
+    }
+
+    jar {
+        dependsOn mainJar
+        enabled false
+    }
+
+    artifacts {
+        archives shadowJar
+        archives mainJar
+    }
+}
+// coveralls does not support mutimodule, therefore merging reports
+task jacocoRootReport(type: JacocoReport) {
+    dependsOn = [subprojects.test
+//                 subprojects.jacocoTestReport
+    ]
+    additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
+    classDirectories = files(subprojects.sourceSets.main.output)
+    executionData = files(subprojects.jacocoTestReport.executionData)
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        csv.enabled = false
+        xml.destination = file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+    }
+    onlyIf = {
+        true
+    }
+    doFirst {
+        executionData = files(executionData.findAll {
+            it.exists()
+        })
+    }
+}
+
+coveralls {
+    sourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs).files.absolutePath
+    jacocoReportPath = "build/reports/jacoco/test/jacocoTestReport.xml"
+}
+
+tasks.coveralls {
+    dependsOn jacocoRootReport
+}
+
+wrapper {
+    gradleVersion "4.2.1"
+}
+
+build.dependsOn project.getSubprojects().collect({ it.getTasks().getByName("build") })

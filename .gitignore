@@ -14,3 +14,4 @@ tempPdf/*
 **/*.iml
 .idea
 config/anhalytics.properties
+*build
