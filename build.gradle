@@ -145,7 +145,6 @@ project("anhalytics-harvest") {
 
     bootJar {
         baseName = 'fileprovider-rest-service'
-        version =  '0.1.0'
     }
 
     tasks.test.workingDir = rootProject.rootDir

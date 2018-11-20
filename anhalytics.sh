@@ -73,7 +73,7 @@ done
 
 
 
-for m in ./anhalytics-*/target/*.one-jar.jar
+for m in ./anhalytics-*/build/libs/*.one-jar.jar
 do
     if [[ $m == *"harvest"* ]]
         then
