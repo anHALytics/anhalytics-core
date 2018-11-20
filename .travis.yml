@@ -3,6 +3,7 @@ jdk:
 
 language: java
 
+sudo: true
 script:
   - ./gradlew build --stacktrace --info --no-daemon
 
