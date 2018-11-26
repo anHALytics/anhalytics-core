@@ -91,7 +91,7 @@ public class GrobidProcess {
                 executor.shutdown();
                 logger.info("Jobs done, shutting down thread pool. The executor will wait 2 minutes before forcing the shutdown.");
                 try {
-                    if (!executor.awaitTermination(5, TimeUnit.MINUTES)) {
+                    if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES)) {
                         executor.shutdownNow();
                     }
                 } catch (InterruptedException e) {

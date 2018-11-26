@@ -3,8 +3,12 @@ jdk:
 
 language: java
 
+sudo: true
+script:
+  - ./gradlew build --stacktrace --info --no-daemon
+
 after_success:
-- mvn clean cobertura:cobertura org.eluder.coveralls:coveralls-maven-plugin:report
+- ./gradlew jacocoRootReport coveralls --no-daemon
 
 notifications:
   slack:

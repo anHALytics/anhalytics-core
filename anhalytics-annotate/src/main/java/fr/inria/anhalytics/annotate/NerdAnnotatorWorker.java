@@ -1,11 +1,12 @@
 package fr.inria.anhalytics.annotate;
 
-import fr.inria.anhalytics.annotate.services.NerdService;
+import fr.inria.anhalytics.annotate.services.NerdClient;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.Processings;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 
+import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,8 +131,8 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
                 if ((text != null) && (text.trim().length() > 1)) {
                     String jsonText = null;
                     try {
-                        NerdService nerdService = new NerdService(IOUtils.toInputStream(text, "UTF-8"), language);
-                        jsonText = nerdService.runNerd();
+                        NerdClient nerdService = new NerdClient(AnnotateProperties.getNerdHost());
+                        jsonText = nerdService.disambiguateText(text, language).toString();
                     } catch (Exception ex) {
                         logger.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by NERD: " + text);
                         ex.printStackTrace();

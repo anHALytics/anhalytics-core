@@ -48,7 +48,7 @@ public class KeyTermExtractionService extends AnnotateService {
     public String runKeyTermExtraction() {
         StringBuffer output = new StringBuffer();
         try {
-            URL url = new URL("http://" + AnnotateProperties.getKeytermHost() + 
+            URL url = new URL(AnnotateProperties.getKeytermHost() +
                     (AnnotateProperties.getKeytermPort().isEmpty() ? "" : ":" + AnnotateProperties.getKeytermPort()) + "/" + RESOURCEPATH);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);

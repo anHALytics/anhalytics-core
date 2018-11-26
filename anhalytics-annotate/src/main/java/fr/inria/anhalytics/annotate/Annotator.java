@@ -180,7 +180,13 @@ public class Annotator {
                     }
                 }
                 executor.shutdown();
-                while (!executor.isTerminated()) {
+                logger.info("Jobs done, shutting down thread pool. The executor will wait 2 minutes before forcing the shutdown.");
+                try {
+                    if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES)) {
+                        executor.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    executor.shutdownNow();
                 }
                 logger.info("Finished all threads");
                 logger.info("Total: " + nb + " documents annotated.");

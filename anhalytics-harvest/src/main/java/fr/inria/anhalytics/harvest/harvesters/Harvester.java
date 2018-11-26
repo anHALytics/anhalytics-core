@@ -110,7 +110,10 @@ public abstract class Harvester {
                     if (object.getPdf() != null) {
                         logger.info("\t\t\t\t downloading PDF file.");
                         requestFile(object.getPdf());
+                        if(object.getPdf().getStream() == null)
+                            object.setIsWithFulltext(Boolean.FALSE);
                     } else {
+                        object.setIsWithFulltext(Boolean.FALSE);
                         mm.save(object.getRepositoryDocId(), "harvestProcess", "no URL for binary");
                         logger.info("\t\t\t\t PDF not found !");
                     }

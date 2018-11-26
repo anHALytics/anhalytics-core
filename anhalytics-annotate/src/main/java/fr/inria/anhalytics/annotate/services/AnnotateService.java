@@ -39,10 +39,10 @@ public abstract class AnnotateService {
         try {
             String urlString = "";
             if (annotator_type == Processings.NERD) {
-                urlString = "http://" + AnnotateProperties.getNerdHost()
-                        + (AnnotateProperties.getNerdPort().isEmpty() ? "" : ":" + AnnotateProperties.getNerdPort()) + "/service/isalive";
+                urlString = AnnotateProperties.getNerdHost()
+                        + (AnnotateProperties.getNerdPort().isEmpty() ? "" : ":" + AnnotateProperties.getNerdPort()) + "/isalive";
             } else if (annotator_type == Processings.QUANTITIES) {
-                urlString = "http://" + AnnotateProperties.getQuantitiesHost()
+                urlString = AnnotateProperties.getQuantitiesHost()
                         + (AnnotateProperties.getQuantitiesPort().isEmpty() ? "" : ":" + AnnotateProperties.getQuantitiesPort()) + "/isalive";
             } else {
                 // keyterm isalive checking not implemented yet.

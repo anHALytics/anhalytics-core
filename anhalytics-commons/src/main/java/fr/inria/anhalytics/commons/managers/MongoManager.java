@@ -1,10 +1,6 @@
 package fr.inria.anhalytics.commons.managers;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
+import com.mongodb.*;
 
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.CommonsProperties;
@@ -30,6 +26,9 @@ abstract class MongoManager {
 
     protected DB db = null;
 
+
+    public MongoClientOptions.Builder builder = new MongoClientOptions.Builder();
+
     public MongoManager(boolean isTest) {
         try {
             CommonsProperties.init("anhalytics.properties", isTest);
@@ -38,24 +37,27 @@ abstract class MongoManager {
         }
 
         try {
-            mongo = new MongoClient(CommonsProperties.getMongodbServer(), CommonsProperties.getMongodbPort());
+            builder.socketKeepAlive(true);
+            MongoClientOptions options = builder.build();
+
+            mongo = new MongoClient(new ServerAddress(CommonsProperties.getMongodbServer(), CommonsProperties.getMongodbPort()),
+                    MongoCredential.createCredential(CommonsProperties.getMongodbUser(), CommonsProperties.getMongodbDb(), CommonsProperties.getMongodbPass().toCharArray()),
+                    options);
             LOGGER.info("Mongodb is running on server : "+CommonsProperties.getMongodbServer()+ " port : "+CommonsProperties.getMongodbPort());
         if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
             LOGGER.info("MongoDB database " + CommonsProperties.getMongodbDb() + " does not exist and will be created");
         }
-        } catch (MongoException|IOException ex) {
+        } catch (MongoException ex) {
             throw new ServiceException("MongoDB is not UP, the process will be halted.");
         }
     }
 
     /**
      * Initializes database if it exists and create it otherwise.
-     *
-     * @param dbName
      */
     protected void initDatabase() {
         db = mongo.getDB(CommonsProperties.getMongodbDb());
-        LOGGER.info("Database : "+CommonsProperties.getMongodbDb());
+        LOGGER.info("Mongodb is connecting to : "+CommonsProperties.getMongodbDb()+ ".");
         if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
             BasicDBObject commandArguments = new BasicDBObject();
             commandArguments.put("user", CommonsProperties.getMongodbUser());
@@ -66,7 +68,6 @@ abstract class MongoManager {
                     commandArguments);
             db.command(command);
         }
-        boolean auth = db.authenticate(CommonsProperties.getMongodbUser(), CommonsProperties.getMongodbPass().toCharArray());
     }
 
     public DBCollection getCollection(String collectionName) {

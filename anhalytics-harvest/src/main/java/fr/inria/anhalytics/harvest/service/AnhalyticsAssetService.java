@@ -1,33 +1,31 @@
 package fr.inria.anhalytics.harvest.service;
 
-
-import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * Grobid assets provider.
  *
  * @author Achraf
  */
-@Path("/")
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletOutputStream;
+
+@RestController
 public class AnhalyticsAssetService {
 
     private MongoFileManager mm;
 
-    private static String KEY = null; // :)
+    private static String KEY = "key"; // :)
 
     public AnhalyticsAssetService() throws IOException {
         this.mm = MongoFileManager.getInstance(false);
@@ -71,45 +69,43 @@ public class AnhalyticsAssetService {
 //        }
 //        return response;
 //    }
-    
-    
-    @Path("pdf")
-    @GET
-    public Response getPDF(@QueryParam("id") String id, @QueryParam("key") String key) {
 
-        Response response = null;
+    @ResponseBody
+    @RequestMapping(value = "/pdf", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    public void getPDF(@RequestParam(value="id") String id, @RequestParam(value="key") String key, HttpServletResponse response) throws IOException {
         InputStream is = null;
+        System.out.println(id);
         if (StringUtils.equals(key, KEY)) {
             try {
                 is = mm.getFulltextByAnhalyticsId(id);
                 if (is == null) {
-                    response = Response.status(Status.NOT_FOUND).build();
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 } else {
-                    response = Response
-                            .ok()
-                            .type("application/pdf")
-                            .entity(IOUtils.toByteArray(is))
-                            .header("Content-Disposition", "filename=\"" + id + ".pdf\"")
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
-                            .header("Access-Control-Allow-Headers", "Range")
-                            .header("Access-Control-Expose-Headers", "Accept-Ranges, Content-Encoding, Content-Length, Content-Range")
-                            .build();
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.addHeader("content-type", "application/pdf");
+                    IOUtils.copy(is, response.getOutputStream());
+                    response.addHeader("Content-Disposition", "filename=\"" + id + ".pdf\"");
+                    response.addHeader("Access-Control-Allow-Origin", "*");
+                    response.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
+                    response.addHeader("Access-Control-Allow-Headers", "Range");
+                    response.addHeader("Access-Control-Expose-Headers", "Accept-Ranges, Content-Encoding, Content-Length, Content-Range");
                 }
 
             } catch (Exception exp) {
-                response = Response.status(Status.INTERNAL_SERVER_ERROR).type("text/plain").entity(exp.getMessage()).build();
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.addHeader("content-type", "text/plain");
+                ServletOutputStream sout = response.getOutputStream();
+                sout.print(exp.getMessage());
             } finally {
                 IOUtils.closeQuietly(is);
             }
         } else {
-            response = Response.status(Status.UNAUTHORIZED).type("text/plain").build();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.addHeader("content-type", "text/plain");
         }
-        return response;
     }
 
-    @GET
-    @Produces(MediaType.TEXT_HTML)
+    @RequestMapping(value = "/hello", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     public String sayHtmlHello() {
         return "<html> " + "<title>" + "Hello Anhalytics" + "</title>"
                 + "<body><h1>" + "Hello Anhalytics" + "</body></h1>" + "</html> ";

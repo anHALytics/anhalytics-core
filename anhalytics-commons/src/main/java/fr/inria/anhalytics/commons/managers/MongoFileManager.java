@@ -118,13 +118,13 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         BasicDBObject index = new BasicDBObject();
         index.put("repositoryDocId", 1);
         index.put("anhalyticsId", 1);
-        collection.ensureIndex(index, "index", true);
+        collection.createIndex(index, "index", true);
 
         BasicDBObject ensureIndexQuery = new BasicDBObject();
 
         query.toMap().keySet().stream().forEach( k -> ensureIndexQuery.append((String) k, 1));
 
-        collection.ensureIndex(ensureIndexQuery, "index_" + StringUtils.join(query.toMap().keySet(), "_"));
+        collection.createIndex(ensureIndexQuery, "index_" + StringUtils.join(query.toMap().keySet(), "_"));
         cursor = collection.find(query);
         cursor.addOption(com.mongodb.Bytes.QUERYOPTION_NOTIMEOUT);
         logger.info(cursor.size() + " objects found.");
@@ -144,7 +144,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         BasicDBObject index = new BasicDBObject();
         index.put("repositoryDocId", 1);
         index.put("anhalyticsId", 1);
-        collection.ensureIndex(index, "index", true);
+        collection.createIndex(index, "index", true);
         BasicDBObject bdbo = new BasicDBObject();
         if (source != null) {
             bdbo.append("source", source);
@@ -211,7 +211,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         BasicDBObject index = new BasicDBObject();
         index.put("repositoryDocId", 1);
         index.put("anhalyticsId", 1);
-        collection.ensureIndex(index, "index", true);
+        collection.createIndex(index, "index", true);
 
         BasicDBObject document = new BasicDBObject();
         /*BasicDBObject index = new BasicDBObject();
@@ -267,7 +267,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             fulltext = getFulltextByAnhalyticsId(biblioObject.getAnhalyticsId());
         } catch (DataException de) {
-            logger.error("No PDF document was found.",de);
+            logger.error("No PDF document was found for : "+biblioObject.getAnhalyticsId(),de);
         }
         return fulltext;
     }
@@ -366,15 +366,14 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             BasicDBObject index = new BasicDBObject();
             index.put("anhalyticsId", 1);
 //        index.put("xml:id", 1);
-            c.ensureIndex(index, "index", true);
+            c.createIndex(index, "index", true);
 
             BasicDBObject document = new BasicDBObject();
             document.put("anhalyticsId", dbObject.get("anhalyticsId"));
             c.findAndRemove(document);
 
-            WriteResult result = c.insert(dbObject);
-            CommandResult res = result.getCachedLastError();
-            if ((res != null) && (res.ok())) {
+            WriteResult result = c.insert(dbObject, WriteConcern.ACKNOWLEDGED);
+            if ((result != null) && (result.wasAcknowledged())) {
                 done = true;
             } else {
                 done = false;
@@ -393,11 +392,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             BasicDBObject index = new BasicDBObject();
             index.put("repositoryDocId", 1);
             index.put("anhalyticsId", 1);
-            c.ensureIndex(index, "index", true);
+            c.createIndex(index, "index", true);
             DBObject dbObject = (DBObject) JSON.parse(crossRefMetadata);
-            WriteResult result = c.insert(dbObject);
-            CommandResult res = result.getCachedLastError();
-            if ((res != null) && (res.ok())) {
+            WriteResult result = c.insert(dbObject, WriteConcern.ACKNOWLEDGED);
+            if ((result != null) && (result.wasAcknowledged())) {
                 done = true;
             } else {
                 done = false;
@@ -558,7 +556,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             BasicDBObject index = new BasicDBObject();
             index.put("repositoryDocId", 1);
             index.put("process", 1);
-            collection.ensureIndex(index, "index", true);
+            collection.createIndex(index, "index", true);
             document.put("desc", desc);
 //            if (date == null) {
 //                date = Utilities.formatDate(new Date());
@@ -579,7 +577,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             BasicDBObject index = new BasicDBObject();
             index.put("repositoryDocId", 1);
             index.put("url", 1);
-            collection.ensureIndex(index, "index", true);
+            collection.createIndex(index, "index", true);
             BasicDBObject document = new BasicDBObject();
             document.put("repositoryDocId", repositoryDocId);
             document.put("url", url);
