@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -45,7 +46,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     public static final DBObject ONLY_NOT_PROCESSED_GROBID_PROCESS = new BasicDBObjectBuilder()
             .add("isWithFulltext", true)
-            .add(Processings.GROBID.getName(), false)
+            .add("$or",
+                    Arrays.asList(
+                            new BasicDBObject(Processings.GROBID.getName(), new BasicDBObject("$exists", false)),
+                            new BasicDBObject(Processings.GROBID.getName(), false)))
             .get();
 
     public static final DBObject ONLY_NOT_PROCESSED_TRANSFORM_METADATA_PROCESS = new BasicDBObjectBuilder()
