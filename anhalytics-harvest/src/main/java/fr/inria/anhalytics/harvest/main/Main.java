@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 /**
  * Main class that implements commands for harvesting, extracting, inserting in
  * KB and generating TEI.
@@ -34,16 +36,16 @@ public class Main {
     private static List<String> availableCommands = new ArrayList<String>() {
         {
             add("harvestAll");
-            
+
             add("transformMetadata");
             add("processGrobid");
-            
+
             add("appendFulltextTei");
-            
+
             add("harvestList");
-            
+
             add("sample");
-            
+
 //            add("harvestDOI");
 //            add("openUrl");
         }
@@ -62,6 +64,10 @@ public class Main {
                 if (HarvestProperties.getFromDate() != null || HarvestProperties.getUntilDate() != null) {
                     Utilities.updateDates(HarvestProperties.getUntilDate(), HarvestProperties.getFromDate());
                 }
+            }
+
+            if (isBlank(HarvestProperties.getSource())) {
+                throw new RuntimeException("Source not specified, please select one of the following: " + Arrays.toString(Harvester.Source.values()));
             }
             Utilities.setTmpPath(HarvestProperties.getTmpPath());
             Main main = new Main();
@@ -85,24 +91,21 @@ public class Main {
         Harvester harvester = null;
 
         if (process.equals("harvestAll")) {
-            if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) 
-            {
+            if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
                 harvester = new HALOAIPMHHarvester();
             } else {
                 harvester = new IstexHarvester();
             }
             harvester.fetchAllDocuments();
         } else if (process.equals("harvestList")) {
-             if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) 
-            {
+            if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
                 harvester = new HALOAIPMHHarvester();
             } else {
                 harvester = new IstexHarvester();
             }
             harvester.fetchListDocuments();
         } else if (process.equals("sample")) {
-            if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) 
-            {
+            if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
                 harvester = new HALOAIPMHHarvester();
             } else {
                 harvester = new IstexHarvester();
@@ -115,7 +118,7 @@ public class Main {
         } else if (process.equals("appendFulltextTei")) {
             tcb.addGrobidFulltextToTEICorpus();
         }
-        
+
 //        else if (process.equals("harvestDOI")) {
 //            cr.findDois();
 //        } else if (process.equals("openUrl")) {
@@ -195,13 +198,13 @@ public class Main {
                     String command = pArgs[i + 1];
 
                     //check source exists
-                    if(!Harvester.Source.contains(command.toLowerCase())){
+                    if (!Harvester.Source.contains(command.toLowerCase())) {
                         System.out.println(command);
                         System.err.println("source should be one value from this list: " + Arrays.toString(Harvester.Source.values()));
                         System.err.println("Refer to the documentation to add new harvesters ");
                         result = false;
                     }
-                    
+
                     HarvestProperties.setSource(command);
                     i++;
                     continue;

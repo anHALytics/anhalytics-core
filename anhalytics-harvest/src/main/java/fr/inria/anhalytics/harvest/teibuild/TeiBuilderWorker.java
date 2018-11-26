@@ -23,6 +23,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -130,10 +131,12 @@ public class TeiBuilderWorker implements Runnable {
      */
     public Document createTEICorpus() throws IOException, SAXException {
         MetadataConverter mc;
-        if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
+        if (StringUtils.equals(HarvestProperties.getSource().toLowerCase(), Harvester.Source.HAL.getName())) {
             mc = new HalTEIConverter();
-        } else {
+        } else if (StringUtils.equals(HarvestProperties.getSource().toLowerCase(), Harvester.Source.ISTEX.getName())){
             mc = new IstexTEIConverter();
+        } else {
+            throw new RuntimeException("Missing -source ");
         }
         Document newTEICorpus = null;
         Document metadataDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(biblioObject.getMetadata().getBytes("utf-8"))));
