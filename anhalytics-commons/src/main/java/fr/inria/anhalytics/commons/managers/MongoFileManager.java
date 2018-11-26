@@ -58,7 +58,6 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public static final DBObject ONLY_NOT_MINED_INIT_KB_PROCESS = new BasicDBObjectBuilder()
             .add("isMined", false)
             .add("isProcessedPub2TEI", true)
-            .add(Processings.GROBID.getName(), true)
             .get();
 
     /**
