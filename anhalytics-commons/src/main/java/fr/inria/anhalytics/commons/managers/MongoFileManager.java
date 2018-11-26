@@ -54,7 +54,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public static final DBObject ONLY_NOT_MINED_INIT_KB_PROCESS = new BasicDBObjectBuilder()
             .add("isMined", false)
             .add("isProcessedPub2TEI", true)
-            .add("grobid", true)
+            .add(Processings.GROBID.getName(), true)
             .get();
 
     /**
@@ -103,7 +103,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             collection.ensureIndex(index, "index", true);
          */
         document.put("repositoryDocId", repositoryDocId);
-        if(repositoryDocVersion != null)
+        if (repositoryDocVersion != null)
             document.put("repositoryDocVersion", repositoryDocVersion);
         BasicDBObject temp = (BasicDBObject) collection.findOne(document);
         return temp;
@@ -122,7 +122,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
         BasicDBObject ensureIndexQuery = new BasicDBObject();
 
-        query.toMap().keySet().stream().forEach( k -> ensureIndexQuery.append((String) k, 1));
+        query.toMap().keySet().stream().forEach(k -> ensureIndexQuery.append((String) k, 1));
 
         collection.createIndex(ensureIndexQuery, "index_" + StringUtils.join(query.toMap().keySet(), "_"));
         cursor = collection.find(query);
@@ -185,14 +185,14 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         newDocument.put("isIndexed", biblioObject.getIsIndexed());
 
         for (Processings p : Processings.values()) {
-            if(processing != null && p.equals(processing)){
+            if (processing != null && p.equals(processing)) {
                 newDocument.put(processing.getName(), true);
-            } else if(temp.get(p.getName()) != null) {
+            } else if (temp.get(p.getName()) != null) {
                 //here should be handled the workflow (when for instance when text xml:ids change (new grobid tei is generated or tei corpus))
 //                if(resetStatus)
 //                    newDocument.put(p.getName(), false);
 //                else
-                    newDocument.put(p.getName(), temp.get(p.getName()));
+                newDocument.put(p.getName(), temp.get(p.getName()));
             }
         }
 
@@ -267,11 +267,11 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             fulltext = getFulltextByAnhalyticsId(biblioObject.getAnhalyticsId());
         } catch (DataException de) {
-            logger.error("No PDF document was found for : "+biblioObject.getAnhalyticsId(),de);
+            logger.error("No PDF document was found for : " + biblioObject.getAnhalyticsId(), de);
         }
         return fulltext;
     }
-    
+
     public InputStream getFulltextByAnhalyticsId(String anhalyticsId) throws DataException {
         try {
             GridFS gfs = new GridFS(db, BINARIES);
@@ -289,7 +289,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             metadata = this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.METADATAS_TEIS);
         } catch (DataException de) {
-            logger.error("No metadata was found for " + biblioObject,de);
+            logger.error("No metadata was found for " + biblioObject, de);
         }
         return metadata;
     }
@@ -299,7 +299,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             teiCorpus = this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.TEI_CORPUS);
         } catch (DataException de) {
-            logger.error("No TEI corpus was found for " + biblioObject,de);
+            logger.error("No TEI corpus was found for " + biblioObject, de);
         }
         return teiCorpus;
     }
@@ -608,7 +608,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
     }
 
-//    public void setGridFSCollection(String collectionName) {
+    //    public void setGridFSCollection(String collectionName) {
 //        if (gfs == null || !gfs.getBucketName().equals(collectionName)) {
 //            gfs = new GridFS(db, collectionName);
 //
@@ -621,7 +621,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //        }
 //    }
     /*
-    
+
      */
     public boolean isProcessed(Processings processing) {
         Object isProcessed = temp.get(processing.getName());
