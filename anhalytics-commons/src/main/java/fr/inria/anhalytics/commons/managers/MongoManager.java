@@ -13,6 +13,8 @@ import java.net.UnknownHostException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 /**
  * Abstract class to be sub-classed to use mongoDB service.
  *
@@ -40,13 +42,28 @@ abstract class MongoManager {
             builder.socketKeepAlive(true);
             MongoClientOptions options = builder.build();
 
-            mongo = new MongoClient(new ServerAddress(CommonsProperties.getMongodbServer(), CommonsProperties.getMongodbPort()),
-                    MongoCredential.createCredential(CommonsProperties.getMongodbUser(), CommonsProperties.getMongodbDb(), CommonsProperties.getMongodbPass().toCharArray()),
-                    options);
-            LOGGER.info("Mongodb is running on server : "+CommonsProperties.getMongodbServer()+ " port : "+CommonsProperties.getMongodbPort());
-        if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
-            LOGGER.info("MongoDB database " + CommonsProperties.getMongodbDb() + " does not exist and will be created");
-        }
+
+            if (isNotBlank(CommonsProperties.getMongodbUser())) {
+                final MongoCredential credential = MongoCredential.createCredential(CommonsProperties.getMongodbUser(), CommonsProperties.getMongodbDb(), CommonsProperties.getMongodbPass().toCharArray());
+                mongo = new MongoClient(
+                        new ServerAddress(
+                                CommonsProperties.getMongodbServer(),
+                                CommonsProperties.getMongodbPort()),
+                        credential,
+                        options);
+            } else {
+                mongo = new MongoClient(
+                        new ServerAddress(
+                                CommonsProperties.getMongodbServer(),
+                                CommonsProperties.getMongodbPort()),
+                        options);
+            }
+
+
+            LOGGER.info("Mongodb is running on server : " + CommonsProperties.getMongodbServer() + " port : " + CommonsProperties.getMongodbPort());
+            if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
+                LOGGER.info("MongoDB database " + CommonsProperties.getMongodbDb() + " does not exist and will be created");
+            }
         } catch (MongoException ex) {
             throw new ServiceException("MongoDB is not UP, the process will be halted.");
         }
@@ -57,7 +74,7 @@ abstract class MongoManager {
      */
     protected void initDatabase() {
         db = mongo.getDB(CommonsProperties.getMongodbDb());
-        LOGGER.info("Mongodb is connecting to : "+CommonsProperties.getMongodbDb()+ ".");
+        LOGGER.info("Mongodb is connecting to : " + CommonsProperties.getMongodbDb() + ".");
         if (!mongo.getDatabaseNames().contains(CommonsProperties.getMongodbDb())) {
             BasicDBObject commandArguments = new BasicDBObject();
             commandArguments.put("user", CommonsProperties.getMongodbUser());

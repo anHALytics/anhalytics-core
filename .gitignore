@@ -1,3 +1,4 @@
+.gradle
 **/tmp/*
 **/target/*
 config/local

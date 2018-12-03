@@ -209,13 +209,9 @@ project("anhalytics-annotate") {
     apply plugin: 'com.github.johnrengelman.shadow'
 
     dependencies {
-
         compile project(':anhalytics-commons')
         compile group: 'commons-io', name: 'commons-io', version: '2.5'
-
         compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.6'
-
-
         runtime group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
         runtime group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.7'
     }
