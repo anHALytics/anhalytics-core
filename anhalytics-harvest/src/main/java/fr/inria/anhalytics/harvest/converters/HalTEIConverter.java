@@ -3,6 +3,8 @@ package fr.inria.anhalytics.harvest.converters;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.grobid.GrobidService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -17,12 +19,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.trim;
 
 /**
  * Function for converting metadata from Hal format to Standard Tei format close
@@ -33,6 +31,8 @@ import static org.apache.commons.lang3.StringUtils.trim;
  * @author achraf
  */
 public class HalTEIConverter implements MetadataConverter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HalTEIConverter.class);
 
     /**
      * Converts metadata to standard TEI format. 
@@ -71,7 +71,7 @@ public class HalTEIConverter implements MetadataConverter {
             teiHeader = createMetadataTEIHeader(stuffToTake, newTEICorpus);
 
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            LOGGER.warn("Error when converting metadata to TEI header. ", e);
 
         }
         return teiHeader;
@@ -92,7 +92,7 @@ public class HalTEIConverter implements MetadataConverter {
                 //classCode.removeAttribute("n");
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            LOGGER.warn("Cannot parse correctly the tei to get the publication type. ", e);
         }
     }
 
@@ -115,7 +115,7 @@ public class HalTEIConverter implements MetadataConverter {
                 }
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            LOGGER.warn("Cannot parse correctly the tei to get the domain type. ", e);
         }
     }
 
@@ -177,7 +177,7 @@ public class HalTEIConverter implements MetadataConverter {
                 dateElt.setAttribute("type", "published");
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            LOGGER.warn("Cannot parse correctly the tei to get the publication date. ", e);
         }
     }
 
@@ -267,7 +267,7 @@ public class HalTEIConverter implements MetadataConverter {
                                 }
                             }
                         } catch (ParserConfigurationException | SAXException | IOException ex) {
-                            Logger.getLogger(HalTEIConverter.class.getName()).log(Level.WARNING, "Could not process the affiliation with GROBID. Ignoring it. ", ex);
+                            LOGGER.warn("Could not process the affiliation with GROBID. Ignoring it. ", ex);
                         }
                     }
                 }
@@ -381,7 +381,7 @@ public class HalTEIConverter implements MetadataConverter {
                 abstractElt.appendChild(p);
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            LOGGER.warn("Error when parsing the abstract: ", e);
         }
     }
 }
