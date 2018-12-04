@@ -90,7 +90,7 @@ public class KnowledgeBaseFeeder {
                         docBuilder = docFactory.newDocumentBuilder();
                         teiDoc = docBuilder.parse(teiStream);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error("Error when parsing TEI stream. ", e);
                     }
                     teiStream.close();
 

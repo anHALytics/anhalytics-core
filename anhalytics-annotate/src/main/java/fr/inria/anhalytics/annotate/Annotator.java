@@ -43,8 +43,8 @@ public class Annotator {
                 annotateTeiCollection(annotator_type);
             }
         } catch (UnreachableAnnotateServiceException | AnnotatorNotAvailableException e) {
-            logger.error(e.getMessage());
-            e.printStackTrace();
+            logger.error("Error when annotating. ", e);
+
         }
     }
 
@@ -227,7 +227,7 @@ public class Annotator {
                 try {
                     Thread.sleep(60000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.error("Error when interrupting the thread. ", e);
                 }
                 logger.info("Lets add another time : "
                         + ((AnnotatorWorker) r).getRepositoryDocId());

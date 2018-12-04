@@ -79,10 +79,10 @@ public class GrobidProcess {
                                 executor.execute(worker);
                             } catch (ParserConfigurationException exp) {
                                 logger.error("An error occured while processing the file " + bf.getRepositoryDocId()
-                                        + ". Continuing the process for the other files" + exp.getMessage());
+                                        + ". Continuing the process for the other files.", exp);
                             } catch (DataException dataexp) {
                                 logger.error("Can't get the fulltext PDF for " + bf.getRepositoryDocId()
-                                        + ". error : " + dataexp.getMessage());
+                                        + ".", dataexp);
                             }
 //                        }
                     }
