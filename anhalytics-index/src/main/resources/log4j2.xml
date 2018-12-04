@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <RollingFile name="LOGFILE" fileName="logs/index.log" append="true" filePattern="logs/index-%d{ddMMyyyy}.log">
+            <PatternLayout pattern="%d{dd MMM yyyy HH:mm.ss} [%-5p] %-25c{1} - %m\n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{dd MMM yyyy HH:mm.ss} [%-5p] %-25c{1} - %m\n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="com.mongodb" level="warn" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOGFILE"/>
+        </Logger>
+        <Logger name="org.springframework" level="DEBUG" additivity="false">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOGFILE"/>
+        </Logger>
+        <Root level="DEBUG">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="LOGFILE"/>
+        </Root>
+    </Loggers>
+</Configuration>

@@ -47,7 +47,7 @@ public class Annotator {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Annotates TEICorpus collection by annotator_type.
      */
@@ -197,8 +197,8 @@ public class Annotator {
     }
 
     /**
-    * Returns an execution pool(blocking mode).
-    */
+     * Returns an execution pool(blocking mode).
+     */
     private ThreadPoolExecutor getThreadsExecutor(Processings annotator_type) {
         // max queue of tasks of 50 
         BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(50);
@@ -212,7 +212,7 @@ public class Annotator {
         } else if (annotator_type == annotator_type.PDFQUANTITIES) {
             nbThreads = AnnotateProperties.getQuantitiesNbThreads();
         }
-        System.out.println(nbThreads);
+        logger.info("Number of threads: " + nbThreads);
         ThreadPoolExecutor executor = new ThreadPoolExecutor(nbThreads, nbThreads, 60000,
                 TimeUnit.MILLISECONDS, blockingQueue);
 
@@ -220,7 +220,7 @@ public class Annotator {
         executor.setRejectedExecutionHandler(new RejectedExecutionHandler() {
             @Override
             public void rejectedExecution(Runnable r,
-                    ThreadPoolExecutor executor) {
+                                          ThreadPoolExecutor executor) {
                 logger.info("Task Rejected : "
                         + ((AnnotatorWorker) r).getRepositoryDocId());
                 logger.info("Waiting for 60 second !!");

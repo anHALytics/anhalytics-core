@@ -46,10 +46,6 @@ subprojects {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
-    test {
-        exclude '**/**IntegrationTest**'
-    }
-
     repositories {
         mavenCentral()
         jcenter()
@@ -63,6 +59,7 @@ subprojects {
     configurations {
         all*.exclude group: 'org.slf4j', module: "slf4j-log4j12"
         all*.exclude group: 'log4j', module: "log4j"
+        all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
 
     dependencies {
@@ -101,6 +98,7 @@ subprojects {
         // enable for having separate test executor for different tests
         //  forkEvery = 1
         maxHeapSize = "1024m"
+        exclude '**/**IntegrationTest**'
     }
 }
 
@@ -145,8 +143,6 @@ project("anhalytics-harvest") {
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
-    //mainClassName = 'org.grobid.service.main.GrobidServiceApplication'
-
     bootJar {
         baseName = 'fileprovider-rest-service'
     }
@@ -178,6 +174,8 @@ project("anhalytics-harvest") {
         compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
 
         compile("org.springframework.boot:spring-boot-starter-web")
+        compile 'org.springframework.boot:spring-boot-starter-log4j2'
+        
         testCompile('org.springframework.boot:spring-boot-starter-test')
         testCompile('com.jayway.jsonpath:json-path')
     }

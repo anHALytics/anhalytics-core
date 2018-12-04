@@ -51,7 +51,7 @@ public abstract class AnnotateService {
             }
             URL url = new URL(urlString);
             conn = (HttpURLConnection) url.openConnection();
-            System.out.println(urlString);
+            logger.info(urlString);
             conn.setDoOutput(true);
             conn.setRequestMethod("GET");
             responseCode = conn.getResponseCode();

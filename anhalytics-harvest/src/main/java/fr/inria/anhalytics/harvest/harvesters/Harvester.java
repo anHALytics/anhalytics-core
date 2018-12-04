@@ -97,7 +97,7 @@ public abstract class Harvester {
             String pdfUrl = "";
             if (object.getPdf() != null) {
                 pdfUrl = object.getPdf().getUrl();
-                System.out.println(pdfUrl);
+                logger.debug(pdfUrl);
             }
             String repositoryDocId = object.getRepositoryDocId();
             logger.info("\t\t Processing metadata from " + object.getSource() + " document :" + repositoryDocId);

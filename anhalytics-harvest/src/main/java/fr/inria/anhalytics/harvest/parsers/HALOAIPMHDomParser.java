@@ -113,9 +113,9 @@ public class HALOAIPMHDomParser {
 
             biblioObj.setMetadataURL("https://hal.archives-ouvertes.fr/" + repositoryDocId + "/tei");
 
-            if (biblioObj.getPdf() != null) {
-                System.out.println(biblioObj.getPdf().getUrl());
-            }
+//            if (biblioObj.getPdf() != null) {
+//                System.out.println(biblioObj.getPdf().getUrl());
+//            }
             List<BinaryFile> annexes = getAnnexes(record, repositoryDocId, currentVersion, "", type);
             biblioObj.setAnnexes(annexes);
 
