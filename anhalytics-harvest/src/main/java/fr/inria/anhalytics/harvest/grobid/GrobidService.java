@@ -50,8 +50,7 @@ public class GrobidService {
     public String runFullTextGrobid(String filepath) {
         String tei = null;
         try {
-            URL url = new URL(HarvestProperties.getGrobidHost()
-                    + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/processFulltextDocument");
+            URL url = new URL(HarvestProperties.getGrobidHost() + "/processFulltextDocument");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             //conn.setConnectTimeout(TIMEOUT_VALUE);
             //conn.setReadTimeout(TIMEOUT_VALUE);
@@ -120,8 +119,7 @@ public class GrobidService {
         String tei = null;
         File zipFolder = null;
         try {
-            URL url = new URL(HarvestProperties.getGrobidHost()
-                    + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/processFulltextAssetDocument");
+            URL url = new URL(HarvestProperties.getGrobidHost() + "/processFulltextAssetDocument");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             //conn.setConnectTimeout(TIMEOUT_VALUE);
             //conn.setReadTimeout(TIMEOUT_VALUE);
@@ -198,8 +196,7 @@ public class GrobidService {
 
         String retVal = null;
         try {
-            URL url = new URL(HarvestProperties.getGrobidHost()
-                    + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/processAffiliations");
+            URL url = new URL(HarvestProperties.getGrobidHost() + "/processAffiliations");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             //conn.setConnectTimeout(TIMEOUT_VALUE);
             //conn.setReadTimeout(TIMEOUT_VALUE);
@@ -277,8 +274,7 @@ public class GrobidService {
 
         int responseCode = 0;
         try {
-            URL url = new URL(HarvestProperties.getGrobidHost()
-                    + (HarvestProperties.getGrobidPort().isEmpty() ? "" : ":" + HarvestProperties.getGrobidPort()) + "/isalive");
+            URL url = new URL(HarvestProperties.getGrobidHost() + "/isalive");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("GET");

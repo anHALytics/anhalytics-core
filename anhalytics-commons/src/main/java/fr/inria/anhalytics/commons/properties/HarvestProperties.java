@@ -26,7 +26,6 @@ public class HarvestProperties {
     private static String source;
     
     private static String grobidHost;
-    private static String grobidPort;
 
     private static String tmpPath;
 
@@ -51,7 +50,6 @@ public class HarvestProperties {
         
         setSource(props.getProperty("harvest.source"));
         setGrobidHost(props.getProperty("harvest.grobid_host"));
-        setGrobidPort(props.getProperty("harvest.grobid_port"));
         setTmpPath(props.getProperty("harvest.tmpPath"));
         Utilities.checkPath(HarvestProperties.getTmpPath());
         String threads = props.getProperty("harvest.nbThreads");
@@ -132,20 +130,6 @@ public class HarvestProperties {
     }
 
     /**
-     * @return the grobid_port
-     */
-    public static String getGrobidPort() {
-        return grobidPort;
-    }
-
-    /**
-     * @param grobid_port the grobid_port to set
-     */
-    public static void setGrobidPort(String grobid_port) {
-        grobidPort = grobid_port;
-    }
-
-    /**
      * @return the tmpPath
      */
     public static String getTmpPath() {
@@ -153,7 +137,7 @@ public class HarvestProperties {
     }
 
     /**
-     * @param tmpPath the tmpPath to set
+     * @param tmppath the tmpPath to set
      */
     public static void setTmpPath(String tmppath) {
         tmpPath = tmppath;
