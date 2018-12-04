@@ -15,16 +15,20 @@
     </Appenders>
 
     <Loggers>
+        <Logger name="org.mongodb" level="warn" additivity="false">
+            <!--<AppenderRef ref="CONSOLE"/>-->
+            <AppenderRef ref="LOGFILE"/>
+        </Logger>
         <Logger name="com.mongodb" level="warn" additivity="false">
-            <AppenderRef ref="CONSOLE"/>
+            <!--<AppenderRef ref="CONSOLE"/>-->
             <AppenderRef ref="LOGFILE"/>
         </Logger>
         <Logger name="org.springframework" level="DEBUG" additivity="false">
-            <AppenderRef ref="CONSOLE"/>
+            <!--<AppenderRef ref="CONSOLE"/>-->
             <AppenderRef ref="LOGFILE"/>
         </Logger>
         <Root level="DEBUG">
-            <AppenderRef ref="CONSOLE"/>
+            <!--<AppenderRef ref="CONSOLE"/>-->
             <AppenderRef ref="LOGFILE"/>
         </Root>
     </Loggers>
