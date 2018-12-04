@@ -281,6 +281,9 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             BasicDBObject whereQuery = new BasicDBObject();
             whereQuery.put("anhalyticsId", anhalyticsId);
             GridFSDBFile file = gfs.findOne(whereQuery);
+            if (file == null) {
+                throw new DataException("No fulltext available for document " + anhalyticsId);
+            }
             return file.getInputStream();
         } catch (Exception e) {
             throw new DataException(e);
