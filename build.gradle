@@ -46,6 +46,10 @@ subprojects {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
+    test {
+        exclude '**/**IntegrationTest**'
+    }
+
     repositories {
         mavenCentral()
         jcenter()
