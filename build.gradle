@@ -49,6 +49,7 @@ subprojects {
     repositories {
         mavenCentral()
         jcenter()
+        maven { url "https://dl.bintray.com/rookies/maven" }
 //        repositories {
 //            maven {
 //                url new File(rootProject.rootDir, "grobid-core/lib")
@@ -201,6 +202,8 @@ project("anhalytics-annotate") {
 
     dependencies {
         compile project(':anhalytics-commons')
+
+        compile('com.scienceminer.nerd:entity-fishing-client:0.0.2')
         compile group: 'commons-io', name: 'commons-io', version: '2.5'
         compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.6'
         runtime group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
