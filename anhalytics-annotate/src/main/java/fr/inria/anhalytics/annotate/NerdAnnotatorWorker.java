@@ -14,6 +14,10 @@ import java.io.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+
 import org.xml.sax.InputSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -72,13 +76,17 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
             // parse the TEI
             docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(biblioObject.getTeiCorpus().getBytes("UTF-8"))));
 
+            // TBD : be able to annotate the metadata only (titles, abstract, keyword)
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            Element metadata = (Element) xPath.compile("/teiCorpus/teiHeader").evaluate(docTei, XPathConstants.NODE);
+
             json.append("{ \"repositoryDocId\" : \"" + biblioObject.getRepositoryDocId()
                     + "\",\"anhalyticsId\" : \"" + biblioObject.getAnhalyticsId()
                     + "\",\"isIndexed\" : \"" + false
                     + "\", \"nerd\" : ["
             );
             //check if any thing was added, throw exception if not (not insert entry)
-            annotateNode(docTei.getDocumentElement(), true, json, null);
+            annotateNode(metadata, true, json, null);
             json.append("] }");
         } catch (Exception ex) {
             ex.printStackTrace();
