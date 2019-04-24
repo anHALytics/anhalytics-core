@@ -116,8 +116,8 @@ public class HALOAIPMHDomParser {
 //            if (biblioObj.getPdf() != null) {
 //                System.out.println(biblioObj.getPdf().getUrl());
 //            }
-            List<BinaryFile> annexes = getAnnexes(record, repositoryDocId, currentVersion, "", type);
-            biblioObj.setAnnexes(annexes);
+//            List<BinaryFile> annexes = getAnnexes(record, repositoryDocId, currentVersion, "", type);
+//            biblioObj.setAnnexes(annexes);
 
             logger.info("\t \t \t tei of " + repositoryDocId + " extracted.");
 //            } else {
