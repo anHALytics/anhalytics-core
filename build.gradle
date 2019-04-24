@@ -128,6 +128,32 @@ project("anhalytics-commons") {
 
         compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
     }
+
+    shadowJar {
+        classifier = 'onejar'
+        mergeServiceFiles()
+        zip64 true
+        manifest {
+            attributes 'Main-Class': 'fr.inria.anhalytics.commons.main.Main'
+        }
+
+    }
+
+    task mainJar(type: ShadowJar) {
+        zip64 true
+        mergeServiceFiles()
+        from sourceSets.main.output
+    }
+
+    jar {
+        dependsOn mainJar
+        enabled false
+    }
+
+    artifacts {
+        archives shadowJar
+        archives mainJar
+    }
 }
 
 project("anhalytics-harvest") {

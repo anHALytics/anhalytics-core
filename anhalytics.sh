@@ -61,7 +61,7 @@ check_dates_option(){
     fi
 }
 
-for p in ./anhalytics-*/target
+for p in ./anhalytics-*/build/libs/
 do
     if [ "$(ls -A $p)" ]; then
         continue;
@@ -72,8 +72,7 @@ do
 done
 
 
-
-for m in ./anhalytics-*/build/libs/*.one-jar.jar
+for m in ./anhalytics-*/build/libs/*-onejar.jar
 do
     if [[ $m == *"harvest"* ]]
         then
@@ -92,6 +91,8 @@ elif [[ $m == *"commons"* ]]
             modules[4]=$m
     fi
 done
+
+
 
 while true; 
 do
