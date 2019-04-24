@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -125,7 +126,12 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
         BasicDBObject ensureIndexQuery = new BasicDBObject();
 
-        query.toMap().keySet().stream().forEach(k -> ensureIndexQuery.append((String) k, 1));
+        query.toMap().keySet().stream().forEach(
+                k ->{
+                    if(!k.equals("$or"))
+                        ensureIndexQuery.append((String) k, 1);
+                }
+                );
 
         collection.createIndex(ensureIndexQuery, "index_" + StringUtils.join(query.toMap().keySet(), "_"));
         cursor = collection.find(query);
