@@ -173,9 +173,10 @@ public class Annotator {
                                 logger.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
                             }
                         } else if (annotator_type == Processings.PDFQUANTITIES) {
-                            if (biblioObject.getIsWithFulltext()) {
-                                BinaryFile bf = new BinaryFile();
-                                bf.setStream(mm.getFulltext(biblioObject));
+                            BinaryFile bf = new BinaryFile();
+                            bf.setStream(mm.getFulltext(biblioObject));
+                            //dont run it if stream is null
+                            if (biblioObject.getIsWithFulltext() && bf.getStream()!=null) {
                                 biblioObject.setPdf(bf);
                                 worker = new PDFQuantitiesAnnotatorWorker(mm, biblioObject);
                             } else {

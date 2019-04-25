@@ -74,6 +74,9 @@ public class GrobidProcess {
                                 }
                                 
                                 bf.setStream(mm.getFulltext(biblioObject));
+                                //dont run it if stream is null
+                                if(bf.getStream()==null)
+                                    throw new DataException("PDF stream is null");
                                 biblioObject.setPdf(bf);
                                 Runnable worker = new GrobidSimpleFulltextWorker(biblioObject, start, end);
                                 executor.execute(worker);
