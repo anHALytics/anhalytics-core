@@ -62,10 +62,10 @@ public class DocumentIndexer extends Indexer {
 
                 while (mm.hasMore()) {
                     BiblioObject biblioObject = mm.nextBiblioObject();
-                    if (!biblioObject.getIsWithFulltext()) {
-                        logger.info("\t\t No fulltext available, Skipping...");
-                        continue;
-                    }
+//                    if (!biblioObject.getIsWithFulltext()) {
+//                        logger.info("\t\t No fulltext available, Skipping...");
+//                        continue;
+//                    }
                     if (!IndexProperties.isReset() && biblioObject.getIsIndexed()) {
                         logger.info("\t\t Already indexed, Skipping...");
                         continue;
@@ -130,7 +130,7 @@ public class DocumentIndexer extends Indexer {
         BulkRequestBuilder bulkRequest = client.prepareBulk();
         //bulkRequest.setRefresh(true);
         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-        if (mm.initObjects(null)) {
+        if (mm.initObjects(null, MongoFileManager.ONLY_KEYTERM_ANNOTATED)) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 Annotation annotation = mm.getKeytermAnnotations(biblioObject.getAnhalyticsId());
@@ -188,7 +188,7 @@ public class DocumentIndexer extends Indexer {
         //bulkRequest.setRefresh(true);
         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
         ObjectMapper mapper = new ObjectMapper();
-        if (mm.initObjects(null)) {
+        if (mm.initObjects(null, MongoFileManager.ONLY_NERD_ANNOTATED)) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 Annotation annotation = mm.getNerdAnnotations(biblioObject.getAnhalyticsId());
@@ -282,7 +282,7 @@ public class DocumentIndexer extends Indexer {
         //bulkRequest.setRefresh(true);
         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
         //if (mm.initQuantitiesAnnotations()) {
-        if (mm.initObjects(null)) {
+        if (mm.initObjects(null, MongoFileManager.ONLY_QUANTITIES_ANNOTATED)) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 Annotation annotation = mm.getQuantitiesAnnotations(biblioObject.getAnhalyticsId());

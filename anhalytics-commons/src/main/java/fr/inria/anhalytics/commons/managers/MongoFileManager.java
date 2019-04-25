@@ -106,6 +106,18 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             .add("isIndexed", false)
             .get();
 
+    public static final DBObject ONLY_NERD_ANNOTATED = new BasicDBObjectBuilder()
+            .add(Processings.NERD.getName(), true)
+            .get();
+
+    public static final DBObject ONLY_KEYTERM_ANNOTATED = new BasicDBObjectBuilder()
+            .add(Processings.KEYTERM.getName(), true)
+            .get();
+
+    public static final DBObject ONLY_QUANTITIES_ANNOTATED = new BasicDBObjectBuilder()
+            .add(Processings.QUANTITIES.getName(), true)
+            .get();
+
 
     /**
      * A static {@link MongoFileManager} object containing MongoFileManager
