@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.annotate;
 
+import com.mongodb.DBObject;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.annotate.exceptions.UnreachableAnnotateServiceException;
@@ -60,7 +61,7 @@ public class Annotator {
         }
         try {
             if (AnnotateService.isAnnotateServiceReady(annotator_type)) {
-                if (mm.initObjects(null)) {
+                if (mm.initObjects(null, getQuery(AnnotateProperties.isReset(), annotator_type))){
                     while (mm.hasMore()) {
                         BiblioObject biblioObject = mm.nextBiblioObject();
                         if (!AnnotateProperties.isReset() && mm.isProcessed(annotator_type)) {
@@ -76,15 +77,19 @@ public class Annotator {
                                 logger.info("\t\t No TEI available for " + biblioObject.getRepositoryDocId());
                             }
                         } else if (annotator_type == Processings.KEYTERM) {
-                            if (mm.isProcessed(Processings.GROBID)) {
+                            if (biblioObject.getIsProcessedByPub2TEI()) {
                                 biblioObject.setGrobidTei(mm.getGrobidTei(biblioObject));
-                                worker = new KeyTermAnnotatorWorker(mm, biblioObject);
+                                if(biblioObject.getGrobidTei()==null)
+                                    biblioObject.setTeiCorpus(mm.getTEICorpus(biblioObject));
+                                    worker = new KeyTermAnnotatorWorker(mm, biblioObject);
                             } else {
                                 logger.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
                             }
                         } else if (annotator_type == Processings.QUANTITIES) {
-                            if (mm.isProcessed(Processings.GROBID)) {
+                            if (biblioObject.getIsProcessedByPub2TEI()) {
                                 biblioObject.setGrobidTei(mm.getGrobidTei(biblioObject));
+                                if(biblioObject.getGrobidTei()==null)
+                                    biblioObject.setTeiCorpus(mm.getTEICorpus(biblioObject));
                                 worker = new QuantitiesAnnotatorWorker(mm, biblioObject);
                             } else {
                                 logger.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
@@ -101,8 +106,8 @@ public class Annotator {
                         }
                         if (worker != null) {
                             worker.run();
+                            nb++;
                         }
-                        nb++;
                     }
                 }
             }
@@ -126,7 +131,7 @@ public class Annotator {
             if (AnnotateService.isAnnotateServiceReady(annotator_type)) {
                 ThreadPoolExecutor executor = getThreadsExecutor(annotator_type);
 
-                if (mm.initObjects(null)) {
+                if (mm.initObjects(null, getQuery(AnnotateProperties.isReset(), annotator_type))) {
                     //logger.info("processing teis for :" + date);
                     while (mm.hasMore()) {
                         BiblioObject biblioObject = mm.nextBiblioObject();
@@ -150,16 +155,20 @@ public class Annotator {
                                 logger.info("\t\t No TEI available for " + biblioObject.getRepositoryDocId());
                             }
                         } else if (annotator_type == Processings.KEYTERM) {
-                            if (mm.isProcessed(Processings.GROBID)) {
+                            if (biblioObject.getIsProcessedByPub2TEI()) {
                                 biblioObject.setGrobidTei(mm.getGrobidTei(biblioObject));
+                                if(biblioObject.getGrobidTei()==null)
+                                    biblioObject.setTeiCorpus(mm.getTEICorpus(biblioObject));
                                 worker = new KeyTermAnnotatorWorker(mm, biblioObject);
                             } else {
                                 logger.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
                             }
                         } else if (annotator_type == Processings.QUANTITIES) {
-                            if (mm.isProcessed(Processings.GROBID)) {
+                            if (biblioObject.getIsProcessedByPub2TEI()) {
                                 biblioObject.setGrobidTei(mm.getGrobidTei(biblioObject));
-                                worker = new QuantitiesAnnotatorWorker(mm, biblioObject);
+                                if(biblioObject.getGrobidTei()==null)
+                                    biblioObject.setTeiCorpus(mm.getTEICorpus(biblioObject));
+                                    worker = new QuantitiesAnnotatorWorker(mm, biblioObject);
                             } else {
                                 logger.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
                             }
@@ -175,8 +184,8 @@ public class Annotator {
                         }
                         if (worker != null) {
                             executor.execute(worker);
+                            nb++;
                         }
-                        nb++;
                     }
                 }
                 executor.shutdown();
@@ -194,6 +203,32 @@ public class Annotator {
         } finally {
             mm.close();
         }
+    }
+
+    private DBObject getQuery(boolean reset, Processings annotator_type) {
+        DBObject filter = null;
+        if (annotator_type == Processings.NERD) {
+            if(reset)
+                filter = MongoFileManager.ONLY_TRANSFORMED_METADATA;
+            else
+                filter = MongoFileManager.ONLY_NOT_NERD_ANNOTATED_TRANSFORMED_METADATA;
+        } else if (annotator_type == Processings.KEYTERM) {
+            if(reset)
+                filter = MongoFileManager.ONLY_TRANSFORMED_METADATA;
+            else
+                filter = MongoFileManager.ONLY_NOT_KEYTERM_ANNOTATED_TRANSFORMED_METADATA;
+        } else if (annotator_type == Processings.QUANTITIES) {
+            if(reset)
+                filter = MongoFileManager.ONLY_TRANSFORMED_METADATA;
+            else
+                filter = MongoFileManager.ONLY_NOT_QUANTITIES_ANNOTATED_TRANSFORMED_METADATA;
+        } else if (annotator_type == Processings.PDFQUANTITIES) {
+            if(reset)
+                filter = MongoFileManager.ONLY_WITH_FULLTEXT_PROCESS;
+            else
+                filter = MongoFileManager.ONLY_NOT_PDFQUANTITIES_ANNOTATED_WITH_FULLTEXT;
+        }
+        return filter;
     }
 
     /**

@@ -62,8 +62,9 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
         Document docTei = null;
         try {
             docBuilder = docFactory.newDocumentBuilder();
+            String tei = biblioObject.getGrobidTei()!= null ? biblioObject.getGrobidTei() : biblioObject.getTeiCorpus();
             // parse the TEI
-            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(biblioObject.getGrobidTei().getBytes("UTF-8"))));
+            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(tei.getBytes("UTF-8"))));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

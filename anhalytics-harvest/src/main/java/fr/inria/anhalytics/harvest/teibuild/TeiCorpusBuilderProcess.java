@@ -81,7 +81,7 @@ public class TeiCorpusBuilderProcess {
             boolean initResult = false;
 
             if (HarvestProperties.isReset()) {
-                initResult = mm.initObjects(null);
+                initResult = mm.initObjects(null, MongoFileManager.ONLY_WITH_FULLTEXT_PROCESS);
             } else {
                 initResult = mm.initObjects(null, MongoFileManager.ONLY_NOT_PROCESSED_FULLTEXT_APPEND_PROCESS);
             }

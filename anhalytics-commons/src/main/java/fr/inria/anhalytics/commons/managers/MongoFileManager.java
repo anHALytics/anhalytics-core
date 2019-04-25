@@ -40,12 +40,16 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 
     private static final Logger logger = LoggerFactory.getLogger(MongoFileManager.class);
 
+    public static final DBObject ONLY_WITH_FULLTEXT_PROCESS = new BasicDBObjectBuilder()
+            .add("isWithFulltext", true)
+            .get();
+
     public static final DBObject ONLY_NOT_PROCESSED_FULLTEXT_APPEND_PROCESS = new BasicDBObjectBuilder()
             .add("isFulltextAppended", false)
             .add("isWithFulltext", true)
             .get();
 
-    public static final DBObject ONLY_NOT_PROCESSED_GROBID_PROCESS = new BasicDBObjectBuilder()
+    public static final DBObject ONLY_WITH_FULLTEXT_NOT_PROCESSED_GROBID_PROCESS = new BasicDBObjectBuilder()
             .add("isWithFulltext", true)
             .add("$or",
                     Arrays.asList(
@@ -56,10 +60,52 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     public static final DBObject ONLY_NOT_PROCESSED_TRANSFORM_METADATA_PROCESS = new BasicDBObjectBuilder()
             .add("isProcessedPub2TEI", false).get();
 
+    public static final DBObject ONLY_TRANSFORMED_METADATA = new BasicDBObjectBuilder()
+            .add("isProcessedPub2TEI", true)
+            .get();
+
     public static final DBObject ONLY_NOT_MINED_INIT_KB_PROCESS = new BasicDBObjectBuilder()
             .add("isMined", false)
             .add("isProcessedPub2TEI", true)
             .get();
+
+    public static final DBObject ONLY_NOT_NERD_ANNOTATED_TRANSFORMED_METADATA = new BasicDBObjectBuilder()
+            .add("isProcessedPub2TEI", true)
+            .add("$or",
+                    Arrays.asList(
+                            new BasicDBObject(Processings.NERD.getName(), new BasicDBObject("$exists", false)),
+                            new BasicDBObject(Processings.NERD.getName(), false)))
+            .get();
+
+    public static final DBObject ONLY_NOT_KEYTERM_ANNOTATED_TRANSFORMED_METADATA = new BasicDBObjectBuilder()
+            .add("isProcessedPub2TEI", true)
+            .add("$or",
+                    Arrays.asList(
+                            new BasicDBObject(Processings.KEYTERM.getName(), new BasicDBObject("$exists", false)),
+                            new BasicDBObject(Processings.KEYTERM.getName(), false)))
+            .get();
+
+    public static final DBObject ONLY_NOT_QUANTITIES_ANNOTATED_TRANSFORMED_METADATA = new BasicDBObjectBuilder()
+            .add("isProcessedPub2TEI", true)
+            .add("$or",
+                    Arrays.asList(
+                            new BasicDBObject(Processings.QUANTITIES.getName(), new BasicDBObject("$exists", false)),
+                            new BasicDBObject(Processings.QUANTITIES.getName(), false)))
+            .get();
+
+    public static final DBObject ONLY_NOT_PDFQUANTITIES_ANNOTATED_WITH_FULLTEXT = new BasicDBObjectBuilder()
+            .add("isWithFulltext", true)
+            .add("$or",
+                    Arrays.asList(
+                            new BasicDBObject(Processings.PDFQUANTITIES.getName(), new BasicDBObject("$exists", false)),
+                            new BasicDBObject(Processings.PDFQUANTITIES.getName(), false)))
+            .get();
+
+    public static final DBObject ONLY_TRANSFORMED_METADATA_NOT_INDEXED = new BasicDBObjectBuilder()
+            .add("isProcessedPub2TEI", true)
+            .add("isIndexed", false)
+            .get();
+
 
     /**
      * A static {@link MongoFileManager} object containing MongoFileManager
@@ -133,7 +179,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 }
                 );
 
-        collection.createIndex(ensureIndexQuery, "index_" + StringUtils.join(query.toMap().keySet(), "_"));
+        collection.createIndex(ensureIndexQuery, "index_" + StringUtils.join(ensureIndexQuery.keySet(), "_"));
         cursor = collection.find(query);
         cursor.addOption(com.mongodb.Bytes.QUERYOPTION_NOTIMEOUT);
         logger.info(cursor.size() + " objects found.");
@@ -201,7 +247,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //                if(resetStatus)
 //                    newDocument.put(p.getName(), false);
 //                else
-                newDocument.put(p.getName(), temp.get(p.getName()));
+                newDocument.put(p.getName(), (boolean)temp.get(p.getName()));
             }
         }
 
@@ -321,7 +367,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             grobidTei = this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.GROBID_TEIS);
         } catch (DataException de) {
-            logger.error("No corresponding fulltext TEI was found for " + biblioObject, de);
+            logger.error("No corresponding fulltext TEI was found for " + biblioObject);
         }
         return grobidTei;
     }

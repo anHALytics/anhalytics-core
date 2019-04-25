@@ -84,7 +84,8 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
                     + "\", \"keyterm\" : ");
             String jsonText = null;
             //call keyterm service on the grobid TEI.
-            KeyTermExtractionService keyTermService = new KeyTermExtractionService(IOUtils.toInputStream(biblioObject.getGrobidTei(), "UTF-8"));
+            String tei = biblioObject.getGrobidTei()!= null ? biblioObject.getGrobidTei() : biblioObject.getTeiCorpus();
+            KeyTermExtractionService keyTermService = new KeyTermExtractionService(IOUtils.toInputStream(tei, "UTF-8"));
             jsonText = keyTermService.runKeyTermExtraction();
             if (jsonText != null) {
                 json.append(jsonText).append("}");
@@ -93,6 +94,7 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
             }
         } catch (IOException e) {
             logger.error(Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + biblioObject.getRepositoryDocId(), e);
+            return null;
         }
         return json.toString();
     }

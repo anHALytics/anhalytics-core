@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.index;
 
 import fr.inria.anhalytics.commons.data.Annotation;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.index.exceptions.IndexNotCreatedException;
 import java.util.*;
 
@@ -50,7 +51,14 @@ public class DocumentIndexer extends Indexer {
             //bulkRequest.setRefresh(true);
             bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
 
-            if (mm.initObjects(null)) {
+            boolean initResult;
+            if (IndexProperties.isReset()) {
+                initResult = mm.initObjects(null, MongoFileManager.ONLY_TRANSFORMED_METADATA);
+            } else {
+                initResult = mm.initObjects(null, MongoFileManager.ONLY_TRANSFORMED_METADATA_NOT_INDEXED);
+            }
+
+            if (initResult) {
 
                 while (mm.hasMore()) {
                     BiblioObject biblioObject = mm.nextBiblioObject();

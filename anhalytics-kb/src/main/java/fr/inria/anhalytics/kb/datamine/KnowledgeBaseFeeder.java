@@ -66,7 +66,7 @@ public class KnowledgeBaseFeeder {
 
         boolean initResult;
         if (KbProperties.isReset()) {
-            initResult = mm.initObjects(null);
+            initResult = mm.initObjects(null, MongoFileManager.ONLY_TRANSFORMED_METADATA);
         } else {
             initResult = mm.initObjects(null, MongoFileManager.ONLY_NOT_MINED_INIT_KB_PROCESS);
         }
@@ -640,6 +640,12 @@ public class KnowledgeBaseFeeder {
         XPath xPath = XPathFactory.newInstance().newXPath();
         BiblioDAOFactory.initConnection();
         DocumentDAO dd = (DocumentDAO) abdf.getDocumentDAO();
+//        boolean initResult;
+//        if (KbProperties.isReset()) {
+//            initResult = mm.initObjects(null, MongoFileManager.ONLY_PROCESSED_TRANSFORM_METADATA_INIT_KB_PROCESS);
+//        } else {
+//            initResult = mm.initObjects(null, MongoFileManager.ONLY_PROCESSED_TRANSFORM_METADATA_INIT_KB_PROCESS);
+//        }
 
         if (mm.initObjects(null)) {
             while (mm.hasMore()) {

@@ -90,6 +90,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
             json.append("] }");
         } catch (Exception ex) {
             ex.printStackTrace();
+            return null;
         }
 
         // NOTE: the part bellow should be used in the future for improving the NERD by setting a custom 

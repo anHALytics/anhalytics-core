@@ -47,9 +47,9 @@ public class GrobidProcess {
 
                 boolean initResult;
                 if (HarvestProperties.isReset()) {
-                    initResult = mm.initObjects(null);
+                    initResult = mm.initObjects(null, MongoFileManager.ONLY_WITH_FULLTEXT_PROCESS);
                 } else {
-                    initResult = mm.initObjects(null, MongoFileManager.ONLY_NOT_PROCESSED_GROBID_PROCESS);
+                    initResult = mm.initObjects(null, MongoFileManager.ONLY_WITH_FULLTEXT_NOT_PROCESSED_GROBID_PROCESS);
                 }
 
                 if (initResult) {
