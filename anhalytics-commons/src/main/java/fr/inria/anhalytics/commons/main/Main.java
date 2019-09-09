@@ -165,7 +165,9 @@ public class Main {
             defaultprops.setProperty("harvest.grobid_host", grobid_host);
         }
 
-        int grobid_port = Integer.parseInt(defaultprops.getProperty("harvest.grobid_port"));
+        int grobid_port = 0;
+        if (defaultprops.getProperty("harvest.grobid_port") != null) 
+            grobid_port = Integer.parseInt(defaultprops.getProperty("harvest.grobid_port"));
         System.out.print(ANSI_YELLOW + "grobid_port (" + grobid_port + "): " + ANSI_RESET);
         try {
             grobid_port = Integer.parseInt(scanner.nextLine());
