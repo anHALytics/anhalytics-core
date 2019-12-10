@@ -141,7 +141,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
                     String jsonText = null;
                     try {
                         NerdClient nerdService = new NerdClient(AnnotateProperties.getNerdHost());
-                        jsonText = nerdService.disambiguateText(text, language).toString();
+                        jsonText = nerdService.disambiguateText(text.trim(), language).toString();
                     } catch (Exception ex) {
                         logger.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by NERD: " + text);
                         ex.printStackTrace();
