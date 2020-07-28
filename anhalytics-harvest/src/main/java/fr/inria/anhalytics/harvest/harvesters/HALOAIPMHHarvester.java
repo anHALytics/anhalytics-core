@@ -22,6 +22,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -32,6 +34,8 @@ import org.xml.sax.SAXException;
  * @author Achraf
  */
 public class HALOAIPMHHarvester extends Harvester {
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(HALOAIPMHHarvester.class);
 
     private static String OAI_FORMAT = "xml-tei";
 
@@ -71,19 +75,22 @@ public class HALOAIPMHHarvester extends Harvester {
             }
             logger.info("\t Sending: " + request);
 
-            InputStream in = Utilities.request(request, proxy);
-            grabbedObjects = this.oaiDom.getGrabbedObjects(in);
-            saveObjects();
-
-            // token if any:
-            tokenn = oaiDom.getToken();
-            if (tokenn == null) {
-                stop = true;
-            }
             try {
+                InputStream in = Utilities.request(request, proxy);
+                grabbedObjects = this.oaiDom.getGrabbedObjects(in);
+                saveObjects();
+
+                // token if any:
+                tokenn = oaiDom.getToken();
+                if (tokenn == null) {
+                    stop = true;
+                }
+
                 in.close();
             } catch (IOException ioex) {
                 throw new ServiceException("Couldn't close opened harvesting stream source.", ioex);
+            } catch(Exception e) {
+                LOGGER.error("Something went wrong, ignoring it and moving forward. ", e);
             }
         }
     }

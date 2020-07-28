@@ -15,19 +15,17 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
-import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 /**
  * Harvest implementation for ISTEX.
@@ -36,7 +34,7 @@ import org.xml.sax.SAXException;
  */
 public class IstexHarvester extends Harvester {
 
-    protected static final Logger logger = LoggerFactory.getLogger(IstexHarvester.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(IstexHarvester.class);
     private static IstexHarvester harvester = null;
 
     private static final String istexApiUrl = "https://api.istex.fr/document";
@@ -74,12 +72,12 @@ public class IstexHarvester extends Harvester {
                     continue;
                 }
                 if (!HarvestProperties.isReset() && mm.isSavedObject(docID, null)) {
-                    logger.info("\t\t Already grabbed, Skipping...");
+                    LOGGER.info("\t\t Already grabbed, Skipping...");
                     continue;
                 }
                 String request = "https://api.istex.fr/document/?q=id:" + docID + "&size=1&output=*";
                 URL url = new URL(request);
-                logger.info(request);
+                LOGGER.info(request);
                 urlConn = (HttpURLConnection) url.openConnection();
                 if (urlConn != null) {
                     urlConn.setDoInput(true);
@@ -100,12 +98,12 @@ public class IstexHarvester extends Harvester {
             }
             saveObjects();
         } catch (MalformedURLException mue) {
-            logger.error(mue.getMessage(), mue);
+            LOGGER.error(mue.getMessage(), mue);
         } catch (ServiceException se) {
-            logger.error(se.getMessage(), se);
+            LOGGER.error(se.getMessage(), se);
             mm.save("", "blockedHarvestProcess", se.getMessage());
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -114,7 +112,7 @@ public class IstexHarvester extends Harvester {
                     br.close();
                 }
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
             }
         }
     }
@@ -152,7 +150,7 @@ public class IstexHarvester extends Harvester {
 
         //get Metadata string from id
         String request = istexApiUrl + "/" + bo.getRepositoryDocId() + "/fulltext/tei";
-        logger.info("Downloading fulltext TEI document :" + bo.getRepositoryDocId());
+        LOGGER.info("Downloading fulltext TEI document :" + bo.getRepositoryDocId());
         bo.setMetadataURL(request);
         bo.setMetadata(IOUtils.toString(new URL(request), "UTF-8"));
 
@@ -186,7 +184,7 @@ public class IstexHarvester extends Harvester {
         try {
             for (String category : categories) {
                 String[] cat = category.split("\\.");
-                logger.info("\t\t\t\t Sampling " + sampleSize + " documents from category : " + cat[1]);
+                LOGGER.info("\t\t\t\t Sampling " + sampleSize + " documents from category : " + cat[1]);
                 //count = getCategoryDocCount(cat);
                 // Use scroll
 //                count = 10000;
@@ -199,7 +197,7 @@ public class IstexHarvester extends Harvester {
 
                 request = istexApiUrl + "/" + params;
                 URL url = new URL(request);
-                logger.info(request);
+                LOGGER.info(request);
                 urlConn = (HttpURLConnection) url.openConnection();
                 if (urlConn != null) {
                     urlConn.setDoInput(true);
@@ -243,7 +241,7 @@ public class IstexHarvester extends Harvester {
         Long total = null;
         try {
             URL url = new URL(request);
-            logger.info(request);
+            LOGGER.info(request);
             urlConn = (HttpURLConnection) url.openConnection();
             if (urlConn != null) {
                 urlConn.setDoInput(true);
@@ -255,7 +253,7 @@ public class IstexHarvester extends Harvester {
                 JSONObject jsonObject = (JSONObject) jsonParser.parse(json);
                 total = (Long) jsonObject.get("total");
 
-                logger.info(String.format("Found %d entries for %s class.", total, cat[0] + "." + cat[1]));
+                LOGGER.info(String.format("Found %d entries for %s class.", total, cat[0] + "." + cat[1]));
             }
         } catch (Exception e) {
             e.printStackTrace();
