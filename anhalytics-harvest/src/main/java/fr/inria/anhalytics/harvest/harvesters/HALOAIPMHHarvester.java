@@ -11,7 +11,9 @@ import java.io.FileReader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -38,12 +40,18 @@ public class HALOAIPMHHarvester extends Harvester {
     
     // hal url for harvesting from a file list
     private static String halUrl = "https://hal.archives-ouvertes.fr/";
+
+    private Proxy proxy = null;
     
     private HALOAIPMHDomParser oaiDom;
 
     public HALOAIPMHHarvester() {
         super();
         this.oaiDom = new HALOAIPMHDomParser();
+    }
+
+    public HALOAIPMHHarvester(Proxy proxy) {
+        this.proxy = proxy;
     }
 
     /**
@@ -64,7 +72,7 @@ public class HALOAIPMHHarvester extends Harvester {
             }
             logger.info("\t Sending: " + request);
 
-            InputStream in = Utilities.request(request);
+            InputStream in = Utilities.request(request, proxy);
             grabbedObjects = this.oaiDom.getGrabbedObjects(in);
             saveObjects();
 

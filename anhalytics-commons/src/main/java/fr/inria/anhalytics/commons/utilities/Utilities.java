@@ -28,6 +28,7 @@ import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -70,7 +71,7 @@ public class Utilities {
             int monthYear = (year == todayYear) ? todayMonth : 12;
             for (int month = 1; month <= monthYear; month++) {
                 for (int day = 1; day <= daysInMonth(year, month); day++) {
-                    if ((year == todayYear) && (todayMonth == todayMonth) && (todayDay == day)) {
+                    if ((year == todayYear) && (todayMonth == month) && (todayDay == day)) {
                         break;
                     }
                     StringBuilder date = new StringBuilder();
@@ -437,13 +438,13 @@ public class Utilities {
         }
     }
 
-    public static InputStream request(String request) throws MalformedURLException {
+    public static InputStream request(String request, Proxy proxy) throws MalformedURLException {
         InputStream in = null;
         long startTime = 0;
         long endTime = 0;
         startTime = System.currentTimeMillis();
         URL url = new URL(request);
-        HttpURLConnection conn = getConnection(url);
+        HttpURLConnection conn = getConnection(url, proxy);
         try {
             in = conn.getInputStream();
         } catch (IOException e) {
@@ -454,7 +455,7 @@ public class Utilities {
         return in;
     }
 
-    private static final HttpURLConnection getConnection(URL url) {
+    private static final HttpURLConnection getConnection(URL url, Proxy proxy) {
         int retry = 0, retries = 4;
         boolean delay = false;
         HttpURLConnection connection = null;
@@ -467,7 +468,11 @@ public class Utilities {
                         Thread.currentThread().interrupt();
                     }
                 }
-                connection = (HttpURLConnection) url.openConnection();
+                if(proxy != null) {
+                    connection = (HttpURLConnection) url.openConnection(proxy);
+                }else {
+                    connection = (HttpURLConnection) url.openConnection();
+                }
                 connection.setRequestMethod("GET");
                 connection.setRequestProperty("accept-charset", "UTF-8");
                 switch (connection.getResponseCode()) {
