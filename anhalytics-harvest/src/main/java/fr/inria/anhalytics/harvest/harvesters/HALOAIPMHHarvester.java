@@ -87,8 +87,6 @@ public class HALOAIPMHHarvester extends Harvester {
                 }
 
                 in.close();
-            } catch (IOException ioex) {
-                throw new ServiceException("Couldn't close opened harvesting stream source.", ioex);
             } catch(Exception e) {
                 LOGGER.error("Something went wrong, ignoring it and moving forward. ", e);
             }
@@ -105,9 +103,9 @@ public class HALOAIPMHHarvester extends Harvester {
                 fetchDocumentsByDate(date);
             }
         } catch (MalformedURLException mue) {
-            logger.error(mue.getMessage(), mue);
+            logger.error("URL Error when fetching the data from the service. ", mue);
         } catch (ServiceException se) {
-            logger.error(se.getMessage(), se);
+            logger.error("Error when fetching the data from the service. ", se);
             mm.save(currentDate, "blockedHarvestProcess", se.getMessage());
         }
     }
