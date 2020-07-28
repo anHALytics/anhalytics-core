@@ -9,6 +9,7 @@ import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 
 import java.io.IOException;
+import java.net.Proxy;
 import java.util.List;
 import java.util.Date;
 import java.text.ParseException;
@@ -34,6 +35,8 @@ public abstract class Harvester {
     protected static final Logger logger = LoggerFactory.getLogger(Harvester.class);
 
     protected List<BiblioObject> grabbedObjects = new ArrayList<BiblioObject>();
+
+    protected Proxy proxy = null;
 
     // Source of the harvesting
     public enum Source {
@@ -147,7 +150,7 @@ public abstract class Harvester {
         if (embDate == null || embDate.before(today) || embDate.equals(today)) {
             logger.info("\t\t\t Downloading: " + bf.getUrl());
             try {
-                bf.setStream(Utilities.request(bf.getUrl()));
+                bf.setStream(Utilities.request(bf.getUrl(), proxy));
             } catch (MalformedURLException | ServiceException se) {
                 logger.error(se.getMessage());
                 throw new BinaryNotAvailableException();

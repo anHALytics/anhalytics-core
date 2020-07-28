@@ -40,8 +40,6 @@ public class HALOAIPMHHarvester extends Harvester {
     
     // hal url for harvesting from a file list
     private static String halUrl = "https://hal.archives-ouvertes.fr/";
-
-    private Proxy proxy = null;
     
     private HALOAIPMHDomParser oaiDom;
 
@@ -51,6 +49,7 @@ public class HALOAIPMHHarvester extends Harvester {
     }
 
     public HALOAIPMHHarvester(Proxy proxy) {
+        this();
         this.proxy = proxy;
     }
 
