@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Main {
     
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
     
     private static List<String> availableCommands = new ArrayList<String>() {
         {
@@ -31,7 +31,7 @@ public class Main {
         try {
             KbProperties.init("anhalytics.properties");
         } catch (Exception exp) {
-            logger.error(exp.getMessage());
+            LOGGER.error(exp.getMessage());
             return;
         }
         
@@ -57,7 +57,7 @@ public class Main {
                 kbf.processCitations();
             }
         } catch (ServiceException se) {
-            logger.error("Error: ", se);
+            LOGGER.error("Error: ", se);
         }
         return;
     }

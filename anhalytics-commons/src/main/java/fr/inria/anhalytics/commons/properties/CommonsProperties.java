@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.commons.properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,6 +13,8 @@ import java.util.Properties;
  * @author achraf
  */
 public class CommonsProperties {
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(CommonsProperties.class);
 
     private static String mongodbServer;
     private static int mongodbPort;
@@ -44,7 +49,7 @@ public class CommonsProperties {
                 setMysql_pass(prop.getProperty("kb.mysql_pass"));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error init common properties", e);
         }
     }
 

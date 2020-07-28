@@ -2,6 +2,7 @@ package fr.inria.anhalytics.commons.dao;
 
 import fr.inria.anhalytics.commons.entities.*;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
@@ -9,14 +10,13 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author azhar
  */
 public class PublicationDAO extends DAO<Publication, Long> {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PublicationDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PublicationDAO.class);
 
     private static final String SQL_INSERT
             = "INSERT INTO PUBLICATION (docID, monographID, publisherID, type, doc_title, date_printed, date_electronic, first_page, last_page, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -125,11 +125,11 @@ public class PublicationDAO extends DAO<Publication, Long> {
                             rs.getString("language")
                     );
                 } catch (ParseException ex) {
-                    Logger.getLogger(PublicationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("Error: ", ex);
                 }
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -160,12 +160,12 @@ public class PublicationDAO extends DAO<Publication, Long> {
                             )
                     );
                 } catch (ParseException ex) {
-                    Logger.getLogger(PublicationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("Error: ", ex);
                 }
             }
             rs.close();
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(preparedStatement);
         }

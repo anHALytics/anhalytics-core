@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class Harvester {
 
-    protected static final Logger logger = LoggerFactory.getLogger(Harvester.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Harvester.class);
 
     protected List<BiblioObject> grabbedObjects = new ArrayList<BiblioObject>();
 
@@ -99,22 +99,22 @@ public abstract class Harvester {
                 pdfUrl = object.getPdf().getUrl();
             }
             String repositoryDocId = object.getRepositoryDocId();
-            logger.info("\t\t Processing metadata from " + object.getSource() + " document :" + repositoryDocId);
+            LOGGER.info("\t\t Processing metadata from " + object.getSource() + " document :" + repositoryDocId);
             if (metadataString.length() > 0) {
                 if (!HarvestProperties.isReset() && mm.isSavedObject(repositoryDocId, object.getRepositoryDocVersion())) {
-                    logger.info("\t\t Already grabbed, Skipping...");
+                    LOGGER.info("\t\t Already grabbed, Skipping...");
                     continue;
                 }
                 try {
                     if (object.getPdf() != null) {
-                        logger.info("\t\t\t\t downloading PDF file.");
+                        LOGGER.info("\t\t\t\t downloading PDF file.");
                         requestFile(object.getPdf());
                         if(object.getPdf().getStream() == null)
                             object.setIsWithFulltext(Boolean.FALSE);
                     } else {
                         object.setIsWithFulltext(Boolean.FALSE);
                         mm.save(object.getRepositoryDocId(), "harvestProcess", "no URL for binary");
-                        logger.info("\t\t\t\t PDF not found !");
+                        LOGGER.info("\t\t\t\t PDF not found !");
                     }
                     if (object.getAnnexes() != null) {
                         for (BinaryFile file : object.getAnnexes()) {
@@ -122,17 +122,17 @@ public abstract class Harvester {
                         }
                     }
                 } catch (BinaryNotAvailableException bna) {
-                    logger.error(bna.getMessage());
+                    LOGGER.error(bna.getMessage());
                     mm.save(object.getRepositoryDocId(), "harvestProcess", "file not downloaded");
                 } catch (ParseException | IOException e) {
-                    logger.error("\t\t Error occured while processing TEI for " + object.getRepositoryDocId(), e);
+                    LOGGER.error("\t\t Error occured while processing TEI for " + object.getRepositoryDocId(), e);
                     mm.save(object.getRepositoryDocId(), "harvestProcess", "harvest error");
                 }
 
-                logger.info("\t\t\t\t Storing object " + repositoryDocId);
+                LOGGER.info("\t\t\t\t Storing object " + repositoryDocId);
                 mm.insertBiblioObject(object);
             } else {
-                logger.info("\t\t\t No TEI metadata !!!");
+                LOGGER.info("\t\t\t No TEI metadata !!!");
             }
         }
     }
@@ -145,11 +145,11 @@ public abstract class Harvester {
         Date embDate = Utilities.parseStringDate(bf.getEmbargoDate());
         Date today = new Date();
         if (embDate == null || embDate.before(today) || embDate.equals(today)) {
-            logger.info("\t\t\t Downloading: " + bf.getUrl());
+            LOGGER.info("\t\t\t Downloading: " + bf.getUrl());
             try {
                 bf.setStream(Utilities.request(bf.getUrl()));
             } catch (MalformedURLException | ServiceException se) {
-                logger.error(se.getMessage());
+                LOGGER.error(se.getMessage());
                 throw new BinaryNotAvailableException();
             }
 
@@ -160,12 +160,12 @@ public abstract class Harvester {
                     int n = bf.getUrl().lastIndexOf("/");
                     String filename = bf.getUrl().substring(n + 1);
                     bf.setFileName(filename);
-                    logger.info("\t\t\t\t Getting annex file " + filename + " for pub ID :" + bf.getRepositoryDocId());
+                    LOGGER.info("\t\t\t\t Getting annex file " + filename + " for pub ID :" + bf.getRepositoryDocId());
                 }
             }
         } else {
             mm.log(bf.getRepositoryDocId(), bf.getAnhalyticsId(), bf.getUrl(), bf.getDocumentType(), bf.isIsAnnexFile(), "embargo", bf.getEmbargoDate());
-            logger.info("\t\t\t file under embargo !");
+            LOGGER.info("\t\t\t file under embargo !");
         }
     }
 }

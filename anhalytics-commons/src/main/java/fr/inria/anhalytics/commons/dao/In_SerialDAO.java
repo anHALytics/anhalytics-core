@@ -5,6 +5,9 @@ import fr.inria.anhalytics.commons.entities.In_Serial;
 import fr.inria.anhalytics.commons.entities.Journal;
 import fr.inria.anhalytics.commons.entities.Monograph;
 import fr.inria.anhalytics.commons.entities.Serial_Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +19,8 @@ import java.sql.Statement;
  * @author azhar
  */
 public class In_SerialDAO extends DAO<In_Serial, Long> {
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(In_SerialDAO.class);
     
     private static final String SQL_INSERT
             = "INSERT INTO IN_SERIAL (monographID, collectionID, journalID, volume, number) VALUES (?, ?, ?, ?, ?)";
@@ -172,7 +177,7 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
                 collection = new Collection(result.getLong("collectionID"), result.getString("title"));
             }
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            LOGGER.error("Error: ", sqle);
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -191,7 +196,7 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
                 journal = new Journal(result.getLong("journalID"), result.getString("title"));
             }
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            LOGGER.error("Error: ", sqle);
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -216,7 +221,7 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
                         result.getString("IN_SERIAL.number"));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Error: ", ex);
         } finally {
             closeQuietly(preparedStatement);
         }

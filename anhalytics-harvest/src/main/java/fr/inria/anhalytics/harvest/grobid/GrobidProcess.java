@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GrobidProcess {
 
-    private static final Logger logger = LoggerFactory.getLogger(GrobidProcess.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidProcess.class);
 
     private MongoFileManager mm;
 
@@ -58,11 +58,11 @@ public class GrobidProcess {
 //                        if (toBeGrobidified.contains(biblioObject.getPublicationType().split("_")[0])) {
 
                             if (!biblioObject.getIsWithFulltext()) {
-                                logger.info("\t\t No fulltext available for : "+biblioObject.getRepositoryDocId()+", Skipping...");
+                                LOGGER.info("\t\t No fulltext available for : "+biblioObject.getRepositoryDocId()+", Skipping...");
                                 continue;
                             }
                             if (!HarvestProperties.isReset() && mm.isProcessed(Processings.GROBID)) {
-                                logger.info("\t\t Already grobidified, Skipping...");
+                                LOGGER.info("\t\t Already grobidified, Skipping...");
                                 continue;
                             }
 
@@ -81,10 +81,10 @@ public class GrobidProcess {
                                 Runnable worker = new GrobidSimpleFulltextWorker(biblioObject, start, end);
                                 executor.execute(worker);
                             } catch (ParserConfigurationException exp) {
-                                logger.error("An error occured while processing the file " + bf.getRepositoryDocId()
+                                LOGGER.error("An error occured while processing the file " + bf.getRepositoryDocId()
                                         + ". Continuing the process for the other files.", exp);
                             } catch (DataException dataexp) {
-                                logger.error("Can't get the fulltext PDF for " + bf.getRepositoryDocId()
+                                LOGGER.error("Can't get the fulltext PDF for " + bf.getRepositoryDocId()
                                         + ".", dataexp);
                             }
 //                        }
@@ -92,7 +92,7 @@ public class GrobidProcess {
                 }
 
                 executor.shutdown();
-                logger.info("Jobs done, shutting down thread pool. The executor will wait 2 minutes before forcing the shutdown.");
+                LOGGER.info("Jobs done, shutting down thread pool. The executor will wait 2 minutes before forcing the shutdown.");
                 try {
                     if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES)) {
                         executor.shutdownNow();
@@ -101,9 +101,9 @@ public class GrobidProcess {
                     executor.shutdownNow();
                 }
             }
-            logger.info("Finished all threads");
+            LOGGER.info("Finished all threads");
         } catch (UnreachableGrobidServiceException ugse) {
-            logger.error(ugse.getMessage());
+            LOGGER.error(ugse.getMessage());
         }
     }
 }

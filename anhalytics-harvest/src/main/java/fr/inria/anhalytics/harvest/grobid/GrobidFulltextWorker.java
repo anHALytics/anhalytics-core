@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GrobidFulltextWorker extends GrobidWorker {
 
-    private static final Logger logger = LoggerFactory.getLogger(GrobidFulltextWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidFulltextWorker.class);
     
     public GrobidFulltextWorker(BiblioObject biblioObject, String date, int start, int end) throws ParserConfigurationException {
         super(biblioObject, start, end);
@@ -42,7 +42,7 @@ public class GrobidFulltextWorker extends GrobidWorker {
 //                }
 //            }
 //        } catch (Exception ex) {
-//            logger.error(ex.getMessage(), ex.getCause());
+//            LOGGER.error(ex.getMessage(), ex.getCause());
 //        }
 //    }
 }

@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Main {
 
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands = new ArrayList<String>() {
         {
@@ -36,7 +36,7 @@ public class Main {
         try {
             AnnotateProperties.init("anhalytics.properties");
         } catch (PropertyException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             return;
         }
 
@@ -68,7 +68,7 @@ public class Main {
                 annotator.annotate(Processings.PDFQUANTITIES);
             }
         } catch (ServiceException se) {
-            logger.error(se.getMessage());
+            LOGGER.error(se.getMessage());
         }
     }
 

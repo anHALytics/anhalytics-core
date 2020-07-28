@@ -19,7 +19,7 @@ import static org.apache.commons.lang3.StringUtils.lowerCase;
  */
 public class TeiCorpusBuilderProcess {
 
-    private static final Logger logger = LoggerFactory.getLogger(TeiCorpusBuilderProcess.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TeiCorpusBuilderProcess.class);
 
     private MongoFileManager mm;
 
@@ -46,7 +46,7 @@ public class TeiCorpusBuilderProcess {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 if (!HarvestProperties.isReset() && biblioObject.getIsProcessedByPub2TEI()) {
-                    logger.info("\t\t Already transformed, Skipping...  " + biblioObject.getRepositoryDocId());
+                    LOGGER.info("\t\t Already transformed, Skipping...  " + biblioObject.getRepositoryDocId());
                     continue;
                 }
                 biblioObject.setMetadata(mm.getMetadata(biblioObject));
@@ -56,7 +56,7 @@ public class TeiCorpusBuilderProcess {
         }
 
         executor.shutdown();
-        logger.info("Jobs done, shutting down thread pool. The executor will wait 1 minutes before forcing off.  ");
+        LOGGER.info("Jobs done, shutting down thread pool. The executor will wait 1 minutes before forcing off.  ");
         try {
             if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES)) {
                 executor.shutdownNow();
@@ -64,7 +64,7 @@ public class TeiCorpusBuilderProcess {
         } catch (InterruptedException e) {
             executor.shutdownNow();
         }
-        logger.info("Finished all threads");
+        LOGGER.info("Finished all threads");
     }
 
     /**
@@ -90,12 +90,12 @@ public class TeiCorpusBuilderProcess {
                 while (mm.hasMore()) {
                     BiblioObject biblioObject = mm.nextBiblioObject();
                     if (!HarvestProperties.isReset() && biblioObject.getIsFulltextAppended()) {
-                        logger.info("\t\t Fulltext already appended, Skipping... " + biblioObject.getRepositoryDocId());
+                        LOGGER.info("\t\t Fulltext already appended, Skipping... " + biblioObject.getRepositoryDocId());
                         continue;
                     }
                     //grobid tei and tei corpus with metadata initialisation should be available.
                     if (!biblioObject.getIsProcessedByPub2TEI()) {
-                        logger.info("\t\t Metadata TEI not found, first consider creating TEI from metadata, Skipping... " + biblioObject.getRepositoryDocId());
+                        LOGGER.info("\t\t Metadata TEI not found, first consider creating TEI from metadata, Skipping... " + biblioObject.getRepositoryDocId());
                         continue;
                     }
                     Runnable worker = new TeiBuilderWorker(biblioObject, Steps.APPEND_FULLTEXT);
@@ -105,7 +105,7 @@ public class TeiCorpusBuilderProcess {
 
 
             executor.shutdown();
-            logger.info("Jobs done, shutting down thread pool. ");
+            LOGGER.info("Jobs done, shutting down thread pool. ");
             try {
                 if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES)) {
                     executor.shutdownNow();
@@ -113,9 +113,9 @@ public class TeiCorpusBuilderProcess {
             } catch (InterruptedException e) {
                 executor.shutdownNow();
             }
-            logger.info("Finished all threads");
+            LOGGER.info("Finished all threads");
         } catch (UnreachableGrobidServiceException ugse) {
-            logger.error(ugse.getMessage());
+            LOGGER.error(ugse.getMessage());
         }
     }
 }

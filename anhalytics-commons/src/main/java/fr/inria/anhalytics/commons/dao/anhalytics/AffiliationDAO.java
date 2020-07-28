@@ -14,7 +14,8 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AffiliationDAO extends DAO<Affiliation, Long> {
     
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AffiliationDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AffiliationDAO.class);
     
     private static final String SQL_INSERT
             = "INSERT INTO AFFILIATION (organisationID, personID, from_date, until_date) VALUES (?, ?, ?, ?)";
@@ -59,11 +60,11 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
                     affiliation.addOrganisation(org);
                     
                 } catch (ParseException ex) {
-                    Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("SQL Exception: ", ex);
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Error: ", ex);
         } finally {
             closeQuietly(statement);
         }
@@ -125,7 +126,7 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
                     result = true;
                     
                 } catch (MySQLIntegrityConstraintViolationException e) {
-                    //e.printStackTrace();
+                    //LOGGER.error("Error: ", e);
                 }finally{
                     closeQuietly(statement);
                 }
@@ -165,11 +166,11 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
                             Utilities.parseStringDate(result.getString("until_date"))
                     );
                 } catch (ParseException ex) {
-                    Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("Error SQL: ", ex);
                 }
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(preparedStatement);
         }

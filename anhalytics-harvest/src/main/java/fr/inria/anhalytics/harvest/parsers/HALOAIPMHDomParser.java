@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
  */
 public class HALOAIPMHDomParser {
 
-    protected static final Logger logger = LoggerFactory.getLogger(HALOAIPMHDomParser.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(HALOAIPMHDomParser.class);
 
     private final static String source = Harvester.Source.HAL.getName();
 
@@ -60,7 +60,7 @@ public class HALOAIPMHDomParser {
             //XPath xPath = XPathFactory.newInstance().newXPath();//play with it  
             //NodeList nodes = (NodeList)xPath.evaluate("/OAI-PMH/ListRecords/record/metadata", rootElement, XPathConstants.NODESET);
             setToken(rootElement);
-            logger.info("\t \t " + listRecords.getLength() + " records found. processing...");
+            LOGGER.info("\t \t " + listRecords.getLength() + " records found. processing...");
 
             if (listRecords.getLength() >= 1) {
                 for (int i = listRecords.getLength() - 1; i >= 0; i--) {
@@ -119,9 +119,9 @@ public class HALOAIPMHDomParser {
 //            List<BinaryFile> annexes = getAnnexes(record, repositoryDocId, currentVersion, "", type);
 //            biblioObj.setAnnexes(annexes);
 
-            logger.info("\t \t \t tei of " + repositoryDocId + " extracted.");
+            LOGGER.info("\t \t \t tei of " + repositoryDocId + " extracted.");
 //            } else {
-//                logger.info("\t \t \t skipping " + completeRepositoryDocId + " , it's not a current version.");
+//                LOGGER.info("\t \t \t skipping " + completeRepositoryDocId + " , it's not a current version.");
 //            }
         }
         return biblioObj;
@@ -133,7 +133,7 @@ public class HALOAIPMHDomParser {
             Element node = (Element) xPath.compile(OAIPMHPathsItf.EditionElement).evaluate(record, XPathConstants.NODE);
             currentVersion = node.getAttribute("n");
         } catch (DataException | XPathExpressionException ex) {
-            logger.info("\t \t \t \t No current edition found .");
+            LOGGER.info("\t \t \t \t No current edition found .");
         }
         return currentVersion;
     }
@@ -149,7 +149,7 @@ public class HALOAIPMHDomParser {
                 throw new DataException();
             }
         } catch (DataException | XPathExpressionException | DOMException ex) {
-            logger.info("\t \t \t \t hal ref not found");
+            LOGGER.info("\t \t \t \t hal ref not found");
         }
         return reference;
     }
@@ -164,7 +164,7 @@ public class HALOAIPMHDomParser {
                 throw new DataException();
             }
         } catch (DataException | XPathExpressionException | DOMException ex) {
-            logger.info("\t \t \t \t doi not found");
+            LOGGER.info("\t \t \t \t doi not found");
         }
         return doi;
     }
@@ -185,7 +185,7 @@ public class HALOAIPMHDomParser {
                 throw new DataException();
             }
         } catch (DataException | XPathExpressionException | DOMException ex) {
-            logger.info("\t \t \t \t no publication type found");
+            LOGGER.info("\t \t \t \t no publication type found");
         }
         return domains;
     }
@@ -200,7 +200,7 @@ public class HALOAIPMHDomParser {
                 throw new DataException();
             }
         } catch (DataException | XPathExpressionException | DOMException ex) {
-            logger.info("\t \t \t \t no publication type found");
+            LOGGER.info("\t \t \t \t no publication type found");
         }
         return type;
     }
@@ -227,7 +227,7 @@ public class HALOAIPMHDomParser {
             DocumentBuilder db = dbf.newDocumentBuilder();
             return db.parse(in);
         } catch (DataException | IOException | ParserConfigurationException | SAXException e) {//
-            logger.error("Could not parse document because "
+            LOGGER.error("Could not parse document because "
                     + e.getMessage());
         }
         return null;
@@ -251,7 +251,7 @@ public class HALOAIPMHDomParser {
                 throw new DataException();
             }
         } catch (DataException | XPathExpressionException ex) {
-            logger.info("\t \t \t \t No file attached .");
+            LOGGER.info("\t \t \t \t No file attached .");
         }
         return file;
     }
@@ -262,7 +262,7 @@ public class HALOAIPMHDomParser {
         try {
             nodes = (NodeList) xPath.compile(OAIPMHPathsItf.AnnexesUrlsElement).evaluate(record, XPathConstants.NODESET);
         } catch (XPathExpressionException ex) {
-            logger.info("\t \t \t \t No annex files attached .");
+            LOGGER.info("\t \t \t \t No annex files attached .");
         }
         String url = null;
         String embargoDate = null;
@@ -291,7 +291,7 @@ public class HALOAIPMHDomParser {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             teiDoc = docBuilder.parse(new ByteArrayInputStream(teiString.getBytes()));
         } catch (SAXException | ParserConfigurationException | IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
 
 //        teiDoc = createTEICorpus(teiDoc);
@@ -300,7 +300,7 @@ public class HALOAIPMHDomParser {
         try {
             teiString = Utilities.toString(teiDoc);
         } catch (DataException de) {
-            de.printStackTrace();
+            LOGGER.error("Error: ", de);
         }
         return teiString;
     }
@@ -328,7 +328,7 @@ public class HALOAIPMHDomParser {
                 throw new DataException();
             }
         } catch (DataException | XPathExpressionException | DOMException ex) {
-            logger.info("\t \t \t \t no publication repository id found");
+            LOGGER.info("\t \t \t \t no publication repository id found");
         }
         return repositoryDocId;
     }

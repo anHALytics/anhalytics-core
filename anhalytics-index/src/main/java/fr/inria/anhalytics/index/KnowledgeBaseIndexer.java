@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  */
 public class KnowledgeBaseIndexer extends Indexer {
 
-    private static final Logger logger = LoggerFactory.getLogger(KnowledgeBaseIndexer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KnowledgeBaseIndexer.class);
 
     private static final AbstractDAOFactory adf = AbstractDAOFactory.getFactory(AbstractDAOFactory.DAO_FACTORY);
     private static final AbstractBiblioDAOFactory biblioadf = AbstractBiblioDAOFactory.getFactory(AbstractBiblioDAOFactory.DAO_FACTORY);
@@ -143,21 +143,21 @@ public class KnowledgeBaseIndexer extends Indexer {
                     BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                     if (bulkResponse.hasFailures()) {
                         // process failures by iterating through each bulk response item	
-                        logger.error(bulkResponse.buildFailureMessage());
+                        LOGGER.error(bulkResponse.buildFailureMessage());
                     }
                     bulkRequest = client.prepareBulk();
                     //bulkRequest.setRefresh(true);
                     bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                    logger.info("\n Bulk number : " + nb / bulkSize);
+                    LOGGER.info("\n Bulk number : " + nb / bulkSize);
                 }
             }
             // last bulk
             if (nb % bulkSize != 0) {
                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                logger.info("\n One Last Bulk.");
+                LOGGER.info("\n One Last Bulk.");
                 if (bulkResponse.hasFailures()) {
                     // process failures by iterating through each bulk response item	
-                    logger.error(bulkResponse.buildFailureMessage());
+                    LOGGER.error(bulkResponse.buildFailureMessage());
                 }
             }
         } else {
@@ -282,7 +282,7 @@ public class KnowledgeBaseIndexer extends Indexer {
 
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("Error: ", e);
                 }
                 documentDocument.put("annotations", result);
                 //HAL domains
@@ -296,21 +296,21 @@ public class KnowledgeBaseIndexer extends Indexer {
                     BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                     if (bulkResponse.hasFailures()) {
                         // process failures by iterating through each bulk response item	
-                        logger.error(bulkResponse.buildFailureMessage());
+                        LOGGER.error(bulkResponse.buildFailureMessage());
                     }
                     bulkRequest = client.prepareBulk();
                     //bulkRequest.setRefresh(true);
                     bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                    logger.info("\n Bulk number : " + nb / bulkSize);
+                    LOGGER.info("\n Bulk number : " + nb / bulkSize);
                 }
             }
             // last bulk
             if (nb % bulkSize != 0) {
                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                logger.info("\n One Last Bulk.");
+                LOGGER.info("\n One Last Bulk.");
                 if (bulkResponse.hasFailures()) {
                     // process failures by iterating through each bulk response item	
-                    logger.error(bulkResponse.buildFailureMessage());
+                    LOGGER.error(bulkResponse.buildFailureMessage());
                 }
             }
         } else {
@@ -378,21 +378,21 @@ public class KnowledgeBaseIndexer extends Indexer {
                     BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                     if (bulkResponse.hasFailures()) {
                         // process failures by iterating through each bulk response item	
-                        logger.error(bulkResponse.buildFailureMessage());
+                        LOGGER.error(bulkResponse.buildFailureMessage());
                     }
                     bulkRequest = client.prepareBulk();
                     //bulkRequest.setRefresh(true);
                     bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                    logger.info("\n Bulk number : " + nb / bulkSize);
+                    LOGGER.info("\n Bulk number : " + nb / bulkSize);
                 }
             }
             // last bulk
             if (nb % bulkSize != 0) {
                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                logger.info("\n One Last Bulk.");
+                LOGGER.info("\n One Last Bulk.");
                 if (bulkResponse.hasFailures()) {
                     // process failures by iterating through each bulk response item	
-                    logger.error(bulkResponse.buildFailureMessage());
+                    LOGGER.error(bulkResponse.buildFailureMessage());
                 }
             }
         } else {

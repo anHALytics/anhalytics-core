@@ -43,7 +43,7 @@ import java.util.List;
  */
 public class KnowledgeBaseFeeder {
 
-    private static final Logger logger = LoggerFactory.getLogger(KnowledgeBaseFeeder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KnowledgeBaseFeeder.class);
 
     private static final AbstractDAOFactory adf = AbstractDAOFactory.getFactory(AbstractDAOFactory.DAO_FACTORY);
 
@@ -75,7 +75,7 @@ public class KnowledgeBaseFeeder {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 if (!KbProperties.isReset() && biblioObject.getIsMined()) {
-                    logger.info("\t\t Already mined, Skipping...");
+                    LOGGER.info("\t\t Already mined, Skipping...");
                     continue;
                 }
                 adf.openTransaction();
@@ -90,7 +90,7 @@ public class KnowledgeBaseFeeder {
                         docBuilder = docFactory.newDocumentBuilder();
                         teiDoc = docBuilder.parse(teiStream);
                     } catch (Exception e) {
-                        logger.error("Error when parsing TEI stream. ", e);
+                        LOGGER.error("Error when parsing TEI stream. ", e);
                     }
                     teiStream.close();
 
@@ -115,7 +115,7 @@ public class KnowledgeBaseFeeder {
                     NodeList authors = teiHeader.getElementsByTagName("author");
                     Element monogr = (Element) xPath.compile(TeiPaths.MonogrElement).evaluate(teiDoc, XPathConstants.NODE);
                     NodeList ids = (NodeList) xPath.compile(TeiPaths.IdnoElement).evaluate(teiDoc, XPathConstants.NODESET);
-                    logger.info("Extracting :" + biblioObject.getRepositoryDocId());
+                    LOGGER.info("Extracting :" + biblioObject.getRepositoryDocId());
                     if (authors.getLength() > 30) {
                         throw new NumberOfCoAuthorsExceededException("Number of authors exceed 30 co-authors for this publication.");
                     }
@@ -137,13 +137,13 @@ public class KnowledgeBaseFeeder {
                     processPersons(authors, "author", pub, teiDoc, authorsFromfulltextTeiHeader);
                     processPersons(editors, "editor", pub, teiDoc, authorsFromfulltextTeiHeader);
 
-                    logger.info("#################################################################");
+                    LOGGER.info("#################################################################");
                 } catch(NumberOfCoAuthorsExceededException e) {
-                    logger.warn("Skipping publication, number of coauthors are exceeding 30", e);
+                    LOGGER.warn("Skipping publication, number of coauthors are exceeding 30", e);
                     adf.rollback();
                     teiDoc = null;
                 } catch (Exception xpe) {
-                    logger.error("Error during transaction. Rollback records", xpe);
+                    LOGGER.error("Error during transaction. Rollback records", xpe);
                     adf.rollback();
                     teiDoc = null;
                 }
@@ -158,7 +158,7 @@ public class KnowledgeBaseFeeder {
         }
 
         DAOFactory.closeConnection();
-        logger.info("DONE.");
+        LOGGER.info("DONE.");
     }
 
     private static void processIdentifiers(NodeList ids, fr.inria.anhalytics.commons.entities.Document doc, String halId) throws SQLException {
@@ -227,7 +227,7 @@ public class KnowledgeBaseFeeder {
                                         try {
                                             pub.setDate_printed(Utilities.parseStringDate(date));
                                         } catch (ParseException ex) {
-                                            ex.printStackTrace();
+                                            LOGGER.error("Error: ", ex);
                                         }
                                     }
                                 } else if (imprintChildElt.getNodeName().equals("biblScope")) {
@@ -651,11 +651,11 @@ public class KnowledgeBaseFeeder {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
                 if (!KbProperties.isReset() && biblioObject.getIsMined()) {
-                    logger.info("\t\t Already mined, Skipping...");
+                    LOGGER.info("\t\t Already mined, Skipping...");
                     continue;
                 }
                 if (!dd.isCitationsMined(biblioObject.getAnhalyticsId())) {
-                    logger.info("Extracting :" + biblioObject.getRepositoryDocId());
+                    LOGGER.info("Extracting :" + biblioObject.getRepositoryDocId());
                     abdf.openTransaction();
                     try {
                         InputStream teiStream = new ByteArrayInputStream(mm.getTEICorpus(biblioObject).getBytes());
@@ -675,7 +675,7 @@ public class KnowledgeBaseFeeder {
                             }
                         }
                     } catch (Exception xpe) {
-                        xpe.printStackTrace();
+                        LOGGER.error("Error: ", xpe);
                         abdf.rollback();
                     }
                     abdf.endTransaction();
@@ -823,7 +823,7 @@ public class KnowledgeBaseFeeder {
                                     try {
                                         pub.setDate_printed(Utilities.parseStringDate(date));
                                     } catch (ParseException ex) {
-                                        ex.printStackTrace();
+                                        LOGGER.error("Error: ", ex);
                                     }
                                 } else if (imprintChildElt.getNodeName().equals("biblScope")) {
                                     String unit = imprintChildElt.getAttribute("unit");
@@ -923,7 +923,7 @@ public class KnowledgeBaseFeeder {
         try {
             doc = docBuilder.parse(in);
         } catch (SAXException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
 
         }
         return doc;

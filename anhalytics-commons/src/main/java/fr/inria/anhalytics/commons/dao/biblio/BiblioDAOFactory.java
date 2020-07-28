@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(BiblioDAOFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BiblioDAOFactory.class);
     protected static Connection conn = null;
 
     public static void initConnection() {
@@ -77,18 +77,18 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
     public void openTransaction() {
         try {
             conn.setAutoCommit(false);
-            logger.info("Storing entry");
+            LOGGER.info("Storing entry");
         } catch (SQLException e) {
-            logger.error("There was an error disabling autocommit");
+            LOGGER.error("There was an error disabling autocommit");
         }
     }
 
     public void endTransaction() {
         try {
             conn.commit();
-            logger.info("Entry stored");
+            LOGGER.info("Entry stored");
         } catch (SQLException ex) {
-            logger.error("Error happened while commiting the changes.");
+            LOGGER.error("Error happened while commiting the changes.");
         }
     }
 
@@ -96,9 +96,9 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
         try {
             // We rollback the transaction, to the last SavePoint!
             conn.rollback();
-            logger.info("The transaction was rollback.");
+            LOGGER.info("The transaction was rollback.");
         } catch (SQLException e1) {
-            logger.error("There was an error making a rollback");
+            LOGGER.error("There was an error making a rollback");
 
         }
     }
@@ -107,7 +107,7 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
         try {
             conn.close();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Error: ", ex);
         }
     }
 }

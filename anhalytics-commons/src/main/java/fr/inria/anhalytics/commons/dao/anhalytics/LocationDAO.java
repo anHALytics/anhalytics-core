@@ -6,16 +6,19 @@ import fr.inria.anhalytics.commons.entities.Address;
 import fr.inria.anhalytics.commons.entities.Location;
 import fr.inria.anhalytics.commons.entities.Organisation;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.text.ParseException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author azhar
  */
 public class LocationDAO extends DAO<Location, Long> {
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(LocationDAO.class);
 
     private static final String SQL_INSERT
             = "INSERT INTO LOCATION (organisationID, addressID, from_date, until_date) VALUES (?, ?, ?, ?)";
@@ -53,11 +56,11 @@ public class LocationDAO extends DAO<Location, Long> {
                             Utilities.parseStringDate(rs.getString("until_date"))
                     );
                 } catch (ParseException ex) {
-                    Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("Error: ", ex);
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Error: ", ex);
         } finally {
             closeQuietly(statement);
         }
@@ -111,7 +114,7 @@ public class LocationDAO extends DAO<Location, Long> {
                 int code = statement.executeUpdate();
                 result = true;
             } catch (MySQLIntegrityConstraintViolationException e) {
-                //e.printStackTrace();
+                //LOGGER.error("Error: ", e);
             } finally {
                 closeQuietly(statement);
             }
@@ -149,11 +152,11 @@ public class LocationDAO extends DAO<Location, Long> {
                             Utilities.parseStringDate(result.getString("until_date"))
                     );
                 } catch (ParseException ex) {
-                    Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.error("Error: ", ex);
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Error: ", ex);
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -172,7 +175,7 @@ public class LocationDAO extends DAO<Location, Long> {
                 addressId = result.getLong("addressID");
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Error: ", ex);
         } finally {
             closeQuietly(preparedStatement);
         }

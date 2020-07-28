@@ -2,6 +2,9 @@ package fr.inria.anhalytics.commons.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -12,6 +15,7 @@ import java.util.Properties;
  * @author achraf
  */
 public class HarvestProperties {
+    protected static final Logger LOGGER = LoggerFactory.getLogger(HarvestProperties.class);
 
     private static String processName;
     
@@ -60,7 +64,7 @@ public class HarvestProperties {
         try {
             setNbThreads(Integer.parseInt(threads));
         } catch (java.lang.NumberFormatException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
     }
 

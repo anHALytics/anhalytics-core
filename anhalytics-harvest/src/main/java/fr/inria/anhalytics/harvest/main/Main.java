@@ -14,6 +14,8 @@ import fr.inria.anhalytics.harvest.teibuild.TeiCorpusBuilderProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
  */
 public class Main {
 
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands = new ArrayList<String>() {
         {
@@ -55,7 +57,7 @@ public class Main {
         try {
             HarvestProperties.init("anhalytics.properties");
         } catch (PropertyException exp) {
-            logger.error("Something wrong when opening anhalytics.properties", exp);
+            LOGGER.error("Something wrong when opening anhalytics.properties", exp);
             return;
         }
 
@@ -89,10 +91,10 @@ public class Main {
         OpenUrl ou = new OpenUrl();
 
         Harvester harvester = null;
-
+        Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("wwwout.nims.go.jp", 8888));
         if (process.equals("harvestAll")) {
             if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
-                harvester = new HALOAIPMHHarvester();
+                harvester = new HALOAIPMHHarvester(proxy);
             } else {
                 harvester = new IstexHarvester();
             }

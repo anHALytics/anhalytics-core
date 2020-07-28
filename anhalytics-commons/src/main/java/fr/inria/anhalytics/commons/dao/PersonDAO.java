@@ -2,6 +2,7 @@ package fr.inria.anhalytics.commons.dao;
 
 import fr.inria.anhalytics.commons.entities.*;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
@@ -11,14 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author azhar
  */
 public class PersonDAO extends DAO<Person, Long> {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PersonDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PersonDAO.class);
     private static final String SQL_INSERT_PERSON
             = "INSERT INTO PERSON (title, photo, url, email, phone) VALUES (?, ?, ?, ?, ?)";
 
@@ -220,7 +220,7 @@ public class PersonDAO extends DAO<Person, Long> {
                     setPersonNameUpdateParameters(obj, preparedStatement2, pn);
                     int code2 = preparedStatement2.executeUpdate();
                 } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e) {
-                    //e.printStackTrace();
+                    //LOGGER.error("Error: ", e);
                 }
             }
 
@@ -307,7 +307,7 @@ public class PersonDAO extends DAO<Person, Long> {
                         if (!person_names.contains(pn))
                             person_names.add(pn);
                     } catch (ParseException ex) {
-                        Logger.getLogger(PersonDAO.class.getName()).log(Level.SEVERE, null, ex);
+                        LOGGER.error("Error: ", ex);
                     }
                 }
 
@@ -322,7 +322,7 @@ public class PersonDAO extends DAO<Person, Long> {
             }
 
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(preparedStatement);
             closeQuietly(preparedStatement1);
@@ -342,7 +342,7 @@ public class PersonDAO extends DAO<Person, Long> {
                 persons.put(rs.getLong("personID"), find(rs.getLong("personID")));
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -363,7 +363,7 @@ public class PersonDAO extends DAO<Person, Long> {
                 persons.put(rs.getLong("personID"), person);
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(ps);
         }
@@ -385,7 +385,7 @@ public class PersonDAO extends DAO<Person, Long> {
                 }
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
            closeQuietly(ps);
         }
@@ -424,7 +424,7 @@ public class PersonDAO extends DAO<Person, Long> {
                 persons.put(rs.getLong("personID"), person);
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(ps);
         }

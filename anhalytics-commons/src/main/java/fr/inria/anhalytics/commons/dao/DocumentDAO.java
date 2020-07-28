@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class DocumentDAO extends DAO<Document, String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(DocumentDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentDAO.class);
 
     private static final String SQL_INSERT
             = "INSERT INTO DOCUMENT (docID, version) VALUES (?, ?)";
@@ -115,7 +115,7 @@ public class DocumentDAO extends DAO<Document, String> {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         } finally {
             closeQuietly(preparedStatement);
             closeQuietly(preparedStatement1);
@@ -166,7 +166,7 @@ public class DocumentDAO extends DAO<Document, String> {
                 documents.add(document);
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -186,7 +186,7 @@ public class DocumentDAO extends DAO<Document, String> {
                 documents.add(find(rs.getString("docID")));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -206,7 +206,7 @@ public class DocumentDAO extends DAO<Document, String> {
                 docs.add(find(rs.getString("docID")));
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(ps);
         }

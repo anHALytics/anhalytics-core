@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
  */
 abstract class GrobidWorker implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(GrobidWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidWorker.class);
     protected MongoFileManager mm;
     protected BiblioObject biblioObject;
     File file = null;
@@ -56,10 +56,10 @@ abstract class GrobidWorker implements Runnable {
     @Override
     public void run() {
         long startTime = System.nanoTime();
-        logger.info(Thread.currentThread().getName() + " Start. Processing = " + biblioObject.getRepositoryDocId());
+        LOGGER.info(Thread.currentThread().getName() + " Start. Processing = " + biblioObject.getRepositoryDocId());
         processCommand();
         long endTime = System.nanoTime();
-        logger.info(Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
+        LOGGER.info(Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
     }
 
     protected void processCommand() {
@@ -71,29 +71,29 @@ abstract class GrobidWorker implements Runnable {
             double mb = file.length() / (1024 * 1024);
 
             if (mb <= 15) { // for now we extract just files with less size (avoid thesis..which may take long time)
-                logger.info("\t\t Tei extraction for : " + biblioObject.getRepositoryDocId() + " sizing :" + mb + "mb");
+                LOGGER.info("\t\t Tei extraction for : " + biblioObject.getRepositoryDocId() + " sizing :" + mb + "mb");
                 String resultPath = grobidService.runFullTextAssetGrobid(filepath);
                 saveExtractions(resultPath);
 
                 FileUtils.deleteDirectory(new File(resultPath));
-                logger.info("\t\t " + biblioObject.getRepositoryDocId()+biblioObject.getRepositoryDocVersion() + " processed.");
+                LOGGER.info("\t\t " + biblioObject.getRepositoryDocId()+biblioObject.getRepositoryDocVersion() + " processed.");
             } else {
-                logger.info("\t\t can't extract tei for : " + biblioObject.getRepositoryDocId() + "size too large : " + mb + "mb");
+                LOGGER.info("\t\t can't extract tei for : " + biblioObject.getRepositoryDocId() + "size too large : " + mb + "mb");
             }
             file.delete();
         } catch (GrobidTimeoutException e) {
             mm.save(biblioObject.getRepositoryDocId(), "processGrobid", "timed out");
-            logger.warn("Processing of " + biblioObject.getRepositoryDocId() + " timed out");
+            LOGGER.warn("Processing of " + biblioObject.getRepositoryDocId() + " timed out");
         } catch (RuntimeException e) {
-            logger.error("\t\t error occurred while processing " + biblioObject.getRepositoryDocId());
+            LOGGER.error("\t\t error occurred while processing " + biblioObject.getRepositoryDocId());
             if (e.getMessage().contains("timed out")) {
                 mm.save(biblioObject.getRepositoryDocId(), "processGrobid", "timed out");
             } else if (e.getMessage().contains("failed")) {
                 mm.save(biblioObject.getRepositoryDocId(), "processGrobid", "failed");
             }
-            logger.error(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e.getCause());
         } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex.getCause());
+            LOGGER.error(ex.getMessage(), ex.getCause());
         }
     }
 
@@ -107,7 +107,7 @@ abstract class GrobidWorker implements Runnable {
             teiDoc = docBuilder.parse(new ByteArrayInputStream(tei.getBytes()));
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
         Utilities.generateIDs(teiDoc);
         tei = Utilities.toString(teiDoc);
@@ -125,15 +125,15 @@ abstract class GrobidWorker implements Runnable {
                         .evaluate(grobidRootElement, XPathConstants.NODE);
                 if (doiNode != null) {
                     biblioObject.setDoi(doiNode.getTextContent());
-                    logger.info("\t\t DOI of " + biblioObject.getRepositoryDocId() + " saved.");
+                    LOGGER.info("\t\t DOI of " + biblioObject.getRepositoryDocId() + " saved.");
                 }
                 grobidStream.close();
             } catch (SAXException ex) {
-                logger.error("\t\t error occurred while parsing document to find DOI " + biblioObject.getRepositoryDocId());
+                LOGGER.error("\t\t error occurred while parsing document to find DOI " + biblioObject.getRepositoryDocId());
             } catch (XPathExpressionException ex) {
-                logger.error("\t\t error occurred while parsing document to find DOI " + biblioObject.getRepositoryDocId());
+                LOGGER.error("\t\t error occurred while parsing document to find DOI " + biblioObject.getRepositoryDocId());
             } catch (IOException ex) {
-                logger.error(ex.getMessage(), ex.getCause());
+                LOGGER.error(ex.getMessage(), ex.getCause());
             }
         }
     }
@@ -144,10 +144,10 @@ abstract class GrobidWorker implements Runnable {
         if(file.exists()) {
             success = file.delete();
             if (!success) {
-                logger.error(
+                LOGGER.error(
                         "Deletion of temporary image files failed for file '" + file.getAbsolutePath() + "'");
             }else
-                logger.info("\t\t "+Thread.currentThread().getName() +" :"+ file.getAbsolutePath()  +" deleted.");
+                LOGGER.info("\t\t "+Thread.currentThread().getName() +" :"+ file.getAbsolutePath()  +" deleted.");
         }
     }
 

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OpenUrl {
 
-    private static final Logger logger = LoggerFactory.getLogger(OpenUrl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenUrl.class);
     private MongoFileManager mm;
 
     private static final String IstexURL
@@ -26,9 +26,9 @@ public class OpenUrl {
 //                try {
 //                    Identifier id = mm.nextIdentifier();
 //                    String currentAnhalyticsId = id.getAnhalyticsId();
-//                    logger.info("################################" + currentAnhalyticsId + "####################");
+//                    LOGGER.info("################################" + currentAnhalyticsId + "####################");
 //                    URL url = new URL(String.format(IstexURL, id.getDoi()));
-//                    logger.info("Sending: " + url.toString());
+//                    LOGGER.info("Sending: " + url.toString());
 //                    HttpURLConnection urlConn = null;
 //                    try {
 //                        urlConn = (HttpURLConnection) url.openConnection();
@@ -49,21 +49,21 @@ public class OpenUrl {
 //                            urlConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 //                            if (urlConn.getResponseCode() == 200) {
 //                                String foundurl = urlConn.getURL().toString();
-//                                logger.info("URL found : " + foundurl);
+//                                LOGGER.info("URL found : " + foundurl);
 //                                //mm.updateIdentifier(doi);
 //                                //mm.insertBinary();
 //                            }
 //                            urlConn.disconnect();
 //                        } catch (Exception e) {
-//                            e.printStackTrace();
+//                            LOGGER.error("Error: ", e);
 //                        }
 //
 //                    }
 //                } catch (Exception e) {
-//                    e.printStackTrace();
+//                    LOGGER.error("Error: ", e);
 //                }
 //            }
-//            logger.info("Done.");
+//            LOGGER.info("Done.");
 //        }
     }
 }

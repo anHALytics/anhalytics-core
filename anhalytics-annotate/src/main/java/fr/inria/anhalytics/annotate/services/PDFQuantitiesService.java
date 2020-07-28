@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PDFQuantitiesService extends AnnotateService {
 
-    private static final Logger logger = LoggerFactory.getLogger(QuantitiesService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuantitiesService.class);
 
     static private String REQUEST_PDF_QUANTITIES = "annotateQuantityPDF";
 
@@ -58,7 +58,7 @@ public class PDFQuantitiesService extends AnnotateService {
         try {
             URL url = new URL(AnnotateProperties.getQuantitiesHost()
                     + (AnnotateProperties.getQuantitiesPort().isEmpty() ? "" : ":" + AnnotateProperties.getQuantitiesPort()) + "/" + REQUEST_PDF_QUANTITIES);
-            logger.info("http://" + AnnotateProperties.getQuantitiesHost()
+            LOGGER.info("http://" + AnnotateProperties.getQuantitiesHost()
                     + (AnnotateProperties.getQuantitiesPort().isEmpty() ? "" : ":" + AnnotateProperties.getQuantitiesPort()) + "/" + REQUEST_PDF_QUANTITIES);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
@@ -88,7 +88,7 @@ public class PDFQuantitiesService extends AnnotateService {
                 throw new RuntimeException("Failed : HTTP error code : "
                         + conn.getResponseCode() + " " + IOUtils.toString(conn.getErrorStream(), "UTF-8"));
             }
-            logger.info("Response "+conn.getResponseCode());
+            LOGGER.info("Response "+conn.getResponseCode());
             InputStream in = conn.getInputStream();
 
             BufferedReader br = new BufferedReader(new InputStreamReader((in)));
@@ -102,9 +102,9 @@ public class PDFQuantitiesService extends AnnotateService {
             conn.disconnect();
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
         //System.out.println(output.toString().trim());
         return output.toString().trim();

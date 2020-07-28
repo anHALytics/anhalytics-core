@@ -32,7 +32,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class KeyTermExtractionService extends AnnotateService {
 
-    private static final Logger logger = LoggerFactory.getLogger(KeyTermExtractionService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyTermExtractionService.class);
 
     static private String RESOURCEPATH = "processKeyTermArticleTEI";
 
@@ -88,7 +88,7 @@ public class KeyTermExtractionService extends AnnotateService {
             br.close();
             conn.disconnect();
         } catch (ConnectException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
             try {
                 Thread.sleep(20000);
                 runKeyTermExtraction();
@@ -96,7 +96,7 @@ public class KeyTermExtractionService extends AnnotateService {
                 Thread.currentThread().interrupt();
             }
         } catch (HttpRetryException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
             try {
                 Thread.sleep(20000);
                 runKeyTermExtraction();
@@ -104,9 +104,9 @@ public class KeyTermExtractionService extends AnnotateService {
                 Thread.currentThread().interrupt();
             }
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
         return output.toString().trim();
     }

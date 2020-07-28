@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AnnotatorWorker implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(AnnotatorWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotatorWorker.class);
     protected MongoFileManager mm = null;
     protected BiblioObject biblioObject = null;
     protected String annotationsCollection;
@@ -29,10 +29,10 @@ public abstract class AnnotatorWorker implements Runnable {
     @Override
     public void run() {
         long startTime = System.nanoTime();
-        logger.info("\t\t " + Thread.currentThread().getName() + " Start. Processing = "+biblioObject.getRepositoryDocId());
+        LOGGER.info("\t\t " + Thread.currentThread().getName() + " Start. Processing = "+biblioObject.getRepositoryDocId());
         processCommand();
         long endTime = System.nanoTime();
-        logger.info("\t\t " + Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
+        LOGGER.info("\t\t " + Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
     }
     protected abstract void processCommand() ;
     protected abstract String annotateDocument() ;

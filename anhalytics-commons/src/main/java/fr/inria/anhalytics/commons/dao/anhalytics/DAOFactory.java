@@ -16,7 +16,7 @@ import fr.inria.anhalytics.commons.dao.Document_OrganisationDAO;
 import fr.inria.anhalytics.commons.dao.PersonDAO;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Level;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DAOFactory extends AbstractDAOFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(DAOFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DAOFactory.class);
 
     protected static Connection conn = null;
 
@@ -88,18 +88,18 @@ public class DAOFactory extends AbstractDAOFactory {
     public void openTransaction() {
         try {
             conn.setAutoCommit(false);
-            logger.info("Storing entry");
+            LOGGER.info("Storing entry");
         } catch (SQLException e) {
-            logger.error("There was an error disabling autocommit");
+            LOGGER.error("There was an error disabling autocommit");
         }
     }
 
     public void endTransaction() {
         try {
             conn.commit();
-            logger.info("Stored");
+            LOGGER.info("Stored");
         } catch (SQLException ex) {
-            logger.error("Error happened while commiting the changes.");
+            LOGGER.error("Error happened while commiting the changes.");
         }
     }
 
@@ -107,9 +107,9 @@ public class DAOFactory extends AbstractDAOFactory {
         try {
             // We rollback the transaction, to the last SavePoint!
             conn.rollback();
-            logger.info("The transaction was rollback.");
+            LOGGER.info("The transaction was rollback.");
         } catch (SQLException e1) {
-            logger.error("There was an error making a rollback");
+            LOGGER.error("There was an error making a rollback");
 
         }
     }
@@ -118,7 +118,7 @@ public class DAOFactory extends AbstractDAOFactory {
         try {
             conn.close();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Error: ", ex);
         }
     }
 

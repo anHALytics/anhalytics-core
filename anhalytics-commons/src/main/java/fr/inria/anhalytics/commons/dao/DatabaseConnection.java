@@ -14,7 +14,7 @@ import java.sql.SQLException;
  */
 public class DatabaseConnection {
 
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseConnection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseConnection.class);
     private static Connection connectDB;
     private static Connection connectBiblioDB;
 

@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -14,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PublisherDAO extends DAO<Publisher, Long> {
     
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PublisherDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PublisherDAO.class);
     private static final String SQL_INSERT
             = "INSERT INTO PUBLISHER (name) VALUES (?)";
     
@@ -83,7 +85,7 @@ public class PublisherDAO extends DAO<Publisher, Long> {
                 );
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -104,7 +106,7 @@ public class PublisherDAO extends DAO<Publisher, Long> {
                 );
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(preparedStatement);
         }
