@@ -40,8 +40,6 @@ abstract class GrobidWorker implements Runnable {
 
     protected DocumentBuilder docBuilder;
 
-    protected XPath xPath = XPathFactory.newInstance().newXPath();
-
     public GrobidWorker(BiblioObject biblioObject, int start, int end) throws ParserConfigurationException {
         this.mm = MongoFileManager.getInstance(false);
         this.start = start;
@@ -116,6 +114,7 @@ abstract class GrobidWorker implements Runnable {
 
     protected void saveExtractedDOI(String tei) {
         if (biblioObject.getDoi() == null) {
+            XPath xPath = XPathFactory.newInstance().newXPath();
             try {
                 InputStream grobidStream = new ByteArrayInputStream(tei.getBytes());
                 Document grobid;
@@ -128,9 +127,7 @@ abstract class GrobidWorker implements Runnable {
                     logger.info("\t\t DOI of " + biblioObject.getRepositoryDocId() + " saved.");
                 }
                 grobidStream.close();
-            } catch (SAXException ex) {
-                logger.error("\t\t error occurred while parsing document to find DOI " + biblioObject.getRepositoryDocId());
-            } catch (XPathExpressionException ex) {
+            } catch (SAXException | XPathExpressionException ex) {
                 logger.error("\t\t error occurred while parsing document to find DOI " + biblioObject.getRepositoryDocId());
             } catch (IOException ex) {
                 logger.error(ex.getMessage(), ex.getCause());

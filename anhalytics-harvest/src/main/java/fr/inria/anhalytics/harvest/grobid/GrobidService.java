@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Call of Grobid process via its REST web services.
@@ -23,7 +24,7 @@ import java.net.*;
  */
 public class GrobidService {
 
-    private static final Logger logger = LoggerFactory.getLogger(GrobidService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidService.class);
 
     private int start = -1;
     private int end = -1;
@@ -32,6 +33,7 @@ public class GrobidService {
     int TIMEOUT_VALUE = 30000;
 
     public GrobidService(int start, int end, boolean generateIDs) {
+        this.start = start;
         this.end = end;
         this.generateIDs = generateIDs;
 
@@ -89,17 +91,23 @@ public class GrobidService {
             //int status = connection.getResponseCode();
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode() + " " + IOUtils.toString(conn.getErrorStream(), "UTF-8"));
+                        + conn.getResponseCode() + " " + IOUtils.toString(conn.getErrorStream(), StandardCharsets.UTF_8));
             }
 
             InputStream in = conn.getInputStream();
-            tei = IOUtils.toString(in, "UTF-8");
-            IOUtils.closeQuietly(in);
+            tei = IOUtils.toString(in, StandardCharsets.UTF_8);
+
+            try {
+                in.close();
+            } catch (IOException e) {
+                LOGGER.warn("Cannot close InputStream ", e);
+            }
+
 
             conn.disconnect();
 
         } catch (ConnectException | HttpRetryException e) {
-            logger.error(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e.getCause());
             try {
                 Thread.sleep(20000);
                 runFullTextGrobid(filepath);
@@ -109,7 +117,7 @@ public class GrobidService {
         } catch (SocketTimeoutException e) {
             throw new GrobidTimeoutException("Grobid processing timed out.");
         } catch (IOException e) {
-            logger.error(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e.getCause());
         }
         return tei;
     }
@@ -177,7 +185,7 @@ public class GrobidService {
             conn.disconnect();
 
         } catch (ConnectException | HttpRetryException e) {
-            logger.error(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e.getCause());
             try {
                 Thread.sleep(20000);
                 runFullTextGrobid(filepath);
@@ -187,7 +195,7 @@ public class GrobidService {
         } catch (SocketTimeoutException e) {
             throw new GrobidTimeoutException("Grobid processing timed out.");
         } catch (IOException e) {
-            logger.error(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e.getCause());
         }
         return zipDirectoryPath;
     }
@@ -238,7 +246,7 @@ public class GrobidService {
             rd.close();
             retVal = response.toString();
         } catch (ConnectException e) {
-            logger.error(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e.getCause());
             try {
                 Thread.sleep(20000);
                 processAffiliation(affiliations);
@@ -246,7 +254,7 @@ public class GrobidService {
                 Thread.currentThread().interrupt();
             }
         } catch (HttpRetryException e) {
-            logger.error(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e.getCause());
             try {
                 Thread.sleep(20000);
                 processAffiliation(affiliations);
@@ -256,7 +264,7 @@ public class GrobidService {
         } catch (SocketTimeoutException e) {
             throw new GrobidTimeoutException("Grobid processing timed out.");
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
 
         return retVal;
@@ -270,7 +278,7 @@ public class GrobidService {
      * @return boolean
      */
     public static boolean isGrobidOk() throws UnreachableGrobidServiceException {
-        logger.info("Cheking Grobid service...");
+        LOGGER.info("Cheking Grobid service...");
 
         int responseCode = 0;
         try {
@@ -286,7 +294,7 @@ public class GrobidService {
         if (responseCode != 200) {
             throw new UnreachableGrobidServiceException(responseCode);
         }
-        logger.info("Grobid service is ok and can be used.");
+        LOGGER.info("Grobid service is ok and can be used.");
         return true;
     }
 }
