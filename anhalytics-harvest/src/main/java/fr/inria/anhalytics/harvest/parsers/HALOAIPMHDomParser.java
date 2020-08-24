@@ -41,11 +41,6 @@ public class HALOAIPMHDomParser {
 
     private Document doc;
     private String token;
-    private XPath xPath;
-
-    public HALOAIPMHDomParser() {
-        xPath = XPathFactory.newInstance().newXPath();
-    }
 
     /*
     ** Collectes BiblioObjects from the inputStream, and saves the metadata.
@@ -128,6 +123,7 @@ public class HALOAIPMHDomParser {
     }
 
     public String getCurrentVersion(Node record) {
+        XPath xPath = XPathFactory.newInstance().newXPath();
         String currentVersion = null;
         try {
             Element node = (Element) xPath.compile(OAIPMHPathsItf.EditionElement).evaluate(record, XPathConstants.NODE);
@@ -139,6 +135,7 @@ public class HALOAIPMHDomParser {
     }
 
     public String getRef(Node ref) {
+        XPath xPath = XPathFactory.newInstance().newXPath();
         String reference = null;
         Node node = null;
         try {
@@ -155,6 +152,7 @@ public class HALOAIPMHDomParser {
     }
 
     public String getDoi(Node ref) {
+        XPath xPath = XPathFactory.newInstance().newXPath();
         String doi = null;
         try {
             Node node = (Node) xPath.compile(OAIPMHPathsItf.DoiPATH).evaluate(ref, XPathConstants.NODE);
@@ -170,6 +168,7 @@ public class HALOAIPMHDomParser {
     }
 
     public List<String> getDomains(Node ref) {
+        XPath xPath = XPathFactory.newInstance().newXPath();
         List<String> domains = new ArrayList<String>();
         try {
             NodeList nodes = (NodeList) xPath.compile(OAIPMHPathsItf.DomainsPATH).evaluate(ref, XPathConstants.NODESET);
@@ -191,6 +190,7 @@ public class HALOAIPMHDomParser {
     }
 
     public String getPublicationType(Node ref) {
+        XPath xPath = XPathFactory.newInstance().newXPath();
         String type = null;
         try {
             Element node = (Element) xPath.compile(OAIPMHPathsItf.PublicationTypePATH).evaluate(ref, XPathConstants.NODE);
@@ -234,6 +234,7 @@ public class HALOAIPMHDomParser {
     }
 
     public BinaryFile getFile(Node record, String repositoryDocId, String repositoryDocVersion, String doi, String type) {
+        XPath xPath = XPathFactory.newInstance().newXPath();
         BinaryFile file = null;
         try {
             Element node = (Element) xPath.compile(OAIPMHPathsItf.FileElement).evaluate(record, XPathConstants.NODE);
@@ -257,6 +258,7 @@ public class HALOAIPMHDomParser {
     }
 
     public List<BinaryFile> getAnnexes(Node record, String repositoryDocId, String repositoryDocVersion, String doi, String type) {
+        XPath xPath = XPathFactory.newInstance().newXPath();
         List<BinaryFile> annexes = new ArrayList<BinaryFile>();
         NodeList nodes = null;
         try {
@@ -319,6 +321,7 @@ public class HALOAIPMHDomParser {
     }
 
     public String getRepositoryDocId(Node record) {
+        XPath xPath = XPathFactory.newInstance().newXPath();
         String repositoryDocId = null;
         try {
             Element node = (Element) xPath.compile(OAIPMHPathsItf.IdElementPath).evaluate(record, XPathConstants.NODE);
