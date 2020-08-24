@@ -71,6 +71,17 @@ public class KnowledgeBaseFeeder {
             initResult = mm.initObjects(null, MongoFileManager.ONLY_NOT_MINED_INIT_KB_PROCESS);
         }
 
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setValidating(false);
+
+        //docFactory.setNamespaceAware(true);
+        DocumentBuilder docBuilder = null;
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+
         if (initResult) {
             while (mm.hasMore()) {
                 BiblioObject biblioObject = mm.nextBiblioObject();
@@ -81,18 +92,18 @@ public class KnowledgeBaseFeeder {
                 adf.openTransaction();
                 Document teiDoc = null;
                 try {
-                    InputStream teiStream = new ByteArrayInputStream(mm.getTEICorpus(biblioObject).getBytes());
-                    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-                    docFactory.setValidating(false);
-                    //docFactory.setNamespaceAware(true);
-                    DocumentBuilder docBuilder = null;
+                    InputStream teiStream = null;
                     try {
-                        docBuilder = docFactory.newDocumentBuilder();
+                        teiStream = new ByteArrayInputStream(mm.getTEICorpus(biblioObject).getBytes());
                         teiDoc = docBuilder.parse(teiStream);
                     } catch (Exception e) {
                         logger.error("Error when parsing TEI stream. ", e);
+                    } finally {
+                        if (teiStream != null) {
+                            teiStream.close();
+                        }
+
                     }
-                    teiStream.close();
 
                     Publication pub = new Publication();
 
@@ -138,7 +149,7 @@ public class KnowledgeBaseFeeder {
                     processPersons(editors, "editor", pub, teiDoc, authorsFromfulltextTeiHeader);
 
                     logger.info("#################################################################");
-                } catch(NumberOfCoAuthorsExceededException e) {
+                } catch (NumberOfCoAuthorsExceededException e) {
                     logger.warn("Skipping publication, number of coauthors are exceeding 30", e);
                     adf.rollback();
                     teiDoc = null;
