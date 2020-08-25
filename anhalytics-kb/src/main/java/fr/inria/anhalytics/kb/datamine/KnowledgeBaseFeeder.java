@@ -73,8 +73,8 @@ public class KnowledgeBaseFeeder {
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         docFactory.setValidating(false);
-
         //docFactory.setNamespaceAware(true);
+
         DocumentBuilder docBuilder = null;
         try {
             docBuilder = docFactory.newDocumentBuilder();

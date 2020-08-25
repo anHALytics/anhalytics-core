@@ -47,8 +47,6 @@ public class TeiBuilderWorker implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(TeiBuilderWorker.class);
 
-    private DocumentBuilder docBuilder;
-
     private Steps step;
 
     protected MongoFileManager mm;
@@ -56,19 +54,8 @@ public class TeiBuilderWorker implements Runnable {
     protected BiblioObject biblioObject;
 
     public TeiBuilderWorker(BiblioObject biblioObject, Steps step) {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        docFactory.setValidating(false);
-        //docFactory.setNamespaceAware(true);
-
         this.step = step;
         this.biblioObject = biblioObject;
-
-        try {
-            docBuilder = docFactory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new SystemException("Cannot instantiate TeiBuilder", e);
-        }
-
     }
 
     @Override
@@ -132,6 +119,16 @@ public class TeiBuilderWorker implements Runnable {
      * Creates a working TEICorpus from the harvested metadata in TEI header.
      */
     public Document createTEICorpus() throws IOException, SAXException {
+        DocumentBuilder docBuilder = null;
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setValidating(false);
+        //docFactory.setNamespaceAware(true);
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new SystemException("Cannot instantiate TeiBuilder", e);
+        }
+
         MetadataConverter mc;
         if (StringUtils.equals(HarvestProperties.getSource().toLowerCase(), Harvester.Source.HAL.getName())) {
             mc = new HalTEIConverter();
@@ -161,6 +158,16 @@ public class TeiBuilderWorker implements Runnable {
      * parts , abstract, keywords, publication date and authors.
      */
     public Document addGrobidTEIToTEICorpus(String teiCorpus, String grobidTei) throws IOException, SAXException {
+        DocumentBuilder docBuilder = null;
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setValidating(false);
+        //docFactory.setNamespaceAware(true);
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new SystemException("Cannot instantiate ", e);
+        }
+
         Document resultTei = null;
 
         HalTEIConverter htc = new HalTEIConverter();
