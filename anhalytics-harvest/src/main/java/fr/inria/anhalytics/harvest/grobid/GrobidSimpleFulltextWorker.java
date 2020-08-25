@@ -37,7 +37,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
                 throw new DataException("File stream can't be closed.", ex);
             }
             file = new File(filepath);
-            double mb = file.length() / (1024 * 1024);
+            double mb = file.length() / (1024.0 * 1024.0);
 
             // for now we extract just files with less size (avoid thesis..which may take long time)
             if (mb <= 15) {

@@ -67,8 +67,6 @@ public class CrossRef {
 
     private DocumentBuilder docBuilder;
 
-    private XPath xPath = XPathFactory.newInstance().newXPath();
-
     public CrossRef() {
         this.mm = MongoFileManager.getInstance(false);
 

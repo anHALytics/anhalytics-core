@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Call of Grobid process via its REST web services.
@@ -32,6 +33,7 @@ public class GrobidService {
     int TIMEOUT_VALUE = 30000;
 
     public GrobidService(int start, int end, boolean generateIDs) {
+        this.start = start;
         this.end = end;
         this.generateIDs = generateIDs;
 
@@ -89,12 +91,18 @@ public class GrobidService {
             //int status = connection.getResponseCode();
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode() + " " + IOUtils.toString(conn.getErrorStream(), "UTF-8"));
+                        + conn.getResponseCode() + " " + IOUtils.toString(conn.getErrorStream(), StandardCharsets.UTF_8));
             }
 
             InputStream in = conn.getInputStream();
-            tei = IOUtils.toString(in, "UTF-8");
-            IOUtils.closeQuietly(in);
+            tei = IOUtils.toString(in, StandardCharsets.UTF_8);
+
+            try {
+                in.close();
+            } catch (IOException e) {
+                LOGGER.warn("Cannot close InputStream ", e);
+            }
+
 
             conn.disconnect();
 
