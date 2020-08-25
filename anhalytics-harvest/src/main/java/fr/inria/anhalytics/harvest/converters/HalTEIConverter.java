@@ -204,6 +204,8 @@ public class HalTEIConverter implements MetadataConverter {
     private void parseOrgsAddress(Document doc, NodeList orgs) {
         Node org = null;
         GrobidService gs = new GrobidService();
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+                .newInstance();
         for (int i = orgs.getLength() - 1; i >= 0; i--) {
             org = orgs.item(i);
             if (org.getNodeType() == Node.ELEMENT_NODE) {
@@ -211,12 +213,12 @@ public class HalTEIConverter implements MetadataConverter {
                 NodeList addressNodes = orgElt.getElementsByTagName("addrLine");
 
                 NodeList orgNameNodes = orgElt.getElementsByTagName("orgName");
-                String orgNameStr = "";
+                StringBuilder orgNameStr = new StringBuilder();
                 Node orgNameNode = null;
                 for (int y = orgNameNodes.getLength() - 1; y >= 0; y--) {
                     orgNameNode = orgNameNodes.item(y);
                     if (orgNameNode.getNodeType() == Node.ELEMENT_NODE) {
-                        orgNameStr += !orgNameStr.isEmpty() ? " "+orgNameNode.getTextContent():orgNameNode.getTextContent();
+                        orgNameStr.append((orgNameStr.length() > 0) ? " " + orgNameNode.getTextContent() : orgNameNode.getTextContent());
                     }
                 }
 
@@ -231,8 +233,7 @@ public class HalTEIConverter implements MetadataConverter {
                     if (addrLine != null && isNotBlank(addrLine.getTextContent())) {
                         grobidResponse = gs.processAffiliation(orgNameStr + " " + addrLine.getTextContent() + " " + countryCode);
                         try {
-                            Element node = DocumentBuilderFactory
-                                    .newInstance()
+                            Element node = documentBuilderFactory
                                     .newDocumentBuilder()
                                     .parse(new ByteArrayInputStream(grobidResponse.getBytes()))
                                     .getDocumentElement();

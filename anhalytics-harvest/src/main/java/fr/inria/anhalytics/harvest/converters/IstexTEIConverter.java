@@ -112,6 +112,8 @@ public class IstexTEIConverter implements MetadataConverter {
     private void parseAffiliationString(Document doc, NodeList affs) {
         Node aff = null;
         GrobidService gs = new GrobidService();
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+                .newInstance();
         for (int i = affs.getLength() - 1; i >= 0; i--) {
             aff = affs.item(i);
             if (aff.getNodeType() == Node.ELEMENT_NODE) {
@@ -125,8 +127,7 @@ public class IstexTEIConverter implements MetadataConverter {
                     try {
                         // (HACK)Grobid may split affiliation string into two affiliation elements, which is considered not well-formed.
                         grobidResponse = "<wrap>" + grobidResponse + "</wrap>";
-                        Element node = DocumentBuilderFactory
-                                .newInstance()
+                        Element node = documentBuilderFactory
                                 .newDocumentBuilder()
                                 .parse(new ByteArrayInputStream(grobidResponse.getBytes()))
                                 .getDocumentElement();

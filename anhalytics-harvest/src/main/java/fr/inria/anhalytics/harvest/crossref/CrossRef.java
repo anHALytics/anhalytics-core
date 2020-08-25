@@ -1,25 +1,26 @@
 package fr.inria.anhalytics.harvest.crossref;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.exceptions.SystemException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
-import com.fasterxml.jackson.databind.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
-
-import java.io.*;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -65,19 +66,8 @@ public class CrossRef {
 
     private MongoFileManager mm;
 
-    private DocumentBuilder docBuilder;
-
     public CrossRef() {
         this.mm = MongoFileManager.getInstance(false);
-
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        docFactory.setValidating(false);
-        //docFactory.setNamespaceAware(true);
-        try {
-            docBuilder = docFactory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new SystemException("Cannot instantiate CrossRef parser", e);
-        }
     }
 
     /**
@@ -85,6 +75,7 @@ public class CrossRef {
      * service based on core metadata
      */
     public void findDois() {
+//        XPath xPath = XPathFactory.newInstance().newXPath()
 //        String doi = "";
 //        String aut = "";
 //        String title = "";
@@ -277,7 +268,7 @@ public class CrossRef {
     }
 
     private HttpURLConnection openConnection(URL url) {
-        HttpURLConnection  urlConn;
+        HttpURLConnection urlConn;
         try {
             urlConn = (HttpURLConnection) url.openConnection();
         } catch (IOException e) {
@@ -293,9 +284,19 @@ public class CrossRef {
     /**
      * Try to consolidate some uncertain bibliographical data with crossref web
      * service based on title and first author.
-     *
      */
     private String queryCrossref(String query) throws Exception {
+
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setValidating(false);
+        //docFactory.setNamespaceAware(true);
+        DocumentBuilder docBuilder = null;
+
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new SystemException("Cannot instantiate CrossRef parser", e);
+        }
 
         String doi = "";
         // we check if the entry is not already in the DB
