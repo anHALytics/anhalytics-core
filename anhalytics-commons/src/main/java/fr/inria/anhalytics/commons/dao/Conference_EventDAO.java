@@ -5,6 +5,9 @@ import fr.inria.anhalytics.commons.entities.Conference;
 import fr.inria.anhalytics.commons.entities.Conference_Event;
 import fr.inria.anhalytics.commons.entities.Country;
 import fr.inria.anhalytics.commons.entities.Monograph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +19,8 @@ import java.sql.Statement;
  * @author azhar
  */
 public class Conference_EventDAO extends DAO<Conference_Event, Long> {
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Conference_EventDAO.class);
 
     private static final String SQL_INSERT
             = "INSERT INTO CONFERENCE_EVENT (conferenceID, addressID, start_date, end_date, monographID) VALUES (?, ?, ?, ?, ?)";
@@ -124,7 +129,7 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
                 );
             }
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            LOGGER.error("Error: ", sqle);
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -143,7 +148,7 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
                 conference = new Conference(result.getLong("conferenceID"), result.getString("title"));
             }
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            LOGGER.error("Error: ", sqle);
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -169,7 +174,7 @@ public class Conference_EventDAO extends DAO<Conference_Event, Long> {
                 );
             }
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            LOGGER.error("Error: ", sqle);
         } finally {
             closeQuietly(ps);
         }

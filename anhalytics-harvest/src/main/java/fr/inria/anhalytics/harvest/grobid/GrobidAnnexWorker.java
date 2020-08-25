@@ -1,6 +1,9 @@
 package fr.inria.anhalytics.harvest.grobid;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -10,6 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author Achraf
  */
 public class GrobidAnnexWorker extends GrobidWorker {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidAnnexWorker.class);
 
     public GrobidAnnexWorker(BiblioObject biblioObject, String date, int start, int end) throws ParserConfigurationException {
         super(biblioObject, start, end);
@@ -33,7 +37,7 @@ public class GrobidAnnexWorker extends GrobidWorker {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
     }
 }

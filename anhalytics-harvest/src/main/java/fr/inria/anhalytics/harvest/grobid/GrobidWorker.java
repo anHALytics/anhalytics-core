@@ -99,7 +99,7 @@ abstract class GrobidWorker implements Runnable {
             teiDoc = docBuilder.parse(new ByteArrayInputStream(tei.getBytes()));
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
         Utilities.generateIDs(teiDoc);
         tei = Utilities.toString(teiDoc);
@@ -162,8 +162,6 @@ abstract class GrobidWorker implements Runnable {
 
     protected void saveExtractions(String resultPath) {
     }
-
-    ;
 
     @Override
     public String toString() {

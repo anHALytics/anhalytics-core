@@ -22,7 +22,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class KeyTermAnnotatorWorker extends AnnotatorWorker {
 
-    private static final Logger logger = LoggerFactory.getLogger(KeyTermAnnotatorWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyTermAnnotatorWorker.class);
 
     public KeyTermAnnotatorWorker(MongoFileManager mongoManager,
             BiblioObject biblioObject) {
@@ -36,14 +36,14 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
 
             if (inserted) {
                 mm.updateBiblioObjectStatus(biblioObject, Processings.KEYTERM, false);
-                logger.info("\t\t " + Thread.currentThread().getName() + ": " + biblioObject.getRepositoryDocId() + " annotated by the KeyTerm extraction and disambiguation service.");
+                LOGGER.info("\t\t " + Thread.currentThread().getName() + ": " + biblioObject.getRepositoryDocId() + " annotated by the KeyTerm extraction and disambiguation service.");
             } else {
-                logger.info("\t\t " + Thread.currentThread().getName() + ": "
+                LOGGER.info("\t\t " + Thread.currentThread().getName() + ": "
                         + biblioObject.getRepositoryDocId() + " error occured trying to annotate Keyterms.");
             }
         } catch (Exception ex) {
-            logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + biblioObject.getRepositoryDocId());
-            ex.printStackTrace();
+            LOGGER.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + biblioObject.getRepositoryDocId());
+            LOGGER.error("Error: ", ex);
         }
     }
 
@@ -93,7 +93,7 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
                 json.append("{} }");
             }
         } catch (IOException e) {
-            logger.error(Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + biblioObject.getRepositoryDocId(), e);
+            LOGGER.error(Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + biblioObject.getRepositoryDocId(), e);
             return null;
         }
         return json.toString();

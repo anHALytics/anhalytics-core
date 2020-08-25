@@ -44,7 +44,7 @@ import java.util.zip.ZipInputStream;
  */
 public class Utilities {
 
-    private static final Logger logger = LoggerFactory.getLogger(Utilities.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Utilities.class);
 
     private static Set<String> dates = new LinkedHashSet<String>();
     private static String tmpPath;
@@ -293,9 +293,9 @@ public class Utilities {
         try {
             File tmpDirectory = new File(tmpPath);
             FileUtils.cleanDirectory(tmpDirectory);
-            logger.info("Temporary directory is cleaned.");
+            LOGGER.info("Temporary directory is cleaned.");
         } catch (IOException exp) {
-            logger.error("Error while deleting the temporary directory: " + exp);
+            LOGGER.error("Error while deleting the temporary directory: " + exp);
         }
     }
 
@@ -414,7 +414,7 @@ public class Utilities {
             zis.closeEntry();
 
         } catch (IOException e) {
-            logger.error("Error when unzipping the file " + file + ".", e);
+            LOGGER.error("Error when unzipping the file " + file + ".", e);
         } finally {
             IOUtils.closeQuietly(zis);
         }
@@ -450,7 +450,7 @@ public class Utilities {
             throw new ServiceException("Can't get data stream.", e);
         }
         endTime = System.currentTimeMillis();
-        logger.info("spend:" + (endTime - startTime) + " ms");
+        LOGGER.info("spend:" + (endTime - startTime) + " ms");
         return in;
     }
 
@@ -472,24 +472,24 @@ public class Utilities {
                 connection.setRequestProperty("accept-charset", "UTF-8");
                 switch (connection.getResponseCode()) {
                     case HttpURLConnection.HTTP_OK:
-                        logger.info(url + " **OK**");
+                        LOGGER.info(url + " **OK**");
                         return connection; // **EXIT POINT** fine, go on
                     case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
-                        logger.info(url + ":" + connection.getResponseCode());
+                        LOGGER.info(url + ":" + connection.getResponseCode());
                         break;// retry
                     case HttpURLConnection.HTTP_UNAVAILABLE:
-                        logger.info(url + "**unavailable**" + " :" + connection.getResponseCode());
+                        LOGGER.info(url + "**unavailable**" + " :" + connection.getResponseCode());
                         break;// retry, server is unstable
                     default:
                         //stop
-                        logger.info(url + ":" + connection.getResponseCode());
+                        LOGGER.info(url + ":" + connection.getResponseCode());
                         throw new ServiceException(url + ":" + connection.getResponseCode());
                 }
                 // we did not succeed with connection (or we would have returned the connection).
                 connection.disconnect();
                 // retry
                 retry++;
-                logger.warn("Failed retry " + retry + "/" + retries);
+                LOGGER.warn("Failed retry " + retry + "/" + retries);
                 delay = true;
                 if (retry == retries) {
                     throw new ServiceException(url + ":" + connection.getResponseCode());
@@ -531,7 +531,7 @@ public class Utilities {
 
             formatedXml = stringWriter.toString();
         } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException | DOMException | IllegalArgumentException | TransformerException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
         return formatedXml;
     }

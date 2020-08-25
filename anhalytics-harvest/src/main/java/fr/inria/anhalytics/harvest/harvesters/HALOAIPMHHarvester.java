@@ -62,7 +62,7 @@ public class HALOAIPMHHarvester extends Harvester {
             if (tokenn != null) {
                 request = String.format("%s/?verb=ListRecords&resumptionToken=%s", this.oai_url, tokenn);
             }
-            logger.info("\t Sending: " + request);
+            LOGGER.info("\t Sending: " + request);
 
             InputStream in = Utilities.request(request);
             grabbedObjects = this.oaiDom.getGrabbedObjects(in);
@@ -86,14 +86,14 @@ public class HALOAIPMHHarvester extends Harvester {
         String currentDate = "";
         try {
             for (String date : Utilities.getDates()) {
-                logger.info("Extracting publications TEIs for : " + date);
+                LOGGER.info("Extracting publications TEIs for : " + date);
                 currentDate = date;
                 fetchDocumentsByDate(date);
             }
         } catch (MalformedURLException mue) {
-            logger.error(mue.getMessage(), mue);
+            LOGGER.error(mue.getMessage(), mue);
         } catch (ServiceException se) {
-            logger.error(se.getMessage(), se);
+            LOGGER.error(se.getMessage(), se);
             mm.save(currentDate, "blockedHarvestProcess", se.getMessage());
         }
     }
@@ -116,7 +116,7 @@ public class HALOAIPMHHarvester extends Harvester {
                     continue;
                 }
                 if (!HarvestProperties.isReset() && mm.isSavedObject(docID, null)) {
-                    logger.info("\t\t Already grabbed, Skipping...");
+                    LOGGER.info("\t\t Already grabbed, Skipping...");
                     continue;
                 }
                 String teiUrl = halUrl + docID + "/tei";
@@ -130,7 +130,7 @@ public class HALOAIPMHHarvester extends Harvester {
                     DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
                     teiDoc = docBuilder.parse(new ByteArrayInputStream(teiString.getBytes()));
                 } catch (SAXException | ParserConfigurationException | IOException e) {
-                    e.printStackTrace();
+                    LOGGER.error("Error: ", e);
                 }
                 Element rootElement = teiDoc.getDocumentElement();
                 BiblioObject biblioObject = this.oaiDom.processRecord((Element) rootElement);
@@ -140,19 +140,19 @@ public class HALOAIPMHHarvester extends Harvester {
             }
             saveObjects();
         } catch (MalformedURLException mue) {
-            logger.error(mue.getMessage(), mue);
+            LOGGER.error(mue.getMessage(), mue);
         } catch (ServiceException se) {
-            logger.error(se.getMessage(), se);
+            LOGGER.error(se.getMessage(), se);
             mm.save("", "blockedHarvestProcess", se.getMessage());
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         } finally {
             try {
                 if (br != null) {
                     br.close();
                 }
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
             }
         }
         

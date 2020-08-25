@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +37,7 @@ import java.util.List;
  */
 public class MongoFileManager extends MongoManager implements MongoCollectionsInterface {
 
-    private static final Logger logger = LoggerFactory.getLogger(MongoFileManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MongoFileManager.class);
 
     public static final DBObject ONLY_WITH_FULLTEXT_PROCESS = new BasicDBObjectBuilder()
             .add("isWithFulltext", true)
@@ -194,7 +193,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         collection.createIndex(ensureIndexQuery, "index_" + StringUtils.join(ensureIndexQuery.keySet(), "_"));
         cursor = collection.find(query);
         cursor.addOption(com.mongodb.Bytes.QUERYOPTION_NOTIMEOUT);
-        logger.info(cursor.size() + " objects found.");
+        LOGGER.info(cursor.size() + " objects found.");
         if (cursor.hasNext()) {
             return true;
         } else {
@@ -218,7 +217,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         }
         cursor = collection.find(bdbo);
         cursor.addOption(com.mongodb.Bytes.QUERYOPTION_NOTIMEOUT);
-        logger.info(cursor.size() + " objects found.");
+        LOGGER.info(cursor.size() + " objects found.");
         if (cursor.hasNext()) {
             return true;
         } else {
@@ -318,11 +317,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                     }
                 }
             }
-        } catch (MongoException me) {
-            me.printStackTrace();
-            //rollback
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+        } catch (MongoException | IOException me) {
+            LOGGER.error("Error: ", me);
             //rollback
         }
         collection.insert(document);
@@ -334,7 +330,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             fulltext = getFulltextByAnhalyticsId(biblioObject.getAnhalyticsId());
         } catch (DataException de) {
-            logger.error("No PDF document was found for : " + biblioObject.getAnhalyticsId(), de);
+            LOGGER.error("No PDF document was found for : " + biblioObject.getAnhalyticsId(), de);
         }
         return fulltext;
     }
@@ -359,7 +355,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             metadata = this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.METADATAS_TEIS);
         } catch (DataException de) {
-            logger.error("No metadata was found for " + biblioObject, de);
+            LOGGER.error("No metadata was found for " + biblioObject, de);
         }
         return metadata;
     }
@@ -369,7 +365,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             teiCorpus = this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.TEI_CORPUS);
         } catch (DataException de) {
-            logger.error("No TEI corpus was found for " + biblioObject, de);
+            LOGGER.error("No TEI corpus was found for " + biblioObject, de);
         }
         return teiCorpus;
     }
@@ -379,7 +375,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         try {
             grobidTei = this.getTei(biblioObject.getAnhalyticsId(), MongoCollectionsInterface.GROBID_TEIS);
         } catch (DataException de) {
-            logger.error("No corresponding fulltext TEI was found for " + biblioObject);
+            LOGGER.error("No corresponding fulltext TEI was found for " + biblioObject);
         }
         return grobidTei;
     }
@@ -449,7 +445,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 done = false;
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e.getCause());
         }
         return done;
     }
@@ -471,7 +467,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 done = false;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
         return done;
     }
@@ -489,7 +485,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         gfsFile.save();
         file.close();
 //        } catch (ParseException e) {
-//            logger.error(e.getMessage(), e.getCause());
+//            LOGGER.error(e.getMessage(), e.getCause());
 //        }
         return true;
     }
@@ -506,7 +502,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         gfsFile.put("anhalyticsId", anhalyticsId);
         gfsFile.save();
 //        } catch (ParseException e) {
-//            logger.error(e.getMessage(), e.getCause());
+//            LOGGER.error(e.getMessage(), e.getCause());
 //        }
         return true;
     }
@@ -523,7 +519,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         gfsFile.put("anhalyticsId", anhalyticsId);
         gfsFile.save();
 //        } catch (ParseException e) {
-//            logger.error(e.getMessage(), e.getCause());
+//            LOGGER.error(e.getMessage(), e.getCause());
 //        }
         return true;
     }
@@ -540,7 +536,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         gfsFile.put("anhalyticsId", anhalyticsId);
         gfsFile.save();
 //        } catch (ParseException e) {
-//            logger.error(e.getMessage(), e.getCause());
+//            LOGGER.error(e.getMessage(), e.getCause());
 //        }
 
         return true;
@@ -600,7 +596,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //                    result = annotations.toString();
 //                }
             } else {
-                logger.warn("The annotations for doc " + anhalyticsId + " was not found in " + annotationsCollection);
+                LOGGER.warn("The annotations for doc " + anhalyticsId + " was not found in " + annotationsCollection);
             }
         } finally {
             if (curs != null) {
@@ -634,7 +630,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
 //            document.put("date", date);
             collection.insert(document);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e.getCause());
         }
     }
 
@@ -662,7 +658,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             document.put("embragoDate", date);
             collection.insert(document);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e.getCause());
         }
     }
 
@@ -674,7 +670,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             whereQuery.put("url", url);
             collection.remove(whereQuery);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e.getCause());
         }
     }
 

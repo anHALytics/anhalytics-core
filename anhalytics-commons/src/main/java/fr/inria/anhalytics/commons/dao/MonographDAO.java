@@ -1,15 +1,18 @@
 package fr.inria.anhalytics.commons.dao;
 
 import fr.inria.anhalytics.commons.entities.Monograph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author azhar
  */
 public class MonographDAO extends DAO<Monograph, Long> {
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(MonographDAO.class);
 
     private static final String SQL_INSERT
             = "INSERT INTO MONOGRAPH (type, title, shortname) VALUES (?, ?, ?)";
@@ -44,7 +47,7 @@ public class MonographDAO extends DAO<Monograph, Long> {
 
             result = true;
         } catch (SQLException ex) {
-            Logger.getLogger(DocumentDAO.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("SQL Exception: ", ex);
         } finally {
             closeQuietly(statement);
         }
@@ -78,7 +81,7 @@ public class MonographDAO extends DAO<Monograph, Long> {
                         result.getString("shortname"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         } finally {
             closeQuietly(preparedStatement);
         }

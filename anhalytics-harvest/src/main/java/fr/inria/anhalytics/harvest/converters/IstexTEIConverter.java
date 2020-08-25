@@ -13,6 +13,9 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
+import fr.inria.anhalytics.harvest.harvesters.Harvester;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,6 +27,8 @@ import org.xml.sax.SAXException;
  * @author azhar
  */
 public class IstexTEIConverter implements MetadataConverter {
+
+    protected static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(IstexTEIConverter.class);
 
     @Override
     public Element convertMetadataToTEIHeader(Document metadata, Document newTEIcorpus, BiblioObject biblio) {
@@ -40,7 +45,7 @@ public class IstexTEIConverter implements MetadataConverter {
             addDomains(metadata, biblio);
             teiHeader = (Element) newTEIcorpus.importNode(teiHeader, true);
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
         return teiHeader;
     }
@@ -60,7 +65,7 @@ public class IstexTEIConverter implements MetadataConverter {
             }
 
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
     }
 
@@ -82,7 +87,7 @@ public class IstexTEIConverter implements MetadataConverter {
                 textClass.appendChild(classCode);
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
     }
 
@@ -105,7 +110,7 @@ public class IstexTEIConverter implements MetadataConverter {
                 existingKeywords.getParentNode().removeChild(existingKeywords);
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
     }
 
@@ -237,7 +242,7 @@ public class IstexTEIConverter implements MetadataConverter {
                 }
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
     }
 

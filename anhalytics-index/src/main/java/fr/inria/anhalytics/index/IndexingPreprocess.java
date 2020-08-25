@@ -35,7 +35,7 @@ import java.text.SimpleDateFormat;
  */
 public class IndexingPreprocess {
 
-    private static final Logger logger = LoggerFactory.getLogger(IndexingPreprocess.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndexingPreprocess.class);
 
     // this is the list of elements for which the text nodes should be expanded with an additional json
     // node capturing the nesting xml:lang attribute name/value pair
@@ -74,7 +74,7 @@ public class IndexingPreprocess {
         JsonNode tei = jsonRoot.findPath("$TEI");
         //check if fulltext is there..
         if (tei.isNull()) {
-            logger.info(repositoryDocId + ": <tei> element is null -> " + tei.toString());
+            LOGGER.info(repositoryDocId + ": <tei> element is null -> " + tei.toString());
             return null;
         }
         if ((teiRoot != null) && (!teiRoot.isMissingNode())) {
@@ -799,12 +799,12 @@ public class IndexingPreprocess {
                     Iterator<JsonNode> iter = jsonLocalAnnotation.elements();
                     while (iter.hasNext()) {
                         JsonNode piece = (JsonNode) iter.next();
-//logger.info(piece.toString());
+//LOGGER.info(piece.toString());
                         JsonNode typeNode = piece.findPath("type");
                         if ((typeNode == null) || (typeNode.isMissingNode()))
                             continue;
                         String type = typeNode.textValue();
-//logger.info("type is " + type + " / " + piece.toString());
+//LOGGER.info("type is " + type + " / " + piece.toString());
 
                         if (type.equals("value")) {
                             JsonNode quantity = piece.findPath("quantity");
@@ -825,10 +825,10 @@ public class IndexingPreprocess {
                             JsonNode newNode = mapper.createObjectNode();
                             ((ObjectNode) newNode).put(valueTypeMeasure.replace(" ", "_"), val);
                             ((ArrayNode) annotNode).add(newNode);
-//logger.info("type is " + type + " / " + annotNode.toString());
+//LOGGER.info("type is " + type + " / " + annotNode.toString());
 
                         } else if (type.equals("interval")) {
-//logger.info("type is " + type + " / " + piece.toString());
+//LOGGER.info("type is " + type + " / " + piece.toString());
                             JsonNode quantityMost = piece.findPath("quantityMost");
                             JsonNode quantityLeast = piece.findPath("quantityLeast");
                             String valueTypeMeasure = null;
@@ -872,7 +872,7 @@ public class IndexingPreprocess {
                                 ((ObjectNode) newNode).put(valueTypeMeasure.replace(" ", "_")+"_range", range);
                                 ((ArrayNode) annotNode).add(newNode);
 
-//logger.info("type is " + type + " / " + annotNode.toString());
+//LOGGER.info("type is " + type + " / " + annotNode.toString());
                             }
 
                         } else if (type.equals("listc")) {
@@ -940,7 +940,7 @@ public class IndexingPreprocess {
                                                 ok = false;
                                             }
                                         } catch (Exception e) {
-                                            e.printStackTrace();
+                                            LOGGER.error("Error: ", e);
                                         }
                                     }
                                 }
@@ -967,7 +967,7 @@ public class IndexingPreprocess {
                                             ok = false;
                                         }
                                     } catch (Exception e) {
-                                        e.printStackTrace();
+                                        LOGGER.error("Error: ", e);
                                     }
                                 }
                             }

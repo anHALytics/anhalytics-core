@@ -31,7 +31,7 @@ import java.net.URL;
  */
 public class CrossRef {
 
-    private static final Logger logger = LoggerFactory.getLogger(CrossRef.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CrossRef.class);
 
     /**
      * Lookup by DOI - 3 parameters are id, password, doi.
@@ -112,7 +112,7 @@ public class CrossRef {
 //                    Document metadata = null;
 //
 //                    try {
-//                        logger.info("###################" + currentRepositoryDocId + "#######################");
+//                        LOGGER.info("###################" + currentRepositoryDocId + "#######################");
 //                        doi = mm.getDocumentDoi(currentAnhalyticsId);
 //                        if (doi == null || doi.isEmpty()) {
 //                            metadata = docBuilder.parse(metadataStream);
@@ -136,8 +136,8 @@ public class CrossRef {
 //
 //                            if (StringUtils.isNotBlank(title)
 //                                    && StringUtils.isNotBlank(aut)) {
-//                                logger.info("test retrieval per title, author");
-//                                logger.info(String.format("persName=%s, title=%s", aut, title));
+//                                LOGGER.info("test retrieval per title, author");
+//                                LOGGER.info(String.format("persName=%s, title=%s", aut, title));
 //                                subpath = String.format(TITLE_BASE_QUERY,
 //                                        HarvestProperties.getCrossrefId(),
 //                                        HarvestProperties.getCrossrefPwd(),
@@ -180,8 +180,8 @@ public class CrossRef {
 //                                    //&& StringUtils.isNotBlank(aut)
 //                                    && StringUtils.isNotBlank(firstPage)) {
 //                                // retrieval per journal title, author, volume, first page
-//                                logger.info("test retrieval per journal title, author, volume, first page");
-//                                logger.info(String.format("aut=%s, firstPage=%s, journalTitle=%s, volume=%s",
+//                                LOGGER.info("test retrieval per journal title, author, volume, first page");
+//                                LOGGER.info(String.format("aut=%s, firstPage=%s, journalTitle=%s, volume=%s",
 //                                        aut, firstPage, journalTitle, volume));
 //                                if (StringUtils.isNotBlank(aut)) {
 //                                    subpath = String.format(JOURNAL_AUTHOR_BASE_QUERY,
@@ -218,16 +218,16 @@ public class CrossRef {
 //                            }
 //                        }
 //                    } catch (Exception e) {
-//                        e.printStackTrace();
+//                        LOGGER.error("Error: ", e);
 //                    }
 //                }
 //                if (!HarvestProperties.isProcessByDate()) {
 //                    break;
 //                }
 //            }
-//            logger.info("Done");
+//            LOGGER.info("Done");
 //        }
-//        logger.info("nb of found doi : " + i);
+//        LOGGER.info("nb of found doi : " + i);
 
     }
 
@@ -238,8 +238,8 @@ public class CrossRef {
         String metadata = "";
         ObjectMapper mapper = new ObjectMapper();
         URL url = new URL("http://api.crossref.org/works/" + doi);
-        logger.info("Fetching for metadata: " + url.toString());
-        logger.info("Sending: " + url.toString());
+        LOGGER.info("Fetching for metadata: " + url.toString());
+        LOGGER.info("Sending: " + url.toString());
         HttpURLConnection urlConn = null;
         urlConn = openConnection(url);
         if (urlConn != null) {
@@ -266,10 +266,10 @@ public class CrossRef {
                     metadata = " \"metadata\": " + metadata;
                 }
                 in.close();
-                logger.info("DOI : " + doi);
+                LOGGER.info("DOI : " + doi);
                 urlConn.disconnect();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Error: ", e);
             }
 
         }
@@ -302,7 +302,7 @@ public class CrossRef {
 
         URL url = new URL("http://" + HarvestProperties.getCrossrefHost() + "/" + query);
 
-        logger.info("Sending: " + url.toString());
+        LOGGER.info("Sending: " + url.toString());
         HttpURLConnection urlConn = openConnection(url);
         if (urlConn != null) {
             try {
@@ -322,10 +322,10 @@ public class CrossRef {
                     doi = nl.item(0).getTextContent();
                 }
                 in.close();
-                logger.info("DOI : " + doi);
+                LOGGER.info("DOI : " + doi);
                 urlConn.disconnect();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Error: ", e);
             }
 
         }

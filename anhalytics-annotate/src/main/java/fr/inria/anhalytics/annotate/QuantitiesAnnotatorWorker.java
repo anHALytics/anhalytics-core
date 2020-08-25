@@ -32,7 +32,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
 
-    private static final Logger logger = LoggerFactory.getLogger(QuantitiesAnnotatorWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuantitiesAnnotatorWorker.class);
 
     public QuantitiesAnnotatorWorker(MongoFileManager mongoManager,
             BiblioObject biblioObject) {
@@ -45,10 +45,10 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
         boolean inserted = mm.insertAnnotation(annotateDocument(), annotationsCollection);
         if (inserted) {
             mm.updateBiblioObjectStatus(biblioObject, Processings.QUANTITIES, false);
-            logger.info("\t\t " + Thread.currentThread().getName() + ": "
+            LOGGER.info("\t\t " + Thread.currentThread().getName() + ": "
                     + biblioObject.getRepositoryDocId() + " annotated by the QUANTITIES service.");
         } else {
-            logger.info("\t\t " + Thread.currentThread().getName() + ": "
+            LOGGER.info("\t\t " + Thread.currentThread().getName() + ": "
                     + biblioObject.getRepositoryDocId() + " error occured trying to annotate with QUANTITIES.");
         }
     }
@@ -66,7 +66,7 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
             // parse the TEI
             docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(tei.getBytes("UTF-8"))));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error("Error: ", ex);
         }
 
         StringBuffer json = new StringBuffer();
@@ -107,11 +107,11 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
                         QuantitiesService quantitiesService = new QuantitiesService(IOUtils.toInputStream(text, "UTF-8"));
                         jsonText = quantitiesService.processTextQuantities();
                     } catch (Exception ex) {
-                        logger.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by QUANTITIES: " + text);
-                        ex.printStackTrace();
+                        LOGGER.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by QUANTITIES: " + text);
+                        LOGGER.error("Error: ", ex);
                     }
                     if (jsonText == null) {
-                        logger.error("\t\t " + Thread.currentThread().getName() + ": QUANTITIES failed annotating text : " + text);
+                        LOGGER.error("\t\t " + Thread.currentThread().getName() + ": QUANTITIES failed annotating text : " + text);
                     }
                     if (jsonText != null) {
                         // resulting annotations, with the corresponding id

@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 abstract class Indexer {
 
-    private static final Logger logger = LoggerFactory.getLogger(Indexer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Indexer.class);
 
     protected MongoFileManager mm;
 
@@ -80,8 +80,8 @@ abstract class Indexer {
             // create new index and load the appropriate mapping
             createIndex(indexName);
         } catch (Exception e) {
-            logger.error("Sep-up of ElasticSearch failed for index " + indexName + ".", e);
-            e.printStackTrace();
+            LOGGER.error("Sep-up of ElasticSearch failed for index " + indexName + ".", e);
+            LOGGER.error("Error: ", e);
         }
     }
 
@@ -96,8 +96,8 @@ abstract class Indexer {
             // create new index and load the appropriate mapping
             createQuantitiesIndex();
         } catch (Exception e) {
-            logger.error("Sep-up of ElasticSearch failed for index " + "quantities" + ".", e);
-            e.printStackTrace();
+            LOGGER.error("Sep-up of ElasticSearch failed for index " + "quantities" + ".", e);
+            LOGGER.error("Error: ", e);
         }
     }*/
 
@@ -124,9 +124,9 @@ abstract class Indexer {
             if (!createResponse.isAcknowledged()) {
                 throw new IndexingServiceException("Failed to create index <" + "quantities" + ">");
             }
-            logger.info("Index {} created", "quantities");
+            LOGGER.info("Index {} created", "quantities");
         } else {
-            logger.info("Index {} already exists", "quantities");
+            LOGGER.info("Index {} already exists", "quantities");
         }
         val = true;
         return val;
@@ -141,13 +141,13 @@ abstract class Indexer {
             DeleteIndexResponse deleteResponse = this.client.admin().indices().delete(new DeleteIndexRequest(indexName)).actionGet();
 
             if (deleteResponse.isAcknowledged()) {
-                logger.info("Index {} deleted", indexName);
+                LOGGER.info("Index {} deleted", indexName);
                 val = true;
             } else {
-                logger.error("Could not delete index " + indexName);
+                LOGGER.error("Could not delete index " + indexName);
             }
         } catch (IndexNotFoundException e) {
-            logger.info("Index " + indexName + " not found.");
+            LOGGER.info("Index " + indexName + " not found.");
 
         }
         return val;
@@ -188,9 +188,9 @@ abstract class Indexer {
             if (!createResponse.isAcknowledged()) {
                 throw new IndexingServiceException("Failed to create index <" + indexName + ">");
             }
-            logger.info("Index {} created", indexName);
+            LOGGER.info("Index {} created", indexName);
         } else {
-            logger.info("Index {} already exists", indexName);
+            LOGGER.info("Index {} already exists", indexName);
         }
         val = true;
         return val;

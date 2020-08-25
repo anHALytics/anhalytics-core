@@ -46,7 +46,7 @@ import org.xml.sax.SAXException;
  */
 public class TeiBuilderWorker implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(TeiBuilderWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TeiBuilderWorker.class);
 
     private Steps step;
 
@@ -63,11 +63,11 @@ public class TeiBuilderWorker implements Runnable {
     public void run() {
         this.mm = MongoFileManager.getInstance(false);
         long startTime = System.nanoTime();
-        logger.info(Thread.currentThread().getName() + " Start. Processing = " + biblioObject.getRepositoryDocId());
+        LOGGER.info(Thread.currentThread().getName() + " Start. Processing = " + biblioObject.getRepositoryDocId());
 
         if(step == Steps.TRANSFORM) {
             try {
-                logger.info("\t\t transforming :" + biblioObject.getRepositoryDocId());
+                LOGGER.info("\t\t transforming :" + biblioObject.getRepositoryDocId());
                 Document generatedTEIcorpus = createTEICorpus();
                 if (generatedTEIcorpus != null) {
                     boolean inserted = mm.insertTEIcorpus(Utilities.toString(generatedTEIcorpus), biblioObject.getAnhalyticsId());
@@ -78,18 +78,18 @@ public class TeiBuilderWorker implements Runnable {
                         biblioObject.setIsMined(Boolean.FALSE);
                         biblioObject.setIsIndexed(Boolean.FALSE);
                         mm.updateBiblioObjectStatus(biblioObject, null, true);
-                        logger.info("\t\t " + biblioObject.getRepositoryDocId()+ " transformed.");
+                        LOGGER.info("\t\t " + biblioObject.getRepositoryDocId()+ " transformed.");
                     } else {
-                        logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
+                        LOGGER.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
                     }
                 }
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
             }
         } else if(step == Steps.APPEND_FULLTEXT) {
 
             Document generatedTEIcorpus = null;
-            logger.info("\t Building TEI for: " + biblioObject.getRepositoryDocId());
+            LOGGER.info("\t Building TEI for: " + biblioObject.getRepositoryDocId());
             //tei.setTei(Utilities.trimEncodedCharaters(tei.getTei()));
             try {
                 String grobidTei = mm.getGrobidTei(biblioObject);
@@ -101,19 +101,19 @@ public class TeiBuilderWorker implements Runnable {
                 if (inserted) {
                     biblioObject.setIsFulltextAppended(Boolean.TRUE);
                     mm.updateBiblioObjectStatus(biblioObject, null, true);
-                    logger.info("\t\t " + biblioObject.getRepositoryDocId()+ " built.");
+                    LOGGER.info("\t\t " + biblioObject.getRepositoryDocId()+ " built.");
                 } else {
-                    logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
+                    LOGGER.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
                 }
 
             } catch (DataException de) {
-                logger.error("No corresponding fulltext TEI was found for " + biblioObject.getRepositoryDocId() + ".");
+                LOGGER.error("No corresponding fulltext TEI was found for " + biblioObject.getRepositoryDocId() + ".");
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
             }
         }
         long endTime = System.nanoTime();
-        logger.info(Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
+        LOGGER.info(Thread.currentThread().getName() + " End. :" + (endTime - startTime) / 1000000 + " ms");
     }
 
     /**
@@ -202,7 +202,7 @@ public class TeiBuilderWorker implements Runnable {
                 fillPubDate(doc, teiCorpusDoc);
                 fillAuthors(doc, teiCorpusDoc);
             } catch (XPathExpressionException e) {
-                e.printStackTrace();
+                LOGGER.error("Error: ", e);
             }
         }
         resultTei = addNewElementToTEI(teiCorpusDoc, grobidTeiElement);
@@ -285,7 +285,7 @@ public class TeiBuilderWorker implements Runnable {
             }
 
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
     }
 

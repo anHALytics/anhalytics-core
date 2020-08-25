@@ -1,6 +1,9 @@
 package fr.inria.anhalytics.commons.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -11,6 +14,7 @@ import java.util.Properties;
  * @author Achraf, Patrice
  */
 public class AnnotateProperties {
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AnnotateProperties.class);
     
     private static String processName;
 
@@ -62,7 +66,7 @@ public class AnnotateProperties {
         try {
             setNerdNbThreads(Integer.parseInt(threads));
         } catch (java.lang.NumberFormatException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
 
         setKeytermHost(props.getProperty("annotate.keyterm_host"));
@@ -71,7 +75,7 @@ public class AnnotateProperties {
         try {
             setKeytermNbThreads(Integer.parseInt(threads));
         } catch (java.lang.NumberFormatException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
         
         setQuantitiesHost(props.getProperty("annotate.quantities_host"));
@@ -80,7 +84,7 @@ public class AnnotateProperties {
         try {
             setQuantitiesNbThreads(Integer.parseInt(threads));
         } catch (java.lang.NumberFormatException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
         setTmp(props.getProperty("annotate.quantities.tmp"));
     }

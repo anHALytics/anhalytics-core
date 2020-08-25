@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
 
-    private static final Logger logger = LoggerFactory.getLogger(PDFQuantitiesAnnotatorWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PDFQuantitiesAnnotatorWorker.class);
 
     public PDFQuantitiesAnnotatorWorker(MongoFileManager mongoManager,
             BiblioObject biblioObject) {
@@ -28,10 +28,10 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
         boolean inserted = mm.insertAnnotation(annotateDocument(), annotationsCollection);
         if (inserted) {
             mm.updateBiblioObjectStatus(biblioObject, Processings.PDFQUANTITIES, false);
-            logger.info("\t\t " + Thread.currentThread().getName() + ": "
+            LOGGER.info("\t\t " + Thread.currentThread().getName() + ": "
                     + biblioObject.getRepositoryDocId() + " annotated by the QUANTITIES service.");
         } else {
-            logger.info("\t\t " + Thread.currentThread().getName() + ": "
+            LOGGER.info("\t\t " + Thread.currentThread().getName() + ": "
                     + biblioObject.getRepositoryDocId() + " error occured trying to annotate with QUANTITIES.");
         }
 
@@ -64,8 +64,8 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
             }
             biblioObject.getPdf().getStream().close();
         } catch (Exception ex) {
-            logger.error("\t\t " + Thread.currentThread().getName() + ": PDF could not be processed by the quantities extractor: ");
-            ex.printStackTrace();
+            LOGGER.error("\t\t " + Thread.currentThread().getName() + ": PDF could not be processed by the quantities extractor: ");
+            LOGGER.error("Error: ", ex);
             return null;
         }
         return json.toString();

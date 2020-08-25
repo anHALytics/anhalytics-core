@@ -2,6 +2,7 @@ package fr.inria.anhalytics.commons.dao;
 
 import fr.inria.anhalytics.commons.entities.Address;
 import fr.inria.anhalytics.commons.entities.Country;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
@@ -13,7 +14,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  */
 public class AddressDAO extends DAO<Address, Long> {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AddressDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AddressDAO.class);
 
     private static final String SQL_INSERT
             = "INSERT INTO ADDRESS (addrLine, postBox, postCode, settlement, region, countryID) VALUES (?, ?, ?, ?, ?, ?)";
@@ -112,7 +113,7 @@ public class AddressDAO extends DAO<Address, Long> {
                 );
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -135,7 +136,7 @@ public class AddressDAO extends DAO<Address, Long> {
                 );
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -157,7 +158,7 @@ public class AddressDAO extends DAO<Address, Long> {
 
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(ps);
         }
@@ -199,7 +200,7 @@ public class AddressDAO extends DAO<Address, Long> {
                 );
             }
         } catch (SQLException ex) {
-            logger.error(ex.getMessage());
+            LOGGER.error(ex.getMessage());
         } finally {
             closeQuietly(ps);
         }

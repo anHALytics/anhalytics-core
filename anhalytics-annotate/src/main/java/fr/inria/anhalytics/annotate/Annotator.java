@@ -23,7 +23,7 @@ import java.util.concurrent.*;
  */
 public class Annotator {
 
-    private static final Logger logger = LoggerFactory.getLogger(Annotator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Annotator.class);
 
     private MongoFileManager mm;
 
@@ -44,7 +44,7 @@ public class Annotator {
                 annotateTeiCollection(annotator_type);
             }
         } catch (UnreachableAnnotateServiceException | AnnotatorNotAvailableException e) {
-            logger.error("Error when annotating. ", e);
+            LOGGER.error("Error when annotating. ", e);
 
         }
     }
@@ -65,7 +65,7 @@ public class Annotator {
                     while (mm.hasMore()) {
                         BiblioObject biblioObject = mm.nextBiblioObject();
                         if (!AnnotateProperties.isReset() && mm.isProcessed(annotator_type)) {
-                            logger.info("\t\t Already annotated by " + annotator_type + ", Skipping...");
+                            LOGGER.info("\t\t Already annotated by " + annotator_type + ", Skipping...");
                             continue;
                         }
                         Runnable worker = null;
@@ -74,7 +74,7 @@ public class Annotator {
                                 biblioObject.setTeiCorpus(mm.getTEICorpus(biblioObject));
                                 worker = new NerdAnnotatorWorker(mm, biblioObject);
                             } else {
-                                logger.info("\t\t No TEI available for " + biblioObject.getRepositoryDocId());
+                                LOGGER.info("\t\t No TEI available for " + biblioObject.getRepositoryDocId());
                             }
                         } else if (annotator_type == Processings.KEYTERM) {
                             if (biblioObject.getIsProcessedByPub2TEI()) {
@@ -83,7 +83,7 @@ public class Annotator {
                                     biblioObject.setTeiCorpus(mm.getTEICorpus(biblioObject));
                                     worker = new KeyTermAnnotatorWorker(mm, biblioObject);
                             } else {
-                                logger.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
+                                LOGGER.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
                             }
                         } else if (annotator_type == Processings.QUANTITIES) {
                             if (biblioObject.getIsProcessedByPub2TEI()) {
@@ -92,7 +92,7 @@ public class Annotator {
                                     biblioObject.setTeiCorpus(mm.getTEICorpus(biblioObject));
                                 worker = new QuantitiesAnnotatorWorker(mm, biblioObject);
                             } else {
-                                logger.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
+                                LOGGER.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
                             }
                         } else if (annotator_type == Processings.PDFQUANTITIES) {
                             if (biblioObject.getIsWithFulltext()) {
@@ -101,7 +101,7 @@ public class Annotator {
                                 biblioObject.setPdf(bf);
                                 worker = new PDFQuantitiesAnnotatorWorker(mm, biblioObject);
                             } else {
-                                logger.info("\t\t No fulltext available for " + biblioObject.getRepositoryDocId());
+                                LOGGER.info("\t\t No fulltext available for " + biblioObject.getRepositoryDocId());
                             }
                         }
                         if (worker != null) {
@@ -111,7 +111,7 @@ public class Annotator {
                     }
                 }
             }
-            logger.info("Total: " + nb + " documents annotated.");
+            LOGGER.info("Total: " + nb + " documents annotated.");
         } finally {
             mm.close();
         }
@@ -132,18 +132,18 @@ public class Annotator {
                 ThreadPoolExecutor executor = getThreadsExecutor(annotator_type);
 
                 if (mm.initObjects(null, getQuery(AnnotateProperties.isReset(), annotator_type))) {
-                    //logger.info("processing teis for :" + date);
+                    //LOGGER.info("processing teis for :" + date);
                     while (mm.hasMore()) {
                         BiblioObject biblioObject = mm.nextBiblioObject();
                         if (!AnnotateProperties.isReset() && mm.isProcessed(annotator_type)) {
-                            logger.info("\t\t Already annotated by " + annotator_type + ", Skipping...");
+                            LOGGER.info("\t\t Already annotated by " + annotator_type + ", Skipping...");
                             continue;
                         }
 
                         // filter based on document size... we should actually annotate only 
                         // a given length and then stop
                         if (biblioObject.getTeiCorpus().length() > 300000) {
-                            logger.info("skipping " + biblioObject.getRepositoryDocId() + ": file too large");
+                            LOGGER.info("skipping " + biblioObject.getRepositoryDocId() + ": file too large");
                             continue;
                         }
                         Runnable worker = null;
@@ -152,7 +152,7 @@ public class Annotator {
                                 biblioObject.setTeiCorpus(mm.getTEICorpus(biblioObject));
                                 worker = new NerdAnnotatorWorker(mm, biblioObject);
                             } else {
-                                logger.info("\t\t No TEI available for " + biblioObject.getRepositoryDocId());
+                                LOGGER.info("\t\t No TEI available for " + biblioObject.getRepositoryDocId());
                             }
                         } else if (annotator_type == Processings.KEYTERM) {
                             if (biblioObject.getIsProcessedByPub2TEI()) {
@@ -161,7 +161,7 @@ public class Annotator {
                                     biblioObject.setTeiCorpus(mm.getTEICorpus(biblioObject));
                                 worker = new KeyTermAnnotatorWorker(mm, biblioObject);
                             } else {
-                                logger.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
+                                LOGGER.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
                             }
                         } else if (annotator_type == Processings.QUANTITIES) {
                             if (biblioObject.getIsProcessedByPub2TEI()) {
@@ -170,7 +170,7 @@ public class Annotator {
                                     biblioObject.setTeiCorpus(mm.getTEICorpus(biblioObject));
                                     worker = new QuantitiesAnnotatorWorker(mm, biblioObject);
                             } else {
-                                logger.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
+                                LOGGER.info("\t\t No Grobid TEI available for " + biblioObject.getRepositoryDocId());
                             }
                         } else if (annotator_type == Processings.PDFQUANTITIES) {
                             BinaryFile bf = new BinaryFile();
@@ -180,7 +180,7 @@ public class Annotator {
                                 biblioObject.setPdf(bf);
                                 worker = new PDFQuantitiesAnnotatorWorker(mm, biblioObject);
                             } else {
-                                logger.info("\t\t No fulltext available for " + biblioObject.getRepositoryDocId());
+                                LOGGER.info("\t\t No fulltext available for " + biblioObject.getRepositoryDocId());
                             }
                         }
                         if (worker != null) {
@@ -190,7 +190,7 @@ public class Annotator {
                     }
                 }
                 executor.shutdown();
-                logger.info("Jobs done, shutting down thread pool. The executor will wait 2 minutes before forcing the shutdown.");
+                LOGGER.info("Jobs done, shutting down thread pool. The executor will wait 2 minutes before forcing the shutdown.");
                 try {
                     if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES)) {
                         executor.shutdownNow();
@@ -198,8 +198,8 @@ public class Annotator {
                 } catch (InterruptedException e) {
                     executor.shutdownNow();
                 }
-                logger.info("Finished all threads");
-                logger.info("Total: " + nb + " documents annotated.");
+                LOGGER.info("Finished all threads");
+                LOGGER.info("Total: " + nb + " documents annotated.");
             }
         } finally {
             mm.close();
@@ -248,7 +248,7 @@ public class Annotator {
         } else if (annotator_type == annotator_type.PDFQUANTITIES) {
             nbThreads = AnnotateProperties.getQuantitiesNbThreads();
         }
-        logger.info("Number of threads: " + nbThreads);
+        LOGGER.info("Number of threads: " + nbThreads);
         ThreadPoolExecutor executor = new ThreadPoolExecutor(nbThreads, nbThreads, 60000,
                 TimeUnit.MILLISECONDS, blockingQueue);
 
@@ -257,15 +257,15 @@ public class Annotator {
             @Override
             public void rejectedExecution(Runnable r,
                                           ThreadPoolExecutor executor) {
-                logger.info("Task Rejected : "
+                LOGGER.info("Task Rejected : "
                         + ((AnnotatorWorker) r).getRepositoryDocId());
-                logger.info("Waiting for 60 second !!");
+                LOGGER.info("Waiting for 60 second !!");
                 try {
                     Thread.sleep(60000);
                 } catch (InterruptedException e) {
-                    logger.error("Error when interrupting the thread. ", e);
+                    LOGGER.error("Error when interrupting the thread. ", e);
                 }
-                logger.info("Lets add another time : "
+                LOGGER.info("Lets add another time : "
                         + ((AnnotatorWorker) r).getRepositoryDocId());
                 executor.execute(r);
             }

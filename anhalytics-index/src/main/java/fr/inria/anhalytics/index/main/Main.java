@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Main {
 
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     private static List<String> availableCommands
             = Arrays.asList("setup", "indexAll", "indexTEI",
@@ -35,7 +35,7 @@ public class Main {
             try {
                 IndexProperties.init("anhalytics.properties");
             } catch (Exception e) {
-                logger.error("Error: ", e);
+                LOGGER.error("Error: ", e);
                 return;
             }
             if (IndexProperties.getFromDate() != null || IndexProperties.getUntilDate() != null) {
@@ -125,116 +125,116 @@ public class Main {
 
                 try {
                     int nbDoc1 = esm.indexTeiCorpus();
-                    logger.info("Total: " + nbDoc1 + " tei documents indexed.");
+                    LOGGER.info("Total: " + nbDoc1 + " tei documents indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getTeisIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getTeisIndexName() + " will be created.");
+                    LOGGER.error(IndexProperties.getTeisIndexName() + " not found, setup the index.");
+                    LOGGER.info("The index " + IndexProperties.getTeisIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getTeisIndexName());
                     int nbDoc1 = esm.indexTeiCorpus();
-                    logger.info("Total: " + nbDoc1 + " teis documents indexed.");
+                    LOGGER.info("Total: " + nbDoc1 + " teis documents indexed.");
                 }
 
                 try {
                     int nbNerdAnnot = esm.indexNerdAnnotations();
-                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+                    LOGGER.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getNerdAnnotsIndexName() + " will be created.");
+                    LOGGER.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
+                    LOGGER.info("The index " + IndexProperties.getNerdAnnotsIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getNerdAnnotsIndexName());
                     int nbNerdAnnot = esm.indexNerdAnnotations();
-                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+                    LOGGER.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
                 }
 
                 try {
                     int nbKeytermAnnot = esm.indexKeytermAnnotations();
-                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+                    LOGGER.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getKeytermAnnotsIndexName() + " will be created.");
+                    LOGGER.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
+                    LOGGER.info("The index " + IndexProperties.getKeytermAnnotsIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getKeytermAnnotsIndexName());
                     int nbKeytermAnnot = esm.indexKeytermAnnotations();
-                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+                    LOGGER.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 }
 
                 try {
                     int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
-                    logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
+                    LOGGER.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getQuantitiesAnnotsIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getQuantitiesAnnotsIndexName() + " will be created.");
+                    LOGGER.error(IndexProperties.getQuantitiesAnnotsIndexName() + " not found, setup the index.");
+                    LOGGER.info("The index " + IndexProperties.getQuantitiesAnnotsIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getQuantitiesAnnotsIndexName());
                     int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
-                    logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
+                    LOGGER.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
                 }
             } else if (process.equals("indexTEI")) {
                 try {
                     int nbDoc1 = esm.indexTeiCorpus();
-                    logger.info("Total: " + nbDoc1 + " metadata documents indexed.");
+                    LOGGER.info("Total: " + nbDoc1 + " metadata documents indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getTeisIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getTeisIndexName() + " will be created.");
+                    LOGGER.error(IndexProperties.getTeisIndexName() + " not found, setup the index.");
+                    LOGGER.info("The index " + IndexProperties.getTeisIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getTeisIndexName());
                     int nbDoc1 = esm.indexTeiCorpus();
-                    logger.info("Total: " + nbDoc1 + " TEI documents indexed.");
+                    LOGGER.info("Total: " + nbDoc1 + " TEI documents indexed.");
                 }
             } else if (process.equals("indexAnnotations")) {
                 try {
                     int nbNerdAnnot = esm.indexNerdAnnotations();
-                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+                    LOGGER.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getNerdAnnotsIndexName() + " will be created.");
+                    LOGGER.error(IndexProperties.getNerdAnnotsIndexName() + " not found, setup the index.");
+                    LOGGER.info("The index " + IndexProperties.getNerdAnnotsIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getNerdAnnotsIndexName());
                     int nbNerdAnnot = esm.indexNerdAnnotations();
-                    logger.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
+                    LOGGER.info("Total: " + nbNerdAnnot + " NERD annotations indexed.");
                 }
 
                 try {
                     int nbKeytermAnnot = esm.indexKeytermAnnotations();
-                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+                    LOGGER.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getKeytermAnnotsIndexName() + " will be created.");
+                    LOGGER.error(IndexProperties.getKeytermAnnotsIndexName() + " not found, setup the index.");
+                    LOGGER.info("The index " + IndexProperties.getKeytermAnnotsIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getKeytermAnnotsIndexName());
                     int nbKeytermAnnot = esm.indexKeytermAnnotations();
-                    logger.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
+                    LOGGER.info("Total: " + nbKeytermAnnot + " Keyterm annotations indexed.");
                 }
 
                 try {
                     int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
-                    logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
+                    LOGGER.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getQuantitiesAnnotsIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getQuantitiesAnnotsIndexName() + " will be created.");
+                    LOGGER.error(IndexProperties.getQuantitiesAnnotsIndexName() + " not found, setup the index.");
+                    LOGGER.info("The index " + IndexProperties.getQuantitiesAnnotsIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getQuantitiesAnnotsIndexName());
                     int nbQuantitiesAnnot = esm.indexQuantitiesAnnotations();
-                    logger.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
+                    LOGGER.info("Total: " + nbQuantitiesAnnot + " grobid-quantities annotations indexed.");
                 }
             } else if (process.equals("indexKB")) {
                 KnowledgeBaseIndexer mi = new KnowledgeBaseIndexer(); // this is the KB in fact !
                 try {
                     int nbAuthtors = mi.indexAuthors();
-                    logger.info("Total: " + nbAuthtors + " authors indexed.");
+                    LOGGER.info("Total: " + nbAuthtors + " authors indexed.");
                     int nbPubs = mi.indexPublications();
-                    logger.info("Total: " + nbPubs + " publications indexed.");
+                    LOGGER.info("Total: " + nbPubs + " publications indexed.");
                     int nbOrgs = mi.indexOrganisations();
-                    logger.info("Total: " + nbOrgs + " organisations indexed.");
+                    LOGGER.info("Total: " + nbOrgs + " organisations indexed.");
                 } catch (IndexNotCreatedException e) {
-                    logger.error(IndexProperties.getKbIndexName() + " not found, setup the index.");
-                    logger.info("The index " + IndexProperties.getKbIndexName() + " will be created.");
+                    LOGGER.error(IndexProperties.getKbIndexName() + " not found, setup the index.");
+                    LOGGER.info("The index " + IndexProperties.getKbIndexName() + " will be created.");
                     esm.createIndex(IndexProperties.getKbIndexName());
                     try {
                         int nbAuthtors = mi.indexAuthors();
-                        logger.info("Total: " + nbAuthtors + " authors indexed.");
+                        LOGGER.info("Total: " + nbAuthtors + " authors indexed.");
                         int nbPubs = mi.indexPublications();
-                        logger.info("Total: " + nbPubs + " publications indexed.");
+                        LOGGER.info("Total: " + nbPubs + " publications indexed.");
                         int nbOrgs = mi.indexOrganisations();
-                        logger.info("Total: " + nbOrgs + " organisations indexed.");
+                        LOGGER.info("Total: " + nbOrgs + " organisations indexed.");
                     } catch (SQLException sqle) {
-                        sqle.printStackTrace();
+                        LOGGER.error("Error: ", sqle);
                     }
                 } catch (SQLException sqle) {
-                    sqle.printStackTrace();
+                    LOGGER.error("Error: ", sqle);
                 }
                 mi.close();
             }
@@ -242,7 +242,7 @@ public class Main {
                 try {
                 int nbDocs = esm.indexIstexQuantites();
                 } catch (Exception sqle) {
-                    sqle.printStackTrace();
+                    LOGGER.error("Error: ", sqle);
                 }
             } else if (process.equals("setupQuantitiesIndex")) {
             
@@ -251,7 +251,7 @@ public class Main {
             esm.close();
 
         } catch (ServiceException se) {
-            logger.error("Error: ", se);
+            LOGGER.error("Error: ", se);
         }
 
         return;

@@ -17,7 +17,7 @@ import java.net.URL;
  */
 public class QuantitiesService extends AnnotateService {
 
-    private static final Logger logger = LoggerFactory.getLogger(QuantitiesService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuantitiesService.class);
 
     static private String REQUEST_TEXT_QUANTITIES = "processQuantityText";
 
@@ -52,9 +52,9 @@ public class QuantitiesService extends AnnotateService {
             OutputStream os = conn.getOutputStream();
             os.write(postDataBytes);
             os.flush();
-            logger.info("Response "+conn.getResponseCode());
+            LOGGER.info("Response "+conn.getResponseCode());
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                logger.error("Failed annotating text segment: HTTP error code : "
+                LOGGER.error("Failed annotating text segment: HTTP error code : "
                         + conn.getResponseCode());
                 return null;
             }
@@ -68,9 +68,9 @@ public class QuantitiesService extends AnnotateService {
             conn.disconnect();
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
         //System.out.println(output.toString().trim());
         return output.toString().trim();

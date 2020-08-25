@@ -26,7 +26,7 @@ import org.elasticsearch.index.query.*;
  */
 public class DocumentIndexer extends Indexer {
 
-    private static final Logger logger = LoggerFactory.getLogger(DocumentIndexer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentIndexer.class);
 
     IndexingPreprocess indexingPreprocess;
     // only annotations under these paths will be indexed for the moment
@@ -63,11 +63,11 @@ public class DocumentIndexer extends Indexer {
                 while (mm.hasMore()) {
                     BiblioObject biblioObject = mm.nextBiblioObject();
 //                    if (!biblioObject.getIsWithFulltext()) {
-//                        logger.info("\t\t No fulltext available, Skipping...");
+//                        LOGGER.info("\t\t No fulltext available, Skipping...");
 //                        continue;
 //                    }
                     if (!IndexProperties.isReset() && biblioObject.getIsIndexed()) {
-                        logger.info("\t\t Already indexed, Skipping...");
+                        LOGGER.info("\t\t Already indexed, Skipping...");
                         continue;
                     }
                     String jsonStr = null;
@@ -90,17 +90,17 @@ public class DocumentIndexer extends Indexer {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                             if (bulkResponse.hasFailures()) {
                                 // process failures by iterating through each bulk response item
-                                logger.error(bulkResponse.buildFailureMessage());
+                                LOGGER.error(bulkResponse.buildFailureMessage());
                             }
                             bulkRequest = client.prepareBulk();
                             //bulkRequest.setRefresh(true);
                             bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                            logger.info("\n Bulk number : " + nb / bulkSize);
+                            LOGGER.info("\n Bulk number : " + nb / bulkSize);
                         }
                         biblioObject.setIsIndexed(Boolean.TRUE);
                         mm.updateBiblioObjectStatus(biblioObject, null, false);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        LOGGER.error("Error: ", e);
                     }
                 }
             }
@@ -108,10 +108,10 @@ public class DocumentIndexer extends Indexer {
             // last bulk
             if (nb % bulkSize != 0) {
                 BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                logger.info("\n One Last Bulk.");
+                LOGGER.info("\n One Last Bulk.");
                 if (bulkResponse.hasFailures()) {
                     // process failures by iterating through each bulk response item
-                    logger.error(bulkResponse.buildFailureMessage());
+                    LOGGER.error(bulkResponse.buildFailureMessage());
                 }
             }
         } else {
@@ -138,7 +138,7 @@ public class DocumentIndexer extends Indexer {
                     continue;
                 annotation.setJson(annotation.getJson().replaceAll("_id", "id"));
                 if (!IndexProperties.isReset() && annotation.isIsIndexed()) {
-                    logger.info("\t\t Already indexed annotations for " + biblioObject.getAnhalyticsId() + ", Skipping...");
+                    LOGGER.info("\t\t Already indexed annotations for " + biblioObject.getAnhalyticsId() + ", Skipping...");
                     continue;
                 }
                 try {
@@ -153,15 +153,15 @@ public class DocumentIndexer extends Indexer {
                         BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                         if (bulkResponse.hasFailures()) {
                             // process failures by iterating through each bulk response item
-                            logger.error(bulkResponse.buildFailureMessage());
+                            LOGGER.error(bulkResponse.buildFailureMessage());
                         }
                         bulkRequest = client.prepareBulk();
                         //bulkRequest.setRefresh(true);
                         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                        logger.info("\n Bulk number : " + nb / bulkSize);
+                        LOGGER.info("\n Bulk number : " + nb / bulkSize);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("Error: ", e);
                 }
             }
         }
@@ -169,10 +169,10 @@ public class DocumentIndexer extends Indexer {
         if (nb % bulkSize != 0) {
             // last bulk
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            logger.info("\n One Last Bulk.");
+            LOGGER.info("\n One Last Bulk.");
             if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item	
-                logger.error(bulkResponse.buildFailureMessage());
+                LOGGER.error(bulkResponse.buildFailureMessage());
             }
         }
         return nb;
@@ -197,7 +197,7 @@ public class DocumentIndexer extends Indexer {
 
                 annotation.setJson(annotation.getJson().replaceAll("_id", "id"));
                 if (!IndexProperties.isReset() && annotation.isIsIndexed()) {
-                    logger.info("\t\t Already indexed annotations for " + biblioObject.getAnhalyticsId() + ", Skipping...");
+                    LOGGER.info("\t\t Already indexed annotations for " + biblioObject.getAnhalyticsId() + ", Skipping...");
                     continue;
                 }
 
@@ -245,16 +245,16 @@ public class DocumentIndexer extends Indexer {
                             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                             if (bulkResponse.hasFailures()) {
                                 // process failures by iterating through each bulk response item
-                                logger.error(bulkResponse.buildFailureMessage());
+                                LOGGER.error(bulkResponse.buildFailureMessage());
                             }
                             bulkRequest = client.prepareBulk();
                             //bulkRequest.setRefresh(true);
                             bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                            logger.info("\n Bulk number : " + nb / bulkSize);
+                            LOGGER.info("\n Bulk number : " + nb / bulkSize);
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("Error: ", e);
                 }
             }
         }
@@ -262,10 +262,10 @@ public class DocumentIndexer extends Indexer {
         // last bulk
         if (nb % bulkSize != 0) {
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            logger.info("\n One Last Bulk.");
+            LOGGER.info("\n One Last Bulk.");
             if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item	
-                logger.error(bulkResponse.buildFailureMessage());
+                LOGGER.error(bulkResponse.buildFailureMessage());
             }
         }
         return nb;
@@ -291,7 +291,7 @@ public class DocumentIndexer extends Indexer {
                 
                 annotation.setJson(annotation.getJson().replaceAll("_id", "id"));
                 if (!IndexProperties.isReset() && annotation.isIsIndexed()) {
-                    logger.info("\t\t Already indexed annotations for " + biblioObject.getAnhalyticsId() + ", Skipping...");
+                    LOGGER.info("\t\t Already indexed annotations for " + biblioObject.getAnhalyticsId() + ", Skipping...");
                     continue;
                 }
                 try {
@@ -305,15 +305,15 @@ public class DocumentIndexer extends Indexer {
                         BulkResponse bulkResponse = bulkRequest.execute().actionGet();
                         if (bulkResponse.hasFailures()) {
                             // process failures by iterating through each bulk response item    
-                            logger.error(bulkResponse.buildFailureMessage());
+                            LOGGER.error(bulkResponse.buildFailureMessage());
                         }
                         bulkRequest = client.prepareBulk();
                         //bulkRequest.setRefresh(true);
                         bulkRequest.setRefreshPolicy(RefreshPolicy.IMMEDIATE);
-                        logger.info("\n Bulk number : " + nb / bulkSize);
+                        LOGGER.info("\n Bulk number : " + nb / bulkSize);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("Error: ", e);
                 }
             }
         }
@@ -321,10 +321,10 @@ public class DocumentIndexer extends Indexer {
         // last bulk
         if (nb % bulkSize != 0) {
             BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            logger.info("\n One Last Bulk.");
+            LOGGER.info("\n One Last Bulk.");
             if (bulkResponse.hasFailures()) {
                 // process failures by iterating through each bulk response item    
-                logger.error(bulkResponse.buildFailureMessage());
+                LOGGER.error(bulkResponse.buildFailureMessage());
             }
         }
 
@@ -337,7 +337,7 @@ public class DocumentIndexer extends Indexer {
      */
     private List<String> validDocIDs(String anhalyticsId, ObjectMapper mapper) {
         List<String> results = new ArrayList<String>();
-        logger.info("validDocIDs: " + anhalyticsId);
+        LOGGER.info("validDocIDs: " + anhalyticsId);
         //String request[] = toBeIndexed.toArray(new String[0]);
         //String query = "{\"query\": { \"bool\": { \"must\": { \"term\": {\"_id\": \"" + anhalyticsId + "\"}}}}}";
 
@@ -368,7 +368,7 @@ public class DocumentIndexer extends Indexer {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error: ", e);
         }
         return results;
     }

@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AnnotateService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AnnotateService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnnotateService.class);
 
     //protected String input = null;
     protected InputStream input = null;
@@ -33,7 +33,7 @@ public abstract class AnnotateService {
      * @return boolean
      */
     public static boolean isAnnotateServiceReady(Processings annotator_type) throws UnreachableAnnotateServiceException {
-        logger.info("Checking " + annotator_type + " service...");
+        LOGGER.info("Checking " + annotator_type + " service...");
         int responseCode = 0;
         HttpURLConnection conn = null;
         try {
@@ -46,12 +46,12 @@ public abstract class AnnotateService {
                         + (AnnotateProperties.getQuantitiesPort().isEmpty() ? "" : ":" + AnnotateProperties.getQuantitiesPort()) + "/isalive";
             } else {
                 // keyterm isalive checking not implemented yet.
-                logger.info(annotator_type + "  service is ok and can be used.");
+                LOGGER.info(annotator_type + "  service is ok and can be used.");
                 return true;
             }
             URL url = new URL(urlString);
             conn = (HttpURLConnection) url.openConnection();
-            logger.info(urlString);
+            LOGGER.info(urlString);
             conn.setDoOutput(true);
             conn.setRequestMethod("GET");
             responseCode = conn.getResponseCode();
@@ -59,11 +59,11 @@ public abstract class AnnotateService {
             throw new UnreachableAnnotateServiceException(responseCode, annotator_type.toString());
         }
         if (responseCode != 200) {
-            logger.error(annotator_type + "  service is not alive.");
+            LOGGER.error(annotator_type + "  service is not alive.");
             throw new UnreachableAnnotateServiceException(responseCode, annotator_type.toString());
         }
         conn.disconnect();
-        logger.info(annotator_type + "  service is ok and can be used.");
+        LOGGER.info(annotator_type + "  service is ok and can be used.");
         return true;
     }
 }

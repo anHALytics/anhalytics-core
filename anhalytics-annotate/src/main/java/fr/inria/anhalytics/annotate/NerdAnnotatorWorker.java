@@ -40,7 +40,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class NerdAnnotatorWorker extends AnnotatorWorker {
 
-    private static final Logger logger = LoggerFactory.getLogger(NerdAnnotatorWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NerdAnnotatorWorker.class);
 
     public NerdAnnotatorWorker(MongoFileManager mongoManager,
             BiblioObject biblioObject) {
@@ -53,9 +53,9 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
         boolean inserted = mm.insertAnnotation(annotateDocument(), annotationsCollection);
         if (inserted) {
             mm.updateBiblioObjectStatus(biblioObject, Processings.NERD, false);
-            logger.info("\t\t " + Thread.currentThread().getName() + ": " + biblioObject.getRepositoryDocId() + " annotated by the NERD service.");
+            LOGGER.info("\t\t " + Thread.currentThread().getName() + ": " + biblioObject.getRepositoryDocId() + " annotated by the NERD service.");
         } else {
-            logger.info("\t\t " + Thread.currentThread().getName() + ": "
+            LOGGER.info("\t\t " + Thread.currentThread().getName() + ": "
                     + biblioObject.getRepositoryDocId() + " error occured trying to annotate with NERD.");
         }
     }
@@ -89,7 +89,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
             annotateNode(metadata, true, json, null);
             json.append("] }");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.error("Error: ", ex);
             return null;
         }
 
@@ -143,11 +143,11 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
                         NerdClient nerdService = new NerdClient(AnnotateProperties.getNerdHost());
                         jsonText = nerdService.disambiguateText(text.trim(), language).toString();
                     } catch (Exception ex) {
-                        logger.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by NERD: " + text);
-                        ex.printStackTrace();
+                        LOGGER.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by NERD: " + text);
+                        LOGGER.error("Error: ", ex);
                     }
                     if (jsonText == null) {
-                        logger.error("\t\t " + Thread.currentThread().getName() + ": NERD failed annotating text : " + text);
+                        LOGGER.error("\t\t " + Thread.currentThread().getName() + ": NERD failed annotating text : " + text);
                     }
                     if (jsonText != null) {
                         // resulting annotations, with the corresponding id

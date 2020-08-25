@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 class GrobidSimpleFulltextWorker extends GrobidWorker {
 
-    private static final Logger logger = LoggerFactory.getLogger(GrobidSimpleFulltextWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidSimpleFulltextWorker.class);
 
     public GrobidSimpleFulltextWorker(BiblioObject biblioObject, int start, int end) throws ParserConfigurationException {
         super(biblioObject, start, end);
@@ -41,7 +41,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
 
             // for now we extract just files with less size (avoid thesis..which may take long time)
             if (mb <= 15) {
-                logger.info("\t\t "+Thread.currentThread().getName() +": TEI extraction for : " + biblioObject.getRepositoryDocId() + " sizing :" + mb + "mb");
+                LOGGER.info("\t\t "+Thread.currentThread().getName() +": TEI extraction for : " + biblioObject.getRepositoryDocId() + " sizing :" + mb + "mb");
                 String tei = grobidService.runFullTextGrobid(filepath).trim();
                 tei = generateIdsGrobidTeiDoc(tei);
 
@@ -49,32 +49,32 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
                 if (inserted) {
                     this.saveExtractedDOI(tei);
                     mm.updateBiblioObjectStatus(biblioObject, Processings.GROBID, false);
-                    logger.info("\t\t "+Thread.currentThread().getName() +": " + biblioObject.getRepositoryDocId() + " processed.");
+                    LOGGER.info("\t\t "+Thread.currentThread().getName() +": " + biblioObject.getRepositoryDocId() + " processed.");
                 } else
-                    logger.error("\t\t "+Thread.currentThread().getName() +": Problem occured while saving " + biblioObject.getRepositoryDocId() + " grobid TEI.");
+                    LOGGER.error("\t\t "+Thread.currentThread().getName() +": Problem occured while saving " + biblioObject.getRepositoryDocId() + " grobid TEI.");
             } else {
-                logger.info("\t\t "+Thread.currentThread().getName() +": can't extract TEI for : " + biblioObject.getRepositoryDocId() + "size too large : " + mb + "mb");
+                LOGGER.info("\t\t "+Thread.currentThread().getName() +": can't extract TEI for : " + biblioObject.getRepositoryDocId() + "size too large : " + mb + "mb");
             }
 
         } catch (GrobidTimeoutException e) {
             mm.save(biblioObject.getRepositoryDocId(), "processGrobid", "timed out");
-            logger.warn(Thread.currentThread().getName() +"Processing of " + biblioObject.getRepositoryDocId() + " timed out");
+            LOGGER.warn(Thread.currentThread().getName() +"Processing of " + biblioObject.getRepositoryDocId() + " timed out");
         } catch (RuntimeException e) {
-            e.printStackTrace();
-            logger.error("\t\t "+Thread.currentThread().getName() +": error occurred while processing " + biblioObject.getRepositoryDocId());
+            LOGGER.error("Error: ", e);
+            LOGGER.error("\t\t "+Thread.currentThread().getName() +": error occurred while processing " + biblioObject.getRepositoryDocId());
             mm.save(biblioObject.getRepositoryDocId(), "processGrobid", e.getMessage());
-            logger.error(e.getMessage(), e.getCause());
+            LOGGER.error(e.getMessage(), e.getCause());
         } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex.getCause());
+            LOGGER.error(ex.getMessage(), ex.getCause());
         }
         boolean success = false;
         if(file.exists()) {
             success = file.delete();
             if (!success) {
-                logger.error(
+                LOGGER.error(
                         Thread.currentThread().getName() +": Deletion of temporary image files failed for file '" + file.getAbsolutePath() + "'");
             }else
-                logger.info("\t\t "+Thread.currentThread().getName() +" :"+ file.getAbsolutePath()  +" deleted.");
+                LOGGER.info("\t\t "+Thread.currentThread().getName() +" :"+ file.getAbsolutePath()  +" deleted.");
         }
     }
 }
