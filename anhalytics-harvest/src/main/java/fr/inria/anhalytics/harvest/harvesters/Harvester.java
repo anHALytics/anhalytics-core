@@ -1,24 +1,22 @@
 package fr.inria.anhalytics.harvest.harvesters;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
-import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.data.BinaryFile;
-import fr.inria.anhalytics.harvest.exceptions.BinaryNotAvailableException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Date;
-import java.text.ParseException;
-import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.SAXException;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-
+import fr.inria.anhalytics.harvest.exceptions.BinaryNotAvailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Abstract class for all harvester of the system. A particular harvester will
@@ -31,15 +29,16 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class Harvester {
 
-    protected static final Logger logger = LoggerFactory.getLogger(Harvester.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Harvester.class);
 
-    protected List<BiblioObject> grabbedObjects = new ArrayList<BiblioObject>();
+    protected List<BiblioObject> grabbedObjects = new ArrayList<>();
 
     // Source of the harvesting
     public enum Source {
         HAL("hal"),
         ISTEX("istex"),
-        ARXIV("arxiv");
+        ARXIV("arxiv"),
+        CUSTOM("local");
 
         private String name;
 
@@ -68,12 +67,12 @@ public abstract class Harvester {
         this.mm = MongoFileManager.getInstance(false);
     }
 
-    abstract public void fetchAllDocuments() throws IOException, SAXException, ParserConfigurationException, ParseException;
+    abstract public void fetchAllDocuments();
 
     
-    abstract public void fetchListDocuments() throws IOException, SAXException, ParserConfigurationException, ParseException;
+    abstract public void fetchListDocuments() ;
     
-    abstract public void sample() throws IOException, SAXException, ParserConfigurationException, ParseException;
+    abstract public void sample();
     
     
     public Source getSource() {
@@ -89,7 +88,7 @@ public abstract class Harvester {
      * ..) .
      */
     protected void saveObjects() {
-        if ((grabbedObjects == null) || (grabbedObjects.size() == 0)) {
+        if (CollectionUtils.isEmpty(grabbedObjects)) {
             return;
         }
         for (BiblioObject object : grabbedObjects) {
@@ -99,22 +98,26 @@ public abstract class Harvester {
                 pdfUrl = object.getPdf().getUrl();
             }
             String repositoryDocId = object.getRepositoryDocId();
-            logger.info("\t\t Processing metadata from " + object.getSource() + " document :" + repositoryDocId);
+            LOGGER.info("\t\t Processing metadata from " + object.getSource() + " document :" + repositoryDocId);
             if (metadataString.length() > 0) {
                 if (!HarvestProperties.isReset() && mm.isSavedObject(repositoryDocId, object.getRepositoryDocVersion())) {
-                    logger.info("\t\t Already grabbed, Skipping...");
+                    LOGGER.info("\t\t Already grabbed, Skipping...");
                     continue;
                 }
                 try {
                     if (object.getPdf() != null) {
-                        logger.info("\t\t\t\t downloading PDF file.");
-                        requestFile(object.getPdf());
-                        if(object.getPdf().getStream() == null)
-                            object.setIsWithFulltext(Boolean.FALSE);
+                        if (object.getPdf().getStream() == null) {
+                            LOGGER.info("\t\t\t\t downloading PDF file.");
+                            requestFile(object.getPdf());
+                            if (object.getPdf().getStream() == null)
+                                object.setIsWithFulltext(Boolean.FALSE);
+                        } else {
+                            object.setIsWithFulltext(Boolean.TRUE);
+                        }
                     } else {
                         object.setIsWithFulltext(Boolean.FALSE);
                         mm.save(object.getRepositoryDocId(), "harvestProcess", "no URL for binary");
-                        logger.info("\t\t\t\t PDF not found !");
+                        LOGGER.info("\t\t\t\t PDF not found !");
                     }
                     if (object.getAnnexes() != null) {
                         for (BinaryFile file : object.getAnnexes()) {
@@ -122,17 +125,17 @@ public abstract class Harvester {
                         }
                     }
                 } catch (BinaryNotAvailableException bna) {
-                    logger.error(bna.getMessage());
+                    LOGGER.error(bna.getMessage());
                     mm.save(object.getRepositoryDocId(), "harvestProcess", "file not downloaded");
                 } catch (ParseException | IOException e) {
-                    logger.error("\t\t Error occured while processing TEI for " + object.getRepositoryDocId(), e);
+                    LOGGER.error("\t\t Error occured while processing TEI for " + object.getRepositoryDocId(), e);
                     mm.save(object.getRepositoryDocId(), "harvestProcess", "harvest error");
                 }
 
-                logger.info("\t\t\t\t Storing object " + repositoryDocId);
+                LOGGER.info("\t\t\t\t Storing object " + repositoryDocId);
                 mm.insertBiblioObject(object);
             } else {
-                logger.info("\t\t\t No TEI metadata !!!");
+                LOGGER.info("\t\t\t No TEI metadata !!!");
             }
         }
     }
@@ -145,11 +148,11 @@ public abstract class Harvester {
         Date embDate = Utilities.parseStringDate(bf.getEmbargoDate());
         Date today = new Date();
         if (embDate == null || embDate.before(today) || embDate.equals(today)) {
-            logger.info("\t\t\t Downloading: " + bf.getUrl());
+            LOGGER.info("\t\t\t Downloading: " + bf.getUrl());
             try {
                 bf.setStream(Utilities.request(bf.getUrl()));
             } catch (MalformedURLException | ServiceException se) {
-                logger.error(se.getMessage());
+                LOGGER.error(se.getMessage());
                 throw new BinaryNotAvailableException();
             }
 
@@ -160,12 +163,12 @@ public abstract class Harvester {
                     int n = bf.getUrl().lastIndexOf("/");
                     String filename = bf.getUrl().substring(n + 1);
                     bf.setFileName(filename);
-                    logger.info("\t\t\t\t Getting annex file " + filename + " for pub ID :" + bf.getRepositoryDocId());
+                    LOGGER.info("\t\t\t\t Getting annex file " + filename + " for pub ID :" + bf.getRepositoryDocId());
                 }
             }
         } else {
             mm.log(bf.getRepositoryDocId(), bf.getAnhalyticsId(), bf.getUrl(), bf.getDocumentType(), bf.isIsAnnexFile(), "embargo", bf.getEmbargoDate());
-            logger.info("\t\t\t file under embargo !");
+            LOGGER.info("\t\t\t file under embargo !");
         }
     }
 }

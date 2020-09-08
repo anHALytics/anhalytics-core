@@ -7,6 +7,7 @@ import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,7 +25,7 @@ import org.apache.commons.io.IOUtils;
 
 /**
  * Annotates the quantities extracted from each text element in the TEICorpus using Grobid Quantities.
- * 
+ * <p>
  * The content of every TEI elements having an attribute @xml:id randomly
  * generated will be annotated. The annotations follow a stand-off
  * representation that is using the @xml:id as base and offsets to identified
@@ -35,7 +36,7 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
     private static final Logger logger = LoggerFactory.getLogger(QuantitiesAnnotatorWorker.class);
 
     public QuantitiesAnnotatorWorker(MongoFileManager mongoManager,
-            BiblioObject biblioObject) {
+                                     BiblioObject biblioObject) {
         super(mongoManager, biblioObject, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
     }
 
@@ -62,21 +63,24 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
         Document docTei = null;
         try {
             docBuilder = docFactory.newDocumentBuilder();
-            String tei = biblioObject.getGrobidTei()!= null ? biblioObject.getGrobidTei() : biblioObject.getTeiCorpus();
+            String tei = biblioObject.getGrobidTei() != null ? biblioObject.getGrobidTei() : biblioObject.getTeiCorpus();
             // parse the TEI
-            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(tei.getBytes("UTF-8"))));
+            docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(tei.getBytes(StandardCharsets.UTF_8))));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
         StringBuffer json = new StringBuffer();
-        json.append("{ \"repositoryDocId\" : \"" + biblioObject.getRepositoryDocId()
-                + "\",\"anhalyticsId\" : \"" + biblioObject.getAnhalyticsId()
+        json.append("{ \"repositoryDocId\" : \"")
+                .append(biblioObject.getRepositoryDocId())
+                .append("\",\"anhalyticsId\" : \"")
+                .append(biblioObject.getAnhalyticsId()
                 //                    + "\", \"date\" :\"" + date
-                + "\", \"isIndexed\" :\"" + false
-                + "\", \"annotation\" : [ ");
+        ).append("\", \"isIndexed\" :\"")
+                .append(false).append("\", \"annotation\" : [ ");
 
         //check if any thing was added, throw exception if not (not insert entry)
+        assert docTei != null;
         annotateNode(docTei.getDocumentElement(), true, json, null);
         json.append("] }");
 
@@ -87,9 +91,9 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
      * Recursive tree walk for annotating every nodes having a random xml:id.
      */
     private boolean annotateNode(Node node,
-            boolean first,
-            StringBuffer json,
-            String language) {
+                                 boolean first,
+                                 StringBuffer json,
+                                 String language) {
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             Element e = (Element) (node);
             String id = e.getAttribute("xml:id");

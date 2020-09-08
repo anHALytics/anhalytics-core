@@ -58,7 +58,7 @@ public class GrobidProcess {
 //                        if (toBeGrobidified.contains(biblioObject.getPublicationType().split("_")[0])) {
 
                             if (!biblioObject.getIsWithFulltext()) {
-                                logger.info("\t\t No fulltext available for : "+biblioObject.getRepositoryDocId()+", Skipping...");
+                                logger.info("\t\t No fulltext available for : " + biblioObject.getRepositoryDocId() + ", Skipping...");
                                 continue;
                             }
                             if (!HarvestProperties.isReset() && mm.isProcessed(Processings.GROBID)) {

@@ -30,7 +30,7 @@ allprojects {
     group = "fr.inria.anhalytics"
 
     jacoco {
-        toolVersion = '0.7.1.201405082137'
+        toolVersion = '0.8.5'
     }
 
     tasks.withType(JavaCompile) {
@@ -119,6 +119,7 @@ project("anhalytics-commons") {
         compile "org.mongodb:mongo-java-driver:3.9.0"
         compile "mysql:mysql-connector-java:5.1.40"
 
+        compile 'org.apache.commons:commons-text:1.9'
         compile "commons-io:commons-io:2.5"
         compile "org.apache.commons:commons-lang3:3.6"
 
@@ -230,8 +231,11 @@ project("anhalytics-annotate") {
         compile project(':anhalytics-commons')
 
         compile('com.scienceminer.nerd:entity-fishing-client:0.0.2')
+
         compile group: 'commons-io', name: 'commons-io', version: '2.5'
+        compile 'org.apache.commons:commons-text:1.9'
         compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.6'
+
         runtime group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
         runtime group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.11.1'
     }

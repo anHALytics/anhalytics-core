@@ -6,13 +6,13 @@ import fr.inria.anhalytics.commons.exceptions.SystemException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import fr.inria.anhalytics.harvest.converters.ARXIVTEIConverter;
 import fr.inria.anhalytics.harvest.harvesters.Harvester;
 import fr.inria.anhalytics.harvest.converters.HalTEIConverter;
 import fr.inria.anhalytics.harvest.converters.IstexTEIConverter;
 import fr.inria.anhalytics.harvest.converters.MetadataConverter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,6 +134,8 @@ public class TeiBuilderWorker implements Runnable {
             mc = new HalTEIConverter();
         } else if (StringUtils.equals(HarvestProperties.getSource().toLowerCase(), Harvester.Source.ISTEX.getName())){
             mc = new IstexTEIConverter();
+        } else if (StringUtils.equals(HarvestProperties.getSource().toLowerCase(), Harvester.Source.ARXIV.getName())){
+            mc = new ARXIVTEIConverter();
         } else {
             throw new RuntimeException("Missing -source ");
         }

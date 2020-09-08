@@ -3,23 +3,20 @@ package fr.inria.anhalytics.harvest.main;
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import fr.inria.anhalytics.harvest.harvesters.Harvester;
-import fr.inria.anhalytics.harvest.harvesters.IstexHarvester;
 import fr.inria.anhalytics.harvest.crossref.CrossRef;
 import fr.inria.anhalytics.harvest.crossref.OpenUrl;
 import fr.inria.anhalytics.harvest.grobid.GrobidProcess;
+import fr.inria.anhalytics.harvest.harvesters.ArxivHarvester;
 import fr.inria.anhalytics.harvest.harvesters.HALOAIPMHHarvester;
+import fr.inria.anhalytics.harvest.harvesters.Harvester;
+import fr.inria.anhalytics.harvest.harvesters.IstexHarvester;
 import fr.inria.anhalytics.harvest.teibuild.TeiCorpusBuilderProcess;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -35,21 +32,26 @@ public class Main {
 
     private static List<String> availableCommands = new ArrayList<String>() {
         {
+            add("harvestFromFilesystem");
             add("harvestAll");
-
             add("transformMetadata");
             add("processGrobid");
-
             add("appendFulltextTei");
-
             add("harvestList");
-
             add("sample");
-
 //            add("harvestDOI");
 //            add("openUrl");
         }
     };
+
+    public static final Map<String, Harvester> harvestersMap = new HashMap<String, Harvester>() {
+        {
+            put(Harvester.Source.HAL.getName(), new HALOAIPMHHarvester());
+            put(Harvester.Source.ISTEX.getName(), new IstexHarvester());
+            put(Harvester.Source.ARXIV.getName(), new ArxivHarvester());
+        }
+    };
+
 
     public static void main(String[] args) throws Exception {
         try {
@@ -88,28 +90,15 @@ public class Main {
         CrossRef cr = new CrossRef();
         OpenUrl ou = new OpenUrl();
 
-        Harvester harvester = null;
 
         if (process.equals("harvestAll")) {
-            if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
-                harvester = new HALOAIPMHHarvester();
-            } else {
-                harvester = new IstexHarvester();
-            }
+            Harvester harvester = harvestersMap.get(HarvestProperties.getSource());
             harvester.fetchAllDocuments();
         } else if (process.equals("harvestList")) {
-            if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
-                harvester = new HALOAIPMHHarvester();
-            } else {
-                harvester = new IstexHarvester();
-            }
+            Harvester harvester = harvestersMap.get(HarvestProperties.getSource());
             harvester.fetchListDocuments();
         } else if (process.equals("sample")) {
-            if (HarvestProperties.getSource().toLowerCase().equals(Harvester.Source.HAL.getName())) {
-                harvester = new HALOAIPMHHarvester();
-            } else {
-                harvester = new IstexHarvester();
-            }
+            Harvester harvester = harvestersMap.get(HarvestProperties.getSource());
             harvester.sample();
         } else if (process.equals("transformMetadata")) {
             tcb.transformMetadata();
@@ -208,6 +197,16 @@ public class Main {
                     HarvestProperties.setSource(command);
                     i++;
                     continue;
+                } else if (currArg.equals("-input")) {
+                    String input = pArgs[i + 1];
+                    HarvestProperties.setInputDirectory(input);
+                    HarvestProperties.setLocal(true);
+                    i++;
+                } else if (currArg.equals("-metadata")) {
+                    String metadata = pArgs[i + 1];
+                    HarvestProperties.setMetadataDirectory(metadata);
+                    HarvestProperties.setLocal(true);
+                    i++;
                 } else {
                     result = false;
                     break;
@@ -228,8 +227,9 @@ public class Main {
         help.append("\t" + Arrays.toString(Harvester.Source.values()) + "\n");
         help.append("-dFromDate: filter start date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
         help.append("-dUntilDate: filter until date for the process, make sure it follows the pattern : yyyy-MM-dd\n");
-        help.append("-exe: gives the command to execute. The value should be one of these : \n");
+        help.append("-input: input directory (only valid when -exe is 'harvestFromFilesystem') \n");
         help.append("--reset: updates all the documents (beware about versions/updates) : \n");
+        help.append("-exe: gives the command to execute. The value should be one of these : \n");
         help.append("\t" + availableCommands + "\n");
         return help.toString();
     }

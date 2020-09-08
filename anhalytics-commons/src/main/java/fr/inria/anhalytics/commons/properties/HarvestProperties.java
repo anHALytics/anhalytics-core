@@ -2,6 +2,7 @@ package fr.inria.anhalytics.commons.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -38,6 +39,9 @@ public class HarvestProperties {
     private static String crossrefId;
     private static String crossrefPwd;
     private static String crossrefHost;
+    private static String inputDirectory;
+    private static boolean local;
+    private static String metadataDirectory;
 
     public static void init(String properties_filename) {
         Properties props = new Properties();
@@ -59,7 +63,7 @@ public class HarvestProperties {
         setCrossrefHost(props.getProperty("harvest.crossref_host"));
         try {
             setNbThreads(Integer.parseInt(threads));
-        } catch (java.lang.NumberFormatException e) {
+        } catch (NumberFormatException e) {
             e.printStackTrace();
         }
     }
@@ -267,5 +271,29 @@ public class HarvestProperties {
      */
     public static void setCrossrefHost(String aCrossrefHost) {
         crossrefHost = aCrossrefHost;
+    }
+
+    public static void setInputDirectory(String inputDirectory) {
+        HarvestProperties.inputDirectory = inputDirectory;
+    }
+
+    public static String getInputDirectory() {
+        return inputDirectory;
+    }
+
+    public static void setLocal(boolean local) {
+        HarvestProperties.local = local;
+    }
+
+    public static boolean getLocal() {
+        return local;
+    }
+
+    public static void setMetadataDirectory(String metadataDirectory) {
+        HarvestProperties.metadataDirectory = metadataDirectory;
+    }
+
+    public static String getMetadataFile() {
+        return metadataDirectory;
     }
 }
