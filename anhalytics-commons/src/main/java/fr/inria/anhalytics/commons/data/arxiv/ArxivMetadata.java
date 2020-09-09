@@ -254,7 +254,7 @@ public class ArxivMetadata {
 
         tei.append("\t\t<profileDesc>\n");
         tei.append("\t\t\t<abstract xml:lang=\"").append("en").append("\">\n");
-        tei.append("<div><p>").append(getAbstract_()).append("</p></div>");
+        tei.append("<div><p>").append(StringEscapeUtils.escapeHtml4(getAbstract_())).append("</p></div>");
         tei.append("\n\t\t\t</abstract>\n");
         tei.append("\t\t</profileDesc>\n");
         tei.append("\t</teiHeader>\n");
