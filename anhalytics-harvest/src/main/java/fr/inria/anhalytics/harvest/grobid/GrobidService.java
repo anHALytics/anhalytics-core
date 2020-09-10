@@ -29,14 +29,19 @@ public class GrobidService {
     private int start = -1;
     private int end = -1;
     private boolean generateIDs = false;
+    private boolean isHeaderConslidationEnabled = false;
 
     int TIMEOUT_VALUE = 30000;
+
+    public GrobidService(int start, int end, boolean generateIDs, boolean isHeaderConslidationEnabled) {
+        this(start, end, generateIDs);
+        this.isHeaderConslidationEnabled = isHeaderConslidationEnabled;
+    }
 
     public GrobidService(int start, int end, boolean generateIDs) {
         this.start = start;
         this.end = end;
         this.generateIDs = generateIDs;
-
     }
 
     public GrobidService() {
@@ -61,6 +66,9 @@ public class GrobidService {
             FileBody fileBody = new FileBody(new File(filepath));
             MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.STRICT);
             multipartEntity.addPart("input", fileBody);
+            if(isHeaderConslidationEnabled) {
+                multipartEntity.addPart("consolidateHeader", new StringBody("1"));
+            }
 
             if (start != -1) {
                 StringBody contentString = new StringBody("" + start);
@@ -245,15 +253,7 @@ public class GrobidService {
             }
             rd.close();
             retVal = response.toString();
-        } catch (ConnectException e) {
-            LOGGER.error(e.getMessage(), e.getCause());
-            try {
-                Thread.sleep(20000);
-                processAffiliation(affiliations);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
-        } catch (HttpRetryException e) {
+        } catch (ConnectException | HttpRetryException e) {
             LOGGER.error(e.getMessage(), e.getCause());
             try {
                 Thread.sleep(20000);

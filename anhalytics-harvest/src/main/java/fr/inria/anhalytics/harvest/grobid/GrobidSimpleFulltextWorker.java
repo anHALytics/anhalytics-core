@@ -3,16 +3,17 @@ package fr.inria.anhalytics.harvest.grobid;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.Processings;
 import fr.inria.anhalytics.commons.exceptions.DataException;
-import fr.inria.anhalytics.harvest.exceptions.GrobidTimeoutException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
-import java.io.File;
-import java.io.IOException;
-import javax.xml.parsers.ParserConfigurationException;
+import fr.inria.anhalytics.harvest.exceptions.GrobidTimeoutException;
+import fr.inria.anhalytics.harvest.harvesters.Harvester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+
 /**
- *
  * @author Patrice
  */
 class GrobidSimpleFulltextWorker extends GrobidWorker {
@@ -26,7 +27,8 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
     @Override
     protected void processCommand() {
         try {
-            GrobidService grobidService = new GrobidService(this.start, this.end, true);
+            String source = biblioObject.getSource();
+            GrobidService grobidService = new GrobidService(this.start, this.end, true, Harvester.Source.ARXIV.getName().equals(source));
             // configured for HAL, first page is added to the document
 
             String filepath = Utilities.storeTmpFile(biblioObject.getPdf().getStream());
@@ -41,7 +43,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
 
             // for now we extract just files with less size (avoid thesis..which may take long time)
             if (mb <= 15) {
-                logger.info("\t\t "+Thread.currentThread().getName() +": TEI extraction for : " + biblioObject.getRepositoryDocId() + " sizing :" + mb + "mb");
+                logger.info("\t\t " + Thread.currentThread().getName() + ": TEI extraction for : " + biblioObject.getRepositoryDocId() + " sizing :" + mb + "mb");
                 String tei = grobidService.runFullTextGrobid(filepath).trim();
                 tei = generateIdsGrobidTeiDoc(tei);
 
@@ -49,32 +51,32 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
                 if (inserted) {
                     this.saveExtractedDOI(tei);
                     mm.updateBiblioObjectStatus(biblioObject, Processings.GROBID, false);
-                    logger.info("\t\t "+Thread.currentThread().getName() +": " + biblioObject.getRepositoryDocId() + " processed.");
+                    logger.info("\t\t " + Thread.currentThread().getName() + ": " + biblioObject.getRepositoryDocId() + " processed.");
                 } else
-                    logger.error("\t\t "+Thread.currentThread().getName() +": Problem occured while saving " + biblioObject.getRepositoryDocId() + " grobid TEI.");
+                    logger.error("\t\t " + Thread.currentThread().getName() + ": Problem occured while saving " + biblioObject.getRepositoryDocId() + " grobid TEI.");
             } else {
-                logger.info("\t\t "+Thread.currentThread().getName() +": can't extract TEI for : " + biblioObject.getRepositoryDocId() + "size too large : " + mb + "mb");
+                logger.info("\t\t " + Thread.currentThread().getName() + ": can't extract TEI for : " + biblioObject.getRepositoryDocId() + "size too large : " + mb + "mb");
             }
 
         } catch (GrobidTimeoutException e) {
             mm.save(biblioObject.getRepositoryDocId(), "processGrobid", "timed out");
-            logger.warn(Thread.currentThread().getName() +"Processing of " + biblioObject.getRepositoryDocId() + " timed out");
+            logger.warn(Thread.currentThread().getName() + "Processing of " + biblioObject.getRepositoryDocId() + " timed out");
         } catch (RuntimeException e) {
             e.printStackTrace();
-            logger.error("\t\t "+Thread.currentThread().getName() +": error occurred while processing " + biblioObject.getRepositoryDocId());
+            logger.error("\t\t " + Thread.currentThread().getName() + ": error occurred while processing " + biblioObject.getRepositoryDocId());
             mm.save(biblioObject.getRepositoryDocId(), "processGrobid", e.getMessage());
             logger.error(e.getMessage(), e.getCause());
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex.getCause());
         }
         boolean success = false;
-        if(file.exists()) {
+        if (file.exists()) {
             success = file.delete();
             if (!success) {
                 logger.error(
-                        Thread.currentThread().getName() +": Deletion of temporary image files failed for file '" + file.getAbsolutePath() + "'");
-            }else
-                logger.info("\t\t "+Thread.currentThread().getName() +" :"+ file.getAbsolutePath()  +" deleted.");
+                        Thread.currentThread().getName() + ": Deletion of temporary image files failed for file '" + file.getAbsolutePath() + "'");
+            } else
+                logger.info("\t\t " + Thread.currentThread().getName() + " :" + file.getAbsolutePath() + " deleted.");
         }
     }
 }
