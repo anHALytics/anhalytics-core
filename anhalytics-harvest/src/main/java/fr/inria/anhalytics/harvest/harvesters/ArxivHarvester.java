@@ -75,6 +75,7 @@ public class ArxivHarvester extends Harvester {
                             biblioObject.setIsProcessedByPub2TEI(Boolean.FALSE);
                             biblioObject.setPublicationType("ART_Journal articles");
                             biblioObject.setMetadata(metadata.toTei());
+                            biblioObject.setSource(Source.ARXIV.getName());
 
                             BinaryFile binaryFile = new BinaryFile();
                             byte[] bytes = Files.readAllBytes(pathPdf);
