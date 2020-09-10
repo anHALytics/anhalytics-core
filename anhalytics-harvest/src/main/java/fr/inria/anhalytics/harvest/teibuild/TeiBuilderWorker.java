@@ -279,7 +279,10 @@ public class TeiBuilderWorker implements Runnable {
             //If the node is not found, is better to get out without doing anything - else we should rebuild
             // the whole nodes
             if (dateElt == null) {
-                return;
+                dateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/publicationStmt/date[@type=\"published\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
+                if(dateElt == null) {
+                    return;
+                }
             }
             String dateFormatted = dateElt.getAttribute("when");
             //and check again if the content is not ok (create a new function and reuse it)
