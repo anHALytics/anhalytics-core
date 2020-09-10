@@ -2,6 +2,7 @@ package fr.inria.anhalytics.commons.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +16,7 @@ import java.util.Properties;
 public class HarvestProperties {
 
     private static String processName;
-    
+
     private static String collection;
 
     private static String fromDate;
@@ -25,7 +26,7 @@ public class HarvestProperties {
     private static boolean processByDate = true;
 
     private static String source;
-    
+
     private static String grobidHost;
 
     private static String tmpPath;
@@ -33,7 +34,7 @@ public class HarvestProperties {
     private static boolean reset;
 
     private static int nbThreads = 1;
-    
+
     private static String listFile;
 
     private static String crossrefId;
@@ -43,21 +44,24 @@ public class HarvestProperties {
     private static boolean local;
     private static String metadataDirectory;
 
+    private static boolean grobidConsolidateHeader;
+
     public static void init(String properties_filename) {
         Properties props = new Properties();
         try {
             File file = new File(System.getProperty("user.dir"));
-            props.load(new FileInputStream(file.getAbsolutePath()+File.separator+"config"+File.separator+properties_filename));
+            props.load(new FileInputStream(file.getAbsolutePath() + File.separator + "config" + File.separator + properties_filename));
         } catch (Exception exp) {
-            throw new PropertyException("Cannot open file "+properties_filename, exp);
+            throw new PropertyException("Cannot open file " + properties_filename, exp);
         }
-        
+
         setSource(props.getProperty("harvest.source"));
         setGrobidHost(props.getProperty("harvest.grobid_host"));
+        parseGrobidConsolidateHeader(props.getProperty("harvest.grobid.headerConsolidation"));
         setTmpPath(props.getProperty("harvest.tmpPath"));
         Utilities.checkPath(HarvestProperties.getTmpPath());
         String threads = props.getProperty("harvest.nbThreads");
-        
+
         setCrossrefId(props.getProperty("harvest.crossref_id"));
         setCrossrefPwd(props.getProperty("harvest.crossref_pw"));
         setCrossrefHost(props.getProperty("harvest.crossref_host"));
@@ -84,65 +88,38 @@ public class HarvestProperties {
         return processName;
     }
 
-    /**
-     * @param processName the processName to set
-     */
     public static void setProcessName(String processname) {
         processName = processname;
     }
 
-    /**
-     * @return the fromDate
-     */
     public static String getFromDate() {
         return fromDate;
     }
 
-    /**
-     * @param fromDate the fromDate to set
-     */
     public static void setFromDate(String fromdate) {
         fromDate = fromdate;
     }
 
-    /**
-     * @return the untilDate
-     */
     public static String getUntilDate() {
         return untilDate;
     }
 
-    /**
-     * @param untilDate the untilDate to set
-     */
     public static void setUntilDate(String untildate) {
         untilDate = untildate;
     }
 
-    /**
-     * @return the grobid_host
-     */
     public static String getGrobidHost() {
         return grobidHost;
     }
 
-    /**
-     * @param grobid_host the grobid_host to set
-     */
     public static void setGrobidHost(String grobid_host) {
         grobidHost = grobid_host;
     }
 
-    /**
-     * @return the tmpPath
-     */
     public static String getTmpPath() {
         return tmpPath;
     }
 
-    /**
-     * @param tmppath the tmpPath to set
-     */
     public static void setTmpPath(String tmppath) {
         tmpPath = tmppath;
     }
@@ -231,7 +208,7 @@ public class HarvestProperties {
         collection = aCollection;
     }
 
-        /**
+    /**
      * @return the crossrefId
      */
     public static String getCrossrefId() {
@@ -295,5 +272,17 @@ public class HarvestProperties {
 
     public static String getMetadataFile() {
         return metadataDirectory;
+    }
+
+    public static boolean getGrobidConsolidateHeader() {
+        return grobidConsolidateHeader;
+    }
+
+    public static void parseGrobidConsolidateHeader(String grobidConsolidateHeader) {
+        if (StringUtils.equalsIgnoreCase(grobidConsolidateHeader, "true")) {
+            HarvestProperties.grobidConsolidateHeader = true;
+        } else {
+            HarvestProperties.grobidConsolidateHeader = false;
+        }
     }
 }

@@ -3,6 +3,7 @@ package fr.inria.anhalytics.harvest.grobid;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.Processings;
 import fr.inria.anhalytics.commons.exceptions.DataException;
+import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.exceptions.GrobidTimeoutException;
 import fr.inria.anhalytics.harvest.harvesters.Harvester;
@@ -28,7 +29,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
     protected void processCommand() {
         try {
             String source = biblioObject.getSource();
-            GrobidService grobidService = new GrobidService(this.start, this.end, true, Harvester.Source.ARXIV.getName().equals(source));
+            GrobidService grobidService = new GrobidService(this.start, this.end, true, HarvestProperties.getGrobidConsolidateHeader());
             // configured for HAL, first page is added to the document
 
             String filepath = Utilities.storeTmpFile(biblioObject.getPdf().getStream());
