@@ -122,6 +122,7 @@ project("anhalytics-commons") {
         compile 'org.apache.commons:commons-text:1.9'
         compile "commons-io:commons-io:2.5"
         compile "org.apache.commons:commons-lang3:3.6"
+        compile "org.apache.commons:commons-collections4:4.1"
 
         compile "com.fasterxml.jackson.core:jackson-core:2.9.6"
         compile "com.fasterxml.jackson.core:jackson-databind:2.9.6"

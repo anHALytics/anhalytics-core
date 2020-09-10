@@ -2,6 +2,7 @@ package fr.inria.anhalytics.commons.data.arxiv;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.inria.anhalytics.commons.utilities.KeyGen;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -191,7 +192,12 @@ public class ArxivMetadata {
         }
         tei.append("</title>\n\t\t\t</titleStmt>\n");
 
-        //No publisher
+        tei.append("\t\t\t<publicationStmt>\n");
+        tei.append("\t\t\t\t<publisher/>\n");
+        tei.append("\t\t\t\t<availability status=\"unknown\"><licence/></availability>\n");
+        //There is no publication date so I add something empty
+        tei.append("\t\t\t\t<date type=\"published\" when=\"\"></date>");
+        tei.append("\t\t\t</publicationStmt>\n");
 
         tei.append("\t\t\t<sourceDesc>\n\t\t\t\t<biblStruct>\n\t\t\t\t\t<analytic>\n");
 
@@ -230,6 +236,9 @@ public class ArxivMetadata {
 
         if (!StringUtils.isEmpty(getId())) {
             tei.append("\t\t\t\t\t<idno type=\"arXiv\">" + StringEscapeUtils.escapeHtml4(getId()) + "</idno>\n");
+        }
+        if (CollectionUtils.isNotEmpty(getVersions())) {
+            tei.append("\t\t\t\t\t<note type=\"submission\">" + getVersions().get(0).getCreated() + "</note>\n");
         }
         tei.append("\t\t\t\t</biblStruct>\n");
 
