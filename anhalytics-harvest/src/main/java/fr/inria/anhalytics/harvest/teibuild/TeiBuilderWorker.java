@@ -11,6 +11,7 @@ import fr.inria.anhalytics.harvest.harvesters.Harvester;
 import fr.inria.anhalytics.harvest.converters.HalTEIConverter;
 import fr.inria.anhalytics.harvest.converters.IstexTEIConverter;
 import fr.inria.anhalytics.harvest.converters.MetadataConverter;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -35,9 +36,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.springframework.util.StringUtils.isEmpty;
+
 /**
  * Functions that builds TEICorpus.
- *
+ * <p>
  * 1. Creates Tei corpus (we use this format to append other extracted metadata
  * from annexes, annotation standoffs..) 2. Appends Extracted Grobid Tei to TEI
  * Corpus (completes missing abstract, keywords, affiliations, publication date)
@@ -65,7 +69,7 @@ public class TeiBuilderWorker implements Runnable {
         long startTime = System.nanoTime();
         logger.info(Thread.currentThread().getName() + " Start. Processing = " + biblioObject.getRepositoryDocId());
 
-        if(step == Steps.TRANSFORM) {
+        if (step == Steps.TRANSFORM) {
             try {
                 logger.info("\t\t transforming :" + biblioObject.getRepositoryDocId());
                 Document generatedTEIcorpus = createTEICorpus();
@@ -78,7 +82,7 @@ public class TeiBuilderWorker implements Runnable {
                         biblioObject.setIsMined(Boolean.FALSE);
                         biblioObject.setIsIndexed(Boolean.FALSE);
                         mm.updateBiblioObjectStatus(biblioObject, null, true);
-                        logger.info("\t\t " + biblioObject.getRepositoryDocId()+ " transformed.");
+                        logger.info("\t\t " + biblioObject.getRepositoryDocId() + " transformed.");
                     } else {
                         logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
                     }
@@ -86,7 +90,7 @@ public class TeiBuilderWorker implements Runnable {
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
-        } else if(step == Steps.APPEND_FULLTEXT) {
+        } else if (step == Steps.APPEND_FULLTEXT) {
 
             Document generatedTEIcorpus = null;
             logger.info("\t Building TEI for: " + biblioObject.getRepositoryDocId());
@@ -101,7 +105,7 @@ public class TeiBuilderWorker implements Runnable {
                 if (inserted) {
                     biblioObject.setIsFulltextAppended(Boolean.TRUE);
                     mm.updateBiblioObjectStatus(biblioObject, null, true);
-                    logger.info("\t\t " + biblioObject.getRepositoryDocId()+ " built.");
+                    logger.info("\t\t " + biblioObject.getRepositoryDocId() + " built.");
                 } else {
                     logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
                 }
@@ -125,16 +129,16 @@ public class TeiBuilderWorker implements Runnable {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             docFactory.setValidating(false);
             //docFactory.setNamespaceAware(true);
-             docBuilder = docFactory.newDocumentBuilder();
+            docBuilder = docFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             throw new SystemException("Cannot instantiate TeiBuilder", e);
         }
         MetadataConverter mc;
         if (StringUtils.equals(HarvestProperties.getSource().toLowerCase(), Harvester.Source.HAL.getName())) {
             mc = new HalTEIConverter();
-        } else if (StringUtils.equals(HarvestProperties.getSource().toLowerCase(), Harvester.Source.ISTEX.getName())){
+        } else if (StringUtils.equals(HarvestProperties.getSource().toLowerCase(), Harvester.Source.ISTEX.getName())) {
             mc = new IstexTEIConverter();
-        } else if (StringUtils.equals(HarvestProperties.getSource().toLowerCase(), Harvester.Source.ARXIV.getName())){
+        } else if (StringUtils.equals(HarvestProperties.getSource().toLowerCase(), Harvester.Source.ARXIV.getName())) {
             mc = new ARXIVTEIConverter();
         } else {
             throw new RuntimeException("Missing -source ");
@@ -271,13 +275,18 @@ public class TeiBuilderWorker implements Runnable {
             Element grobidDateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/publicationStmt/date[@type=\"published\"]").evaluate(doc, XPathConstants.NODE);
 
             String dateRaw = "";
-            String dateFormatted = dateElt.getAttribute("when");
 
+            //If the node is not found, is better to get out without doing anything - else we should rebuild
+            // the whole nodes
+            if (dateElt == null) {
+                return;
+            }
+            String dateFormatted = dateElt.getAttribute("when");
             //and check again if the content is not ok (create a new function and reuse it)
-            if (dateFormatted.isEmpty()) {
+            if (isEmpty(dateFormatted)) {
                 if (grobidDateElt != null) {
                     dateRaw = grobidDateElt.getAttribute("when");
-                    if (!dateRaw.isEmpty()) {
+                    if (isNotEmpty(dateRaw)) {
                         dateFormatted = Utilities.completeDate(dateRaw);
                     }
                 }
