@@ -107,7 +107,7 @@ public class TeiBuilderWorker implements Runnable {
                     mm.updateBiblioObjectStatus(biblioObject, null, true);
                     logger.info("\t\t " + biblioObject.getRepositoryDocId() + " built.");
                 } else {
-                    logger.error("\t\t Problem occured while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
+                    logger.error("\t\t Problem occurred while saving " + biblioObject.getRepositoryDocId() + " corpus TEI.");
                 }
 
             } catch (DataException de) {
@@ -279,7 +279,7 @@ public class TeiBuilderWorker implements Runnable {
             //If the node is not found, is better to get out without doing anything - else we should rebuild
             // the whole nodes
             if (dateElt == null) {
-                dateElt = (Element) xPath.compile("/TEI/teiHeader/fileDesc/publicationStmt/date[@type=\"published\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
+                dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/publicationStmt/date[@type=\"published\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
                 if(dateElt == null) {
                     return;
                 }
