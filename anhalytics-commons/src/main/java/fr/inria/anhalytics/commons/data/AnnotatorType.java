@@ -4,17 +4,19 @@ package fr.inria.anhalytics.commons.data;
  *
  * @author azhar
  */
-public enum Processings {
+public enum AnnotatorType {
     
     GROBID("grobid"),
     NERD("nerd"),
     KEYTERM("keyterm"),
     QUANTITIES("quantities"),
-    PDFQUANTITIES("PDFQUANTITIES");
+    PDFQUANTITIES("PDFQUANTITIES"),
+    SUPERCONDUCTORS("superconductors"),
+    SUPERCONDUCTORS_PDF("superconductors_pdf");;
 
     private String name;
 
-    private Processings(String name) {
+    private AnnotatorType(String name) {
         this.name = name;
     }
 
@@ -23,7 +25,7 @@ public enum Processings {
     }
     
     public static boolean contains(String test) {
-            for (Processings c : Processings.values()) {
+            for (AnnotatorType c : AnnotatorType.values()) {
                 if (c.getName().equals(test)) {
                     return true;
                 }

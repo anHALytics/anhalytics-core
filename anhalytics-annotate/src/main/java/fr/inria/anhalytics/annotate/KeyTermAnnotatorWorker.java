@@ -1,8 +1,8 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.services.KeyTermExtractionService;
+import fr.inria.anhalytics.commons.data.AnnotatorType;
 import fr.inria.anhalytics.commons.data.BiblioObject;
-import fr.inria.anhalytics.commons.data.Processings;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
 
@@ -35,7 +35,7 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
             boolean inserted = mm.insertAnnotation(annotateDocument(), annotationsCollection);
 
             if (inserted) {
-                mm.updateBiblioObjectStatus(biblioObject, Processings.KEYTERM, false);
+                mm.updateBiblioObjectStatus(biblioObject, AnnotatorType.KEYTERM, false);
                 logger.info("\t\t " + Thread.currentThread().getName() + ": " + biblioObject.getRepositoryDocId() + " annotated by the KeyTerm extraction and disambiguation service.");
             } else {
                 logger.info("\t\t " + Thread.currentThread().getName() + ": "

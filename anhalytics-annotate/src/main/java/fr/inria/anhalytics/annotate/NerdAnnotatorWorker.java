@@ -1,30 +1,25 @@
 package fr.inria.anhalytics.annotate;
 
 import com.scienceminer.nerd.client.NerdClient;
+import fr.inria.anhalytics.commons.data.AnnotatorType;
 import fr.inria.anhalytics.commons.data.BiblioObject;
-import fr.inria.anhalytics.commons.data.Processings;
-import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
-
+import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-
-import org.xml.sax.InputSource;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
-
-import org.apache.commons.io.IOUtils;
+import java.io.ByteArrayInputStream;
 
 /**
  * Runnable that uses the NERD REST service for annotating HAL TEI
@@ -52,7 +47,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
         // get all the elements having an attribute id and annotate their text content
         boolean inserted = mm.insertAnnotation(annotateDocument(), annotationsCollection);
         if (inserted) {
-            mm.updateBiblioObjectStatus(biblioObject, Processings.NERD, false);
+            mm.updateBiblioObjectStatus(biblioObject, AnnotatorType.NERD, false);
             logger.info("\t\t " + Thread.currentThread().getName() + ": " + biblioObject.getRepositoryDocId() + " annotated by the NERD service.");
         } else {
             logger.info("\t\t " + Thread.currentThread().getName() + ": "

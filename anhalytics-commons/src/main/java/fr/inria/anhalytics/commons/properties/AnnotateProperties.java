@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.commons.properties;
 
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -11,7 +12,7 @@ import java.util.Properties;
  * @author Achraf, Patrice
  */
 public class AnnotateProperties {
-    
+
     private static String processName;
 
     private static String fromDate;
@@ -27,10 +28,12 @@ public class AnnotateProperties {
     private static String keyterm_host = null;
 
     private static String keyterm_port = null;
-    
+
     private static String quantities_host = null;
 
     private static String quantities_port = null;
+
+    private static String superconductorsUrl = null;
 
     private static boolean isMultiThread;
 
@@ -39,9 +42,10 @@ public class AnnotateProperties {
     private static int nerd_nbThreads = 1;
 
     private static int keyterm_nbThreads = 1;
-    
+
     private static int quantities_nbThreads = 1;
-    
+    private static int superconductorsNbThreads = 1;
+
     private static String tmp = null;
 
     /**
@@ -51,7 +55,7 @@ public class AnnotateProperties {
         Properties props = new Properties();
         try {
             File file = new File(System.getProperty("user.dir"));
-            props.load(new FileInputStream(file.getAbsolutePath()+File.separator+"config"+File.separator+properties_filename));
+            props.load(new FileInputStream(file.getAbsolutePath() + File.separator + "config" + File.separator + properties_filename));
         } catch (Exception exp) {
             throw new PropertyException("Cannot open file " + properties_filename, exp);
         }
@@ -73,7 +77,7 @@ public class AnnotateProperties {
         } catch (java.lang.NumberFormatException e) {
             e.printStackTrace();
         }
-        
+
         setQuantitiesHost(props.getProperty("annotate.quantities_host"));
         setQuantitiesPort(props.getProperty("annotate.quantities_port"));
         threads = props.getProperty("annotate.quantities.nbThreads");
@@ -82,7 +86,15 @@ public class AnnotateProperties {
         } catch (java.lang.NumberFormatException e) {
             e.printStackTrace();
         }
-        setTmp(props.getProperty("annotate.quantities.tmp"));
+        setTmp(props.getProperty("annotate.tmp"));
+
+        setSuperconductorsUrl(props.getProperty("annotate.superconductors.url"));
+        threads = props.getProperty("annotate.superconductors.nbThreads");
+        try {
+            setSuperconductorsNbThreads(Integer.parseInt(threads));
+        } catch (java.lang.NumberFormatException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void checkPath(String path) {
@@ -171,9 +183,6 @@ public class AnnotateProperties {
         return keyterm_host;
     }
 
-    /**
-     * @param aNerd_host the host name for the keyterm extraction service
-     */
     public static void setKeytermHost(String aKeyterm_host) {
         keyterm_host = aKeyterm_host;
     }
@@ -185,23 +194,14 @@ public class AnnotateProperties {
         return keyterm_port;
     }
 
-    /**
-     * @param aNerd_port the port for the keyterm extraction service
-     */
     public static void setKeytermPort(String aKeyterm_port) {
         keyterm_port = aKeyterm_port;
     }
-    
-    /**
-     * @return the host name of the quantities extraction service
-     */
+
     public static String getQuantitiesHost() {
         return quantities_host;
     }
 
-    /**
-     * @param aQuantities_host the host name for the quantities extraction service
-     */
     public static void setQuantitiesHost(String aQuantities_host) {
         quantities_host = aQuantities_host;
     }
@@ -261,8 +261,8 @@ public class AnnotateProperties {
     public static void setKeytermNbThreads(int aNbThreads) {
         keyterm_nbThreads = aNbThreads;
     }
-    
-    
+
+
     /**
      * @return return the number of threads to be used for calling the quantities extraction service
      */
@@ -319,4 +319,19 @@ public class AnnotateProperties {
         tmp = aTmp;
     }
 
+    public static String getSuperconductorsUrl() {
+        return superconductorsUrl;
+    }
+
+    public static void setSuperconductorsUrl(String superconductorsUrl) {
+        AnnotateProperties.superconductorsUrl = superconductorsUrl;
+    }
+
+    public static int getSuperconductorsNbThreads() {
+        return superconductorsNbThreads;
+    }
+
+    public static void setSuperconductorsNbThreads(int superconductorsNbThreads) {
+        AnnotateProperties.superconductorsNbThreads = superconductorsNbThreads;
+    }
 }

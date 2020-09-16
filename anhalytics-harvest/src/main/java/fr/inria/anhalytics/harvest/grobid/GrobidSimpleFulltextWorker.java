@@ -1,12 +1,11 @@
 package fr.inria.anhalytics.harvest.grobid;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
-import fr.inria.anhalytics.commons.data.Processings;
+import fr.inria.anhalytics.commons.data.AnnotatorType;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 import fr.inria.anhalytics.harvest.exceptions.GrobidTimeoutException;
-import fr.inria.anhalytics.harvest.harvesters.Harvester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
                 boolean inserted = mm.insertGrobidTei(tei, biblioObject.getAnhalyticsId());
                 if (inserted) {
                     this.saveExtractedDOI(tei);
-                    mm.updateBiblioObjectStatus(biblioObject, Processings.GROBID, false);
+                    mm.updateBiblioObjectStatus(biblioObject, AnnotatorType.GROBID, false);
                     logger.info("\t\t " + Thread.currentThread().getName() + ": " + biblioObject.getRepositoryDocId() + " processed.");
                 } else
                     logger.error("\t\t " + Thread.currentThread().getName() + ": Problem occured while saving " + biblioObject.getRepositoryDocId() + " grobid TEI.");

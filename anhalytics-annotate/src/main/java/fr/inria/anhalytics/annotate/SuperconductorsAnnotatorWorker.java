@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.annotate;
 
+import fr.inria.anhalytics.annotate.services.GrobidSuperconductorsService;
 import fr.inria.anhalytics.annotate.services.QuantitiesService;
 import fr.inria.anhalytics.commons.data.AnnotatorType;
 import fr.inria.anhalytics.commons.data.BiblioObject;
@@ -27,13 +28,13 @@ import java.nio.charset.StandardCharsets;
  * representation that is using the @xml:id as base and offsets to identified
  * the annotated chunk of text.
  */
-public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
+public class SuperconductorsAnnotatorWorker extends AnnotatorWorker {
 
-    private static final Logger logger = LoggerFactory.getLogger(QuantitiesAnnotatorWorker.class);
+    private static final Logger logger = LoggerFactory.getLogger(SuperconductorsAnnotatorWorker.class);
 
-    public QuantitiesAnnotatorWorker(MongoFileManager mongoManager,
-                                     BiblioObject biblioObject) {
-        super(mongoManager, biblioObject, MongoCollectionsInterface.QUANTITIES_ANNOTATIONS);
+    public SuperconductorsAnnotatorWorker(MongoFileManager mongoManager,
+                                          BiblioObject biblioObject) {
+        super(mongoManager, biblioObject, MongoCollectionsInterface.SUPERCONDUCTORS_ANNOTATIONS);
     }
 
     @Override
@@ -41,12 +42,12 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
         // get all the elements having an attribute id and annotate their text content
         boolean inserted = mm.insertAnnotation(annotateDocument(), annotationsCollection);
         if (inserted) {
-            mm.updateBiblioObjectStatus(biblioObject, AnnotatorType.QUANTITIES, false);
+            mm.updateBiblioObjectStatus(biblioObject, AnnotatorType.SUPERCONDUCTORS, false);
             logger.info("\t\t " + Thread.currentThread().getName() + ": "
-                    + biblioObject.getRepositoryDocId() + " annotated by the QUANTITIES service.");
+                    + biblioObject.getRepositoryDocId() + " annotated by the " + AnnotatorType.SUPERCONDUCTORS + " service.");
         } else {
             logger.info("\t\t " + Thread.currentThread().getName() + ": "
-                    + biblioObject.getRepositoryDocId() + " error occured trying to annotate with QUANTITIES.");
+                    + biblioObject.getRepositoryDocId() + " error occurred trying to annotate with SUPERCONDUCTORS.");
         }
     }
 
@@ -71,8 +72,8 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
                 .append(biblioObject.getRepositoryDocId())
                 .append("\",\"anhalyticsId\" : \"")
                 .append(biblioObject.getAnhalyticsId()
-                //                    + "\", \"date\" :\"" + date
-        ).append("\", \"isIndexed\" :\"")
+                        //                    + "\", \"date\" :\"" + date
+                ).append("\", \"isIndexed\" :\"")
                 .append(false).append("\", \"annotation\" : [ ");
 
         //check if any thing was added, throw exception if not (not insert entry)
@@ -104,14 +105,13 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
                 if ((text != null) && (text.trim().length() > 1)) {
                     String jsonText = null;
                     try {
-                        QuantitiesService quantitiesService = new QuantitiesService(IOUtils.toInputStream(text, "UTF-8"));
-                        jsonText = quantitiesService.processTextQuantities();
+                        GrobidSuperconductorsService service = new GrobidSuperconductorsService(IOUtils.toInputStream(text, "UTF-8"));
+                        jsonText = service.process();
                     } catch (Exception ex) {
-                        logger.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by QUANTITIES: " + text);
-                        ex.printStackTrace();
+                        logger.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by SUPERCONDUCTORS: " + text, ex);
                     }
                     if (jsonText == null) {
-                        logger.error("\t\t " + Thread.currentThread().getName() + ": QUANTITIES failed annotating text : " + text);
+                        logger.error("\t\t " + Thread.currentThread().getName() + ": SUPERCONDUCTORS failed annotating text : " + text);
                     }
                     if (jsonText != null) {
                         // resulting annotations, with the corresponding id
@@ -120,7 +120,7 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
                         } else {
                             json.append(", ");
                         }
-                        json.append("{ \"xml:id\" : \"" + id + "\", \"quantities\" : " + jsonText + " }");
+                        json.append("{ \"xml:id\" : \"" + id + "\", \"value\" : " + jsonText + " }");
                     }
                 }
             }

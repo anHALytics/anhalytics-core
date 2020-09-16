@@ -1,14 +1,15 @@
 package fr.inria.anhalytics.annotate.services;
 
-import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.annotate.exceptions.UnreachableAnnotateServiceException;
-import fr.inria.anhalytics.commons.data.Processings;
+import fr.inria.anhalytics.commons.data.AnnotatorType;
+import fr.inria.anhalytics.commons.properties.AnnotateProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -32,16 +33,16 @@ public abstract class AnnotateService {
      *
      * @return boolean
      */
-    public static boolean isAnnotateServiceReady(Processings annotator_type) throws UnreachableAnnotateServiceException {
+    public static boolean isAnnotateServiceReady(AnnotatorType annotator_type) throws UnreachableAnnotateServiceException {
         logger.info("Checking " + annotator_type + " service...");
         int responseCode = 0;
         HttpURLConnection conn = null;
         try {
             String urlString = "";
-            if (annotator_type == Processings.NERD) {
+            if (annotator_type == AnnotatorType.NERD) {
                 urlString = AnnotateProperties.getNerdHost()
                         + (AnnotateProperties.getNerdPort().isEmpty() ? "" : ":" + AnnotateProperties.getNerdPort()) + "/isalive";
-            } else if (annotator_type == Processings.QUANTITIES) {
+            } else if (annotator_type == AnnotatorType.QUANTITIES) {
                 urlString = AnnotateProperties.getQuantitiesHost()
                         + (AnnotateProperties.getQuantitiesPort().isEmpty() ? "" : ":" + AnnotateProperties.getQuantitiesPort()) + "/isalive";
             } else {

@@ -9,7 +9,7 @@ import com.mongodb.util.JSON;
 import fr.inria.anhalytics.commons.data.Annotation;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.BinaryFile;
-import fr.inria.anhalytics.commons.data.Processings;
+import fr.inria.anhalytics.commons.data.AnnotatorType;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.utilities.Utilities;
 
@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -53,8 +52,8 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             .add("isWithFulltext", true)
             .add("$or",
                     Arrays.asList(
-                            new BasicDBObject(Processings.GROBID.getName(), new BasicDBObject("$exists", false)),
-                            new BasicDBObject(Processings.GROBID.getName(), false)))
+                            new BasicDBObject(AnnotatorType.GROBID.getName(), new BasicDBObject("$exists", false)),
+                            new BasicDBObject(AnnotatorType.GROBID.getName(), false)))
             .get();
 
     public static final DBObject ONLY_NOT_PROCESSED_TRANSFORM_METADATA_PROCESS = new BasicDBObjectBuilder()
@@ -73,32 +72,32 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             .add("isProcessedPub2TEI", true)
             .add("$or",
                     Arrays.asList(
-                            new BasicDBObject(Processings.NERD.getName(), new BasicDBObject("$exists", false)),
-                            new BasicDBObject(Processings.NERD.getName(), false)))
+                            new BasicDBObject(AnnotatorType.NERD.getName(), new BasicDBObject("$exists", false)),
+                            new BasicDBObject(AnnotatorType.NERD.getName(), false)))
             .get();
 
     public static final DBObject ONLY_NOT_KEYTERM_ANNOTATED_TRANSFORMED_METADATA = new BasicDBObjectBuilder()
             .add("isProcessedPub2TEI", true)
             .add("$or",
                     Arrays.asList(
-                            new BasicDBObject(Processings.KEYTERM.getName(), new BasicDBObject("$exists", false)),
-                            new BasicDBObject(Processings.KEYTERM.getName(), false)))
+                            new BasicDBObject(AnnotatorType.KEYTERM.getName(), new BasicDBObject("$exists", false)),
+                            new BasicDBObject(AnnotatorType.KEYTERM.getName(), false)))
             .get();
 
     public static final DBObject ONLY_NOT_QUANTITIES_ANNOTATED_TRANSFORMED_METADATA = new BasicDBObjectBuilder()
             .add("isProcessedPub2TEI", true)
             .add("$or",
                     Arrays.asList(
-                            new BasicDBObject(Processings.QUANTITIES.getName(), new BasicDBObject("$exists", false)),
-                            new BasicDBObject(Processings.QUANTITIES.getName(), false)))
+                            new BasicDBObject(AnnotatorType.QUANTITIES.getName(), new BasicDBObject("$exists", false)),
+                            new BasicDBObject(AnnotatorType.QUANTITIES.getName(), false)))
             .get();
 
     public static final DBObject ONLY_NOT_PDFQUANTITIES_ANNOTATED_WITH_FULLTEXT = new BasicDBObjectBuilder()
             .add("isWithFulltext", true)
             .add("$or",
                     Arrays.asList(
-                            new BasicDBObject(Processings.PDFQUANTITIES.getName(), new BasicDBObject("$exists", false)),
-                            new BasicDBObject(Processings.PDFQUANTITIES.getName(), false)))
+                            new BasicDBObject(AnnotatorType.PDFQUANTITIES.getName(), new BasicDBObject("$exists", false)),
+                            new BasicDBObject(AnnotatorType.PDFQUANTITIES.getName(), false)))
             .get();
 
     public static final DBObject ONLY_TRANSFORMED_METADATA_NOT_INDEXED = new BasicDBObjectBuilder()
@@ -107,15 +106,35 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
             .get();
 
     public static final DBObject ONLY_NERD_ANNOTATED = new BasicDBObjectBuilder()
-            .add(Processings.NERD.getName(), true)
+            .add(AnnotatorType.NERD.getName(), true)
             .get();
 
     public static final DBObject ONLY_KEYTERM_ANNOTATED = new BasicDBObjectBuilder()
-            .add(Processings.KEYTERM.getName(), true)
+            .add(AnnotatorType.KEYTERM.getName(), true)
             .get();
 
     public static final DBObject ONLY_QUANTITIES_ANNOTATED = new BasicDBObjectBuilder()
-            .add(Processings.QUANTITIES.getName(), true)
+            .add(AnnotatorType.QUANTITIES.getName(), true)
+            .get();
+
+    public static final DBObject ONLY_SUPERCONDUCTORS_ANNOTATED = new BasicDBObjectBuilder()
+            .add(AnnotatorType.SUPERCONDUCTORS.getName(), true)
+            .get();
+
+    public static DBObject ONLY_NOT_SUPERCONDUCTORS_ANNOTATED_WITH_FULLTEXT = new BasicDBObjectBuilder()
+            .add("isProcessedPub2TEI", true)
+            .add("$or",
+                 Arrays.asList(
+                         new BasicDBObject(AnnotatorType.SUPERCONDUCTORS.getName(), new BasicDBObject("$exists", false)),
+            new BasicDBObject(AnnotatorType.SUPERCONDUCTORS.getName(), false)))
+            .get();
+
+    public static final DBObject ONLY_NOT_SUPERCONDUCTORS_PDF_ANNOTATED_WITH_FULLTEXT = new BasicDBObjectBuilder()
+            .add("isWithFulltext", true)
+            .add("$or",
+                 Arrays.asList(
+                         new BasicDBObject(AnnotatorType.SUPERCONDUCTORS_PDF.getName(), new BasicDBObject("$exists", false)),
+            new BasicDBObject(AnnotatorType.SUPERCONDUCTORS_PDF.getName(), false)))
             .get();
 
 
@@ -232,7 +251,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
      *
      * @param biblioObject
      */
-    public void updateBiblioObjectStatus(BiblioObject biblioObject, Processings processing, boolean resetStatus) {
+    public void updateBiblioObjectStatus(BiblioObject biblioObject, AnnotatorType processing, boolean resetStatus) {
         DBCollection collection = db.getCollection(MongoCollectionsInterface.BIBLIO_OBJECTS);
         BasicDBObject newDocument = new BasicDBObject();
         ObjectId objectId = new ObjectId(biblioObject.getAnhalyticsId());
@@ -251,7 +270,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         newDocument.put("isMined", biblioObject.getIsMined());
         newDocument.put("isIndexed", biblioObject.getIsIndexed());
 
-        for (Processings p : Processings.values()) {
+        for (AnnotatorType p : AnnotatorType.values()) {
             if (processing != null && p.equals(processing)) {
                 newDocument.put(processing.getName(), true);
             } else if (temp.get(p.getName()) != null) {
@@ -693,7 +712,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
     /*
 
      */
-    public boolean isProcessed(Processings processing) {
+    public boolean isProcessed(AnnotatorType processing) {
         Object isProcessed = temp.get(processing.getName());
         if (isProcessed == null) {
             return false;

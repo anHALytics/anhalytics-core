@@ -38,9 +38,12 @@ public interface MongoCollectionsInterface {
     public static final String KEYTERM_ANNOTATIONS = "keyterm_annotations";
     public static final String QUANTITIES_ANNOTATIONS = "quantities_annotations";
     public static final String PDF_QUANTITIES_ANNOTATIONS = "pdf_quantities_annotations";
+    public static final String SUPERCONDUCTORS_ANNOTATIONS = "superconductors_annotations";
+    public static final String SUPERCONDUCTORS_PDF_ANNOTATIONS = "superconductors_pdf_annotations";
+
     //metadata harvested from other repositorues
     public static final String ISTEX_TEIS = "istex_teis";
-    
+
     public static final String ISTEX_PDFS = "istex_pdfs";
     public static final String ARXIV_METADATA = "arxiv_metadata";
     public static String CROSSREF_METADATAS = "crossref_metadata";

@@ -1,14 +1,18 @@
 package fr.inria.anhalytics.annotate.main;
 
 import fr.inria.anhalytics.annotate.Annotator;
-import fr.inria.anhalytics.commons.data.Processings;
+import fr.inria.anhalytics.commons.data.AnnotatorType;
 import fr.inria.anhalytics.commons.exceptions.PropertyException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.utilities.Utilities;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,15 +26,14 @@ public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    private static List<String> availableCommands = new ArrayList<String>() {
-        {
-            add("annotateAll");
-            add("annotateNerd");
-            add("annotateKeyTerm");
-            add("annotateQuantities");
-            add("annotateQuantitiesFromPDF");
-        }
-    };
+    private static final List<String> availableCommands = Arrays.asList(
+            "annotateAll",
+            "annotateNerd",
+            "annotateKeyTerm",
+            "annotateQuantities",
+            "annotateQuantitiesFromPDF",
+            "annotateSuperconductors",
+            "annotateSuperconductorsFromPDF");
 
     public static void main(String[] args) throws UnknownHostException {
         try {
@@ -56,16 +59,20 @@ public class Main {
         try {
             Annotator annotator = new Annotator();
             if (process.equals("annotateNerd")) {
-                annotator.annotate(Processings.NERD);
+                annotator.annotate(AnnotatorType.NERD);
             } else if (process.equals("annotateKeyTerm")) {
-                annotator.annotate(Processings.KEYTERM);
+                annotator.annotate(AnnotatorType.KEYTERM);
             } else if (process.equals("annotateAll")) {
-                annotator.annotate(Processings.NERD);
-                annotator.annotate(Processings.KEYTERM);
+                annotator.annotate(AnnotatorType.NERD);
+                annotator.annotate(AnnotatorType.KEYTERM);
             } else if (process.equals("annotateQuantities")) {
-                annotator.annotate(Processings.QUANTITIES);
+                annotator.annotate(AnnotatorType.QUANTITIES);
             } else if (process.equals("annotateQuantitiesFromPDF")) {
-                annotator.annotate(Processings.PDFQUANTITIES);
+                annotator.annotate(AnnotatorType.PDFQUANTITIES);
+            } else if (process.equals("annotateSuperconductors")) {
+                annotator.annotate(AnnotatorType.SUPERCONDUCTORS);
+            } else if (process.equals("annotateSuperconductorsFromPDF")) {
+                annotator.annotate(AnnotatorType.SUPERCONDUCTORS_PDF);
             }
         } catch (ServiceException se) {
             logger.error(se.getMessage());
@@ -116,8 +123,8 @@ public class Main {
         help.append("-h: displays help\n");
         help.append("-multiThread: enables using multiple threads to annotate\n");
         help.append("-nodates: fetches entries from database with no date filtering.\n");
-        help.append("-exe: gives the command to execute. The value should be one of these : \n");
         help.append("--reset: updates all the documents (beware about versions/updates) : \n");
+        help.append("-exe: gives the command to execute. The value should be one of these : \n");
         help.append("\t" + availableCommands + "\n");
         return help.toString();
     }

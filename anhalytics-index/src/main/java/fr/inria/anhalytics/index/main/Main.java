@@ -262,9 +262,9 @@ public class Main {
         help.append("HELP ANHALYTICS_INDEX \n");
         help.append("-h: displays help\n");
         help.append("-exe: followed by either :\n");
-        help.append("-nodates: fetches entries from database with no date filtering.\n");
         //help.append("--reset: updates all the documents (beware about versions/updates) : \n");
         help.append("\t" + availableCommands + "\n");
+        help.append("-nodates: fetches entries from database with no date filtering.\n");
         return help.toString();
     }
 }

@@ -1,6 +1,7 @@
 package fr.inria.anhalytics.annotate;
 
 import fr.inria.anhalytics.annotate.services.PDFQuantitiesService;
+import fr.inria.anhalytics.annotate.services.PDFSuperconductorsService;
 import fr.inria.anhalytics.commons.data.AnnotatorType;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.managers.MongoCollectionsInterface;
@@ -12,13 +13,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Annotates the PDF with the quantities along with the boudingBoxes.
  */
-public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
+public class PDFSuperconductorsAnnotatorWorker extends AnnotatorWorker {
 
-    private static final Logger logger = LoggerFactory.getLogger(PDFQuantitiesAnnotatorWorker.class);
+    private static final Logger logger = LoggerFactory.getLogger(PDFSuperconductorsAnnotatorWorker.class);
 
-    public PDFQuantitiesAnnotatorWorker(MongoFileManager mongoManager,
-            BiblioObject biblioObject) {
-        super(mongoManager, biblioObject, MongoCollectionsInterface.PDF_QUANTITIES_ANNOTATIONS);
+    public PDFSuperconductorsAnnotatorWorker(MongoFileManager mongoManager,
+                                             BiblioObject biblioObject) {
+        super(mongoManager, biblioObject, MongoCollectionsInterface.SUPERCONDUCTORS_PDF_ANNOTATIONS);
     }
 
     @Override
@@ -26,12 +27,12 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
         // get all the elements having an attribute id and annotate their text content
         boolean inserted = mm.insertAnnotation(annotateDocument(), annotationsCollection);
         if (inserted) {
-            mm.updateBiblioObjectStatus(biblioObject, AnnotatorType.PDFQUANTITIES, false);
+            mm.updateBiblioObjectStatus(biblioObject, AnnotatorType.SUPERCONDUCTORS_PDF, false);
             logger.info("\t\t " + Thread.currentThread().getName() + ": "
-                    + biblioObject.getRepositoryDocId() + " annotated by the QUANTITIES service.");
+                    + biblioObject.getRepositoryDocId() + " annotated by the SUPERCONDUCTORS service.");
         } else {
             logger.info("\t\t " + Thread.currentThread().getName() + ": "
-                    + biblioObject.getRepositoryDocId() + " error occured trying to annotate with QUANTITIES.");
+                    + biblioObject.getRepositoryDocId() + " error occurred trying to annotate with QUANTITIES.");
         }
 
     }
@@ -40,12 +41,6 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
     protected String annotateDocument() {
         StringBuffer json = new StringBuffer();
         try {
-            /*String filepath = Utilities.storeTmpFile(((IstexFile)file).getStream());
-            try {
-                ((IstexFile)file).getStream().close();
-            } catch (IOException ex) {
-                throw new DataException("File stream can't be closed.", ex);
-            }*/
 
             json.append("{ \"repositoryDocId\" : \"" + biblioObject.getRepositoryDocId()
                     + "\",\"anhalyticsId\" : \"" + biblioObject.getAnhalyticsId()
@@ -54,8 +49,8 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
                     + "\", \"annotation\" : ");
             String jsonText = null;
 
-            PDFQuantitiesService quantitiesService = new PDFQuantitiesService(biblioObject.getPdf().getStream());
-            jsonText = quantitiesService.processPDFQuantities();
+            PDFSuperconductorsService superconductorsService = new PDFSuperconductorsService(biblioObject.getPdf().getStream());
+            jsonText = superconductorsService.processPDFQuantities();
             if (jsonText != null) {
                 json.append(jsonText).append("}");
             } else {
@@ -63,8 +58,7 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
             }
             biblioObject.getPdf().getStream().close();
         } catch (Exception ex) {
-            logger.error("\t\t " + Thread.currentThread().getName() + ": PDF could not be processed by the quantities extractor: ");
-            ex.printStackTrace();
+            logger.error("\t\t " + Thread.currentThread().getName() + ": PDF could not be processed by the superconductors extractor: ", ex);
             return null;
         }
         return json.toString();

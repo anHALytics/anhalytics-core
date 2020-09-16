@@ -127,18 +127,28 @@ public class KnowledgeBaseFeeder {
 
                     pub.setDocument(doc);
                     // for some pub types we just keep the submission date.
-                    pub.setDate_eletronic(submission_date.getTextContent());
-                    pub.setDate_printed(Utilities.parseStringDate(submission_date.getTextContent()));
-                    pub.setType(type.getTextContent());
-                    pub.setLanguage(language.getTextContent());
-                    processMonogr(monogr, pub);
+                    if (submission_date != null) {
+                        pub.setDate_eletronic(submission_date.getTextContent());
+                        pub.setDate_printed(Utilities.parseStringDate(submission_date.getTextContent()));
+                    }
+
+                    if (type != null) {
+                        pub.setType(type.getTextContent());
+                    }
+
+                    if (language != null) {
+                        pub.setLanguage(language.getTextContent());
+                    }
+
+                        processMonogr(monogr, pub);
+
 
                     pd.create(pub);
                     processPersons(authors, "author", pub, teiDoc, authorsFromfulltextTeiHeader);
                     processPersons(editors, "editor", pub, teiDoc, authorsFromfulltextTeiHeader);
 
                     logger.info("#################################################################");
-                } catch(NumberOfCoAuthorsExceededException e) {
+                } catch (NumberOfCoAuthorsExceededException e) {
                     logger.warn("Skipping publication, number of coauthors are exceeding 30", e);
                     adf.rollback();
                     teiDoc = null;

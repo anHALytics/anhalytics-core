@@ -2,7 +2,7 @@ package fr.inria.anhalytics.harvest.grobid;
 
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.BinaryFile;
-import fr.inria.anhalytics.commons.data.Processings;
+import fr.inria.anhalytics.commons.data.AnnotatorType;
 import fr.inria.anhalytics.commons.exceptions.DataException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
@@ -61,7 +61,7 @@ public class GrobidProcess {
                                 logger.info("\t\t No fulltext available for : " + biblioObject.getRepositoryDocId() + ", Skipping...");
                                 continue;
                             }
-                            if (!HarvestProperties.isReset() && mm.isProcessed(Processings.GROBID)) {
+                            if (!HarvestProperties.isReset() && mm.isProcessed(AnnotatorType.GROBID)) {
                                 logger.info("\t\t Already grobidified, Skipping...");
                                 continue;
                             }
