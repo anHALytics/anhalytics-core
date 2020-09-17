@@ -17,8 +17,10 @@ import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 
 /*import org.codehaus.jackson.map.ObjectMapper;
@@ -65,11 +67,13 @@ public class PDFQuantitiesService extends AnnotateService {
             conn.setRequestMethod("POST");
 
             // note: how to pass directly the stream in the multipartEntity? - we could if we know the length of the stream
-            File file = new File(AnnotateProperties.getTmp(), KeyGen.getKey());
-            FileUtils.copyInputStreamToFile(input,file);
+            File file = File.createTempFile("tmp_quantities", AnnotateProperties.getTmp());
+            FileUtils.copyInputStreamToFile(input, file);
             FileBody fileBody = new FileBody(file);
-            MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.STRICT);
-            multipartEntity.addPart("input", fileBody);
+            HttpEntity multipartEntity = MultipartEntityBuilder.create()
+                    .setMode(HttpMultipartMode.STRICT)
+                    .addPart("input", fileBody)
+                    .build();
 
             conn.setRequestProperty("Content-Type", multipartEntity.getContentType().getValue());
             OutputStream out = conn.getOutputStream();
@@ -88,7 +92,7 @@ public class PDFQuantitiesService extends AnnotateService {
                 throw new RuntimeException("Failed : HTTP error code : "
                         + conn.getResponseCode() + " " + IOUtils.toString(conn.getErrorStream(), "UTF-8"));
             }
-            logger.info("Response "+conn.getResponseCode());
+            logger.info("Response " + conn.getResponseCode());
             InputStream in = conn.getInputStream();
 
             BufferedReader br = new BufferedReader(new InputStreamReader((in)));

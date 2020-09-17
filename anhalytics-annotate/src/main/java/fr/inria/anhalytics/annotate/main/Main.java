@@ -93,6 +93,7 @@ public class Main {
                     break;
                 } else if (currArg.equals("-multiThread")) {
                     AnnotateProperties.setIsMultiThread(true);
+                    i++;
                     continue;
                 } else if (currArg.equals("-exe")) {
                     String command = args[i + 1];

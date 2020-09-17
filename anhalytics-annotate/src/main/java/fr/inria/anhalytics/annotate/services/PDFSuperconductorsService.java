@@ -1,5 +1,6 @@
 package fr.inria.anhalytics.annotate.services;
 
+import com.sun.tools.javac.comp.Annotate;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
 import fr.inria.anhalytics.commons.utilities.KeyGen;
 import org.apache.commons.io.FileUtils;
@@ -39,7 +40,7 @@ public class PDFSuperconductorsService extends AnnotateService {
             conn.setRequestMethod("POST");
 
             // note: how to pass directly the stream in the multipartEntity? - we could if we know the length of the stream
-            File file = new File(AnnotateProperties.getTmp(), KeyGen.getKey());
+            File file = File.createTempFile("tmp_superconductors", AnnotateProperties.getTmp());
             FileUtils.copyInputStreamToFile(input, file);
             FileBody fileBody = new FileBody(file);
             HttpEntity multipartEntity = MultipartEntityBuilder.create()
