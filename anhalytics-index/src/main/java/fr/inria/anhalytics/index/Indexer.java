@@ -1,13 +1,10 @@
 package fr.inria.anhalytics.index;
 
-import fr.inria.anhalytics.index.exceptions.ElasticSearchConfigurationException;
-import fr.inria.anhalytics.index.exceptions.IndexingServiceException;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.managers.MongoFileManager;
 import fr.inria.anhalytics.commons.properties.IndexProperties;
-import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
-
+import fr.inria.anhalytics.index.exceptions.ElasticSearchConfigurationException;
+import fr.inria.anhalytics.index.exceptions.IndexingServiceException;
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -21,8 +18,10 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
+
 /**
- *
  * @author azhar
  */
 abstract class Indexer {
@@ -39,9 +38,9 @@ abstract class Indexer {
             Settings settings = Settings.builder()
                     .put("cluster.name", IndexProperties.getElasticSearchClusterName()).build();
             this.client = new PreBuiltTransportClient(settings)
-                .addTransportAddress(new InetSocketTransportAddress(
-                    InetAddress.getByName(IndexProperties.getElasticSearch_host()), 
-                    Integer.parseInt(IndexProperties.getElasticSearch_port())));
+                    .addTransportAddress(new InetSocketTransportAddress(
+                            InetAddress.getByName(IndexProperties.getElasticSearch_host()),
+                            Integer.parseInt(IndexProperties.getElasticSearch_port())));
 
             //Settings settings = Settings.settingsBuilder()
             //        .put("cluster.name", IndexProperties.getElasticSearchClusterName()).build();
@@ -203,7 +202,7 @@ abstract class Indexer {
             if (indexName.contains(IndexProperties.getNerdAnnotsIndexName())) {
                 mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_nerd.json"), StandardCharsets.UTF_8);
             } else if (indexName.contains(IndexProperties.getKeytermAnnotsIndexName())) {
-                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_keyterm.json"),StandardCharsets.UTF_8);
+                mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/annotation_keyterm.json"), StandardCharsets.UTF_8);
             } else if (indexName.equals(IndexProperties.getKbIndexName())) {
                 if (type.equals(IndexProperties.getKbAuthorsTypeName())) {
                     mappingStr = IOUtils.toString(classLoader.getResourceAsStream("elasticSearch/kbauthors.json"), StandardCharsets.UTF_8);

@@ -92,31 +92,31 @@ public class Main {
         try {
             DocumentIndexer esm = new DocumentIndexer();
             if (process.equals("setup")) {
-                System.out.println("The existing index (" + IndexProperties.getTeisIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
+                System.out.println("The existing index (" + IndexProperties.getTeisIndexName() + ") will be deleted and reset, continue ?(Y/N)");
                 reponse = sc.nextLine().charAt(0);
                 if (reponse != 'N') {
                     esm.setUpIndex(IndexProperties.getTeisIndexName());
                 }
 
-                System.out.println("The existing index (" + IndexProperties.getNerdAnnotsIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
+                System.out.println("The existing index (" + IndexProperties.getNerdAnnotsIndexName() + ") will be deleted and reset, continue ?(Y/N)");
                 reponse = sc.nextLine().charAt(0);
                 if (reponse != 'N') {
                     esm.setUpIndex(IndexProperties.getNerdAnnotsIndexName());
                 }
 
-                System.out.println("The existing index (" + IndexProperties.getKeytermAnnotsIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
+                System.out.println("The existing index (" + IndexProperties.getKeytermAnnotsIndexName() + ") will be deleted and reset, continue ?(Y/N)");
                 reponse = sc.nextLine().charAt(0);
                 if (reponse != 'N') {
                     esm.setUpIndex(IndexProperties.getKeytermAnnotsIndexName());
                 }
 
-                System.out.println("The existing index (" + IndexProperties.getQuantitiesAnnotsIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
+                System.out.println("The existing index (" + IndexProperties.getQuantitiesAnnotsIndexName() + ") will be deleted and reset, continue ?(Y/N)");
                 reponse = sc.nextLine().charAt(0);
                 if (reponse != 'N') {
                     esm.setUpIndex(IndexProperties.getQuantitiesAnnotsIndexName());
                 }
 
-                System.out.println("The existing index (" + IndexProperties.getKbIndexName() + ") will be deleted and reseted, continue ?(Y/N)");
+                System.out.println("The existing index (" + IndexProperties.getKbIndexName() + ") will be deleted and reset, continue ?(Y/N)");
                 reponse = sc.nextLine().charAt(0);
                 if (reponse != 'N') {
                     esm.setUpIndex(IndexProperties.getKbIndexName());

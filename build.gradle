@@ -330,8 +330,8 @@ project("anhalytics-index") {
 
         compile "org.json:json:20080701"
 
-        compile "org.elasticsearch:elasticsearch:5.2.2"
-        compile "org.elasticsearch.client:transport:5.2.2"
+        compile "org.elasticsearch:elasticsearch:5.6.0"
+        compile "org.elasticsearch.client:transport:5.6.0"
 
         compile "org.mongodb:mongo-java-driver:3.9.0"
 
