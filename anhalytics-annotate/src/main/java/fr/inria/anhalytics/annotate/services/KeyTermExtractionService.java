@@ -1,26 +1,16 @@
 package fr.inria.anhalytics.annotate.services;
 
+import fr.inria.anhalytics.commons.properties.AnnotateProperties;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.inria.anhalytics.commons.properties.AnnotateProperties;
-
 import java.io.*;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.InputStream;
+import java.net.*;
 import java.nio.charset.Charset;
-import java.net.HttpRetryException;
-import java.net.ConnectException;
-
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  * Perform a key term extraction for a document and disambiguate the resulting

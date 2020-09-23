@@ -1,13 +1,10 @@
 package fr.inria.anhalytics.annotate.services;
 
-import com.sun.tools.javac.comp.Annotate;
 import fr.inria.anhalytics.commons.properties.AnnotateProperties;
-import fr.inria.anhalytics.commons.utilities.KeyGen;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.slf4j.Logger;
