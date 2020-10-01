@@ -595,6 +595,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
         return getAnnotations(anhalyticsId, MongoCollectionsInterface.PDF_QUANTITIES_ANNOTATIONS);
     }
 
+    public Annotation getSuperconductorsAnnotations(String anhalyticsId) {
+        return getAnnotations(anhalyticsId, MongoCollectionsInterface.SUPERCONDUCTORS_PDF_ANNOTATIONS);
+    }
+
     /**
      * Returns the annotation for a given repositoryDocId.
      */

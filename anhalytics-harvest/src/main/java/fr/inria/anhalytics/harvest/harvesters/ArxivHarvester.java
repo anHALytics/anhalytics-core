@@ -8,10 +8,14 @@ import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.data.BinaryFile;
 import fr.inria.anhalytics.commons.data.arxiv.ArxivMetadata;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
+import fr.inria.anhalytics.harvest.transformers.JSON2TEITransformer;
+import net.sf.saxon.s9api.SaxonApiException;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,6 +42,7 @@ public class ArxivHarvester extends Harvester {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
         mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 
+        JSON2TEITransformer json2TEITransformer = new JSON2TEITransformer();
 
         try {
 
@@ -64,8 +69,15 @@ public class ArxivHarvester extends Harvester {
                         String prefix = id.split("\\.")[0];
                         prefix = prefix.substring(0, 4);
 
-//                        System.out.println(prefix);
                         String pdfFileName = id.replaceAll("\\.", "") + lastVersion + ".pdf";
+
+                        String tei = "";
+                        try {
+                            tei = json2TEITransformer.transform(l);
+                        } catch (SaxonApiException e) {
+                            e.printStackTrace();
+                            return;
+                        }
 
                         Path pathPdf = Paths.get(HarvestProperties.getInputDirectory(), prefix, pdfFileName);
                         if (Files.exists(pathPdf) && Files.isRegularFile(pathPdf)) {
@@ -74,7 +86,7 @@ public class ArxivHarvester extends Harvester {
                             biblioObject.setDoi(metadata.getDoi());
                             biblioObject.setIsProcessedByPub2TEI(Boolean.FALSE);
                             biblioObject.setPublicationType("ART_Journal articles");
-                            biblioObject.setMetadata(metadata.toTei());
+                            biblioObject.setMetadata(tei);
                             biblioObject.setSource(Source.ARXIV.getName());
 
                             BinaryFile binaryFile = new BinaryFile();
@@ -91,32 +103,6 @@ public class ArxivHarvester extends Harvester {
                         e.printStackTrace();
                     }
                 });
-
-
-//
-//
-//                LOGGER.info(refFiles.size() + " files to be processed.");
-//
-//                if (isEmpty(refFiles)) {
-//                    return;
-//                }
-//
-//                LOGGER.info(refFiles.size() + " files");
-//                String name;
-//
-//                for (int n = 0; n < refFiles.size(); n++) {
-//                    File theFile = refFiles.get(n);
-//                    name = theFile.getName();
-//                    LOGGER.info(name);
-
-//                    BiblioObject object = new BiblioObject();
-//                    object.setAnhalyticsId("");
-//                    object.setIsWithFulltext(true);
-//                    object.setMetadata("");
-//                    object.setPdf(binaryFile);
-//                    grabbedObjects = Collections.singletonList(object);
-//                    saveObjects(true);
-
 
             }
         } catch (IOException e) {

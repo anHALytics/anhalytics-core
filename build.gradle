@@ -189,6 +189,7 @@ project("anhalytics-harvest") {
 //        compile "directory-naming:naming-java:0.8"
 
         compile "com.google.guava:guava:16.0.1"
+        compile "net.sf.saxon:Saxon-HE:10.2"
 
         compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
         compile("org.springframework.boot:spring-boot-starter-web")
@@ -196,6 +197,7 @@ project("anhalytics-harvest") {
 
         testCompile('org.springframework.boot:spring-boot-starter-test')
         testCompile('com.jayway.jsonpath:json-path')
+
     }
 
     shadowJar {
@@ -330,8 +332,8 @@ project("anhalytics-index") {
 
         compile "org.json:json:20080701"
 
-        compile "org.elasticsearch:elasticsearch:5.6.0"
-        compile "org.elasticsearch.client:transport:5.6.0"
+        compile "org.elasticsearch:elasticsearch:7.9.1"
+        compile "org.elasticsearch.client:transport:7.9.1"
 
         compile "org.mongodb:mongo-java-driver:3.9.0"
 

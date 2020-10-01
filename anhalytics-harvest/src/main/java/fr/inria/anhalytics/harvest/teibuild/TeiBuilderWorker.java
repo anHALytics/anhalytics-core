@@ -152,8 +152,9 @@ public class TeiBuilderWorker implements Runnable {
 
         Element teiCorpus = newTEICorpus.createElement("teiCorpus");
         teiHeader.setAttribute("xml:id", HarvestProperties.getSource());
+//        teiHeader.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
         teiCorpus.appendChild(teiHeader);
-        teiCorpus.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
+//        teiCorpus.setAttribute("xmlns", "http://www.tei-c.org/ns/1.0");
         newTEICorpus.appendChild(teiCorpus);
         Utilities.generateIDs(newTEICorpus);
         return newTEICorpus;
