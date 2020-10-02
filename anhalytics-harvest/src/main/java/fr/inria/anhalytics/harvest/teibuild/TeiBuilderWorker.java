@@ -113,7 +113,7 @@ public class TeiBuilderWorker implements Runnable {
             } catch (DataException de) {
                 logger.error("No corresponding fulltext TEI was found for " + biblioObject.getRepositoryDocId() + ".");
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error("Generic exception: ", e);
             }
         }
         long endTime = System.nanoTime();
@@ -164,7 +164,7 @@ public class TeiBuilderWorker implements Runnable {
      * appends fulltext grobid tei to existing TEICorpus. Fills missing metadata
      * parts , abstract, keywords, publication date and authors.
      */
-    public Document addGrobidTEIToTEICorpus(String teiCorpus, String grobidTei) throws IOException, SAXException {
+    public Document addGrobidTEIToTEICorpus(String teiCorpus, String teiGrobid) throws IOException, SAXException {
         DocumentBuilder docBuilder = null;
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -178,8 +178,8 @@ public class TeiBuilderWorker implements Runnable {
         Document resultTei = null;
 
         HalTEIConverter htc = new HalTEIConverter();
-        Document teiCorpusDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(teiCorpus.getBytes("utf-8"))));
-        Document doc = null;
+        Document teiCorpusDoc = docBuilder.parse(new InputSource(new ByteArrayInputStream(teiCorpus.getBytes(StandardCharsets.UTF_8))));
+        Document grobidDocument = null;
 
         //Remove if already existing.
         NodeList elements = (NodeList) teiCorpusDoc.getElementsByTagName("TEI");
@@ -196,18 +196,22 @@ public class TeiBuilderWorker implements Runnable {
             }
         }
         Element grobidTeiElement = null;
-        if (grobidTei != null) {
-            doc = docBuilder.parse(new InputSource(new ByteArrayInputStream(grobidTei.getBytes("utf-8"))));
-            grobidTeiElement = (Element) doc.getDocumentElement();
+        if (teiGrobid != null) {
+            grobidDocument = docBuilder.parse(new InputSource(new ByteArrayInputStream(teiGrobid.getBytes(StandardCharsets.UTF_8))));
+            grobidTeiElement = (Element) grobidDocument.getDocumentElement();
             Attr attr = grobidTeiElement.getAttributeNode("xmlns");
             grobidTeiElement.removeAttributeNode(attr);
             grobidTeiElement.setAttribute("type", "main");
             grobidTeiElement.setAttribute("xml:id", "grobid");
             try {
-                fillAbstract(doc, teiCorpusDoc);
-                fillKeywords(doc, teiCorpusDoc);
-                fillPubDate(doc, teiCorpusDoc);
-                fillAuthors(doc, teiCorpusDoc);
+                //the signature is inverted, the first parameter ought to be the destination
+                fillAbstract(grobidDocument, teiCorpusDoc);
+                fillKeywords(grobidDocument, teiCorpusDoc);
+                fillPubDate(grobidDocument, teiCorpusDoc);
+                fillAuthors(grobidDocument, teiCorpusDoc);
+
+                // the signature is consistent with the main method
+                fillMonogr(teiCorpusDoc, grobidDocument);
             } catch (XPathExpressionException e) {
                 e.printStackTrace();
             }
@@ -216,6 +220,33 @@ public class TeiBuilderWorker implements Runnable {
         // add random xml:id on textual elements
 
         return resultTei;
+    }
+
+    private void fillMonogr(Document teiCorpusDoc, Document grobidDocument) throws XPathExpressionException {
+        XPath xPath = XPathFactory.newInstance().newXPath();
+
+        Element monogr = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct/monogr")
+                .evaluate(teiCorpusDoc, XPathConstants.NODE);
+
+        if (monogr == null || monogr.getChildNodes().getLength() == 0) {
+            // I copy the node from the grobid document
+            Element grobidMonogr = (Element) xPath.compile("/TEI/teiHeader/fileDesc/sourceDesc/biblStruct/monogr")
+                    .evaluate(grobidDocument, XPathConstants.NODE);
+
+            if(grobidMonogr != null) {
+                Element monogrParent = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/sourceDesc/biblStruct")
+                        .evaluate(teiCorpusDoc, XPathConstants.NODE);
+
+                if(monogr != null) {
+                    // if the monogr tag is empty, I shall remove the empty node before adding the new one.
+                    monogr.getParentNode().removeChild(monogr);
+                }
+
+                Node newGrobidMonogr = grobidMonogr.cloneNode(true);
+                teiCorpusDoc.adoptNode(newGrobidMonogr);
+                monogrParent.appendChild(newGrobidMonogr);
+            }
+        }
     }
 
     public void fillAbstract(Document doc, Document teiCorpusDoc) throws XPathExpressionException {
@@ -281,7 +312,7 @@ public class TeiBuilderWorker implements Runnable {
             // the whole nodes
             if (dateElt == null) {
                 dateElt = (Element) xPath.compile("/teiCorpus/teiHeader/fileDesc/publicationStmt/date[@type=\"published\"]").evaluate(teiCorpusDoc, XPathConstants.NODE);
-                if(dateElt == null) {
+                if (dateElt == null) {
                     return;
                 }
             }
