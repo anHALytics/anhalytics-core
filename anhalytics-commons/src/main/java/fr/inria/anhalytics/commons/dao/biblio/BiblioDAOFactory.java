@@ -107,7 +107,7 @@ public class BiblioDAOFactory extends AbstractBiblioDAOFactory {
         try {
             conn.close();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         }
     }
 }

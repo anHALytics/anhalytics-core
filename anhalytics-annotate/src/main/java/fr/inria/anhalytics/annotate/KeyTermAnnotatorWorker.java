@@ -43,7 +43,7 @@ public class KeyTermAnnotatorWorker extends AnnotatorWorker {
             }
         } catch (Exception ex) {
             logger.error("\t\t " + Thread.currentThread().getName() + ": TEI could not be processed by the keyterm extractor: " + biblioObject.getRepositoryDocId());
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         }
     }
 

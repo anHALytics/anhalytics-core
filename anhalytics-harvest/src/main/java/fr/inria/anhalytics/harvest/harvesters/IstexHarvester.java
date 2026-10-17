@@ -107,7 +107,7 @@ public class IstexHarvester extends Harvester {
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         } finally {
             try {
                 if (br != null) {
@@ -224,7 +224,7 @@ public class IstexHarvester extends Harvester {
         } catch (UnsupportedEncodingException ex) {
             java.util.logging.Logger.getLogger(IstexHarvester.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
     }
 
@@ -258,7 +258,7 @@ public class IstexHarvester extends Harvester {
                 logger.info(String.format("Found %d entries for %s class.", total, cat[0] + "." + cat[1]));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
         return total.intValue();
     }

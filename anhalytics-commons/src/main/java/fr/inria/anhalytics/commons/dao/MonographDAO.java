@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.commons.dao;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import fr.inria.anhalytics.commons.entities.Monograph;
 
 import java.sql.*;
@@ -10,6 +13,8 @@ import java.util.logging.Logger;
  * @author azhar
  */
 public class MonographDAO extends DAO<Monograph, Long> {
+    private static final Logger logger = LoggerFactory.getLogger(MonographDAO.class);
+
 
     private static final String SQL_INSERT
             = "INSERT INTO MONOGRAPH (type, title, shortname) VALUES (?, ?, ?)";
@@ -78,7 +83,7 @@ public class MonographDAO extends DAO<Monograph, Long> {
                         result.getString("shortname"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         } finally {
             closeQuietly(preparedStatement);
         }

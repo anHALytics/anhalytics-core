@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.commons.dao.anhalytics;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import fr.inria.anhalytics.commons.dao.DAO;
 import fr.inria.anhalytics.commons.entities.*;
@@ -16,6 +19,8 @@ import java.util.logging.Logger;
  * @author azhar
  */
 public class OrganisationDAO extends DAO<Organisation, Long> {
+    private static final Logger logger = LoggerFactory.getLogger(OrganisationDAO.class);
+
 
     private static final String SQL_INSERT
             = "INSERT INTO ORGANISATION (type, url, status) VALUES (?, ?, ?)";
@@ -113,7 +118,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                         }
                         int code1 = statement1.executeUpdate();
                     } catch (MySQLIntegrityConstraintViolationException e) {
-                        //e.printStackTrace();
+                        //logger.error("Unexpected error", e);
                     }
                 }
 
@@ -138,7 +143,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                             int code1 = statement2.executeUpdate();
                         }
                     } catch (MySQLIntegrityConstraintViolationException e) {
-                        //e.printStackTrace();
+                        //logger.error("Unexpected error", e);
                     }
                 }
 
@@ -210,7 +215,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                             preparedStatement1.setLong(2, existingName.getOrganisation_nameid());
                             int code2 = preparedStatement1.executeUpdate();
                         } catch (MySQLIntegrityConstraintViolationException e) {
-                            //e.printStackTrace();
+                            //logger.error("Unexpected error", e);
                         }
                     }
                     //update pub date
@@ -225,7 +230,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                         }
                         int code2 = statement1.executeUpdate();
                     } catch (MySQLIntegrityConstraintViolationException e) {
-                        //e.printStackTrace();
+                        //logger.error("Unexpected error", e);
                     }
                 }
             }
@@ -279,7 +284,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                             }
                         }
                     } catch (MySQLIntegrityConstraintViolationException e) {
-                        //e.printStackTrace();
+                        //logger.error("Unexpected error", e);
                     }
                 }
                 //update end_date if no relation is found yet
@@ -327,7 +332,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(statement);
         }
@@ -381,7 +386,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 Logger.getLogger(LocationDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(preparedStatement1);
             closeQuietly(preparedStatement2);
@@ -415,7 +420,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             }
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(statement);
         }
@@ -473,7 +478,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             }
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(preparedStatement);
             closeQuietly(preparedStatement1);
@@ -501,7 +506,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
             }
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -518,7 +523,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 organisations.add(find(rs.getLong("org.organisationID")));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -548,7 +553,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
 
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(ps);
             closeQuietly(ps1);
@@ -572,7 +577,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(ps);
         }
@@ -607,7 +612,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 affiliations.add(affiliation);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(ps);
         }
@@ -627,7 +632,7 @@ public class OrganisationDAO extends DAO<Organisation, Long> {
                 dorg.addOrg(find(result.getLong("organisationID")));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(preparedStatement);
         }

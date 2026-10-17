@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.harvest.harvesters;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.commons.exceptions.ServiceException;
 import fr.inria.anhalytics.commons.properties.HarvestProperties;
@@ -30,6 +33,8 @@ import org.xml.sax.SAXException;
  * @author Achraf
  */
 public class HALOAIPMHHarvester extends Harvester {
+    private static final Logger logger = LoggerFactory.getLogger(HALOAIPMHHarvester.class);
+
 
     private static String OAI_FORMAT = "xml-tei";
 
@@ -130,7 +135,7 @@ public class HALOAIPMHHarvester extends Harvester {
                     DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
                     teiDoc = docBuilder.parse(new ByteArrayInputStream(teiString.getBytes()));
                 } catch (SAXException | ParserConfigurationException | IOException e) {
-                    e.printStackTrace();
+                    logger.error("Unexpected error", e);
                 }
                 Element rootElement = teiDoc.getDocumentElement();
                 BiblioObject biblioObject = this.oaiDom.processRecord((Element) rootElement);

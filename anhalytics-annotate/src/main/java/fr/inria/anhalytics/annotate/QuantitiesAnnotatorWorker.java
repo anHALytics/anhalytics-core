@@ -66,7 +66,7 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
             // parse the TEI
             docTei = docBuilder.parse(new InputSource(new ByteArrayInputStream(tei.getBytes("UTF-8"))));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         }
 
         StringBuffer json = new StringBuffer();
@@ -108,7 +108,7 @@ public class QuantitiesAnnotatorWorker extends AnnotatorWorker {
                         jsonText = quantitiesService.processTextQuantities();
                     } catch (Exception ex) {
                         logger.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by QUANTITIES: " + text);
-                        ex.printStackTrace();
+                        logger.error("Unexpected error", ex);
                     }
                     if (jsonText == null) {
                         logger.error("\t\t " + Thread.currentThread().getName() + ": QUANTITIES failed annotating text : " + text);

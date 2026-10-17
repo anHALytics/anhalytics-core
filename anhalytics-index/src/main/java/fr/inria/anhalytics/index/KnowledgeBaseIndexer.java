@@ -282,7 +282,7 @@ public class KnowledgeBaseIndexer extends Indexer {
 
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("Unexpected error", e);
                 }
                 documentDocument.put("annotations", result);
                 //HAL domains

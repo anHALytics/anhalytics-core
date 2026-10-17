@@ -118,7 +118,7 @@ public class DAOFactory extends AbstractDAOFactory {
         try {
             conn.close();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         }
     }
 

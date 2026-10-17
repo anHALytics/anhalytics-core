@@ -89,7 +89,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
             annotateNode(metadata, true, json, null);
             json.append("] }");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
             return null;
         }
 
@@ -144,7 +144,7 @@ public class NerdAnnotatorWorker extends AnnotatorWorker {
                         jsonText = nerdService.disambiguateText(text.trim(), language).toString();
                     } catch (Exception ex) {
                         logger.error("\t\t " + Thread.currentThread().getName() + ": Text could not be annotated by NERD: " + text);
-                        ex.printStackTrace();
+                        logger.error("Unexpected error", ex);
                     }
                     if (jsonText == null) {
                         logger.error("\t\t " + Thread.currentThread().getName() + ": NERD failed annotating text : " + text);

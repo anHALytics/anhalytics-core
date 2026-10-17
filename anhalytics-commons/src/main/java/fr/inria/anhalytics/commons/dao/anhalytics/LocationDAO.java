@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.commons.dao.anhalytics;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import fr.inria.anhalytics.commons.dao.DAO;
 import fr.inria.anhalytics.commons.entities.Address;
@@ -16,6 +19,8 @@ import java.util.logging.Logger;
  * @author azhar
  */
 public class LocationDAO extends DAO<Location, Long> {
+    private static final Logger logger = LoggerFactory.getLogger(LocationDAO.class);
+
 
     private static final String SQL_INSERT
             = "INSERT INTO LOCATION (organisationID, addressID, from_date, until_date) VALUES (?, ?, ?, ?)";
@@ -57,7 +62,7 @@ public class LocationDAO extends DAO<Location, Long> {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(statement);
         }
@@ -111,7 +116,7 @@ public class LocationDAO extends DAO<Location, Long> {
                 int code = statement.executeUpdate();
                 result = true;
             } catch (MySQLIntegrityConstraintViolationException e) {
-                //e.printStackTrace();
+                //logger.error("Unexpected error", e);
             } finally {
                 closeQuietly(statement);
             }
@@ -153,7 +158,7 @@ public class LocationDAO extends DAO<Location, Long> {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -172,7 +177,7 @@ public class LocationDAO extends DAO<Location, Long> {
                 addressId = result.getLong("addressID");
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(preparedStatement);
         }

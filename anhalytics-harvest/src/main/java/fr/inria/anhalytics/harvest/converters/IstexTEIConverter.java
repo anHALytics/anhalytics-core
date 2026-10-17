@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.harvest.converters;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import fr.inria.anhalytics.commons.data.BiblioObject;
 import fr.inria.anhalytics.harvest.grobid.GrobidService;
 import java.io.ByteArrayInputStream;
@@ -24,6 +27,8 @@ import org.xml.sax.SAXException;
  * @author azhar
  */
 public class IstexTEIConverter implements MetadataConverter {
+    private static final Logger logger = LoggerFactory.getLogger(IstexTEIConverter.class);
+
 
     @Override
     public Element convertMetadataToTEIHeader(Document metadata, Document newTEIcorpus, BiblioObject biblio) {
@@ -40,7 +45,7 @@ public class IstexTEIConverter implements MetadataConverter {
             addDomains(metadata, biblio);
             teiHeader = (Element) newTEIcorpus.importNode(teiHeader, true);
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
         return teiHeader;
     }
@@ -60,7 +65,7 @@ public class IstexTEIConverter implements MetadataConverter {
             }
 
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
     }
 
@@ -82,7 +87,7 @@ public class IstexTEIConverter implements MetadataConverter {
                 textClass.appendChild(classCode);
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
     }
 
@@ -105,7 +110,7 @@ public class IstexTEIConverter implements MetadataConverter {
                 existingKeywords.getParentNode().removeChild(existingKeywords);
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
     }
 
@@ -237,7 +242,7 @@ public class IstexTEIConverter implements MetadataConverter {
                 }
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
     }
 

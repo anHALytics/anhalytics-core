@@ -102,9 +102,9 @@ public class PDFQuantitiesService extends AnnotateService {
             conn.disconnect();
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
         //System.out.println(output.toString().trim());
         return output.toString().trim();
