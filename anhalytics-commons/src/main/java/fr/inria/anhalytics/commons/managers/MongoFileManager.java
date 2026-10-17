@@ -319,10 +319,10 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 }
             }
         } catch (MongoException me) {
-            me.printStackTrace();
+            logger.error("Unexpected error", me);
             //rollback
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            logger.error("Unexpected error", ioe);
             //rollback
         }
         collection.insert(document);
@@ -471,7 +471,7 @@ public class MongoFileManager extends MongoManager implements MongoCollectionsIn
                 done = false;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
         return done;
     }

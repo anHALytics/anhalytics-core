@@ -293,7 +293,7 @@ public class HALOAIPMHDomParser {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             teiDoc = docBuilder.parse(new ByteArrayInputStream(teiString.getBytes()));
         } catch (SAXException | ParserConfigurationException | IOException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
 
 //        teiDoc = createTEICorpus(teiDoc);
@@ -302,7 +302,7 @@ public class HALOAIPMHDomParser {
         try {
             teiString = Utilities.toString(teiDoc);
         } catch (DataException de) {
-            de.printStackTrace();
+            logger.error("Unexpected error", de);
         }
         return teiString;
     }

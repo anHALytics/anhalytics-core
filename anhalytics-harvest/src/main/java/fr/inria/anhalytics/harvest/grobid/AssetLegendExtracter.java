@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.harvest.grobid;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -12,6 +15,8 @@ import java.io.InputStream;
  * @author achraf
  */
 public class AssetLegendExtracter {
+    private static final Logger logger = LoggerFactory.getLogger(AssetLegendExtracter.class);
+
 
     static String extractLegendFromTei(String filename, InputStream teiStream) {
         String legend = null;
@@ -43,7 +48,7 @@ public class AssetLegendExtracter {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
         return legend;
     }

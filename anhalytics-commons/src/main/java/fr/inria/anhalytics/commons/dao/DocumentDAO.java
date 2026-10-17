@@ -115,7 +115,7 @@ public class DocumentDAO extends DAO<Document, String> {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         } finally {
             closeQuietly(preparedStatement);
             closeQuietly(preparedStatement1);
@@ -186,7 +186,7 @@ public class DocumentDAO extends DAO<Document, String> {
                 documents.add(find(rs.getString("docID")));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         } finally {
             closeQuietly(preparedStatement);
         }

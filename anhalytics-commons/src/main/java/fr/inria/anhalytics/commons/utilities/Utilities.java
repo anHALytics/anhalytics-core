@@ -531,7 +531,7 @@ public class Utilities {
 
             formatedXml = stringWriter.toString();
         } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException | DOMException | IllegalArgumentException | TransformerException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
         return formatedXml;
     }

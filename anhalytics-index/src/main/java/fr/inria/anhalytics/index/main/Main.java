@@ -231,10 +231,10 @@ public class Main {
                         int nbOrgs = mi.indexOrganisations();
                         logger.info("Total: " + nbOrgs + " organisations indexed.");
                     } catch (SQLException sqle) {
-                        sqle.printStackTrace();
+                        logger.error("Unexpected error", sqle);
                     }
                 } catch (SQLException sqle) {
-                    sqle.printStackTrace();
+                    logger.error("Unexpected error", sqle);
                 }
                 mi.close();
             }
@@ -242,7 +242,7 @@ public class Main {
                 try {
                 int nbDocs = esm.indexIstexQuantites();
                 } catch (Exception sqle) {
-                    sqle.printStackTrace();
+                    logger.error("Unexpected error", sqle);
                 }
             } else if (process.equals("setupQuantitiesIndex")) {
             

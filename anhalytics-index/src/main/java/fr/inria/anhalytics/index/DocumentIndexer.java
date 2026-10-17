@@ -100,7 +100,7 @@ public class DocumentIndexer extends Indexer {
                         biblioObject.setIsIndexed(Boolean.TRUE);
                         mm.updateBiblioObjectStatus(biblioObject, null, false);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error("Unexpected error", e);
                     }
                 }
             }
@@ -161,7 +161,7 @@ public class DocumentIndexer extends Indexer {
                         logger.info("\n Bulk number : " + nb / bulkSize);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("Unexpected error", e);
                 }
             }
         }
@@ -254,7 +254,7 @@ public class DocumentIndexer extends Indexer {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("Unexpected error", e);
                 }
             }
         }
@@ -313,7 +313,7 @@ public class DocumentIndexer extends Indexer {
                         logger.info("\n Bulk number : " + nb / bulkSize);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("Unexpected error", e);
                 }
             }
         }
@@ -368,7 +368,7 @@ public class DocumentIndexer extends Indexer {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
         return results;
     }

@@ -227,7 +227,7 @@ public class KnowledgeBaseFeeder {
                                         try {
                                             pub.setDate_printed(Utilities.parseStringDate(date));
                                         } catch (ParseException ex) {
-                                            ex.printStackTrace();
+                                            logger.error("Unexpected error", ex);
                                         }
                                     }
                                 } else if (imprintChildElt.getNodeName().equals("biblScope")) {
@@ -675,7 +675,7 @@ public class KnowledgeBaseFeeder {
                             }
                         }
                     } catch (Exception xpe) {
-                        xpe.printStackTrace();
+                        logger.error("Unexpected error", xpe);
                         abdf.rollback();
                     }
                     abdf.endTransaction();
@@ -823,7 +823,7 @@ public class KnowledgeBaseFeeder {
                                     try {
                                         pub.setDate_printed(Utilities.parseStringDate(date));
                                     } catch (ParseException ex) {
-                                        ex.printStackTrace();
+                                        logger.error("Unexpected error", ex);
                                     }
                                 } else if (imprintChildElt.getNodeName().equals("biblScope")) {
                                     String unit = imprintChildElt.getAttribute("unit");
@@ -923,7 +923,7 @@ public class KnowledgeBaseFeeder {
         try {
             doc = docBuilder.parse(in);
         } catch (SAXException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
 
         }
         return doc;

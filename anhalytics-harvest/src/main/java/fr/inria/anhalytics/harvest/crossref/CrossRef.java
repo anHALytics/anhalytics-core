@@ -218,7 +218,7 @@ public class CrossRef {
 //                            }
 //                        }
 //                    } catch (Exception e) {
-//                        e.printStackTrace();
+//                        logger.error("Unexpected error", e);
 //                    }
 //                }
 //                if (!HarvestProperties.isProcessByDate()) {
@@ -269,7 +269,7 @@ public class CrossRef {
                 logger.info("DOI : " + doi);
                 urlConn.disconnect();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Unexpected error", e);
             }
 
         }
@@ -325,7 +325,7 @@ public class CrossRef {
                 logger.info("DOI : " + doi);
                 urlConn.disconnect();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Unexpected error", e);
             }
 
         }

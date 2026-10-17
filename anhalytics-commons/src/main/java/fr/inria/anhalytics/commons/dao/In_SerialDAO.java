@@ -1,5 +1,8 @@
 package fr.inria.anhalytics.commons.dao;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import fr.inria.anhalytics.commons.entities.Collection;
 import fr.inria.anhalytics.commons.entities.In_Serial;
 import fr.inria.anhalytics.commons.entities.Journal;
@@ -16,6 +19,8 @@ import java.sql.Statement;
  * @author azhar
  */
 public class In_SerialDAO extends DAO<In_Serial, Long> {
+    private static final Logger logger = LoggerFactory.getLogger(In_SerialDAO.class);
+
     
     private static final String SQL_INSERT
             = "INSERT INTO IN_SERIAL (monographID, collectionID, journalID, volume, number) VALUES (?, ?, ?, ?, ?)";
@@ -172,7 +177,7 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
                 collection = new Collection(result.getLong("collectionID"), result.getString("title"));
             }
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            logger.error("Unexpected error", sqle);
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -191,7 +196,7 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
                 journal = new Journal(result.getLong("journalID"), result.getString("title"));
             }
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            logger.error("Unexpected error", sqle);
         } finally {
             closeQuietly(preparedStatement);
         }
@@ -216,7 +221,7 @@ public class In_SerialDAO extends DAO<In_Serial, Long> {
                         result.getString("IN_SERIAL.number"));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(preparedStatement);
         }

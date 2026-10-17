@@ -99,7 +99,7 @@ abstract class GrobidWorker implements Runnable {
             teiDoc = docBuilder.parse(new ByteArrayInputStream(tei.getBytes()));
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
         Utilities.generateIDs(teiDoc);
         tei = Utilities.toString(teiDoc);

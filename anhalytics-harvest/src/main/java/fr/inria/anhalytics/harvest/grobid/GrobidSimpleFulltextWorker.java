@@ -60,7 +60,7 @@ class GrobidSimpleFulltextWorker extends GrobidWorker {
             mm.save(biblioObject.getRepositoryDocId(), "processGrobid", "timed out");
             logger.warn(Thread.currentThread().getName() +"Processing of " + biblioObject.getRepositoryDocId() + " timed out");
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
             logger.error("\t\t "+Thread.currentThread().getName() +": error occurred while processing " + biblioObject.getRepositoryDocId());
             mm.save(biblioObject.getRepositoryDocId(), "processGrobid", e.getMessage());
             logger.error(e.getMessage(), e.getCause());

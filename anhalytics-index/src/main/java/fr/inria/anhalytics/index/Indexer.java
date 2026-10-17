@@ -81,7 +81,7 @@ abstract class Indexer {
             createIndex(indexName);
         } catch (Exception e) {
             logger.error("Sep-up of ElasticSearch failed for index " + indexName + ".", e);
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
     }
 
@@ -97,7 +97,7 @@ abstract class Indexer {
             createQuantitiesIndex();
         } catch (Exception e) {
             logger.error("Sep-up of ElasticSearch failed for index " + "quantities" + ".", e);
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
     }*/
 

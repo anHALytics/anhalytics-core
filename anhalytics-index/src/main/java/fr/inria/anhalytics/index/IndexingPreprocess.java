@@ -940,7 +940,7 @@ public class IndexingPreprocess {
                                                 ok = false;
                                             }
                                         } catch (Exception e) {
-                                            e.printStackTrace();
+                                            logger.error("Unexpected error", e);
                                         }
                                     }
                                 }
@@ -967,7 +967,7 @@ public class IndexingPreprocess {
                                             ok = false;
                                         }
                                     } catch (Exception e) {
-                                        e.printStackTrace();
+                                        logger.error("Unexpected error", e);
                                     }
                                 }
                             }

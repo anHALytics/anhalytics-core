@@ -202,7 +202,7 @@ public class TeiBuilderWorker implements Runnable {
                 fillPubDate(doc, teiCorpusDoc);
                 fillAuthors(doc, teiCorpusDoc);
             } catch (XPathExpressionException e) {
-                e.printStackTrace();
+                logger.error("Unexpected error", e);
             }
         }
         resultTei = addNewElementToTEI(teiCorpusDoc, grobidTeiElement);
@@ -285,7 +285,7 @@ public class TeiBuilderWorker implements Runnable {
             }
 
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
     }
 

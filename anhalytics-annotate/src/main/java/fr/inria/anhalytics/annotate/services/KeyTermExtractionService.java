@@ -88,7 +88,7 @@ public class KeyTermExtractionService extends AnnotateService {
             br.close();
             conn.disconnect();
         } catch (ConnectException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
             try {
                 Thread.sleep(20000);
                 runKeyTermExtraction();
@@ -96,7 +96,7 @@ public class KeyTermExtractionService extends AnnotateService {
                 Thread.currentThread().interrupt();
             }
         } catch (HttpRetryException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
             try {
                 Thread.sleep(20000);
                 runKeyTermExtraction();
@@ -104,9 +104,9 @@ public class KeyTermExtractionService extends AnnotateService {
                 Thread.currentThread().interrupt();
             }
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Unexpected error", e);
         }
         return output.toString().trim();
     }

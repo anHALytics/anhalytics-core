@@ -65,7 +65,7 @@ public class PDFQuantitiesAnnotatorWorker extends AnnotatorWorker {
             biblioObject.getPdf().getStream().close();
         } catch (Exception ex) {
             logger.error("\t\t " + Thread.currentThread().getName() + ": PDF could not be processed by the quantities extractor: ");
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
             return null;
         }
         return json.toString();

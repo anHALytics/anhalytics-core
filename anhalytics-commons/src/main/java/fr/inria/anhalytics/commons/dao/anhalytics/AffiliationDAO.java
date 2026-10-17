@@ -63,7 +63,7 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Unexpected error", ex);
         } finally {
             closeQuietly(statement);
         }
@@ -125,7 +125,7 @@ public class AffiliationDAO extends DAO<Affiliation, Long> {
                     result = true;
                     
                 } catch (MySQLIntegrityConstraintViolationException e) {
-                    //e.printStackTrace();
+                    //logger.error("Unexpected error", e);
                 }finally{
                     closeQuietly(statement);
                 }
